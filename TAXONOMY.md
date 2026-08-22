@@ -1,7 +1,7 @@
 # MandateGuard — V1 Threat & Evaluation Taxonomy
 
-**Status:** D1 pre-registration artifact  
-**Freeze rule:** this document is committed before detector implementation. Any later change must be a new commit that explicitly explains why the pre-registered taxonomy changed.
+**Status:** D1 pre-registration artifact, amended before detector implementation  
+**Freeze rule:** this document was committed before detector implementation. Any later change must be a new commit that explicitly explains why the pre-registered taxonomy changed. This amendment closes mandate-conformance gaps before D2 detector code exists.
 
 ## 1. V1 claim
 
@@ -66,25 +66,39 @@ Checked against state the buyer agent does not control. A consistent lie can sti
 | A1 | Declared line price vs catalog price | Merchant catalog source/fixture | Detects agent-side price divergence from catalog state |
 | A2 | SKU existence and merchant ownership | Merchant catalog source/fixture | Detects nonexistent or merchant-mismatched SKU declarations |
 | A3 | Merchant identity consistency | Merchant/catalog mapping | Detects merchant substitution relative to independently retrieved ownership |
-| A4 | Nonce replay | PSP nonce ledger | Detects reuse of a consumed authorization nonce |
+| A4 | Nonce replay | PSP nonce ledger | Detects reuse of a consumed authorization nonce. **All V1 mandate nonces are single-use.** Multi-use mandates/counters are out of scope. |
 | A5 | Mandate expiry | PSP/server clock | Detects execution after the mandate validity window |
 | A6 | Snapshot mutation | PSP-side committed hash | Detects mutation after a transaction/evidence snapshot was committed |
+| A7 | Catalog-derived total vs mandate ceiling | Merchant catalog + mandate + committed execution quantities | Verifies `Σ(catalog_price × execution_qty) ≤ max_total_minor`. The price component is independent of the agent; quantity is agent-supplied but is bound to the exact transaction hash the executor will execute. Stronger than checking the agent-declared total alone. |
+| A8 | Catalog recurrence vs mandate permission | Merchant catalog + mandate | Detects a catalog-declared recurring SKU when `recurring_allowed=false`, without relying on the agent's recurrence flag. |
 
-**Interpretation:** Tier A is the strongest V1 evidence surface. It does not require the buyer agent to be truthful.
+**Interpretation:** Tier A is the strongest V1 evidence surface. A7 is deliberately documented as a composed check: catalog price is independent evidence, while quantity is safe only because the executor is bound to the same committed quantity. MandateGuard never presents A7 as proof of independently observed quantity.
 
 ### Tier B — self-reported, internally checkable
 
-These checks validate consistency of fields supplied within the transaction state. A compromised agent that lies coherently may pass them.
+These checks validate consistency of agent-supplied fields and conformance of those fields to the declared mandate. A compromised agent that lies coherently may pass them unless a composing Tier A check contradicts the lie.
+
+#### Internal consistency
 
 | ID | Check | Example |
 |---|---|---|
 | B1 | Line-sum consistency | sum(line totals) == declared order total |
-| B2 | Quantity consistency | declared quantity matches line-item arithmetic |
+| B2 | Quantity consistency | declared aggregate quantity matches line-item quantities |
 | B3 | Currency consistency | mandate/cart/order use the same declared currency |
 | B4 | Recurrence-field consistency | recurring flags agree across self-reported structures |
 | B5 | Canonical transaction hash recomputation | serialized transaction matches its own declared commitment |
 
-**Interpretation:** Tier B proves internal consistency, not external truth.
+#### Mandate conformance
+
+| ID | Check | V1 interpretation |
+|---|---|---|
+| B6 | Declared order total ≤ `max_total_minor` | Self-reported ceiling check; A7 is the stronger catalog-derived economic check. |
+| B7 | Declared aggregate quantity ≤ `max_quantity` | Compares the execution quantity supplied by the agent to the mandate ceiling. |
+| B8 | Declared recurrence vs `recurring_allowed` | Detects self-reported recurrence that the mandate prohibits; A8 independently cross-checks catalog recurrence where available. |
+| B9 | Declared merchant ∈ `merchant_allowlist` | Composes with A3, which independently checks the merchant/catalog identity. |
+| B10 | Declared SKUs ⊆ `sku_allowlist` | Composes with A2, which independently checks SKU existence and ownership. |
+
+**Interpretation:** Tier B proves internal consistency and declared-mandate conformance, not external truth. A coherent liar can pass Tier B; the strongest corresponding guarantees come from composing B checks with Tier A evidence.
 
 ### Tier C — semantic judgment
 
@@ -131,6 +145,16 @@ These families are executed only after detector freeze.
 
 If any held-out family is inspected or used for detector tuning before the freeze, it loses held-out status and must be reported as such.
 
+### Pre-registered expected difficulty ordering
+
+Before any detector code or held-out execution, V1 predicts the following transfer ordering:
+
+1. **Easiest held-out transfer: `C-HOLD-BUNDLE`** — structurally closest to `C-DEV-EXCLUSION`; success may come from transferring exclusion reasoning to a composite description.
+2. **Middle: `C-HOLD-COMPATIBILITY`** — requires relational reasoning between an item and an external device/context rather than direct exclusion matching.
+3. **Hardest: `C-HOLD-FULFILLMENT`** — requires reasoning over service/fulfillment obligations whose conflict may be temporally or conditionally expressed and has the weakest structural overlap with the development families.
+
+This ordering is a pre-registered prediction, not a result. D10 must report whether it is confirmed or refuted; it must not be rewritten after execution.
+
 ## 7. Benchmark provenance and scale
 
 ### Tier A/B
@@ -152,6 +176,8 @@ Allowed provenance labels:
 No reusable offensive prompt-injection payload collection is committed to the public repository. Defensive fixtures may store redacted identifiers/hashes and structured mutation metadata.
 
 ## 8. Evaluation claims and metrics
+
+Ground truth and detector action are distinct. Ground truth is binary (`violation` or `benign`); `ALLOW`, `REVIEW`, and `BLOCK` are detector actions. Precision/recall are computed from ground truth, while REVIEW/abstention is reported separately.
 
 ### Tier A/B
 
@@ -190,13 +216,19 @@ The economic model may analyze or justify action policy, but V1 must not pretend
 
 D10 executes held-out Tier C families for the first time.
 
+Every benchmark case is content-addressed by `case_content_sha256` when its label is recorded. Any post-recording edit changes the hash and is therefore detectable. The original labelled case remains part of the audit record.
+
 After the main evaluation, a structured minimal-mutation robustness probe may search for the smallest semantic/economic transaction mutation that causes an unauthorized case to remain `ALLOW`.
 
 Any evasions found after freeze are **reported, not patched**. The point of the probe is to expose residual failure modes without contaminating the frozen evaluation.
 
 ## 10. Replay requirement
 
-Every deterministic scenario must be replayable from a seed with a byte-identical decision/event log, excluding explicitly documented non-deterministic external values. Model calls are isolated from the deterministic replay guarantee and are recorded by immutable input/output hashes for audit.
+Every deterministic scenario must be replayable from a seed with a byte-identical decision/event log, excluding explicitly documented non-deterministic external values.
+
+For Tier C replay, model responses are **not re-called**. The semantic verifier cache is keyed by a canonical input hash; replay reads the previously recorded model response and verifies its stored input/output hashes before reproducing the decision. This makes an already-recorded Tier C scenario replayable without pretending the external model itself is deterministic.
+
+A cache miss in replay mode is an error, not permission to call the model.
 
 ## 11. AI-use principle
 
