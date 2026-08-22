@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://mandateguard.local/schemas/mandate.schema.json",
   "title": "MandateGuard Declared Mandate Envelope",
-  "description": "PSP-side declared authorization contract. V1 verifies consistency after this boundary; it does not claim that a DECLARED_ONLY mandate is identical to the human's private original intent.",
+  "description": "PSP-side declared authorization contract. V1 verifies consistency after this boundary; it does not claim that a DECLARED_ONLY mandate is identical to the human's private original intent. The issuer attestation covers payload only. Top-level metadata is explicitly non-authoritative and excluded from authorization hashes/signatures.",
   "type": "object",
   "additionalProperties": false,
   "required": ["payload", "issuer_attestation"],
@@ -23,7 +23,13 @@
       "properties": {
         "schema_version": {"const": "1.0"},
         "mandate_id": {"type": "string", "format": "uuid"},
-        "nonce": {"type": "string", "minLength": 16, "maxLength": 128, "pattern": "^[A-Za-z0-9_-]+$"},
+        "nonce": {
+          "type": "string",
+          "minLength": 16,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9_-]+$",
+          "description": "Single-use authorization nonce in V1. Any second execution attempt with a consumed nonce is an A4 replay violation; multi-use mandates are out of scope."
+        },
         "issued_at": {"type": "string", "format": "date-time"},
         "expires_at": {"type": "string", "format": "date-time"},
         "subject_ref": {"type": "string", "minLength": 1, "maxLength": 256, "description": "Opaque reference to the authorizing subject. Do not place raw PII here."},
@@ -36,12 +42,11 @@
             "hard": {
               "type": "object",
               "additionalProperties": false,
-              "required": ["max_total_minor", "max_quantity", "recurring_allowed", "one_time_use"],
+              "required": ["max_total_minor", "max_quantity", "recurring_allowed"],
               "properties": {
-                "max_total_minor": {"type": "integer", "minimum": 0, "description": "Maximum total in minor currency units. Table-stakes bound, not a novelty claim."},
-                "max_quantity": {"type": "integer", "minimum": 1},
-                "recurring_allowed": {"type": "boolean"},
-                "one_time_use": {"type": "boolean"},
+                "max_total_minor": {"type": "integer", "minimum": 0, "description": "Maximum total in minor currency units. Enforced by B6 against the declared total and by A7 against the catalog-derived total."},
+                "max_quantity": {"type": "integer", "minimum": 1, "description": "Maximum aggregate execution quantity enforced by B7."},
+                "recurring_allowed": {"type": "boolean", "description": "Mandate recurrence permission enforced by B8 against self-report and A8 against catalog recurrence where available."},
                 "merchant_allowlist": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 128}},
                 "sku_allowlist": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 128}}
               }
@@ -61,17 +66,13 @@
               }
             }
           }
-        },
-        "metadata": {
-          "type": "object",
-          "description": "Non-authoritative display/debug metadata. Never used as an authorization source.",
-          "additionalProperties": {"type": ["string", "number", "boolean", "null"]}
         }
       }
     },
     "issuer_attestation": {
       "type": "object",
       "additionalProperties": false,
+      "description": "Attestation over the canonical mandate payload only. Top-level metadata is not covered and must never influence authorization decisions.",
       "required": ["assurance", "issuer_id"],
       "properties": {
         "assurance": {"type": "string", "enum": ["DECLARED_ONLY", "SIGNED_UPSTREAM"]},
@@ -94,6 +95,11 @@
           }
         }
       ]
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Non-authoritative display/debug metadata. Excluded from mandate payload hashes and issuer signatures and forbidden as an authorization source. Integers are allowed; floating-point values are intentionally excluded to preserve deterministic serialization conventions across the codebase.",
+      "additionalProperties": {"type": ["string", "integer", "boolean", "null"]}
     }
   }
 }

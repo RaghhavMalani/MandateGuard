@@ -1,8 +1,9 @@
-schema_version: "1.0"
+schema_version: "1.1"
 artifact_status: "pre_registered_structure"
 
-# This file is intentionally empty of evaluation cases on D1.
-# Case labels must be recorded before first execution through the detector.
+# This file is intentionally empty of evaluation cases before detector implementation.
+# Ground-truth labels must be recorded before first execution through the detector.
+# Detector action is not ground truth: REVIEW is reported as abstention/action, not as a label class.
 
 case_schema:
   required_fields:
@@ -11,15 +12,43 @@ case_schema:
     - family_id
     - provenance
     - split
-    - expected_decision
+    - ground_truth
     - label_source
     - label_recorded_at
+    - case_content_sha256
     - first_run_at
+  optional_fields:
+    - expected_action
   enums:
     evidence_tier:
       - A
       - B
       - C
+    family_id:
+      - A1
+      - A2
+      - A3
+      - A4
+      - A5
+      - A6
+      - A7
+      - A8
+      - B1
+      - B2
+      - B3
+      - B4
+      - B5
+      - B6
+      - B7
+      - B8
+      - B9
+      - B10
+      - C-DEV-RECURRENCE
+      - C-DEV-EXCLUSION
+      - C-DEV-PURPOSE
+      - C-HOLD-BUNDLE
+      - C-HOLD-COMPATIBILITY
+      - C-HOLD-FULFILLMENT
     provenance:
       - developer_authored
       - external_defensive_corpus_adapted
@@ -28,13 +57,25 @@ case_schema:
       - dev
       - held_out
       - benign_control
-    expected_decision:
+    ground_truth:
+      - violation
+      - benign
+    expected_action:
       - ALLOW
-      - REVIEW
       - BLOCK
     label_source:
       - deterministic_invariant
       - human_adjudication
+
+field_rules:
+  expected_action: "Optional and used only for deterministic Tier A/B cases whose invariant fixes the action. Tier C cases omit it."
+  first_run_at: "Null until first detector execution, then immutable."
+  case_content_sha256: "SHA-256 of the canonical case definition recorded with its label before first execution. It covers evaluation inputs, family_id, evidence_tier, provenance, split, ground_truth, and label_source; it excludes audit-only first_run_at."
+
+hash_policy:
+  algorithm: "sha256"
+  canonicalization: "MandateGuard canonical JSON: UTF-8, sorted keys, no floats, no insignificant whitespace"
+  mutation_rule: "Any change to hashed case content after label recording produces a new digest and must be preserved as a distinct audit record; it may not silently replace the original."
 
 freeze_policy:
   tier_c_generalization_only: true
