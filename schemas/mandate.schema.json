@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mandateguard.local/schemas/mandate.schema.json",
+  "title": "MandateGuard Declared Mandate Envelope",
+  "description": "PSP-side declared authorization contract. V1 verifies consistency after this boundary; it does not claim that a DECLARED_ONLY mandate is identical to the human's private original intent.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["payload", "issuer_attestation"],
+  "properties": {
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "mandate_id",
+        "nonce",
+        "issued_at",
+        "expires_at",
+        "subject_ref",
+        "currency",
+        "constraints"
+      ],
+      "properties": {
+        "schema_version": {"const": "1.0"},
+        "mandate_id": {"type": "string", "format": "uuid"},
+        "nonce": {"type": "string", "minLength": 16, "maxLength": 128, "pattern": "^[A-Za-z0-9_-]+$"},
+        "issued_at": {"type": "string", "format": "date-time"},
+        "expires_at": {"type": "string", "format": "date-time"},
+        "subject_ref": {"type": "string", "minLength": 1, "maxLength": 256, "description": "Opaque reference to the authorizing subject. Do not place raw PII here."},
+        "currency": {"type": "string", "pattern": "^[A-Z]{3}$", "description": "ISO-4217 style three-letter currency code, e.g. INR."},
+        "constraints": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["hard", "semantic"],
+          "properties": {
+            "hard": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["max_total_minor", "max_quantity", "recurring_allowed", "one_time_use"],
+              "properties": {
+                "max_total_minor": {"type": "integer", "minimum": 0, "description": "Maximum total in minor currency units. Table-stakes bound, not a novelty claim."},
+                "max_quantity": {"type": "integer", "minimum": 1},
+                "recurring_allowed": {"type": "boolean"},
+                "one_time_use": {"type": "boolean"},
+                "merchant_allowlist": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 128}},
+                "sku_allowlist": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 128}}
+              }
+            },
+            "semantic": {
+              "type": "array",
+              "maxItems": 32,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["constraint_id", "kind", "text"],
+                "properties": {
+                  "constraint_id": {"type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[A-Za-z0-9._-]+$"},
+                  "kind": {"type": "string", "enum": ["exclusion", "purpose", "compatibility", "fulfillment", "obligation", "category_intent", "other"]},
+                  "text": {"type": "string", "minLength": 1, "maxLength": 1000}
+                }
+              }
+            }
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Non-authoritative display/debug metadata. Never used as an authorization source.",
+          "additionalProperties": {"type": ["string", "number", "boolean", "null"]}
+        }
+      }
+    },
+    "issuer_attestation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assurance", "issuer_id"],
+      "properties": {
+        "assurance": {"type": "string", "enum": ["DECLARED_ONLY", "SIGNED_UPSTREAM"]},
+        "issuer_id": {"type": "string", "minLength": 1, "maxLength": 256},
+        "alg": {"type": ["string", "null"], "enum": ["Ed25519", null]},
+        "key_id": {"type": ["string", "null"], "maxLength": 256},
+        "signature_b64url": {"type": ["string", "null"], "maxLength": 512},
+        "attestation_ref": {"type": ["string", "null"], "maxLength": 512, "description": "Opaque reference for a future upstream trust anchor. MandateGuard does not interpret protocol-specific semantics in V1."}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"assurance": {"const": "SIGNED_UPSTREAM"}}, "required": ["assurance"]},
+          "then": {
+            "required": ["alg", "key_id", "signature_b64url"],
+            "properties": {
+              "alg": {"const": "Ed25519"},
+              "key_id": {"type": "string", "minLength": 1},
+              "signature_b64url": {"type": "string", "minLength": 16}
+            }
+          }
+        }
+      ]
+    }
+  }
+}

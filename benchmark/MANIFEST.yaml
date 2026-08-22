@@ -1,0 +1,46 @@
+schema_version: "1.0"
+artifact_status: "pre_registered_structure"
+
+# This file is intentionally empty of evaluation cases on D1.
+# Case labels must be recorded before first execution through the detector.
+
+case_schema:
+  required_fields:
+    - case_id
+    - evidence_tier
+    - family_id
+    - provenance
+    - split
+    - expected_decision
+    - label_source
+    - label_recorded_at
+    - first_run_at
+  enums:
+    evidence_tier:
+      - A
+      - B
+      - C
+    provenance:
+      - developer_authored
+      - external_defensive_corpus_adapted
+      - separate_model_adversarial
+    split:
+      - dev
+      - held_out
+      - benign_control
+    expected_decision:
+      - ALLOW
+      - REVIEW
+      - BLOCK
+    label_source:
+      - deterministic_invariant
+      - human_adjudication
+
+freeze_policy:
+  tier_c_generalization_only: true
+  detector_code_freeze: "end_of_D9"
+  held_out_first_execution: "D10"
+  post_freeze_detector_changes_allowed: false
+  post_freeze_evasions_are_report_only: true
+
+cases: []
