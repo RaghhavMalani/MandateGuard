@@ -24,6 +24,7 @@ from mandateguard.benchmark.codec import (
     case_record_line,
     decode_case,
     decode_evaluation_inputs,
+    decode_timestamp,
     encode_evaluation_inputs,
 )
 from mandateguard.benchmark.deterministic_generator import (
@@ -59,7 +60,15 @@ from mandateguard.core.hashing import sha256_canonical
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 CORPUS_ROOT = REPOSITORY_ROOT / CORPUS_SUBDIRECTORY
-LABEL_RECORDED_AT = datetime(2026, 8, 23, tzinfo=timezone.utc)
+# The label timestamp is audit metadata recorded at the moment the corpus was
+# materialized, so it is read back from the committed generation summary rather
+# than hard-coded here: a stale constant would silently misstate when the labels
+# were actually recorded.
+LABEL_RECORDED_AT = decode_timestamp(
+    json.loads((REPOSITORY_ROOT / SUMMARY_PATH).read_text(encoding="utf-8"))[
+        "label_recorded_at"
+    ]
+)
 
 FORBIDDEN_MODULE_PREFIXES = (
     "mandateguard.policy",
