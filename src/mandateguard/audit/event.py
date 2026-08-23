@@ -21,7 +21,7 @@ from mandateguard.models.finding import (
 )
 
 
-EVENT_SCHEMA_VERSION = "1.0"
+EVENT_SCHEMA_VERSION = "1.1"
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 _TIER_A_ORDER = tuple(TaxonomyFamily(f"A{index}") for index in range(1, 9))
 _EVENT_FIELDS = frozenset(
@@ -30,9 +30,13 @@ _EVENT_FIELDS = frozenset(
         "sequence",
         "replay_seed",
         "evaluated_at",
+        "server_time",
         "mandate_payload_sha256",
         "transaction_body_sha256",
         "catalog_snapshot_sha256",
+        "committed_transaction_sha256",
+        "committed_catalog_snapshot_sha256",
+        "nonce_state_sha256",
         "tier_a_results",
         "tier_b_findings",
         "action",
@@ -95,9 +99,13 @@ def _body_data(
     sequence: int,
     replay_seed: int,
     evaluated_at: datetime,
+    server_time: datetime | None,
     mandate_payload_sha256: str,
     transaction_body_sha256: str,
     catalog_snapshot_sha256: str | None,
+    committed_transaction_sha256: str | None,
+    committed_catalog_snapshot_sha256: str | None,
+    nonce_state_sha256: str | None,
     tier_a_results: tuple[TierACheckResult, ...],
     tier_b_findings: tuple[Finding, ...],
     action: DecisionAction,
@@ -108,9 +116,13 @@ def _body_data(
         "sequence": sequence,
         "replay_seed": replay_seed,
         "evaluated_at": evaluated_at,
+        "server_time": server_time,
         "mandate_payload_sha256": mandate_payload_sha256,
         "transaction_body_sha256": transaction_body_sha256,
         "catalog_snapshot_sha256": catalog_snapshot_sha256,
+        "committed_transaction_sha256": committed_transaction_sha256,
+        "committed_catalog_snapshot_sha256": committed_catalog_snapshot_sha256,
+        "nonce_state_sha256": nonce_state_sha256,
         "tier_a_results": [_tier_a_result_data(result) for result in tier_a_results],
         "tier_b_findings": [_finding_data(finding) for finding in tier_b_findings],
         "action": action.value,
@@ -141,9 +153,13 @@ class DecisionEvent:
     sequence: int
     replay_seed: int
     evaluated_at: datetime
+    server_time: datetime | None
     mandate_payload_sha256: str
     transaction_body_sha256: str
     catalog_snapshot_sha256: str | None
+    committed_transaction_sha256: str | None
+    committed_catalog_snapshot_sha256: str | None
+    nonce_state_sha256: str | None
     tier_a_results: tuple[TierACheckResult, ...]
     tier_b_findings: tuple[Finding, ...]
     action: DecisionAction
@@ -171,11 +187,38 @@ class DecisionEvent:
             raise DecisionEventValidationError(
                 "evaluated_at must be a timezone-aware datetime"
             )
+        if self.server_time is not None and (
+            not isinstance(self.server_time, datetime)
+            or self.server_time.tzinfo is None
+            or self.server_time.utcoffset() is None
+        ):
+            raise DecisionEventValidationError(
+                "server_time must be a timezone-aware datetime or null"
+            )
+        if self.server_time is not None and self.server_time != self.evaluated_at:
+            raise DecisionEventValidationError(
+                "server_time must equal evaluated_at when server_time is present"
+            )
         _require_sha256(self.mandate_payload_sha256, "mandate_payload_sha256")
         _require_sha256(self.transaction_body_sha256, "transaction_body_sha256")
         _require_sha256(
             self.catalog_snapshot_sha256,
             "catalog_snapshot_sha256",
+            nullable=True,
+        )
+        _require_sha256(
+            self.committed_transaction_sha256,
+            "committed_transaction_sha256",
+            nullable=True,
+        )
+        _require_sha256(
+            self.committed_catalog_snapshot_sha256,
+            "committed_catalog_snapshot_sha256",
+            nullable=True,
+        )
+        _require_sha256(
+            self.nonce_state_sha256,
+            "nonce_state_sha256",
             nullable=True,
         )
         _require_sha256(
@@ -220,9 +263,13 @@ class DecisionEvent:
         sequence: int,
         replay_seed: int,
         evaluated_at: datetime,
+        server_time: datetime | None,
         mandate_payload_sha256: str,
         transaction_body_sha256: str,
         catalog_snapshot_sha256: str | None,
+        committed_transaction_sha256: str | None,
+        committed_catalog_snapshot_sha256: str | None,
+        nonce_state_sha256: str | None,
         tier_a_results: tuple[TierACheckResult, ...],
         tier_b_findings: tuple[Finding, ...],
         action: DecisionAction,
@@ -234,9 +281,13 @@ class DecisionEvent:
             sequence=sequence,
             replay_seed=replay_seed,
             evaluated_at=evaluated_at,
+            server_time=server_time,
             mandate_payload_sha256=mandate_payload_sha256,
             transaction_body_sha256=transaction_body_sha256,
             catalog_snapshot_sha256=catalog_snapshot_sha256,
+            committed_transaction_sha256=committed_transaction_sha256,
+            committed_catalog_snapshot_sha256=committed_catalog_snapshot_sha256,
+            nonce_state_sha256=nonce_state_sha256,
             tier_a_results=tier_a_results,
             tier_b_findings=tier_b_findings,
             action=action,
@@ -248,9 +299,13 @@ class DecisionEvent:
             sequence=sequence,
             replay_seed=replay_seed,
             evaluated_at=evaluated_at,
+            server_time=server_time,
             mandate_payload_sha256=mandate_payload_sha256,
             transaction_body_sha256=transaction_body_sha256,
             catalog_snapshot_sha256=catalog_snapshot_sha256,
+            committed_transaction_sha256=committed_transaction_sha256,
+            committed_catalog_snapshot_sha256=committed_catalog_snapshot_sha256,
+            nonce_state_sha256=nonce_state_sha256,
             tier_a_results=tier_a_results,
             tier_b_findings=tier_b_findings,
             action=action,
@@ -264,9 +319,13 @@ class DecisionEvent:
             sequence=self.sequence,
             replay_seed=self.replay_seed,
             evaluated_at=self.evaluated_at,
+            server_time=self.server_time,
             mandate_payload_sha256=self.mandate_payload_sha256,
             transaction_body_sha256=self.transaction_body_sha256,
             catalog_snapshot_sha256=self.catalog_snapshot_sha256,
+            committed_transaction_sha256=self.committed_transaction_sha256,
+            committed_catalog_snapshot_sha256=self.committed_catalog_snapshot_sha256,
+            nonce_state_sha256=self.nonce_state_sha256,
             tier_a_results=self.tier_a_results,
             tier_b_findings=self.tier_b_findings,
             action=self.action,
@@ -286,7 +345,13 @@ class DecisionEvent:
             raise DecisionEventValidationError("decision event must be an object")
         _require_exact_fields(value, _EVENT_FIELDS, "decision event")
         try:
-            evaluated_at = _parse_timestamp(value["evaluated_at"])
+            evaluated_at = _parse_timestamp(value["evaluated_at"], "evaluated_at")
+            server_time_raw = value["server_time"]
+            server_time = (
+                None
+                if server_time_raw is None
+                else _parse_timestamp(server_time_raw, "server_time")
+            )
             tier_a_raw = value["tier_a_results"]
             tier_b_raw = value["tier_b_findings"]
             if not isinstance(tier_a_raw, list):
@@ -301,9 +366,15 @@ class DecisionEvent:
                 sequence=value["sequence"],
                 replay_seed=value["replay_seed"],
                 evaluated_at=evaluated_at,
+                server_time=server_time,
                 mandate_payload_sha256=value["mandate_payload_sha256"],
                 transaction_body_sha256=value["transaction_body_sha256"],
                 catalog_snapshot_sha256=value["catalog_snapshot_sha256"],
+                committed_transaction_sha256=value["committed_transaction_sha256"],
+                committed_catalog_snapshot_sha256=value[
+                    "committed_catalog_snapshot_sha256"
+                ],
+                nonce_state_sha256=value["nonce_state_sha256"],
                 tier_a_results=tier_a_results,
                 tier_b_findings=tier_b_findings,
                 action=action,
@@ -316,13 +387,13 @@ class DecisionEvent:
             raise DecisionEventValidationError("invalid decision event value") from error
 
 
-def _parse_timestamp(value: object) -> datetime:
+def _parse_timestamp(value: object, name: str) -> datetime:
     if not isinstance(value, str):
-        raise DecisionEventValidationError("evaluated_at must be a timestamp string")
+        raise DecisionEventValidationError(f"{name} must be a timestamp string")
     try:
         return datetime.fromisoformat(value.replace("Z", "+00:00"))
     except ValueError as error:
-        raise DecisionEventValidationError("evaluated_at is not an ISO timestamp") from error
+        raise DecisionEventValidationError(f"{name} is not an ISO timestamp") from error
 
 
 def _parse_finding(value: object) -> Finding:

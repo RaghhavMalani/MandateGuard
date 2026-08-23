@@ -1,5 +1,6 @@
 """Deterministic decision audit records and append-only journals."""
 
+from mandateguard.audit.evidence import nonce_state_sha256
 from mandateguard.audit.event import (
     EVENT_SCHEMA_VERSION,
     DecisionEvent,
@@ -32,6 +33,7 @@ __all__ = [
     "canonical_event_body_bytes",
     "canonical_event_bytes",
     "event_body_sha256",
+    "nonce_state_sha256",
     "verify_event_hash",
     "verify_hash_chain",
 ]

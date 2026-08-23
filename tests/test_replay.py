@@ -3,10 +3,12 @@ from __future__ import annotations
 import inspect
 import json
 from dataclasses import replace
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytest
 
+from mandateguard.audit import evidence as evidence_module
+from mandateguard.audit.evidence import nonce_state_sha256
 from mandateguard.audit.event import (
     DecisionEvent,
     canonical_event_bytes,
@@ -18,7 +20,11 @@ from mandateguard.core.hashing import (
 from mandateguard.core.nonce_ledger import NonceLedgerState
 from mandateguard.models.catalog import CatalogItem
 from mandateguard.models.decision import DecisionAction
-from mandateguard.models.finding import Finding
+from mandateguard.models.finding import (
+    Finding,
+    TaxonomyFamily,
+    TierACheckStatus,
+)
 from mandateguard.models.mandate import Mandate
 from mandateguard.models import decision as decision_module
 from mandateguard.policy import tier_a as tier_a_module
@@ -47,6 +53,7 @@ def _scenario(
     nonce_state: NonceLedgerState | None = NonceLedgerState(),
     commitments: CommittedHashes | None | object = Ellipsis,
     replay_seed: int = 7,
+    evaluated_at: datetime | None = None,
 ) -> ReplayScenario:
     actual_mandate = mandate if mandate is not None else make_mandate()
     actual_transaction = transaction if transaction is not None else make_transaction()
@@ -56,6 +63,11 @@ def _scenario(
         if commitments is Ellipsis
         else commitments
     )
+    actual_evaluated_at = (
+        server_time
+        if evaluated_at is None and server_time is not None
+        else SERVER_TIME if evaluated_at is None else evaluated_at
+    )
     return ReplayScenario(
         mandate=actual_mandate,
         transaction=actual_transaction,
@@ -64,7 +76,7 @@ def _scenario(
         nonce_state=nonce_state,
         psp_committed_hashes=actual_commitments,
         replay_seed=replay_seed,
-        evaluated_at=SERVER_TIME,
+        evaluated_at=actual_evaluated_at,
     )
 
 
@@ -225,9 +237,13 @@ def test_finding_detail_construction_order_is_canonical() -> None:
         sequence=event.sequence,
         replay_seed=event.replay_seed,
         evaluated_at=event.evaluated_at,
+        server_time=event.server_time,
         mandate_payload_sha256=event.mandate_payload_sha256,
         transaction_body_sha256=event.transaction_body_sha256,
         catalog_snapshot_sha256=event.catalog_snapshot_sha256,
+        committed_transaction_sha256=event.committed_transaction_sha256,
+        committed_catalog_snapshot_sha256=event.committed_catalog_snapshot_sha256,
+        nonce_state_sha256=event.nonce_state_sha256,
         tier_a_results=(reconstructed_result, *event.tier_a_results[1:]),
         tier_b_findings=event.tier_b_findings,
         action=event.action,
@@ -277,6 +293,89 @@ def test_semantically_ordered_transaction_lines_are_not_reordered() -> None:
     assert transaction_body_sha256(first) != transaction_body_sha256(second)
 
 
+def test_different_pre_expiry_server_times_change_event_hashes() -> None:
+    earlier = SERVER_TIME - timedelta(minutes=1)
+    first = run_scenario(_scenario(server_time=earlier, evaluated_at=earlier))
+    second = run_scenario(_scenario(server_time=SERVER_TIME, evaluated_at=SERVER_TIME))
+
+    assert first.tier_a_results == second.tier_a_results
+    assert first.server_time == earlier
+    assert second.server_time == SERVER_TIME
+    assert first.event_sha256 != second.event_sha256
+
+
+def test_scenario_rejects_distinct_server_and_evaluation_times() -> None:
+    with pytest.raises(ValueError, match="server_time must equal evaluated_at"):
+        replace(_allow(), evaluated_at=SERVER_TIME + timedelta(microseconds=1))
+
+
+def test_different_passing_nonce_states_change_evidence_and_event_hashes() -> None:
+    first = run_scenario(
+        _scenario(nonce_state=NonceLedgerState(frozenset({"unused-nonce-a"})))
+    )
+    second = run_scenario(
+        _scenario(nonce_state=NonceLedgerState(frozenset({"unused-nonce-b"})))
+    )
+
+    first_a4 = next(
+        result for result in first.tier_a_results if result.family is TaxonomyFamily.A4
+    )
+    second_a4 = next(
+        result for result in second.tier_a_results if result.family is TaxonomyFamily.A4
+    )
+    assert first_a4.status is second_a4.status is TierACheckStatus.PASS
+    assert first.nonce_state_sha256 != second.nonce_state_sha256
+    assert first.event_sha256 != second.event_sha256
+
+
+def test_logically_identical_nonce_sets_have_the_same_digest() -> None:
+    first = NonceLedgerState(frozenset(["nonce-b", "nonce-a"]))
+    second = NonceLedgerState(frozenset(["nonce-a", "nonce-b"]))
+
+    assert nonce_state_sha256(first) == nonce_state_sha256(second)
+
+
+def test_absent_nonce_state_records_null_digest() -> None:
+    event = run_scenario(_scenario(nonce_state=None))
+
+    assert event.nonce_state_sha256 is None
+
+
+def test_absent_psp_commitments_record_null_committed_hashes() -> None:
+    event = run_scenario(_scenario(commitments=None))
+
+    assert event.committed_transaction_sha256 is None
+    assert event.committed_catalog_snapshot_sha256 is None
+
+
+def test_matching_psp_commitments_are_recorded_exactly() -> None:
+    scenario = _allow()
+    event = run_scenario(scenario)
+
+    assert scenario.psp_committed_hashes is not None
+    assert (
+        event.committed_transaction_sha256
+        == scenario.psp_committed_hashes.transaction_sha256
+    )
+    assert (
+        event.committed_catalog_snapshot_sha256
+        == scenario.psp_committed_hashes.catalog_snapshot_sha256
+    )
+    assert event.transaction_body_sha256 == event.committed_transaction_sha256
+    assert event.catalog_snapshot_sha256 == event.committed_catalog_snapshot_sha256
+
+
+def test_absent_server_time_is_recorded_without_substituting_audit_time() -> None:
+    event = run_scenario(_scenario(server_time=None, evaluated_at=SERVER_TIME))
+    a5 = next(
+        result for result in event.tier_a_results if result.family is TaxonomyFamily.A5
+    )
+
+    assert event.server_time is None
+    assert event.evaluated_at == SERVER_TIME
+    assert a5.status is TierACheckStatus.NOT_EVALUABLE
+
+
 @pytest.mark.parametrize(
     "forbidden",
     [
@@ -295,6 +394,7 @@ def test_deterministic_path_contains_no_runtime_entropy_or_clock_reads(
         tier_a_module,
         tier_b_module,
         decision_module,
+        evidence_module,
         replay_scenario_module,
         replay_runner_module,
     )

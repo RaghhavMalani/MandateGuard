@@ -53,16 +53,20 @@ def test_decision_event_contains_only_the_canonical_schema_fields() -> None:
         "sequence",
         "replay_seed",
         "evaluated_at",
+        "server_time",
         "mandate_payload_sha256",
         "transaction_body_sha256",
         "catalog_snapshot_sha256",
+        "committed_transaction_sha256",
+        "committed_catalog_snapshot_sha256",
+        "nonce_state_sha256",
         "tier_a_results",
         "tier_b_findings",
         "action",
         "previous_event_sha256",
         "event_sha256",
     }
-    assert event.schema_version == EVENT_SCHEMA_VERSION
+    assert event.schema_version == EVENT_SCHEMA_VERSION == "1.1"
     assert event.mandate_payload_sha256 == mandate_payload_sha256(make_mandate())
     assert event.action is DecisionAction.ALLOW
 

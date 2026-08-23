@@ -4,7 +4,11 @@ from dataclasses import replace
 
 import pytest
 
-from mandateguard.audit.hash_chain import HashChainError, verify_hash_chain
+from mandateguard.audit.hash_chain import (
+    HashChainError,
+    verify_event_hash,
+    verify_hash_chain,
+)
 from mandateguard.core.nonce_ledger import NonceLedgerState
 from mandateguard.replay.runner import run_scenario
 from mandateguard.replay.scenario import ReplayScenario
@@ -85,3 +89,35 @@ def test_incorrect_event_hash_is_rejected() -> None:
 
     with pytest.raises(HashChainError):
         verify_hash_chain((incorrect_hash, second, third))
+
+
+def test_tampered_committed_transaction_hash_fails_event_hash_verification() -> None:
+    event, _, _ = _chain()
+    tampered = replace(event, committed_transaction_sha256="0" * 64)
+
+    with pytest.raises(HashChainError):
+        verify_event_hash(tampered)
+
+
+def test_tampered_committed_catalog_hash_fails_event_hash_verification() -> None:
+    event, _, _ = _chain()
+    tampered = replace(event, committed_catalog_snapshot_sha256="0" * 64)
+
+    with pytest.raises(HashChainError):
+        verify_event_hash(tampered)
+
+
+def test_tampered_server_time_fails_event_hash_verification() -> None:
+    event, _, _ = _chain()
+    tampered = replace(event, server_time=None)
+
+    with pytest.raises(HashChainError):
+        verify_event_hash(tampered)
+
+
+def test_tampered_nonce_state_hash_fails_event_hash_verification() -> None:
+    event, _, _ = _chain()
+    tampered = replace(event, nonce_state_sha256="0" * 64)
+
+    with pytest.raises(HashChainError):
+        verify_event_hash(tampered)

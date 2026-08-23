@@ -46,6 +46,10 @@ class ReplayScenario:
                 raise ValueError(f"{name} must be a timezone-aware datetime or None")
         if not isinstance(self.evaluated_at, datetime):
             raise ValueError("evaluated_at must be a timezone-aware datetime")
+        if self.server_time is not None and self.server_time != self.evaluated_at:
+            raise ValueError(
+                "server_time must equal evaluated_at when server_time is present"
+            )
         if self.nonce_state is not None and not isinstance(
             self.nonce_state, NonceLedgerState
         ):
