@@ -1,0 +1,26 @@
+{
+  "merchant_id": "merchant-1",
+  "entries": [
+    {
+      "evidence_id": "merchant-terms-v1",
+      "merchant_id": "merchant-1",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Orders are one-time unless the selected product terms explicitly state a recurring schedule."
+    },
+    {
+      "evidence_id": "sku-1-description-v1",
+      "merchant_id": "merchant-1",
+      "sku": "sku-1",
+      "source_kind": "product_description",
+      "text": "A single-purchase digital reference guide intended for individual study."
+    },
+    {
+      "evidence_id": "sku-2-description-v1",
+      "merchant_id": "merchant-1",
+      "sku": "sku-2",
+      "source_kind": "product_description",
+      "text": "A one-time reference workbook intended for individual study."
+    }
+  ]
+}
