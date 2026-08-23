@@ -1,7 +1,7 @@
 # MandateGuard — V1 Threat & Evaluation Taxonomy
 
-**Status:** D1 pre-registration artifact, amended before detector implementation and again after D2 deterministic-core review  
-**Freeze rule:** this document was committed before detector implementation. Any later change must be a new commit that explicitly explains why the pre-registered taxonomy changed. The first amendment closed mandate-conformance gaps before D2 detector code existed. This second amendment records deterministic evidence-state semantics discovered during D2 review, before benchmark generation, Tier C implementation, or held-out execution.
+**Status:** D1 pre-registration artifact, amended before detector implementation and during D2 deterministic-core review  
+**Freeze rule:** this document was committed before detector implementation. Any later change must be a new commit that explicitly explains why the pre-registered taxonomy changed. The first amendment closed mandate-conformance gaps before D2 detector code existed. The second amendment recorded deterministic evidence-state semantics discovered during D2 review. This third amendment records an execution-amount binding gap found by adversarial D2 review: the original taxonomy verified catalog unit price, line totals, and mandate ceilings without explicitly requiring the verified unit price to determine the exact charged total. This amendment is made before benchmark generation, Tier C implementation, or held-out execution.
 
 ## 1. V1 claim
 
@@ -69,10 +69,10 @@ Checked against state the buyer agent does not control. A consistent lie can sti
 | A4 | Nonce replay | PSP nonce ledger | Detects reuse of a consumed authorization nonce. **All V1 mandate nonces are single-use.** Multi-use mandates/counters are out of scope. |
 | A5 | Mandate expiry | PSP/server clock | Detects execution after the mandate validity window |
 | A6 | Snapshot mutation | PSP-side committed hash | Detects mutation after a transaction/evidence snapshot was committed |
-| A7 | Catalog-derived total vs mandate ceiling | Merchant catalog + mandate + committed execution quantities | Verifies `Σ(catalog_price × execution_qty) ≤ max_total_minor`. The price component is independent of the agent; quantity is agent-supplied but is bound to the exact transaction hash the executor will execute. Stronger than checking the agent-declared total alone. |
+| A7 | Catalog-derived exact execution amount and mandate ceiling | Merchant catalog + mandate + PSP-committed transaction quantities/total | Computes `catalog_total = Σ(catalog_effective_unit_price × committed_execution_qty)` and requires both `catalog_total == declared_order_total_minor` and `catalog_total ≤ max_total_minor`. Catalog price is independent evidence; quantity and declared order total remain agent-supplied but are bound to the exact PSP-committed transaction. V1 has no implicit tax/shipping/fee/tolerance adjustment: any future adjustment must be represented explicitly. |
 | A8 | Catalog recurrence vs mandate permission | Merchant catalog + mandate | Detects a catalog-declared recurring SKU when `recurring_allowed=false`, without relying on the agent's recurrence flag. |
 
-**Interpretation:** Tier A is the strongest V1 evidence surface. A7 is deliberately documented as a composed check: catalog price is independent evidence, while quantity is safe only because the executor is bound to the same committed quantity. MandateGuard never presents A7 as proof of independently observed quantity.
+**Interpretation:** Tier A is the strongest V1 evidence surface. A7 is deliberately documented as a composed check: catalog price is independent evidence, while quantity and declared order total are agent-supplied values made execution-relevant only because the executor is bound to the same committed transaction. MandateGuard never presents quantity or order total as independently observed.
 
 ### Tier B — self-reported, internally checkable
 
@@ -82,7 +82,7 @@ These checks validate consistency of agent-supplied fields and conformance of th
 
 | ID | Check | Example |
 |---|---|---|
-| B1 | Line-sum consistency | sum(line totals) == declared order total |
+| B1 | Per-line arithmetic and order-total reconciliation | For every line, `line_total_minor == effective_unit_price_minor × quantity`, and `Σ(line_total_minor) == declared_order_total_minor`. This binds the self-reported unit price and quantity to the self-reported amount that will be charged. |
 | B2 | Agent-declared aggregate quantity vs line-item quantities | `declared_aggregate_quantity == Σ(line.quantity)`. The aggregate quantity is a distinct agent-supplied field; B2 is therefore falsifiable rather than comparing a derived value to itself. |
 | B3 | Currency consistency | mandate/cart/order use the same declared currency |
 | B4 | Recurrence-field consistency | recurring flags agree across self-reported structures |
@@ -98,7 +98,7 @@ These checks validate consistency of agent-supplied fields and conformance of th
 | B9 | Declared merchant ∈ `merchant_allowlist` | Composes with A3, which independently checks the merchant/catalog identity. |
 | B10 | Declared SKUs ⊆ `sku_allowlist` | Composes with A2, which independently checks SKU existence and ownership. |
 
-**Interpretation:** Tier B proves internal consistency and declared-mandate conformance, not external truth. A coherent liar can pass Tier B; the strongest corresponding guarantees come from composing B checks with Tier A evidence.
+**Interpretation:** Tier B proves internal consistency and declared-mandate conformance, not external truth. B1 specifically closes the arithmetic path from self-reported unit price and quantity to the amount that is charged; A1/A7 then compose independent catalog price evidence with that path. A coherent liar can still pass Tier B; the strongest corresponding guarantees come from composing B checks with Tier A evidence.
 
 ### Tier C — semantic judgment
 
@@ -119,11 +119,13 @@ Tier A checks use three states:
 
 - `PASS`: the applicable invariant was evaluated and no violation was found, **or the check is not applicable to this transaction**;
 - `FAIL`: the invariant was evaluated and a concrete violation was established;
-- `NOT_EVALUABLE`: the check is required, but the independent evidence needed to evaluate it is unavailable, uncommitted, or incomparable.
+- `NOT_EVALUABLE`: the check is required, but the independent evidence needed to evaluate it is unavailable, uncommitted, integrity-invalid, or incomparable.
 
 A `Finding` is emitted **only for `FAIL`**. `NOT_EVALUABLE` is not evidence of a violation and therefore must not be represented as a `Finding`.
 
-Examples of `NOT_EVALUABLE` include a required catalog lookup that is unavailable, a required independent snapshot without a valid commitment, or A1 prices denominated in currencies that cannot be compared. A check that is simply irrelevant to the transaction remains `PASS`, not `NOT_EVALUABLE`.
+Examples of `NOT_EVALUABLE` include a required catalog lookup that is unavailable, a required independent snapshot without a valid commitment, a dependent catalog check whose snapshot failed commitment-integrity verification, or A1 prices denominated in currencies that cannot be compared. A check that is simply irrelevant to the transaction remains `PASS`, not `NOT_EVALUABLE`.
+
+**Commitment-integrity ownership:** A6 owns the positive claim that a committed snapshot was mutated. If a catalog commitment is absent, dependent catalog checks are `NOT_EVALUABLE` because trusted evidence is unavailable. If a catalog commitment exists but the supplied snapshot mismatches it, A6 is `FAIL`; dependent A1/A2/A3/A7/A8 checks remain `NOT_EVALUABLE` with a reason explicitly identifying failed commitment integrity, rather than double-counting the same tampering as five separate violations.
 
 Tier B operates on required typed declared state and is `PASS`/`FAIL` only in V1.
 
