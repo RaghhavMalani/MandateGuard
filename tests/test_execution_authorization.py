@@ -68,12 +68,13 @@ def _gate(capability, result, mandate, transaction, tmp_path, *, now=SERVER_TIME
     ],
 )
 def test_non_allow_decisions_return_refusal_and_no_capability(action, reason) -> None:
-    result, mandate, transaction = make_authorization(action)
+    result, scenario = make_authorization(action)
 
     outcome = issue_execution_authorization(
         authorization_result=result,
-        mandate=mandate,
-        transaction=transaction,
+        authorization_scenario=scenario,
+        semantic_evidence=None,
+        semantic_verifier=None,
         issued_at=SERVER_TIME,
         expires_at=CAPABILITY_EXPIRES_AT,
         decision_nonce=DECISION_NONCE,
@@ -108,12 +109,13 @@ def test_allow_decision_issues_signed_capability() -> None:
 def test_invalid_capability_lifetime_returns_typed_refusal(
     issued_at, expires_at
 ) -> None:
-    result, mandate, transaction = make_authorization()
+    result, scenario = make_authorization()
 
     outcome = issue_execution_authorization(
         authorization_result=result,
-        mandate=mandate,
-        transaction=transaction,
+        authorization_scenario=scenario,
+        semantic_evidence=None,
+        semantic_verifier=None,
         issued_at=issued_at,
         expires_at=expires_at,
         decision_nonce=DECISION_NONCE,
@@ -172,7 +174,6 @@ def test_unknown_key_is_rejected_before_reservation(tmp_path) -> None:
 @pytest.mark.parametrize(
     "change",
     [
-        lambda p: replace(p, action=DecisionAction.BLOCK),
         lambda p: replace(p, transaction_body_sha256="0" * 64),
         lambda p: replace(p, execution_request_sha256="0" * 64),
         lambda p: replace(p, mandate_payload_sha256="0" * 64),
@@ -231,16 +232,13 @@ def test_validly_signed_wrong_scope_is_rejected(
     assert ledger.get(DECISION_NONCE) is None
 
 
-def test_validly_signed_block_action_is_not_executable(tmp_path) -> None:
-    capability, result, mandate, transaction = make_signed_allow()
-    blocked = _signer().sign(
-        replace(capability.payload, action=DecisionAction.BLOCK)
-    )
+@pytest.mark.parametrize("action", [DecisionAction.BLOCK, DecisionAction.REVIEW])
+def test_non_allow_execution_payload_cannot_be_constructed_or_signed(action) -> None:
+    capability, _result, _mandate, _transaction = make_signed_allow()
 
-    outcome, ledger = _gate(blocked, result, mandate, transaction, tmp_path)
-
-    assert outcome == ExecutionRefusal(ExecutionRefusalReason.AUTHORIZATION_BLOCKED)
-    assert ledger.get(DECISION_NONCE) is None
+    with pytest.raises(ValueError, match="action must be ALLOW"):
+        invalid_payload = replace(capability.payload, action=action)
+        _signer().sign(invalid_payload)
 
 
 @pytest.mark.parametrize(

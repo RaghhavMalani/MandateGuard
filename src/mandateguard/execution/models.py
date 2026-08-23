@@ -47,6 +47,8 @@ def _require_aware(value: object, name: str) -> None:
 class ExecutionRefusalReason(str, Enum):
     AUTHORIZATION_BLOCKED = "AUTHORIZATION_BLOCKED"
     AUTHORIZATION_REVIEW_REQUIRED = "AUTHORIZATION_REVIEW_REQUIRED"
+    AUTHORIZATION_CONTEXT_MISMATCH = "AUTHORIZATION_CONTEXT_MISMATCH"
+    AUTHORIZATION_CONTEXT_UNVERIFIABLE = "AUTHORIZATION_CONTEXT_UNVERIFIABLE"
     AUTHORIZATION_RESULT_HASH_MISMATCH = "AUTHORIZATION_RESULT_HASH_MISMATCH"
     SIGNATURE_INVALID = "SIGNATURE_INVALID"
     UNKNOWN_SIGNING_KEY = "UNKNOWN_SIGNING_KEY"
@@ -115,8 +117,8 @@ class ExecutionAuthorizationPayload:
             self.decision_nonce
         ):
             raise ValueError("decision_nonce must be 16-128 ASCII letters, digits, '_' or '-'")
-        if not isinstance(self.action, DecisionAction):
-            raise TypeError("action must be a DecisionAction")
+        if self.action is not DecisionAction.ALLOW:
+            raise ValueError("execution authorization action must be ALLOW")
         _require_aware(self.issued_at, "issued_at")
         _require_aware(self.expires_at, "expires_at")
         if self.issued_at >= self.expires_at:

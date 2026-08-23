@@ -24,9 +24,12 @@ from mandateguard.execution.request import (
 )
 from mandateguard.execution.signing import ExecutionSigner
 from mandateguard.models.decision import DecisionAction
-from mandateguard.models.mandate import Mandate
-from mandateguard.models.transaction import Transaction
+from mandateguard.replay.scenario import ReplayScenario
+from mandateguard.semantic.cache import SemanticCacheError
+from mandateguard.semantic.evidence import SemanticEvidence
 from mandateguard.semantic.models import AuthorizationResult
+from mandateguard.semantic.orchestration import authorize_transaction
+from mandateguard.semantic.verifier import SemanticMode, SemanticVerifier
 
 
 def authorization_result_sha256(result: AuthorizationResult) -> str:
@@ -40,8 +43,9 @@ def authorization_result_sha256(result: AuthorizationResult) -> str:
 def issue_execution_authorization(
     *,
     authorization_result: AuthorizationResult,
-    mandate: Mandate,
-    transaction: Transaction,
+    authorization_scenario: ReplayScenario,
+    semantic_evidence: SemanticEvidence | None,
+    semantic_verifier: SemanticVerifier | None,
     issued_at: datetime,
     expires_at: datetime,
     decision_nonce: str,
@@ -52,10 +56,8 @@ def issue_execution_authorization(
 
     if not isinstance(authorization_result, AuthorizationResult):
         raise TypeError("authorization_result must be AuthorizationResult")
-    if not isinstance(mandate, Mandate):
-        raise TypeError("mandate must be Mandate")
-    if not isinstance(transaction, Transaction):
-        raise TypeError("transaction must be Transaction")
+    if not isinstance(authorization_scenario, ReplayScenario):
+        raise TypeError("authorization_scenario must be ReplayScenario")
     if not isinstance(config, TrustedExecutionConfig):
         raise TypeError("config must be TrustedExecutionConfig")
 
@@ -64,12 +66,42 @@ def issue_execution_authorization(
     if authorization_result.final_action is DecisionAction.REVIEW:
         return ExecutionRefusal(ExecutionRefusalReason.AUTHORIZATION_REVIEW_REQUIRED)
 
-    current_transaction_sha256 = transaction_body_sha256(transaction)
+    mandate = authorization_scenario.mandate
+    transaction = authorization_scenario.transaction
+    semantic_constraints_present = bool(mandate.payload.constraints.semantic)
+    try:
+        recomputed = authorize_transaction(
+            mandate=mandate,
+            transaction=transaction,
+            catalog_snapshot=authorization_scenario.catalog_snapshot,
+            server_time=authorization_scenario.server_time,
+            nonce_state=authorization_scenario.nonce_state,
+            committed_hashes=authorization_scenario.psp_committed_hashes,
+            replay_seed=authorization_scenario.replay_seed,
+            evaluated_at=authorization_scenario.evaluated_at,
+            semantic_evidence=semantic_evidence,
+            semantic_verifier=semantic_verifier,
+            semantic_mode=SemanticMode.REPLAY,
+        )
+    except SemanticCacheError:
+        return ExecutionRefusal(
+            ExecutionRefusalReason.AUTHORIZATION_CONTEXT_UNVERIFIABLE
+        )
+    except (TypeError, ValueError):
+        if not semantic_constraints_present:
+            raise
+        return ExecutionRefusal(
+            ExecutionRefusalReason.AUTHORIZATION_CONTEXT_UNVERIFIABLE
+        )
+
+    recomputed_sha256 = authorization_result_sha256(recomputed)
     if (
-        authorization_result.deterministic_decision.transaction_sha256
-        != current_transaction_sha256
+        recomputed.final_action is not DecisionAction.ALLOW
+        or recomputed_sha256 != authorization_result_sha256(authorization_result)
     ):
-        return ExecutionRefusal(ExecutionRefusalReason.TRANSACTION_HASH_MISMATCH)
+        return ExecutionRefusal(ExecutionRefusalReason.AUTHORIZATION_CONTEXT_MISMATCH)
+
+    current_transaction_sha256 = transaction_body_sha256(transaction)
     if transaction.payload.merchant_id != config.merchant_id:
         return ExecutionRefusal(ExecutionRefusalReason.MERCHANT_MISMATCH)
 
@@ -88,7 +120,7 @@ def issue_execution_authorization(
         return ExecutionRefusal(ExecutionRefusalReason.INVALID_CAPABILITY_LIFETIME)
 
     request = build_razorpay_order_request(transaction, decision_nonce)
-    semantic_decision = authorization_result.semantic_decision
+    semantic_decision = recomputed.semantic_decision
     payload = ExecutionAuthorizationPayload(
         schema_version=EXECUTION_SCHEMA_VERSION,
         decision_nonce=decision_nonce,
@@ -101,9 +133,7 @@ def issue_execution_authorization(
         merchant_id=config.merchant_id,
         mandate_payload_sha256=mandate_payload_sha256(mandate),
         transaction_body_sha256=current_transaction_sha256,
-        authorization_result_sha256=authorization_result_sha256(
-            authorization_result
-        ),
+        authorization_result_sha256=recomputed_sha256,
         execution_request_sha256=execution_request_sha256(request),
         semantic_input_sha256=(
             semantic_decision.semantic_input_sha256

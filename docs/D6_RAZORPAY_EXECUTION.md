@@ -9,10 +9,30 @@ webhooks.
 
 ## Signed capability boundary
 
-An existing structurally valid `AuthorizationResult` can produce an execution
-capability only when its final action is `ALLOW`. `BLOCK` produces
+An existing `AuthorizationResult` can produce an execution capability only
+when its final action is `ALLOW` and the complete historical authorization
+context reproduces it. `BLOCK` produces
 `AUTHORIZATION_BLOCKED`; `REVIEW` produces `AUTHORIZATION_REVIEW_REQUIRED`.
 Neither refusal contains a capability that an executor can use.
+
+The issuer accepts one recorded `ReplayScenario` rather than separately
+supplied mandate and transaction objects. For a claimed `ALLOW`, it reruns
+`authorize_transaction` from the scenario's mandate, transaction, catalog,
+server time, nonce state, PSP commitments, replay seed, and evaluation time.
+The canonical hash of the reproduced result must equal the supplied result
+hash or issuance returns `AUTHORIZATION_CONTEXT_MISMATCH` without signing.
+
+When semantic constraints are present, re-derivation always uses
+`SemanticMode.REPLAY`. The exact semantic evidence and integrity-checked cache
+record must be available. Missing or invalid replay state returns
+`AUTHORIZATION_CONTEXT_UNVERIFIABLE`; issuance never falls back to live model
+evaluation and never calls the model.
+
+This proves that the supplied historical policy inputs, when rerun through the
+actual Tier A/B policy and recorded Tier C replay result, reproduce the exact
+authorization result being signed. It does not prove merchant evidence
+authenticity beyond D4's trust assumptions, upstream human intent, or
+third-party provenance of the recorded context.
 
 The capability payload commits:
 
@@ -32,6 +52,10 @@ payload or signature modification are refused.
 HMAC provides integrity and authenticity between components that share the
 trusted secret. It does **not** provide third-party non-repudiation or external
 attestation.
+
+`ExecutionAuthorizationPayload` is structurally restricted to `ALLOW`;
+`BLOCK` and `REVIEW` payload objects cannot be constructed. The execution gate
+retains an action check as defense in depth.
 
 Capabilities must have `issued_at < expires_at`, cannot exceed five minutes,
 and cannot outlive the mandate. Execution uses an injected clock, refuses at
@@ -62,6 +86,10 @@ Razorpay adapter.
 
 This independently closes both transaction substitution and outbound request
 substitution. The adapter serializes only `amount`, `currency`, and `receipt`.
+
+The frozen `declared_transaction_hash` wrapper field remains outside
+`transaction_body_sha256` and is checked by frozen B5. No D6 amount, currency,
+receipt, or provider request field depends on that wrapper value.
 
 ## Merchant and Test Mode scope
 
@@ -124,12 +152,13 @@ by pytest. At its composition boundary it reads only:
 - `RAZORPAY_KEY_SECRET`
 - `MANDATEGUARD_EXECUTION_HMAC_KEY` (at least 32 bytes)
 
-It builds a deterministic Tier A/B `ALLOW` transaction with no semantic
-constraints, generates a fresh execution decision nonce, and exercises
-authorization, capability issuance, signature verification, the SQLite gate,
-and the real Razorpay Test Mode Orders endpoint. It prints only the final
-action, transaction hash, execution request hash, receipt, Razorpay order ID,
-status, amount, and currency.
+It builds and retains the exact `ReplayScenario` for a deterministic Tier A/B
+`ALLOW` transaction with no semantic constraints, generates a fresh execution
+decision nonce, and exercises authorization, context re-derivation, capability
+issuance, signature verification, the SQLite gate, and the real Razorpay Test
+Mode Orders endpoint. It prints only the final action, transaction hash,
+execution request hash, receipt, Razorpay order ID, status, amount, and
+currency.
 
 No real Test Mode order has yet been submitted from this repository state. On
 the first successful manual run, sanitized evidence may record the time, git

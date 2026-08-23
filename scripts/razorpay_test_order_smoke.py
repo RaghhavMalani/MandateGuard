@@ -40,6 +40,7 @@ from mandateguard.models.transaction import (
     TransactionLine,
     TransactionPayload,
 )
+from mandateguard.replay.scenario import ReplayScenario
 from mandateguard.semantic.orchestration import authorize_transaction
 
 
@@ -126,18 +127,28 @@ def main() -> int:
 
     now = datetime.now(timezone.utc)
     mandate, transaction, catalog = _inputs(now)
-    result = authorize_transaction(
+    scenario = ReplayScenario(
         mandate=mandate,
         transaction=transaction,
         catalog_snapshot=catalog,
         server_time=now,
         nonce_state=NonceLedgerState(),
-        committed_hashes=CommittedHashes(
+        psp_committed_hashes=CommittedHashes(
             transaction_sha256=transaction_body_sha256(transaction),
             catalog_snapshot_sha256=catalog_snapshot_sha256(catalog),
         ),
         replay_seed=6001,
         evaluated_at=now,
+    )
+    result = authorize_transaction(
+        mandate=scenario.mandate,
+        transaction=scenario.transaction,
+        catalog_snapshot=scenario.catalog_snapshot,
+        server_time=scenario.server_time,
+        nonce_state=scenario.nonce_state,
+        committed_hashes=scenario.psp_committed_hashes,
+        replay_seed=scenario.replay_seed,
+        evaluated_at=scenario.evaluated_at,
     )
     decision_nonce = secrets.token_urlsafe(24)
     account_scope = "razorpay-test-" + sha256(key_id.encode("utf-8")).hexdigest()[:16]
@@ -148,8 +159,9 @@ def main() -> int:
     signer = HMACSHA256Signer(key_id="manual-smoke-hmac-v1", key=hmac_key)
     capability = issue_execution_authorization(
         authorization_result=result,
-        mandate=mandate,
-        transaction=transaction,
+        authorization_scenario=scenario,
+        semantic_evidence=None,
+        semantic_verifier=None,
         issued_at=now,
         expires_at=now + timedelta(minutes=2),
         decision_nonce=decision_nonce,

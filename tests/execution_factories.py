@@ -15,6 +15,7 @@ from mandateguard.execution import (
 )
 from mandateguard.execution.models import RazorpayOrderRequest, RazorpayOrderResult
 from mandateguard.models.decision import DecisionAction
+from mandateguard.replay.scenario import ReplayScenario
 from mandateguard.semantic.models import AuthorizationResult
 from mandateguard.semantic.orchestration import authorize_transaction
 from tests.factories import (
@@ -41,7 +42,7 @@ def make_authorization(
     *,
     transaction=None,
     mandate=None,
-) -> tuple[AuthorizationResult, object, object]:
+) -> tuple[AuthorizationResult, ReplayScenario]:
     actual_transaction = transaction or make_transaction()
     if action is DecisionAction.BLOCK:
         actual_mandate = mandate or make_mandate(max_total_minor=5_000)
@@ -58,40 +59,48 @@ def make_authorization(
         actual_mandate = mandate or make_mandate()
         catalog = make_catalog()
         commitments = make_commitments(actual_transaction, catalog)
-    result = authorize_transaction(
+    scenario = ReplayScenario(
         mandate=actual_mandate,
         transaction=actual_transaction,
         catalog_snapshot=catalog,
         server_time=SERVER_TIME,
         nonce_state=NonceLedgerState(),
-        committed_hashes=commitments,
+        psp_committed_hashes=commitments,
         replay_seed=601,
         evaluated_at=SERVER_TIME,
     )
+    result = authorize_transaction(
+        mandate=scenario.mandate,
+        transaction=scenario.transaction,
+        catalog_snapshot=scenario.catalog_snapshot,
+        server_time=scenario.server_time,
+        nonce_state=scenario.nonce_state,
+        committed_hashes=scenario.psp_committed_hashes,
+        replay_seed=scenario.replay_seed,
+        evaluated_at=scenario.evaluated_at,
+    )
     assert result.final_action is action
-    return result, actual_mandate, actual_transaction
+    return result, scenario
 
 
 def make_signed_allow(
     *,
     authorization_result: AuthorizationResult | None = None,
-    mandate=None,
-    transaction=None,
+    authorization_scenario: ReplayScenario | None = None,
     signer: HMACSHA256Signer | None = None,
     decision_nonce: str = DECISION_NONCE,
 ) -> tuple[SignedExecutionAuthorization, AuthorizationResult, object, object]:
     if authorization_result is None:
-        result, actual_mandate, actual_transaction = make_authorization(
-            transaction=transaction, mandate=mandate
-        )
+        result, scenario = make_authorization()
     else:
         result = authorization_result
-        actual_mandate = mandate
-        actual_transaction = transaction
+        scenario = authorization_scenario
+    assert isinstance(scenario, ReplayScenario)
     capability = issue_execution_authorization(
         authorization_result=result,
-        mandate=actual_mandate,
-        transaction=actual_transaction,
+        authorization_scenario=scenario,
+        semantic_evidence=None,
+        semantic_verifier=None,
         issued_at=SERVER_TIME,
         expires_at=CAPABILITY_EXPIRES_AT,
         decision_nonce=decision_nonce,
@@ -100,7 +109,7 @@ def make_signed_allow(
         or HMACSHA256Signer(key_id=SIGNING_KEY_ID, key=SYNTHETIC_SIGNING_KEY),
     )
     assert isinstance(capability, SignedExecutionAuthorization)
-    return capability, result, actual_mandate, actual_transaction
+    return capability, result, scenario.mandate, scenario.transaction
 
 
 @dataclass
