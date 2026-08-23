@@ -4,7 +4,12 @@ from datetime import timedelta
 
 import pytest
 
-from mandateguard.core.hashing import CommittedHashes, transaction_body_sha256
+from mandateguard.core.hashing import (
+    CommitmentState,
+    CommittedHashes,
+    compare_sha256_commitment,
+    transaction_body_sha256,
+)
 from mandateguard.core.nonce_ledger import NonceAlreadyConsumed, NonceLedgerState
 from mandateguard.models.catalog import CatalogItem
 from mandateguard.models.finding import TaxonomyFamily, TierACheckResult, TierACheckStatus
@@ -69,6 +74,26 @@ def test_tier_a_happy_path_passes_all_checks() -> None:
 
     assert len(results) == 8
     assert all(result.status is TierACheckStatus.PASS for result in results)
+
+
+def test_commitment_states_distinguish_absent_match_and_mismatch() -> None:
+    digest = "a" * 64
+
+    assert (
+        compare_sha256_commitment(actual_sha256=None, committed_sha256=digest)
+        is CommitmentState.ABSENT
+    )
+    assert (
+        compare_sha256_commitment(actual_sha256=digest, committed_sha256=digest)
+        is CommitmentState.MATCH
+    )
+    assert (
+        compare_sha256_commitment(
+            actual_sha256=digest,
+            committed_sha256="b" * 64,
+        )
+        is CommitmentState.MISMATCH
+    )
 
 
 def test_a1_requires_exact_declared_catalog_price_equality() -> None:
@@ -235,7 +260,7 @@ def test_missing_sku_recurrence_and_price_evidence_is_not_evaluable() -> None:
         assert result.finding is None
 
 
-def test_uncommitted_catalog_is_not_evaluable_for_catalog_dependent_checks() -> None:
+def test_catalog_commitment_mismatch_fails_a6_only() -> None:
     transaction = make_transaction()
     catalog = make_catalog()
     commitments = CommittedHashes(
@@ -249,7 +274,9 @@ def test_uncommitted_catalog_is_not_evaluable_for_catalog_dependent_checks() -> 
         commitments=commitments,
     )
 
-    assert _result(results, TaxonomyFamily.A6).status is TierACheckStatus.FAIL
+    a6 = _result(results, TaxonomyFamily.A6)
+    assert a6.status is TierACheckStatus.FAIL
+    assert a6.finding is not None
     for family in (
         TaxonomyFamily.A1,
         TaxonomyFamily.A2,
@@ -260,6 +287,37 @@ def test_uncommitted_catalog_is_not_evaluable_for_catalog_dependent_checks() -> 
         result = _result(results, family)
         assert result.status is TierACheckStatus.NOT_EVALUABLE
         assert result.finding is None
+        assert result.reason == "catalog failed commitment integrity verification"
+
+
+def test_absent_catalog_commitment_is_not_evaluable_without_findings() -> None:
+    transaction = make_transaction()
+    catalog = make_catalog()
+    commitments = CommittedHashes(
+        transaction_sha256=transaction_body_sha256(transaction),
+        catalog_snapshot_sha256=None,
+    )
+
+    results = _evaluate(
+        transaction=transaction,
+        catalog=catalog,
+        commitments=commitments,
+    )
+
+    a6 = _result(results, TaxonomyFamily.A6)
+    assert a6.status is TierACheckStatus.NOT_EVALUABLE
+    assert a6.finding is None
+    for family in (
+        TaxonomyFamily.A1,
+        TaxonomyFamily.A2,
+        TaxonomyFamily.A3,
+        TaxonomyFamily.A7,
+        TaxonomyFamily.A8,
+    ):
+        result = _result(results, family)
+        assert result.status is TierACheckStatus.NOT_EVALUABLE
+        assert result.finding is None
+        assert result.reason == "committed merchant catalog snapshot unavailable"
 
 
 def test_only_actual_tier_a_violations_have_findings() -> None:

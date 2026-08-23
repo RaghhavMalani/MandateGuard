@@ -7,8 +7,10 @@ from mandateguard.core.canonical import (
     canonical_json_text,
 )
 from mandateguard.core.hashing import (
+    CommitmentState,
     CommittedHashes,
     catalog_snapshot_sha256,
+    compare_sha256_commitment,
     mandate_payload_sha256,
     sha256_canonical,
     transaction_body_sha256,
@@ -17,6 +19,7 @@ from mandateguard.core.nonce_ledger import NonceAlreadyConsumed, NonceLedgerStat
 
 __all__ = [
     "CanonicalizationError",
+    "CommitmentState",
     "CommittedHashes",
     "FloatNotAllowedError",
     "NonceAlreadyConsumed",
@@ -24,6 +27,7 @@ __all__ = [
     "canonical_json_bytes",
     "canonical_json_text",
     "catalog_snapshot_sha256",
+    "compare_sha256_commitment",
     "mandate_payload_sha256",
     "sha256_canonical",
     "transaction_body_sha256",

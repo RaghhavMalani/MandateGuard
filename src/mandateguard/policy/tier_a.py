@@ -5,8 +5,10 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from mandateguard.core.hashing import (
+    CommitmentState,
     CommittedHashes,
     catalog_snapshot_sha256,
+    compare_sha256_commitment,
     transaction_body_sha256,
 )
 from mandateguard.core.nonce_ledger import NonceLedgerState
@@ -73,28 +75,28 @@ def _canonical_timestamp(value: datetime) -> str:
     )
 
 
-def _catalog_commit_matches(
-    catalog_snapshot: CatalogSnapshot | None,
-    committed_hashes: CommittedHashes | None,
-) -> bool:
-    return (
-        catalog_snapshot is not None
-        and committed_hashes is not None
-        and committed_hashes.catalog_snapshot_sha256 is not None
-        and catalog_snapshot_sha256(catalog_snapshot)
-        == committed_hashes.catalog_snapshot_sha256
-    )
+def _catalog_not_evaluable(
+    family: TaxonomyFamily, commitment_state: CommitmentState
+) -> TierACheckResult:
+    if commitment_state is CommitmentState.MISMATCH:
+        reason = "catalog failed commitment integrity verification"
+    elif commitment_state is CommitmentState.ABSENT:
+        reason = "committed merchant catalog snapshot unavailable"
+    else:
+        raise ValueError("catalog evidence is evaluable when its commitment matches")
+    return _not_evaluable(family, reason)
 
 
-def _transaction_commit_matches(
-    transaction: Transaction,
-    committed_hashes: CommittedHashes | None,
-) -> bool:
-    return (
-        committed_hashes is not None
-        and committed_hashes.transaction_sha256 is not None
-        and transaction_body_sha256(transaction) == committed_hashes.transaction_sha256
-    )
+def _transaction_not_evaluable(
+    family: TaxonomyFamily, commitment_state: CommitmentState
+) -> TierACheckResult:
+    if commitment_state is CommitmentState.MISMATCH:
+        reason = "transaction failed commitment integrity verification"
+    elif commitment_state is CommitmentState.ABSENT:
+        reason = "PSP-committed transaction quantities and total unavailable"
+    else:
+        raise ValueError("transaction evidence is evaluable when its commitment matches")
+    return _not_evaluable(family, reason)
 
 
 def evaluate_tier_a(
@@ -128,17 +130,28 @@ def evaluate_tier_a(
     payload = transaction.payload
     hard = mandate.payload.constraints.hard
     results: list[TierACheckResult] = []
+    actual_transaction_hash = transaction_body_sha256(transaction)
+    actual_catalog_hash = (
+        catalog_snapshot_sha256(catalog_snapshot) if catalog_snapshot is not None else None
+    )
+    catalog_commitment_state = compare_sha256_commitment(
+        actual_sha256=actual_catalog_hash,
+        committed_sha256=(
+            committed_hashes.catalog_snapshot_sha256
+            if committed_hashes is not None
+            else None
+        ),
+    )
+    transaction_commitment_state = compare_sha256_commitment(
+        actual_sha256=actual_transaction_hash,
+        committed_sha256=(
+            committed_hashes.transaction_sha256 if committed_hashes is not None else None
+        ),
+    )
 
     # A1: exact declared/effective unit-price equality at the committed catalog snapshot.
-    if catalog_snapshot is None:
-        results.append(_not_evaluable(TaxonomyFamily.A1, "merchant catalog snapshot unavailable"))
-    elif not _catalog_commit_matches(catalog_snapshot, committed_hashes):
-        results.append(
-            _not_evaluable(
-                TaxonomyFamily.A1,
-                "committed merchant catalog snapshot unavailable or does not match",
-            )
-        )
+    if catalog_commitment_state is not CommitmentState.MATCH:
+        results.append(_catalog_not_evaluable(TaxonomyFamily.A1, catalog_commitment_state))
     elif catalog_snapshot.currency != payload.order_currency:
         results.append(
             _not_evaluable(
@@ -174,15 +187,8 @@ def evaluate_tier_a(
             results.append(_pass(TaxonomyFamily.A1))
 
     # A2: SKU existence and ownership.
-    if catalog_snapshot is None:
-        results.append(_not_evaluable(TaxonomyFamily.A2, "merchant catalog snapshot unavailable"))
-    elif not _catalog_commit_matches(catalog_snapshot, committed_hashes):
-        results.append(
-            _not_evaluable(
-                TaxonomyFamily.A2,
-                "committed merchant catalog snapshot unavailable or does not match",
-            )
-        )
+    if catalog_commitment_state is not CommitmentState.MATCH:
+        results.append(_catalog_not_evaluable(TaxonomyFamily.A2, catalog_commitment_state))
     else:
         missing_skus: list[str] = []
         ownership_mismatches: list[str] = []
@@ -205,15 +211,8 @@ def evaluate_tier_a(
             results.append(_pass(TaxonomyFamily.A2))
 
     # A3: declared merchant vs independent catalog mapping.
-    if catalog_snapshot is None:
-        results.append(_not_evaluable(TaxonomyFamily.A3, "merchant catalog mapping unavailable"))
-    elif not _catalog_commit_matches(catalog_snapshot, committed_hashes):
-        results.append(
-            _not_evaluable(
-                TaxonomyFamily.A3,
-                "committed merchant catalog mapping unavailable or does not match",
-            )
-        )
+    if catalog_commitment_state is not CommitmentState.MATCH:
+        results.append(_catalog_not_evaluable(TaxonomyFamily.A3, catalog_commitment_state))
     elif payload.merchant_id != catalog_snapshot.merchant_id:
         results.append(
             _fail(
@@ -256,19 +255,22 @@ def evaluate_tier_a(
         results.append(_pass(TaxonomyFamily.A5))
 
     # A6: current snapshots must match all available PSP-side commitments.
-    actual_transaction_hash = transaction_body_sha256(transaction)
-    mutated_snapshots: list[str] = []
-    unavailable_commitments: list[str] = []
-    if committed_hashes is None or committed_hashes.transaction_sha256 is None:
-        unavailable_commitments.append("transaction")
-    elif actual_transaction_hash != committed_hashes.transaction_sha256:
-        mutated_snapshots.append("transaction")
-    if catalog_snapshot is None:
-        unavailable_commitments.append("catalog_snapshot")
-    elif committed_hashes is None or committed_hashes.catalog_snapshot_sha256 is None:
-        unavailable_commitments.append("catalog_commitment")
-    elif catalog_snapshot_sha256(catalog_snapshot) != committed_hashes.catalog_snapshot_sha256:
-        mutated_snapshots.append("catalog")
+    mutated_snapshots = [
+        name
+        for name, state in (
+            ("transaction", transaction_commitment_state),
+            ("catalog", catalog_commitment_state),
+        )
+        if state is CommitmentState.MISMATCH
+    ]
+    unavailable_commitments = [
+        name
+        for name, state in (
+            ("transaction", transaction_commitment_state),
+            ("catalog", catalog_commitment_state),
+        )
+        if state is CommitmentState.ABSENT
+    ]
     if mutated_snapshots:
         results.append(
             _fail(
@@ -288,22 +290,12 @@ def evaluate_tier_a(
     else:
         results.append(_pass(TaxonomyFamily.A6))
 
-    # A7: catalog price is independent; execution quantity is agent-supplied and hash-bound.
-    if catalog_snapshot is None:
-        results.append(_not_evaluable(TaxonomyFamily.A7, "merchant catalog snapshot unavailable"))
-    elif not _catalog_commit_matches(catalog_snapshot, committed_hashes):
+    # A7: independent catalog price binds agent-supplied quantity and total in the PSP commit.
+    if catalog_commitment_state is not CommitmentState.MATCH:
+        results.append(_catalog_not_evaluable(TaxonomyFamily.A7, catalog_commitment_state))
+    elif transaction_commitment_state is not CommitmentState.MATCH:
         results.append(
-            _not_evaluable(
-                TaxonomyFamily.A7,
-                "committed merchant catalog snapshot unavailable or does not match",
-            )
-        )
-    elif not _transaction_commit_matches(transaction, committed_hashes):
-        results.append(
-            _not_evaluable(
-                TaxonomyFamily.A7,
-                "committed execution quantities unavailable or do not match",
-            )
+            _transaction_not_evaluable(TaxonomyFamily.A7, transaction_commitment_state)
         )
     elif catalog_snapshot.currency != mandate.payload.currency:
         results.append(
@@ -329,28 +321,28 @@ def evaluate_tier_a(
                 * line.quantity
                 for line in payload.lines
             )
-            if catalog_total_minor > hard.max_total_minor:
+            matches_declared_total = (
+                catalog_total_minor == payload.declared_order_total_minor
+            )
+            within_mandate_ceiling = catalog_total_minor <= hard.max_total_minor
+            if not matches_declared_total or not within_mandate_ceiling:
                 results.append(
                     _fail(
                         TaxonomyFamily.A7,
-                        "catalog-derived total exceeds the mandate ceiling",
+                        "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
                         catalog_total_minor=catalog_total_minor,
+                        declared_order_total_minor=payload.declared_order_total_minor,
                         mandate_max_total_minor=hard.max_total_minor,
+                        matches_declared_total=matches_declared_total,
+                        within_mandate_ceiling=within_mandate_ceiling,
                     )
                 )
             else:
                 results.append(_pass(TaxonomyFamily.A7))
 
     # A8: catalog recurrence state vs mandate permission.
-    if catalog_snapshot is None:
-        results.append(_not_evaluable(TaxonomyFamily.A8, "merchant catalog snapshot unavailable"))
-    elif not _catalog_commit_matches(catalog_snapshot, committed_hashes):
-        results.append(
-            _not_evaluable(
-                TaxonomyFamily.A8,
-                "committed merchant catalog snapshot unavailable or does not match",
-            )
-        )
+    if catalog_commitment_state is not CommitmentState.MATCH:
+        results.append(_catalog_not_evaluable(TaxonomyFamily.A8, catalog_commitment_state))
     else:
         missing_recurrence_skus = sorted(
             {line.sku for line in payload.lines if catalog_snapshot.item_by_sku(line.sku) is None}

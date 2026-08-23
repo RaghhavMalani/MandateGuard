@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import Enum
 from hashlib import sha256
 import re
 from typing import Any
@@ -14,6 +15,12 @@ from mandateguard.models.transaction import Transaction, TransactionPayload
 
 
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+
+
+class CommitmentState(str, Enum):
+    ABSENT = "ABSENT"
+    MATCH = "MATCH"
+    MISMATCH = "MISMATCH"
 
 
 def sha256_canonical(value: Any) -> str:
@@ -40,6 +47,26 @@ def mandate_payload_sha256(mandate: Mandate | MandatePayload) -> str:
     if not isinstance(payload, MandatePayload):
         raise TypeError("mandate must be Mandate or MandatePayload")
     return sha256_canonical(payload)
+
+
+def compare_sha256_commitment(
+    *, actual_sha256: str | None, committed_sha256: str | None
+) -> CommitmentState:
+    """Distinguish unavailable commitments from verified matches and mutations."""
+
+    for digest, name in (
+        (actual_sha256, "actual_sha256"),
+        (committed_sha256, "committed_sha256"),
+    ):
+        if digest is not None and (
+            not isinstance(digest, str) or not _SHA256_RE.fullmatch(digest)
+        ):
+            raise ValueError(f"{name} must be null or a lowercase SHA-256 hex digest")
+    if actual_sha256 is None or committed_sha256 is None:
+        return CommitmentState.ABSENT
+    if actual_sha256 == committed_sha256:
+        return CommitmentState.MATCH
+    return CommitmentState.MISMATCH
 
 
 @dataclass(frozen=True, slots=True)

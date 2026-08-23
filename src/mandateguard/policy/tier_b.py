@@ -45,14 +45,21 @@ def evaluate_tier_b(*, mandate: Mandate, transaction: Transaction) -> tuple[Find
     hard = mandate.payload.constraints.hard
     findings: list[Finding] = []
 
-    # B1: sum of declared line totals vs the declared order total.
+    # B1: per-line arithmetic and sum of line totals vs the declared order total.
+    invalid_line_totals = sorted(
+        line.sku
+        for line in payload.lines
+        if line.line_total_minor
+        != line.effective_unit_price_minor * line.quantity
+    )
     line_sum_minor = sum(line.line_total_minor for line in payload.lines)
-    if line_sum_minor != payload.declared_order_total_minor:
+    if invalid_line_totals or line_sum_minor != payload.declared_order_total_minor:
         findings.append(
             _finding(
                 TaxonomyFamily.B1,
-                "declared line totals do not reconcile with the declared order total",
+                "declared line arithmetic or order-total reconciliation failed",
                 declared_order_total_minor=payload.declared_order_total_minor,
+                invalid_line_totals=",".join(invalid_line_totals),
                 line_sum_minor=line_sum_minor,
             )
         )

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from mandateguard.core.canonical import canonical_json_bytes
 from mandateguard.core.hashing import (
     CommittedHashes,
@@ -38,6 +40,21 @@ def test_b1_checks_declared_order_line_sum() -> None:
     line = make_line(effective_unit_price_minor=10_000, quantity=2)
     transaction = make_transaction(
         payload=make_payload(lines=(line,), declared_order_total_minor=10_000)
+    )
+
+    assert TaxonomyFamily.B1 in _families(
+        evaluate_tier_b(mandate=make_mandate(), transaction=transaction)
+    )
+
+
+def test_b1_checks_per_line_price_quantity_arithmetic() -> None:
+    line = make_line(
+        effective_unit_price_minor=10_000,
+        quantity=2,
+        line_total_minor=19_999,
+    )
+    transaction = make_transaction(
+        payload=make_payload(lines=(line,), declared_order_total_minor=19_999)
     )
 
     assert TaxonomyFamily.B1 in _families(
@@ -184,6 +201,92 @@ def test_catalog_price_attack_passes_b6_but_a1_a7_force_block() -> None:
             tier_b_findings=tier_b,
         )
     )
+
+
+@pytest.mark.parametrize(
+    "charged_total_minor",
+    [
+        pytest.param(500_000, id="overcharge"),
+        pytest.param(1, id="undercharge"),
+    ],
+)
+def test_catalog_price_is_bound_to_execution_amount(
+    charged_total_minor: int,
+) -> None:
+    mandate = make_mandate(max_total_minor=500_000)
+    transaction = make_transaction(
+        payload=make_payload(
+            lines=(
+                make_line(
+                    effective_unit_price_minor=10_000,
+                    quantity=1,
+                    line_total_minor=charged_total_minor,
+                ),
+            ),
+            declared_order_total_minor=charged_total_minor,
+        )
+    )
+    catalog = make_catalog(price_minor=10_000)
+    tier_b = evaluate_tier_b(mandate=mandate, transaction=transaction)
+    tier_a = evaluate_tier_a(
+        mandate=mandate,
+        transaction=transaction,
+        catalog_snapshot=catalog,
+        server_time=SERVER_TIME,
+        nonce_state=NonceLedgerState(),
+        committed_hashes=make_commitments(transaction, catalog),
+    )
+    decision = decide_deterministically(
+        replay_seed=20,
+        evaluated_at=SERVER_TIME,
+        transaction_sha256=transaction_body_sha256(transaction),
+        catalog_snapshot_sha256=catalog_snapshot_sha256(catalog),
+        tier_a_results=tier_a,
+        tier_b_findings=tier_b,
+    )
+
+    assert TaxonomyFamily.B1 in _families(tier_b)
+    assert _tier_a_status(tier_a, TaxonomyFamily.A1) is TierACheckStatus.PASS
+    assert _tier_a_status(tier_a, TaxonomyFamily.A7) is TierACheckStatus.FAIL
+    assert decision.action is DecisionAction.BLOCK
+
+
+def test_legitimate_catalog_derived_execution_amount_passes_b1_and_a7() -> None:
+    mandate = make_mandate(max_total_minor=20_000)
+    transaction = make_transaction(
+        payload=make_payload(
+            lines=(
+                make_line(
+                    effective_unit_price_minor=10_000,
+                    quantity=2,
+                    line_total_minor=20_000,
+                ),
+            ),
+            declared_order_total_minor=20_000,
+        )
+    )
+    catalog = make_catalog(price_minor=10_000)
+    tier_b = evaluate_tier_b(mandate=mandate, transaction=transaction)
+    tier_a = evaluate_tier_a(
+        mandate=mandate,
+        transaction=transaction,
+        catalog_snapshot=catalog,
+        server_time=SERVER_TIME,
+        nonce_state=NonceLedgerState(),
+        committed_hashes=make_commitments(transaction, catalog),
+    )
+    decision = decide_deterministically(
+        replay_seed=21,
+        evaluated_at=SERVER_TIME,
+        transaction_sha256=transaction_body_sha256(transaction),
+        catalog_snapshot_sha256=catalog_snapshot_sha256(catalog),
+        tier_a_results=tier_a,
+        tier_b_findings=tier_b,
+    )
+
+    assert TaxonomyFamily.B1 not in _families(tier_b)
+    assert _tier_a_status(tier_a, TaxonomyFamily.A7) is TierACheckStatus.PASS
+    assert decision.action is DecisionAction.ALLOW
 
 
 def test_unavailable_tier_a_evidence_routes_to_review() -> None:
