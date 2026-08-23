@@ -1,0 +1,148 @@
+{
+  "case_schema_version": "1.2",
+  "class_counts": {
+    "NE": 64,
+    "P": 472,
+    "V": 472
+  },
+  "corpus_file_sha256": {
+    "A1.jsonl": "e5d5c6cf072f09f1661dc5dc52fe7cedd295d473671583f4b58cd9a9e0fea621",
+    "A2.jsonl": "a6f1c567c6a2982ca203c9f486afb446decb1a96e63b8ed18373779552d68c15",
+    "A3.jsonl": "a124ceffca5997dce8b4d149af4e0d4cc48f450875fb750999b905f8375869b9",
+    "A4.jsonl": "78de4718aae55cca03ebd166e88c4d1da542a0aead0dccf6ffa5e18306490414",
+    "A5.jsonl": "e55a32826bd04a52599f5e1bfe1184ec6b0dc76480e9ebed25e90e69add79cd7",
+    "A6.jsonl": "a12766f0e5786ea4b29654ae9a3d1af32eea21efba56936bada982d623a617d0",
+    "A7.jsonl": "828b7d0163d1ca49af0bd2c600c49b1fd2f6315a0bde72c29006de7d983ce579",
+    "A8.jsonl": "2a3a3753de2bc69d28abb3b9b14f5cb11d7758a69cb35834c3659eb8aac5c055",
+    "B1.jsonl": "4f6f9b63c6174950e7e1854e094c1e99d8c63d6c83e649bb67f9008f5f007075",
+    "B10.jsonl": "6a95d63c8ab03011d2b587a7101eaaf9ab59c85f25f7cabb037dfcce7cb6ce5d",
+    "B2.jsonl": "432bfade74f7c02c558ff8f556ddc24489b3439b6bea703f550e10fb12387ef9",
+    "B3.jsonl": "99fe6e3e2d1db58f6185c144f1532c3b32d10eb31c46556e81640458de042cf8",
+    "B4.jsonl": "d5db30bd1f420d8c7b7674fe8b50bcfbe4f7fe72c488de5880dc179223bc75a8",
+    "B5.jsonl": "aef2647cdf31d304d1cbd246e4c57caee40cda93099b1e5bfdbc18a4630cb325",
+    "B6.jsonl": "2778ad64397e37a4570cafeb1cd666094ba7a5bc6a53eb03146d864d07c49ed4",
+    "B7.jsonl": "a06095682e31b5bb96184924bf46b17a2ec529d444f13466739943c96c2298f8",
+    "B8.jsonl": "90ffde6b937ebd5f9e58d9ebec2c45d31dd32353d019b97e898d12f288a92748",
+    "B9.jsonl": "8f542140c4a865a1b5a24a210f4152b00316e94145adddfe6b3005e1d72c3529"
+  },
+  "expected_action_counts": {
+    "ALLOW": 472,
+    "BLOCK": 472,
+    "REVIEW": 64
+  },
+  "first_run_null_count": 1008,
+  "generator_version": "d7-tier-ab/1.0.0",
+  "ground_truth_counts": {
+    "benign": 536,
+    "violation": 472
+  },
+  "label_recorded_at": "2026-08-23T00:00:00.000000Z",
+  "per_family_counts": {
+    "A1": {
+      "NE": 8,
+      "P": 24,
+      "V": 24,
+      "total": 56
+    },
+    "A2": {
+      "NE": 8,
+      "P": 24,
+      "V": 24,
+      "total": 56
+    },
+    "A3": {
+      "NE": 8,
+      "P": 24,
+      "V": 24,
+      "total": 56
+    },
+    "A4": {
+      "NE": 8,
+      "P": 24,
+      "V": 24,
+      "total": 56
+    },
+    "A5": {
+      "NE": 8,
+      "P": 24,
+      "V": 24,
+      "total": 56
+    },
+    "A6": {
+      "NE": 8,
+      "P": 24,
+      "V": 24,
+      "total": 56
+    },
+    "A7": {
+      "NE": 8,
+      "P": 24,
+      "V": 24,
+      "total": 56
+    },
+    "A8": {
+      "NE": 8,
+      "P": 24,
+      "V": 24,
+      "total": 56
+    },
+    "B1": {
+      "P": 28,
+      "V": 28,
+      "total": 56
+    },
+    "B10": {
+      "P": 28,
+      "V": 28,
+      "total": 56
+    },
+    "B2": {
+      "P": 28,
+      "V": 28,
+      "total": 56
+    },
+    "B3": {
+      "P": 28,
+      "V": 28,
+      "total": 56
+    },
+    "B4": {
+      "P": 28,
+      "V": 28,
+      "total": 56
+    },
+    "B5": {
+      "P": 28,
+      "V": 28,
+      "total": 56
+    },
+    "B6": {
+      "P": 28,
+      "V": 28,
+      "total": 56
+    },
+    "B7": {
+      "P": 28,
+      "V": 28,
+      "total": 56
+    },
+    "B8": {
+      "P": 28,
+      "V": 28,
+      "total": 56
+    },
+    "B9": {
+      "P": 28,
+      "V": 28,
+      "total": 56
+    }
+  },
+  "registered_corpus_executed": false,
+  "semantic_constraint_case_count": 0,
+  "tier_a_total": 448,
+  "tier_b_total": 560,
+  "tier_c_case_count": 0,
+  "total_cases": 1008,
+  "unique_case_ids": 1008,
+  "unique_content_hashes": 1008
+}

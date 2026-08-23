@@ -1,0 +1,3 @@
+benchmark/MANIFEST.yaml text eol=lf
+benchmark/cases/tier_ab/*.jsonl text eol=lf
+benchmark/generated/*.json text eol=lf
