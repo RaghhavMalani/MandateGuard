@@ -23,14 +23,14 @@ def _minor_units(value: object, name: str) -> None:
 @dataclass(frozen=True, slots=True)
 class TransactionLine:
     sku: str
-    unit_price_minor: int
+    effective_unit_price_minor: int
     quantity: int
     line_total_minor: int
     recurring: bool
 
     def __post_init__(self) -> None:
         _nonempty(self.sku, "sku", 128)
-        _minor_units(self.unit_price_minor, "unit_price_minor")
+        _minor_units(self.effective_unit_price_minor, "effective_unit_price_minor")
         if isinstance(self.quantity, bool) or not isinstance(self.quantity, int) or self.quantity < 1:
             raise ValueError("quantity must be a positive integer")
         _minor_units(self.line_total_minor, "line_total_minor")
@@ -79,12 +79,12 @@ class TransactionPayload:
 @dataclass(frozen=True, slots=True)
 class Transaction:
     payload: TransactionPayload
-    declared_payload_sha256: str
+    declared_transaction_hash: str
 
     def __post_init__(self) -> None:
         if not isinstance(self.payload, TransactionPayload):
             raise ValueError("payload must be TransactionPayload")
-        if not isinstance(self.declared_payload_sha256, str) or not _SHA256_RE.fullmatch(
-            self.declared_payload_sha256
+        if not isinstance(self.declared_transaction_hash, str) or not _SHA256_RE.fullmatch(
+            self.declared_transaction_hash
         ):
-            raise ValueError("declared_payload_sha256 must be a lowercase SHA-256 hex digest")
+            raise ValueError("declared_transaction_hash must be a lowercase SHA-256 hex digest")

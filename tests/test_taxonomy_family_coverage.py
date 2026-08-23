@@ -8,9 +8,11 @@ from mandateguard.models.finding import (
     TIER_B_FAMILIES,
     Finding,
     TaxonomyFamily,
+    TierACheckResult,
+    TierACheckStatus,
 )
 from mandateguard.policy import SUPPORTED_TIER_A_FAMILIES, SUPPORTED_TIER_B_FAMILIES
-from mandateguard.policy.tier_a import _finding as tier_a_finding
+from mandateguard.policy.tier_a import _fail as tier_a_failure
 from mandateguard.policy.tier_b import _finding as tier_b_finding
 
 
@@ -47,7 +49,7 @@ def test_every_policy_emission_family_is_registered() -> None:
 
 def test_policy_helpers_reject_cross_tier_or_tier_c_findings() -> None:
     with pytest.raises(ValueError):
-        tier_a_finding(TaxonomyFamily.B1, "wrong tier")
+        tier_a_failure(TaxonomyFamily.B1, "wrong tier")
     with pytest.raises(ValueError):
         tier_b_finding(TaxonomyFamily.C_DEV_PURPOSE, "Tier C is out of scope")
 
@@ -55,3 +57,16 @@ def test_policy_helpers_reject_cross_tier_or_tier_c_findings() -> None:
 def test_finding_rejects_unregistered_family_string() -> None:
     with pytest.raises(ValueError):
         Finding(family="A99", message="not registered")  # type: ignore[arg-type]
+
+
+def test_tier_a_result_rejects_non_tier_a_family() -> None:
+    with pytest.raises(ValueError):
+        TierACheckResult(
+            family=TaxonomyFamily.B1,
+            status=TierACheckStatus.PASS,
+        )
+    with pytest.raises(ValueError):
+        TierACheckResult(
+            family="A1",  # type: ignore[arg-type]
+            status=TierACheckStatus.PASS,
+        )

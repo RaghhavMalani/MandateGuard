@@ -6,7 +6,12 @@ from mandateguard.models.decision import (
     DeterministicDecision,
     decide_deterministically,
 )
-from mandateguard.models.finding import Finding, TaxonomyFamily
+from mandateguard.models.finding import (
+    Finding,
+    TaxonomyFamily,
+    TierACheckResult,
+    TierACheckStatus,
+)
 from mandateguard.models.mandate import (
     HardConstraints,
     IssuerAttestation,
@@ -30,6 +35,8 @@ __all__ = [
     "MandatePayload",
     "SemanticConstraint",
     "TaxonomyFamily",
+    "TierACheckResult",
+    "TierACheckStatus",
     "Transaction",
     "TransactionLine",
     "TransactionPayload",

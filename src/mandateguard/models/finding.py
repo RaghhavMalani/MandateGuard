@@ -42,6 +42,12 @@ TIER_A_FAMILIES = frozenset(family for family in TaxonomyFamily if family.value.
 TIER_B_FAMILIES = frozenset(family for family in TaxonomyFamily if family.value.startswith("B"))
 
 
+class TierACheckStatus(str, Enum):
+    PASS = "PASS"
+    FAIL = "FAIL"
+    NOT_EVALUABLE = "NOT_EVALUABLE"
+
+
 @dataclass(frozen=True, slots=True)
 class Finding:
     family: TaxonomyFamily
@@ -77,3 +83,31 @@ class Finding:
     ) -> Finding:
         ordered = tuple(sorted((details or {}).items()))
         return cls(family=family, message=message, details=ordered)
+
+
+@dataclass(frozen=True, slots=True)
+class TierACheckResult:
+    """One explicit A-family outcome, including evidence-unavailable REVIEW state."""
+
+    family: TaxonomyFamily
+    status: TierACheckStatus
+    finding: Finding | None = None
+    reason: str | None = None
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.family, TaxonomyFamily) or self.family not in TIER_A_FAMILIES:
+            raise ValueError("Tier A check result family must be A1-A8")
+        if not isinstance(self.status, TierACheckStatus):
+            raise ValueError("status must be a TierACheckStatus")
+        if self.status is TierACheckStatus.FAIL:
+            if not isinstance(self.finding, Finding) or self.finding.family is not self.family:
+                raise ValueError("FAIL requires a same-family Finding")
+            if self.reason is not None:
+                raise ValueError("FAIL records its reason in the Finding")
+        elif self.status is TierACheckStatus.NOT_EVALUABLE:
+            if self.finding is not None:
+                raise ValueError("NOT_EVALUABLE must not be represented as a violation Finding")
+            if not isinstance(self.reason, str) or not self.reason:
+                raise ValueError("NOT_EVALUABLE requires an evidence-unavailability reason")
+        elif self.finding is not None or self.reason is not None:
+            raise ValueError("PASS must not carry a finding or reason")

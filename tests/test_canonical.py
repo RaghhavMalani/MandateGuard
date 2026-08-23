@@ -11,9 +11,9 @@ from mandateguard.core.canonical import (
     FloatNotAllowedError,
     canonical_json_bytes,
 )
-from mandateguard.core.hashing import sha256_canonical, transaction_payload_sha256
+from mandateguard.core.hashing import sha256_canonical, transaction_body_sha256
 from mandateguard.models.transaction import TransactionLine
-from tests.factories import make_payload
+from tests.factories import make_payload, make_transaction
 
 
 def test_canonical_json_is_sorted_compact_and_utf8() -> None:
@@ -67,15 +67,24 @@ def test_sha256_is_over_exact_canonical_bytes() -> None:
 def test_transaction_hash_is_stable_and_contains_no_declared_hash_cycle() -> None:
     payload = make_payload()
 
-    assert transaction_payload_sha256(payload) == transaction_payload_sha256(payload)
-    assert len(transaction_payload_sha256(payload)) == 64
+    assert transaction_body_sha256(payload) == transaction_body_sha256(payload)
+    assert len(transaction_body_sha256(payload)) == 64
+
+
+def test_transaction_body_hash_excludes_declared_transaction_hash() -> None:
+    payload = make_payload()
+    first = make_transaction(payload=payload, declared_transaction_hash="0" * 64)
+    second = make_transaction(payload=payload, declared_transaction_hash="f" * 64)
+
+    assert transaction_body_sha256(first) == transaction_body_sha256(second)
+    assert canonical_json_bytes(first) != canonical_json_bytes(second)
 
 
 def test_money_model_rejects_float_minor_units() -> None:
     with pytest.raises(ValueError):
         TransactionLine(
             sku="sku-1",
-            unit_price_minor=10.5,  # type: ignore[arg-type]
+            effective_unit_price_minor=10.5,  # type: ignore[arg-type]
             quantity=1,
             line_total_minor=10,
             recurring=False,

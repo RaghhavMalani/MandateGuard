@@ -11,7 +11,7 @@ from mandateguard.core.hashing import (
     catalog_snapshot_sha256,
     mandate_payload_sha256,
     sha256_canonical,
-    transaction_payload_sha256,
+    transaction_body_sha256,
 )
 from mandateguard.core.nonce_ledger import NonceAlreadyConsumed, NonceLedgerState
 
@@ -26,5 +26,5 @@ __all__ = [
     "catalog_snapshot_sha256",
     "mandate_payload_sha256",
     "sha256_canonical",
-    "transaction_payload_sha256",
+    "transaction_body_sha256",
 ]

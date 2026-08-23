@@ -20,7 +20,9 @@ def sha256_canonical(value: Any) -> str:
     return sha256(canonical_json_bytes(value)).hexdigest()
 
 
-def transaction_payload_sha256(transaction: Transaction | TransactionPayload) -> str:
+def transaction_body_sha256(transaction: Transaction | TransactionPayload) -> str:
+    """Hash the canonical transaction body, excluding declared_transaction_hash."""
+
     payload = transaction.payload if isinstance(transaction, Transaction) else transaction
     if not isinstance(payload, TransactionPayload):
         raise TypeError("transaction must be Transaction or TransactionPayload")
@@ -44,13 +46,15 @@ def mandate_payload_sha256(mandate: Mandate | MandatePayload) -> str:
 class CommittedHashes:
     """PSP-side commitments captured before deterministic evaluation."""
 
-    transaction_sha256: str
-    catalog_snapshot_sha256: str
+    transaction_sha256: str | None
+    catalog_snapshot_sha256: str | None
 
     def __post_init__(self) -> None:
         for digest, name in (
             (self.transaction_sha256, "transaction_sha256"),
             (self.catalog_snapshot_sha256, "catalog_snapshot_sha256"),
         ):
-            if not isinstance(digest, str) or not _SHA256_RE.fullmatch(digest):
-                raise ValueError(f"{name} must be a lowercase SHA-256 hex digest")
+            if digest is not None and (
+                not isinstance(digest, str) or not _SHA256_RE.fullmatch(digest)
+            ):
+                raise ValueError(f"{name} must be null or a lowercase SHA-256 hex digest")

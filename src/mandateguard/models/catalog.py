@@ -18,14 +18,20 @@ def _nonempty(value: object, name: str, maximum: int = 256) -> None:
 class CatalogItem:
     sku: str
     merchant_id: str
-    price_minor: int
+    effective_unit_price_minor: int
     recurring: bool
 
     def __post_init__(self) -> None:
         _nonempty(self.sku, "sku", 128)
         _nonempty(self.merchant_id, "merchant_id", 128)
-        if isinstance(self.price_minor, bool) or not isinstance(self.price_minor, int) or self.price_minor < 0:
-            raise ValueError("price_minor must be a non-negative integer in minor units")
+        if (
+            isinstance(self.effective_unit_price_minor, bool)
+            or not isinstance(self.effective_unit_price_minor, int)
+            or self.effective_unit_price_minor < 0
+        ):
+            raise ValueError(
+                "effective_unit_price_minor must be a non-negative integer in minor units"
+            )
         if not isinstance(self.recurring, bool):
             raise ValueError("recurring must be a boolean")
 

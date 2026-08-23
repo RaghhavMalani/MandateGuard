@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from mandateguard.core.hashing import transaction_payload_sha256
+from mandateguard.core.hashing import transaction_body_sha256
 from mandateguard.models.finding import Finding, TIER_B_FAMILIES, TaxonomyFamily
 from mandateguard.models.mandate import Mandate
 from mandateguard.models.transaction import Transaction
@@ -45,20 +45,14 @@ def evaluate_tier_b(*, mandate: Mandate, transaction: Transaction) -> tuple[Find
     hard = mandate.payload.constraints.hard
     findings: list[Finding] = []
 
-    # B1: each declared line total and the order line-sum must be arithmetically consistent.
-    invalid_line_totals = sorted(
-        line.sku
-        for line in payload.lines
-        if line.line_total_minor != line.unit_price_minor * line.quantity
-    )
+    # B1: sum of declared line totals vs the declared order total.
     line_sum_minor = sum(line.line_total_minor for line in payload.lines)
-    if invalid_line_totals or line_sum_minor != payload.declared_order_total_minor:
+    if line_sum_minor != payload.declared_order_total_minor:
         findings.append(
             _finding(
                 TaxonomyFamily.B1,
                 "declared line totals do not reconcile with the declared order total",
                 declared_order_total_minor=payload.declared_order_total_minor,
-                invalid_line_totals=",".join(invalid_line_totals),
                 line_sum_minor=line_sum_minor,
             )
         )
@@ -108,14 +102,14 @@ def evaluate_tier_b(*, mandate: Mandate, transaction: Transaction) -> tuple[Find
         )
 
     # B5: transaction payload vs its agent-declared commitment.
-    actual_transaction_hash = transaction_payload_sha256(transaction)
-    if actual_transaction_hash != transaction.declared_payload_sha256:
+    actual_transaction_hash = transaction_body_sha256(transaction)
+    if actual_transaction_hash != transaction.declared_transaction_hash:
         findings.append(
             _finding(
                 TaxonomyFamily.B5,
                 "canonical transaction hash does not match its declared commitment",
                 actual_sha256=actual_transaction_hash,
-                declared_sha256=transaction.declared_payload_sha256,
+                declared_sha256=transaction.declared_transaction_hash,
             )
         )
 

@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from mandateguard.core.hashing import (
     CommittedHashes,
     catalog_snapshot_sha256,
-    transaction_payload_sha256,
+    transaction_body_sha256,
 )
 from mandateguard.models.catalog import CatalogItem, CatalogSnapshot
 from mandateguard.models.mandate import (
@@ -62,17 +62,19 @@ def make_mandate(
 def make_line(
     *,
     sku: str = "sku-1",
-    unit_price_minor: int = 100_00,
+    effective_unit_price_minor: int = 100_00,
     quantity: int = 1,
     line_total_minor: int | None = None,
     recurring: bool = False,
 ) -> TransactionLine:
     return TransactionLine(
         sku=sku,
-        unit_price_minor=unit_price_minor,
+        effective_unit_price_minor=effective_unit_price_minor,
         quantity=quantity,
         line_total_minor=(
-            unit_price_minor * quantity if line_total_minor is None else line_total_minor
+            effective_unit_price_minor * quantity
+            if line_total_minor is None
+            else line_total_minor
         ),
         recurring=recurring,
     )
@@ -115,15 +117,15 @@ def make_payload(
 def make_transaction(
     *,
     payload: TransactionPayload | None = None,
-    declared_payload_sha256: str | None = None,
+    declared_transaction_hash: str | None = None,
 ) -> Transaction:
     actual_payload = payload if payload is not None else make_payload()
     return Transaction(
         payload=actual_payload,
-        declared_payload_sha256=(
-            transaction_payload_sha256(actual_payload)
-            if declared_payload_sha256 is None
-            else declared_payload_sha256
+        declared_transaction_hash=(
+            transaction_body_sha256(actual_payload)
+            if declared_transaction_hash is None
+            else declared_transaction_hash
         ),
     )
 
@@ -142,7 +144,7 @@ def make_catalog(
             CatalogItem(
                 sku="sku-1",
                 merchant_id=merchant_id,
-                price_minor=price_minor,
+                effective_unit_price_minor=price_minor,
                 recurring=recurring,
             ),
         )
@@ -158,6 +160,6 @@ def make_commitments(
     transaction: Transaction, catalog: CatalogSnapshot
 ) -> CommittedHashes:
     return CommittedHashes(
-        transaction_sha256=transaction_payload_sha256(transaction),
+        transaction_sha256=transaction_body_sha256(transaction),
         catalog_snapshot_sha256=catalog_snapshot_sha256(catalog),
     )
