@@ -1,7 +1,7 @@
 # MandateGuard — V1 Threat & Evaluation Taxonomy
 
-**Status:** D1 pre-registration artifact, amended before detector implementation  
-**Freeze rule:** this document was committed before detector implementation. Any later change must be a new commit that explicitly explains why the pre-registered taxonomy changed. This amendment closes mandate-conformance gaps before D2 detector code exists.
+**Status:** D1 pre-registration artifact, amended before detector implementation and again after D2 deterministic-core review  
+**Freeze rule:** this document was committed before detector implementation. Any later change must be a new commit that explicitly explains why the pre-registered taxonomy changed. The first amendment closed mandate-conformance gaps before D2 detector code existed. This second amendment records deterministic evidence-state semantics discovered during D2 review, before benchmark generation, Tier C implementation, or held-out execution.
 
 ## 1. V1 claim
 
@@ -63,7 +63,7 @@ Checked against state the buyer agent does not control. A consistent lie can sti
 
 | ID | Check | Independent source | V1 guarantee |
 |---|---|---|---|
-| A1 | Declared line price vs catalog price | Merchant catalog source/fixture | Detects agent-side price divergence from catalog state |
+| A1 | Declared effective unit price vs catalog effective unit price | Merchant catalog source/fixture | Exact equality at the committed catalog snapshot. V1 has **zero price tolerance**: a tolerance band would be policy, not verification. Legitimate discounts must be reflected in the authoritative effective catalog price. |
 | A2 | SKU existence and merchant ownership | Merchant catalog source/fixture | Detects nonexistent or merchant-mismatched SKU declarations |
 | A3 | Merchant identity consistency | Merchant/catalog mapping | Detects merchant substitution relative to independently retrieved ownership |
 | A4 | Nonce replay | PSP nonce ledger | Detects reuse of a consumed authorization nonce. **All V1 mandate nonces are single-use.** Multi-use mandates/counters are out of scope. |
@@ -83,10 +83,10 @@ These checks validate consistency of agent-supplied fields and conformance of th
 | ID | Check | Example |
 |---|---|---|
 | B1 | Line-sum consistency | sum(line totals) == declared order total |
-| B2 | Quantity consistency | declared aggregate quantity matches line-item quantities |
+| B2 | Agent-declared aggregate quantity vs line-item quantities | `declared_aggregate_quantity == Σ(line.quantity)`. The aggregate quantity is a distinct agent-supplied field; B2 is therefore falsifiable rather than comparing a derived value to itself. |
 | B3 | Currency consistency | mandate/cart/order use the same declared currency |
 | B4 | Recurrence-field consistency | recurring flags agree across self-reported structures |
-| B5 | Canonical transaction hash recomputation | serialized transaction matches its own declared commitment |
+| B5 | Canonical transaction body vs agent-declared transaction hash | Recompute SHA-256 over the canonical transaction body **excluding the declared hash field** and compare it with the separately supplied `declared_transaction_hash`. B5 is self-reported consistency; A6 remains the stronger PSP-side committed-hash check. |
 
 #### Mandate conformance
 
@@ -102,7 +102,7 @@ These checks validate consistency of agent-supplied fields and conformance of th
 
 ### Tier C — semantic judgment
 
-Invoked only when **all Tier A/B checks pass** and the mandate contains at least one constraint that cannot be reduced to a deterministic field comparison.
+Invoked only when **all deterministic checks have no known violation, no required Tier A evidence is unavailable,** and the mandate contains at least one constraint that cannot be reduced to a deterministic field comparison.
 
 Examples include:
 
@@ -113,17 +113,33 @@ Examples include:
 
 Tier C returns a categorical verdict with an explicit abstention path. Raw model confidence is recorded for diagnostics only and is not used as authorization evidence in V1.
 
+### Deterministic check-result semantics
+
+Tier A checks use three states:
+
+- `PASS`: the applicable invariant was evaluated and no violation was found, **or the check is not applicable to this transaction**;
+- `FAIL`: the invariant was evaluated and a concrete violation was established;
+- `NOT_EVALUABLE`: the check is required, but the independent evidence needed to evaluate it is unavailable, uncommitted, or incomparable.
+
+A `Finding` is emitted **only for `FAIL`**. `NOT_EVALUABLE` is not evidence of a violation and therefore must not be represented as a `Finding`.
+
+Examples of `NOT_EVALUABLE` include a required catalog lookup that is unavailable, a required independent snapshot without a valid commitment, or A1 prices denominated in currencies that cannot be compared. A check that is simply irrelevant to the transaction remains `PASS`, not `NOT_EVALUABLE`.
+
+Tier B operates on required typed declared state and is `PASS`/`FAIL` only in V1.
+
 ## 5. Enforcement precedence
 
-1. **Tier A violation → BLOCK**
-2. **Tier A passes; Tier B violation → BLOCK**
-3. **Tier A/B pass; no semantic constraints → ALLOW**
-4. **Tier A/B pass; semantic constraints exist → Tier C invoked**
-5. **Tier C PASS → ALLOW**
-6. **Tier C VIOLATION → BLOCK**
-7. **Tier C ABSTAIN → REVIEW**
+All applicable Tier A/B checks are evaluated before the deterministic action is selected.
 
-No LLM call occurs before deterministic checks have passed.
+1. **Any known Tier A or Tier B `FAIL` → BLOCK.** A known violation outranks missing evidence elsewhere.
+2. **Otherwise, any Tier A `NOT_EVALUABLE` → REVIEW.** Missing independent evidence must not be converted into a false violation or silently allowed.
+3. **Otherwise, no semantic constraints → ALLOW.**
+4. **Otherwise → Tier C invoked.**
+5. **Tier C PASS → ALLOW.**
+6. **Tier C VIOLATION → BLOCK.**
+7. **Tier C ABSTAIN → REVIEW.**
+
+No LLM call occurs before deterministic checks have passed and required Tier A evidence is evaluable.
 
 ## 6. Pre-registered Tier C family split
 
@@ -137,13 +153,13 @@ Generalization claims apply **only to Tier C**. Holding out deterministic checks
 
 ### Held-out families — detector implementation must not be developed against these
 
-These families are executed only after detector freeze.
-
 - `C-HOLD-BUNDLE`: a composite bundle contains a semantically disallowed component that is not exposed by structured fields.
 - `C-HOLD-COMPATIBILITY`: an item matches structured category/price constraints but is semantically incompatible with the requested device/context.
 - `C-HOLD-FULFILLMENT`: free-text fulfillment/service terms conflict with a semantic requirement when no structured field independently exposes the conflict.
 
-If any held-out family is inspected or used for detector tuning before the freeze, it loses held-out status and must be reported as such.
+The **family definitions are pre-registered**, but individual held-out case content must not be inspected while detector code remains editable. The detector freezes first. Held-out cases are then revealed/authored, human-adjudicated, labelled, and content-hashed **before their first detector execution**. No detector changes are permitted after that reveal.
+
+If any individual held-out case is inspected or used for detector tuning before the freeze, that case loses held-out status and must be reported as such.
 
 ### Pre-registered expected difficulty ordering
 
@@ -181,7 +197,7 @@ Ground truth and detector action are distinct. Ground truth is binary (`violatio
 
 ### Tier A/B
 
-Report invariant-level pass/fail coverage and correctness. Near-100% correctness is expected and is not presented as an ML result.
+Report invariant-level pass/fail coverage and correctness. Near-100% correctness is expected and is not presented as an ML result. `NOT_EVALUABLE` must be reported separately from both PASS and FAIL; it may not be counted as successful detection.
 
 ### Tier C
 
@@ -214,7 +230,7 @@ The economic model may analyze or justify action policy, but V1 must not pretend
 
 **Detector freeze:** end of D9. No detector or decision-rule changes after this point.
 
-D10 executes held-out Tier C families for the first time.
+After the freeze, held-out Tier C cases may be revealed/authored and human-adjudicated. Their `ground_truth` labels and `case_content_sha256` values must be recorded before the frozen detector sees them. D10 executes those held-out cases for the first time.
 
 Every benchmark case is content-addressed by `case_content_sha256` when its label is recorded. Any post-recording edit changes the hash and is therefore detectable. The original labelled case remains part of the audit record.
 

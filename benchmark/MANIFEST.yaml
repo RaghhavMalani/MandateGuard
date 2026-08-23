@@ -1,4 +1,4 @@
-schema_version: "1.1"
+schema_version: "1.2"
 artifact_status: "pre_registered_structure"
 
 # This file is intentionally empty of evaluation cases before detector implementation.
@@ -62,13 +62,14 @@ case_schema:
       - benign
     expected_action:
       - ALLOW
+      - REVIEW
       - BLOCK
     label_source:
       - deterministic_invariant
       - human_adjudication
 
 field_rules:
-  expected_action: "Optional and used only for deterministic Tier A/B cases whose invariant fixes the action. Tier C cases omit it."
+  expected_action: "Optional. For deterministic Tier A/B cases, ALLOW/BLOCK may be fixed by an invariant and REVIEW may be fixed when a required independent Tier A check is NOT_EVALUABLE. Tier C cases omit expected_action."
   first_run_at: "Null until first detector execution, then immutable."
   case_content_sha256: "SHA-256 of the canonical case definition recorded with its label before first execution. It covers evaluation inputs, family_id, evidence_tier, provenance, split, ground_truth, and label_source; it excludes audit-only first_run_at."
 
@@ -80,6 +81,8 @@ hash_policy:
 freeze_policy:
   tier_c_generalization_only: true
   detector_code_freeze: "end_of_D9"
+  held_out_case_content_revealed_after_freeze: true
+  held_out_labels_recorded_before_first_detector_execution: true
   held_out_first_execution: "D10"
   post_freeze_detector_changes_allowed: false
   post_freeze_evasions_are_report_only: true
