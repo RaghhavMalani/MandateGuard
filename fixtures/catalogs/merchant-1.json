@@ -1,0 +1,19 @@
+{
+  "snapshot_id": "fixture-merchant-1-v1",
+  "merchant_id": "merchant-1",
+  "currency": "INR",
+  "items": [
+    {
+      "sku": "sku-2",
+      "merchant_id": "merchant-1",
+      "effective_unit_price_minor": 25000,
+      "recurring": false
+    },
+    {
+      "sku": "sku-1",
+      "merchant_id": "merchant-1",
+      "effective_unit_price_minor": 10000,
+      "recurring": false
+    }
+  ]
+}
