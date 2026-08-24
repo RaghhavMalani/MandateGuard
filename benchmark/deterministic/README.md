@@ -1,13 +1,18 @@
 # D7 — Deterministic Tier A/B benchmark corpus generation
 
-**Status:** generated, labelled, hashed, and **not yet executed**.
+**Status:** generated, labelled, hashed, and **executed once** on
+2026-08-24. This document describes the generation milestone; the first
+registered execution is recorded separately in
+`benchmark/results/tier_ab/FIRST_RUN_SUMMARY.json`.
 
 D7 is corpus *generation* only. It creates the 1,008 preregistered
 deterministic Tier A/B cases fixed by `benchmark/PROTOCOL.md` §2.1, records a
 mechanical ground-truth label for each one, and hashes the case content. The
 registered corpus has **not** been run through `evaluate_tier_a`,
 `evaluate_tier_b`, `authorize_transaction`, `finalize_authorization`, or the
-semantic verifier. Every case carries `first_run_at: null`.
+semantic verifier at generation time, and every generated case carried
+`first_run_at: null`. Those values were recorded once, at the first registered
+execution, without moving a single `case_content_sha256`.
 
 The claim this artifact supports, and no more:
 
@@ -209,15 +214,33 @@ violations, all of A4, A5, A8, B1, B2, B4, B5, B7, B8, B9, B10, and every
 benign case — introduce no second finding and no additional `NOT_EVALUABLE`
 check.
 
-## What has not happened yet
+## Lifecycle after generation
 
-- The registered corpus has not been executed. `first_run_at` is `null` for all
-  1,008 cases.
-- No detector metric of any kind exists for Tier A or Tier B.
-- `benchmark/generated/TIER_AB_GENERATION_SUMMARY.json` is generation audit
-  metadata only. It contains counts and file digests, never a detector result.
+The registered corpus was executed once, on 2026-08-24, from the harness
+committed at `827462cca6c163bbb45b7623521fe111d9ffc416`. That run recorded
+`first_run_at` in both registered mirrors — the JSONL corpus files and
+`benchmark/MANIFEST.yaml` — which is the transition the manifest preregisters
+in its `field_rules`:
+
+> `first_run_at`: Null until first detector execution, then immutable.
+
+`first_run_at` is excluded from `case_content_sha256` by the manifest hash
+policy, by PROTOCOL §6, and by the codec's content projection, so recording it
+cannot move a digest. All 1,008 digests are unchanged, and the generator
+remains a pure function: regenerating the corpus reproduces every committed
+byte except that one audit-only field.
+
+`benchmark/generated/TIER_AB_GENERATION_SUMMARY.json` is **generation** audit
+metadata and is deliberately left byte-immutable. Its `corpus_file_sha256`
+values are the pre-execution digests, and its `registered_corpus_executed` and
+`first_run_null_count` fields describe the moment of generation. The
+post-execution facts that supersede them are recorded in
+`benchmark/results/tier_ab/FIRST_RUN_SUMMARY.json`, which carries both
+`pre_execution_corpus_sha256` and `post_first_run_metadata_corpus_sha256` so
+the two states are distinguishable rather than conflated.
 
 ## Next step
 
-Hostile review of this generated corpus, and only then the first registered
-deterministic execution.
+Tier C corpus construction and held-out handling, per `benchmark/PROTOCOL.md`.
+Detector freeze remains scheduled for the end of D9; the Tier A/B corpus is
+closed and its labels may not be revised in light of the first-run result.

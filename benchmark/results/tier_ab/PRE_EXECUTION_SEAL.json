@@ -1,0 +1,85 @@
+{
+  "benchmark_protocol_git_sha": "be9bfc5e2092362d79c7554dac35fef5490bfa5e",
+  "class_counts": {
+    "NE": 64,
+    "P": 472,
+    "V": 472
+  },
+  "corpus_generation_git_sha": "c50ad89259cd5d4b73929eebbff7fd66af3363db",
+  "environment": {
+    "execution_mode": "single process, in-process call, no warm-up, no caching",
+    "machine": "AMD64",
+    "os_name": "nt",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+    "python_build": "tags/v3.12.0:0fb18b0 Oct  2 2023 13:03:39",
+    "python_implementation": "CPython",
+    "python_version": "3.12.0"
+  },
+  "execution_code_git_sha": "827462cca6c163bbb45b7623521fe111d9ffc416",
+  "execution_run_id": "a725ae0b51c6396cdf90a2cd5edfce15926fd192f4a787810b2ff7bb2477f046",
+  "execution_schema_version": "d8-tier-ab-execution/1.0.0",
+  "expected_action_counts": {
+    "ALLOW": 472,
+    "BLOCK": 472,
+    "REVIEW": 64
+  },
+  "first_run_at_null_count": 1008,
+  "generation_summary_sha256": "0836872583905ef8e3d510d75edaea7d65b6526767e659eda406b5e312b7cf27",
+  "ground_truth_counts": {
+    "benign": 536,
+    "violation": 472
+  },
+  "manifest_first_run_at_null_count": 1008,
+  "per_family_counts": {
+    "A1": 56,
+    "A2": 56,
+    "A3": 56,
+    "A4": 56,
+    "A5": 56,
+    "A6": 56,
+    "A7": 56,
+    "A8": 56,
+    "B1": 56,
+    "B10": 56,
+    "B2": 56,
+    "B3": 56,
+    "B4": 56,
+    "B5": 56,
+    "B6": 56,
+    "B7": 56,
+    "B8": 56,
+    "B9": 56
+  },
+  "pre_execution_corpus_sha256": {
+    "A1.jsonl": "a9a83d6424ec0dde68f4a58d27f367d6976fcbed0597adf447849fcbcc0dc6ac",
+    "A2.jsonl": "7d04affcce329acca2aea3a02dbcbdd80f8eec2ddbaca5cb10396e74891cc33a",
+    "A3.jsonl": "7546fa2f528fb1d3d7cf2fdd05e37195a725fe2b7dda1199e96fe798f23fd6f7",
+    "A4.jsonl": "2ebb04f4f40d781c0f58dc8f62e6dd1e63457c0a0aad27b5d41931b9582d246a",
+    "A5.jsonl": "d5e9419752ccfa951710803d634f9bf5d4ef43c0221a06dcbf0eac0093588775",
+    "A6.jsonl": "b3bbb6e0cb6a8154803c500aa3220d05871e6d319ef8e0bdad58615856c029e8",
+    "A7.jsonl": "7fa9e9adfe6473fd06f5ca3115b934e473e65c6687be16c40cd6da4b1a6436ea",
+    "A8.jsonl": "c31a0880cab2f3be33fecc16c9896e611a1451cce89858e5f233485b47a1afb8",
+    "B1.jsonl": "80fb52f0ee45889925bb5a636f42da3115f9c75b205e571629e77563e0382130",
+    "B10.jsonl": "50e1ef3bf999264c6185f7b66f71b3614765c5d81118a759ada0ad10f701819b",
+    "B2.jsonl": "2a5320de857222d1a01f585d508c303d18847a9d69901a02158c4a5ad60d03f6",
+    "B3.jsonl": "eba6c5aebfeee0e6c3b24e597f2d3b88a41a585bb5c45529091cf426fc4ac76e",
+    "B4.jsonl": "5ffc073ca89e58cc7216b55bf7a8c932a5350cf003417737c1bf286da900cb6b",
+    "B5.jsonl": "76e4171c26cc2c3bb0e85ee95996c9d75981030423e652f3564a85839376d9cb",
+    "B6.jsonl": "c3fe1fadac86b24754bfe4f527c14fad0d2c4a2b3580174081c852db92a89559",
+    "B7.jsonl": "8862e81fe4c6b7bca1af82020d7d53f90152a099c12becdfa91fd21a4ade517b",
+    "B8.jsonl": "e90152d29d3c4c939821a87c87d21d1bd886fbc64a8d2697fc41a296e6e06e93",
+    "B9.jsonl": "ab4244961bb6b1e612f0e2d61a4c98fae87a5a5945f1e4f0e4992643d2240cac"
+  },
+  "pre_execution_manifest_cases_sha256": "9ce8174dba85e70d9ba3f996b33bd0f57cb3f5f288ea3828cd122af8e579b296",
+  "registered_target_status_counts": {
+    "FAIL": 472,
+    "NOT_EVALUABLE": 64,
+    "PASS": 472
+  },
+  "run_started_at": "2026-08-24T07:38:35.760189Z",
+  "semantic_constraint_case_count": 0,
+  "total_registered_cases": 1008,
+  "unique_case_content_sha256": 1008,
+  "unique_case_ids": 1008
+}

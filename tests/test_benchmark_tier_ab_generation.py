@@ -12,6 +12,7 @@ from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 import json
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
@@ -55,6 +56,7 @@ from mandateguard.benchmark.models import (
     TargetExpectation,
 )
 from mandateguard.benchmark.recipes import build_inputs, default_scenario
+from mandateguard.core.canonical import canonical_json_text
 from mandateguard.core.hashing import sha256_canonical
 
 
@@ -201,10 +203,24 @@ def test_registered_metadata_values(committed_records):
         assert record["generator"]["generator_version"] == GENERATOR_VERSION
 
 
-def test_every_case_keeps_first_run_at_null(committed_records, manifest_records):
-    assert all(record["first_run_at"] is None for record in committed_records)
-    assert all(record["first_run_at"] is None for record in manifest_records)
-    assert sum(1 for r in committed_records if r["first_run_at"] is None) == EXPECTED_TOTAL
+def test_every_case_records_exactly_one_first_run(committed_records, manifest_records):
+    """The registered corpus has now been executed once, on 2026-08-24.
+
+    ``benchmark/MANIFEST.yaml`` registers ``first_run_at`` as "Null until first
+    detector execution, then immutable". Both mirrors carry the same recorded
+    value for all 1,008 cases, and the digests are unmoved (see
+    ``test_recomputing_every_case_content_digest_matches``).
+    """
+
+    assert all(record["first_run_at"] is not None for record in committed_records)
+    assert all(record["first_run_at"] is not None for record in manifest_records)
+    assert sum(1 for r in committed_records if r["first_run_at"]) == EXPECTED_TOTAL
+
+    corpus = {r["case_id"]: r["first_run_at"] for r in committed_records}
+    manifest = {r["case_id"]: r["first_run_at"] for r in manifest_records}
+    assert corpus == manifest
+    for value in corpus.values():
+        assert decode_timestamp(value).tzinfo is timezone.utc
 
 
 def test_only_evidence_unavailable_cases_request_review(committed_records):
@@ -408,16 +424,47 @@ def test_two_generation_runs_are_byte_identical(tmp_path):
     ).read_bytes()
 
 
+def _without_first_run(line: str) -> str:
+    record = json.loads(line)
+    record["first_run_at"] = None
+    return canonical_json_text(record)
+
+
 def test_committed_corpus_matches_a_fresh_generation(tmp_path):
+    """Content reproduction still holds, with the lifecycle field set aside.
+
+    The generator remains a pure function of its version, the registered
+    recipes, and the explicit label timestamp. Since the first registered
+    execution, the committed artifacts additionally carry ``first_run_at``,
+    which generation never writes, so it is the one field lifted out before the
+    comparison. Every other byte must still match, which is what makes this a
+    tamper guard rather than a formality.
+    """
+
     generated = build_corpus(LABEL_RECORDED_AT, REPOSITORY_ROOT / MANIFEST_PATH)
     for family_id in BENCHMARK_FAMILIES:
         name = f"{family_id}.jsonl"
         committed = (CORPUS_ROOT / name).read_bytes().decode("utf-8")
-        assert generated.corpus_files[name] == committed
+        stripped = [_without_first_run(line) for line in committed.splitlines()]
+        assert generated.corpus_files[name] == "\n".join(stripped) + "\n"
+        assert all(
+            json.loads(line)["first_run_at"] is not None
+            for line in committed.splitlines()
+        )
+
     committed_manifest = normalized_manifest_text(
         (REPOSITORY_ROOT / MANIFEST_PATH).read_bytes()
     )
-    assert generated.manifest_text == committed_manifest
+    # Four spaces matches a case record only; the two-space ``field_rules``
+    # entry in the frozen preamble must not be rewritten.
+    stripped_manifest = re.sub(
+        r'^    first_run_at: "[^"]+"$',
+        "    first_run_at: null",
+        committed_manifest,
+        flags=re.MULTILINE,
+    )
+    assert generated.manifest_text == stripped_manifest
+    assert 'first_run_at: null' not in committed_manifest
 
 
 def test_generation_requires_an_explicit_aware_timestamp():
@@ -426,6 +473,15 @@ def test_generation_requires_an_explicit_aware_timestamp():
 
 
 def test_summary_records_generation_audit_only():
+    """A generation-time snapshot, deliberately not rewritten after execution.
+
+    ``benchmark/deterministic/README.md`` documents this file as generation
+    audit metadata. Its ``corpus_file_sha256`` values are the pre-execution
+    digests and its lifecycle counts describe the moment of generation, so it
+    stays byte-immutable; the post-execution facts that supersede it live in
+    ``benchmark/results/tier_ab/FIRST_RUN_SUMMARY.json``.
+    """
+
     summary = json.loads((REPOSITORY_ROOT / SUMMARY_PATH).read_text(encoding="utf-8"))
     assert summary["total_cases"] == EXPECTED_TOTAL
     assert summary["tier_a_total"] == EXPECTED_TIER_A_TOTAL
@@ -538,7 +594,9 @@ def test_a_recorded_first_run_round_trips_without_changing_the_digest(
     value through a round trip while leaving ``case_content_sha256`` alone.
     """
 
-    baseline = decode_case(violation_record)
+    unexecuted = dict(violation_record)
+    unexecuted["first_run_at"] = None
+    baseline = decode_case(unexecuted)
     record = dict(violation_record)
     record["first_run_at"] = "2026-08-23T00:00:00.000000Z"
     executed = decode_case(record)

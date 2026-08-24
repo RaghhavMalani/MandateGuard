@@ -1,0 +1,423 @@
+{
+  "actual_action_counts": {
+    "ALLOW": 472,
+    "BLOCK": 472,
+    "REVIEW": 64
+  },
+  "benchmark_protocol_git_sha": "be9bfc5e2092362d79c7554dac35fef5490bfa5e",
+  "case_content_sha256_preserved_count": 1008,
+  "cases_with_a_semantic_decision": 0,
+  "cases_with_semantic_constraints": 0,
+  "completed_cases": 1008,
+  "corpus_generation_git_sha": "c50ad89259cd5d4b73929eebbff7fd66af3363db",
+  "environment": {
+    "execution_mode": "single process, in-process call, no warm-up, no caching",
+    "machine": "AMD64",
+    "os_name": "nt",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+    "python_build": "tags/v3.12.0:0fb18b0 Oct  2 2023 13:03:39",
+    "python_implementation": "CPython",
+    "python_version": "3.12.0"
+  },
+  "execution_capability_issue_count": 0,
+  "execution_code_git_sha": "827462cca6c163bbb45b7623521fe111d9ffc416",
+  "execution_error_count": 0,
+  "execution_errors": [],
+  "execution_run_id": "a725ae0b51c6396cdf90a2cd5edfce15926fd192f4a787810b2ff7bb2477f046",
+  "execution_schema_version": "d8-tier-ab-execution/1.0.0",
+  "expected_action_correctness": {
+    "matches": 1008,
+    "mismatched_case_ids": [],
+    "mismatches": 0
+  },
+  "extra_observed_state": {
+    "cases_with_a_finding_outside_the_target_family": 64,
+    "cases_with_a_not_evaluable_outside_the_target_family": 98
+  },
+  "first_run_at_populated_count": 1008,
+  "generation_summary_disposition": {
+    "path": "benchmark/generated/TIER_AB_GENERATION_SUMMARY.json",
+    "rationale": "benchmark/deterministic/README.md documents the file as generation audit metadata; its corpus_file_sha256 values are the pre-execution digests and are preserved here rather than overwritten",
+    "superseded_fields": {
+      "first_run_null_count": 0,
+      "registered_corpus_executed": true
+    },
+    "treatment": "immutable pre-execution generation snapshot"
+  },
+  "latency": {
+    "deterministic_max_ns": 357100,
+    "deterministic_min_ns": 71200,
+    "deterministic_p50_ns": 135600,
+    "deterministic_p95_ns": 177900,
+    "measurement": "perf_counter_ns around the single frozen authorization call; excludes JSONL parsing, fixture reconstruction, serialization, manifest updating, and scoring",
+    "population": "completed deterministic-only cases",
+    "sample_count": 1008
+  },
+  "lifecycle": {
+    "case_content_sha256_preserved": 1008,
+    "case_content_sha256_total": 1008,
+    "corpus_records_updated": 1008,
+    "manifest_records_updated": 1008
+  },
+  "network_call_count": 0,
+  "observed_compositions": {
+    "A1_NOT_EVALUABLE_with_A7_NOT_EVALUABLE": 68,
+    "A2_FAIL_with_dependent_NOT_EVALUABLE": 12,
+    "A3_FAIL_with_A2_FAIL": 12,
+    "A6_FAIL_with_dependent_NOT_EVALUABLE": 24,
+    "A7_FAIL_with_B6_FAIL": 52,
+    "A7_NOT_EVALUABLE_with_A6_NOT_EVALUABLE": 44,
+    "B3_FAIL_with_A1_NOT_EVALUABLE": 14,
+    "B6_FAIL_with_A7_FAIL": 52
+  },
+  "observed_target_family_status_counts": {
+    "FAIL": 472,
+    "NOT_EVALUABLE": 64,
+    "PASS": 472
+  },
+  "per_family": {
+    "A1": {
+      "action_matches": 56,
+      "action_mismatches": 0,
+      "execution_errors": 0,
+      "target_status_matches": 56,
+      "target_status_mismatches": 0,
+      "total": 56
+    },
+    "A2": {
+      "action_matches": 56,
+      "action_mismatches": 0,
+      "execution_errors": 0,
+      "target_status_matches": 56,
+      "target_status_mismatches": 0,
+      "total": 56
+    },
+    "A3": {
+      "action_matches": 56,
+      "action_mismatches": 0,
+      "execution_errors": 0,
+      "target_status_matches": 56,
+      "target_status_mismatches": 0,
+      "total": 56
+    },
+    "A4": {
+      "action_matches": 56,
+      "action_mismatches": 0,
+      "execution_errors": 0,
+      "target_status_matches": 56,
+      "target_status_mismatches": 0,
+      "total": 56
+    },
+    "A5": {
+      "action_matches": 56,
+      "action_mismatches": 0,
+      "execution_errors": 0,
+      "target_status_matches": 56,
+      "target_status_mismatches": 0,
+      "total": 56
+    },
+    "A6": {
+      "action_matches": 56,
+      "action_mismatches": 0,
+      "execution_errors": 0,
+      "target_status_matches": 56,
+      "target_status_mismatches": 0,
+      "total": 56
+    },
+    "A7": {
+      "action_matches": 56,
+      "action_mismatches": 0,
+      "execution_errors": 0,
+      "target_status_matches": 56,
+      "target_status_mismatches": 0,
+      "total": 56
+    },
+    "A8": {
+      "action_matches": 56,
+      "action_mismatches": 0,
+      "execution_errors": 0,
+      "target_status_matches": 56,
+      "target_status_mismatches": 0,
+      "total": 56
+    },
+    "B1": {
+      "action_matches": 56,
+      "action_mismatches": 0,
+      "execution_errors": 0,
+      "target_status_matches": 56,
+      "target_status_mismatches": 0,
+      "total": 56
+    },
+    "B10": {
+      "action_matches": 56,
+      "action_mismatches": 0,
+      "execution_errors": 0,
+      "target_status_matches": 56,
+      "target_status_mismatches": 0,
+      "total": 56
+    },
+    "B2": {
+      "action_matches": 56,
+      "action_mismatches": 0,
+      "execution_errors": 0,
+      "target_status_matches": 56,
+      "target_status_mismatches": 0,
+      "total": 56
+    },
+    "B3": {
+      "action_matches": 56,
+      "action_mismatches": 0,
+      "execution_errors": 0,
+      "target_status_matches": 56,
+      "target_status_mismatches": 0,
+      "total": 56
+    },
+    "B4": {
+      "action_matches": 56,
+      "action_mismatches": 0,
+      "execution_errors": 0,
+      "target_status_matches": 56,
+      "target_status_mismatches": 0,
+      "total": 56
+    },
+    "B5": {
+      "action_matches": 56,
+      "action_mismatches": 0,
+      "execution_errors": 0,
+      "target_status_matches": 56,
+      "target_status_mismatches": 0,
+      "total": 56
+    },
+    "B6": {
+      "action_matches": 56,
+      "action_mismatches": 0,
+      "execution_errors": 0,
+      "target_status_matches": 56,
+      "target_status_mismatches": 0,
+      "total": 56
+    },
+    "B7": {
+      "action_matches": 56,
+      "action_mismatches": 0,
+      "execution_errors": 0,
+      "target_status_matches": 56,
+      "target_status_mismatches": 0,
+      "total": 56
+    },
+    "B8": {
+      "action_matches": 56,
+      "action_mismatches": 0,
+      "execution_errors": 0,
+      "target_status_matches": 56,
+      "target_status_mismatches": 0,
+      "total": 56
+    },
+    "B9": {
+      "action_matches": 56,
+      "action_mismatches": 0,
+      "execution_errors": 0,
+      "target_status_matches": 56,
+      "target_status_mismatches": 0,
+      "total": 56
+    }
+  },
+  "per_tier": {
+    "A": {
+      "action_matches": 448,
+      "action_mismatches": 0,
+      "execution_errors": 0,
+      "target_status_matches": 448,
+      "target_status_mismatches": 0,
+      "total": 448
+    },
+    "B": {
+      "action_matches": 560,
+      "action_mismatches": 0,
+      "execution_errors": 0,
+      "target_status_matches": 560,
+      "target_status_mismatches": 0,
+      "total": 560
+    }
+  },
+  "post_first_run_metadata_corpus_sha256": {
+    "A1.jsonl": "b422ce8539c84b042a637e2f378f9343f5acdcc97afc9e000273ab5ebeea7c95",
+    "A2.jsonl": "49b7990f277ce2968376573197704a0ba98ceddc7739eeb71687e8a17c98eb18",
+    "A3.jsonl": "62c43e63af807fad9fd7440d470978345cee590100e7c50011cd0bf40529d2e0",
+    "A4.jsonl": "cbacb3033e13c8e57c0421d76680795a151ca66432cb111359e032c2c4e41871",
+    "A5.jsonl": "693bd3d6322b230a157c272032e1e003c2cb1a2e80be1c50f2c4ea187954cdc3",
+    "A6.jsonl": "06c57fd5e408476c604bccac0ecd2c3771ae9e401447fb505bce5f856edca728",
+    "A7.jsonl": "ee0d9eb7b817e8bee4a3da995ae4d6a540e8d456f6ccccd4300555a9f6f07fcd",
+    "A8.jsonl": "913c1e3c2612463c6a0fba9f436e627b5df42ac44bce76b3bb04bda1acb401b5",
+    "B1.jsonl": "5e0965e7547df6b1623257c001efb05566d2562046986056190f7c858fd2606d",
+    "B10.jsonl": "9f08c51b73e25adfbd1dbbfe841075467bd3783f9d2c2aa3d5153db137a61021",
+    "B2.jsonl": "8d5ed7c904f63c27ca347e938681a36251a33f74acba10f064b21aa9809d9c8b",
+    "B3.jsonl": "f649c14d29f3eb41b9f4f5cfb335fcff4b6516ea317551327176dc2736e5e3d0",
+    "B4.jsonl": "1ae6eda263c71afb932072f7abcf23abcd1ddb89949f2f102264d89fc3686800",
+    "B5.jsonl": "84002c0a3109dcec62d6f43bb036ef0ab723fce8c87dbb701ca8a2d3232a8280",
+    "B6.jsonl": "c898a44e630f0cbf5b0fd8b3b96730d95529c0d8089901413fdc127422a2a2b7",
+    "B7.jsonl": "2d1b508a291a8b07883afed36ac9ec53421d56f7950cb137f50652d623b8e187",
+    "B8.jsonl": "57920294aaf93f6063a20fc0917633f3c3c7ed292a7c31317c4e4c0a90059f6e",
+    "B9.jsonl": "b7cac9490a13604e0e8e01ab4b2de430bd490cb6858a63be75752675c1562805"
+  },
+  "pre_execution_corpus_sha256": {
+    "A1.jsonl": "a9a83d6424ec0dde68f4a58d27f367d6976fcbed0597adf447849fcbcc0dc6ac",
+    "A2.jsonl": "7d04affcce329acca2aea3a02dbcbdd80f8eec2ddbaca5cb10396e74891cc33a",
+    "A3.jsonl": "7546fa2f528fb1d3d7cf2fdd05e37195a725fe2b7dda1199e96fe798f23fd6f7",
+    "A4.jsonl": "2ebb04f4f40d781c0f58dc8f62e6dd1e63457c0a0aad27b5d41931b9582d246a",
+    "A5.jsonl": "d5e9419752ccfa951710803d634f9bf5d4ef43c0221a06dcbf0eac0093588775",
+    "A6.jsonl": "b3bbb6e0cb6a8154803c500aa3220d05871e6d319ef8e0bdad58615856c029e8",
+    "A7.jsonl": "7fa9e9adfe6473fd06f5ca3115b934e473e65c6687be16c40cd6da4b1a6436ea",
+    "A8.jsonl": "c31a0880cab2f3be33fecc16c9896e611a1451cce89858e5f233485b47a1afb8",
+    "B1.jsonl": "80fb52f0ee45889925bb5a636f42da3115f9c75b205e571629e77563e0382130",
+    "B10.jsonl": "50e1ef3bf999264c6185f7b66f71b3614765c5d81118a759ada0ad10f701819b",
+    "B2.jsonl": "2a5320de857222d1a01f585d508c303d18847a9d69901a02158c4a5ad60d03f6",
+    "B3.jsonl": "eba6c5aebfeee0e6c3b24e597f2d3b88a41a585bb5c45529091cf426fc4ac76e",
+    "B4.jsonl": "5ffc073ca89e58cc7216b55bf7a8c932a5350cf003417737c1bf286da900cb6b",
+    "B5.jsonl": "76e4171c26cc2c3bb0e85ee95996c9d75981030423e652f3564a85839376d9cb",
+    "B6.jsonl": "c3fe1fadac86b24754bfe4f527c14fad0d2c4a2b3580174081c852db92a89559",
+    "B7.jsonl": "8862e81fe4c6b7bca1af82020d7d53f90152a099c12becdfa91fd21a4ade517b",
+    "B8.jsonl": "e90152d29d3c4c939821a87c87d21d1bd886fbc64a8d2697fc41a296e6e06e93",
+    "B9.jsonl": "ab4244961bb6b1e612f0e2d61a4c98fae87a5a5945f1e4f0e4992643d2240cac"
+  },
+  "pre_execution_manifest_cases_sha256": "9ce8174dba85e70d9ba3f996b33bd0f57cb3f5f288ea3828cd122af8e579b296",
+  "pre_execution_seal": {
+    "benchmark_protocol_git_sha": "be9bfc5e2092362d79c7554dac35fef5490bfa5e",
+    "class_counts": {
+      "NE": 64,
+      "P": 472,
+      "V": 472
+    },
+    "corpus_generation_git_sha": "c50ad89259cd5d4b73929eebbff7fd66af3363db",
+    "environment": {
+      "execution_mode": "single process, in-process call, no warm-up, no caching",
+      "machine": "AMD64",
+      "os_name": "nt",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "processor": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+      "python_build": "tags/v3.12.0:0fb18b0 Oct  2 2023 13:03:39",
+      "python_implementation": "CPython",
+      "python_version": "3.12.0"
+    },
+    "execution_code_git_sha": "827462cca6c163bbb45b7623521fe111d9ffc416",
+    "execution_run_id": "a725ae0b51c6396cdf90a2cd5edfce15926fd192f4a787810b2ff7bb2477f046",
+    "execution_schema_version": "d8-tier-ab-execution/1.0.0",
+    "expected_action_counts": {
+      "ALLOW": 472,
+      "BLOCK": 472,
+      "REVIEW": 64
+    },
+    "first_run_at_null_count": 1008,
+    "generation_summary_sha256": "0836872583905ef8e3d510d75edaea7d65b6526767e659eda406b5e312b7cf27",
+    "ground_truth_counts": {
+      "benign": 536,
+      "violation": 472
+    },
+    "manifest_first_run_at_null_count": 1008,
+    "per_family_counts": {
+      "A1": 56,
+      "A2": 56,
+      "A3": 56,
+      "A4": 56,
+      "A5": 56,
+      "A6": 56,
+      "A7": 56,
+      "A8": 56,
+      "B1": 56,
+      "B10": 56,
+      "B2": 56,
+      "B3": 56,
+      "B4": 56,
+      "B5": 56,
+      "B6": 56,
+      "B7": 56,
+      "B8": 56,
+      "B9": 56
+    },
+    "pre_execution_corpus_sha256": {
+      "A1.jsonl": "a9a83d6424ec0dde68f4a58d27f367d6976fcbed0597adf447849fcbcc0dc6ac",
+      "A2.jsonl": "7d04affcce329acca2aea3a02dbcbdd80f8eec2ddbaca5cb10396e74891cc33a",
+      "A3.jsonl": "7546fa2f528fb1d3d7cf2fdd05e37195a725fe2b7dda1199e96fe798f23fd6f7",
+      "A4.jsonl": "2ebb04f4f40d781c0f58dc8f62e6dd1e63457c0a0aad27b5d41931b9582d246a",
+      "A5.jsonl": "d5e9419752ccfa951710803d634f9bf5d4ef43c0221a06dcbf0eac0093588775",
+      "A6.jsonl": "b3bbb6e0cb6a8154803c500aa3220d05871e6d319ef8e0bdad58615856c029e8",
+      "A7.jsonl": "7fa9e9adfe6473fd06f5ca3115b934e473e65c6687be16c40cd6da4b1a6436ea",
+      "A8.jsonl": "c31a0880cab2f3be33fecc16c9896e611a1451cce89858e5f233485b47a1afb8",
+      "B1.jsonl": "80fb52f0ee45889925bb5a636f42da3115f9c75b205e571629e77563e0382130",
+      "B10.jsonl": "50e1ef3bf999264c6185f7b66f71b3614765c5d81118a759ada0ad10f701819b",
+      "B2.jsonl": "2a5320de857222d1a01f585d508c303d18847a9d69901a02158c4a5ad60d03f6",
+      "B3.jsonl": "eba6c5aebfeee0e6c3b24e597f2d3b88a41a585bb5c45529091cf426fc4ac76e",
+      "B4.jsonl": "5ffc073ca89e58cc7216b55bf7a8c932a5350cf003417737c1bf286da900cb6b",
+      "B5.jsonl": "76e4171c26cc2c3bb0e85ee95996c9d75981030423e652f3564a85839376d9cb",
+      "B6.jsonl": "c3fe1fadac86b24754bfe4f527c14fad0d2c4a2b3580174081c852db92a89559",
+      "B7.jsonl": "8862e81fe4c6b7bca1af82020d7d53f90152a099c12becdfa91fd21a4ade517b",
+      "B8.jsonl": "e90152d29d3c4c939821a87c87d21d1bd886fbc64a8d2697fc41a296e6e06e93",
+      "B9.jsonl": "ab4244961bb6b1e612f0e2d61a4c98fae87a5a5945f1e4f0e4992643d2240cac"
+    },
+    "pre_execution_manifest_cases_sha256": "9ce8174dba85e70d9ba3f996b33bd0f57cb3f5f288ea3828cd122af8e579b296",
+    "registered_target_status_counts": {
+      "FAIL": 472,
+      "NOT_EVALUABLE": 64,
+      "PASS": 472
+    },
+    "run_started_at": "2026-08-24T07:38:35.760189Z",
+    "semantic_constraint_case_count": 0,
+    "total_registered_cases": 1008,
+    "unique_case_content_sha256": 1008,
+    "unique_case_ids": 1008
+  },
+  "razorpay_call_count": 0,
+  "run_completed_at": "2026-08-24T07:38:36.459896Z",
+  "run_started_at": "2026-08-24T07:38:35.760189Z",
+  "semantic_model_call_count": 0,
+  "target_state_correctness": {
+    "matches": 1008,
+    "mismatched_case_ids": [],
+    "mismatches": 0
+  },
+  "tier_a_by_registered_target_status": {
+    "FAIL": {
+      "action_matches": 192,
+      "action_mismatches": 0,
+      "execution_errors": 0,
+      "target_status_matches": 192,
+      "target_status_mismatches": 0,
+      "total": 192
+    },
+    "NOT_EVALUABLE": {
+      "action_matches": 64,
+      "action_mismatches": 0,
+      "execution_errors": 0,
+      "target_status_matches": 64,
+      "target_status_mismatches": 0,
+      "total": 64
+    },
+    "PASS": {
+      "action_matches": 192,
+      "action_mismatches": 0,
+      "execution_errors": 0,
+      "target_status_matches": 192,
+      "target_status_mismatches": 0,
+      "total": 192
+    }
+  },
+  "tier_b_by_registered_target_status": {
+    "FAIL": {
+      "action_matches": 280,
+      "action_mismatches": 0,
+      "execution_errors": 0,
+      "target_status_matches": 280,
+      "target_status_mismatches": 0,
+      "total": 280
+    },
+    "PASS": {
+      "action_matches": 280,
+      "action_mismatches": 0,
+      "execution_errors": 0,
+      "target_status_matches": 280,
+      "target_status_mismatches": 0,
+      "total": 280
+    }
+  },
+  "total_cases": 1008
+}
