@@ -166,7 +166,14 @@ def _require_registered_label(
 
 @dataclass(frozen=True, slots=True)
 class BenchmarkCase:
-    """One registered, labelled, unexecuted deterministic benchmark case."""
+    """One registered, labelled deterministic benchmark case.
+
+    ``first_run_at`` is audit-only lifecycle metadata excluded from
+    ``case_content_sha256``. Generation always leaves it null - the generator
+    enforces that independently in ``deterministic_generator._validate`` - and
+    the registered manifest schema records it exactly once, at the first
+    detector execution, after which it is immutable.
+    """
 
     case_id: str
     case_schema_version: str
@@ -181,7 +188,7 @@ class BenchmarkCase:
     evaluation_inputs: EvaluationInputs
     label_recorded_at: datetime
     generator: GeneratorAudit
-    first_run_at: None = None
+    first_run_at: datetime | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.case_id, str) or not self.case_id:
@@ -214,7 +221,7 @@ class BenchmarkCase:
         if not isinstance(self.generator, GeneratorAudit):
             raise TypeError("generator must be GeneratorAudit")
         if self.first_run_at is not None:
-            raise ValueError("D7 generation must leave first_run_at null")
+            _require_aware_utc(self.first_run_at, "first_run_at")
         _require_registered_label(
             ground_truth=self.ground_truth,
             expected_action=self.expected_action,

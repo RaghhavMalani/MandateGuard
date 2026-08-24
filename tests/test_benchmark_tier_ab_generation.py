@@ -528,20 +528,62 @@ def test_decoding_refuses_a_tampered_content_digest(violation_record):
         decode_case(record)
 
 
-def test_decoding_refuses_a_recorded_first_run(violation_record):
+def test_a_recorded_first_run_round_trips_without_changing_the_digest(
+    violation_record,
+):
+    """Lifecycle metadata is audit-only: recording it may not move the digest.
+
+    ``benchmark/MANIFEST.yaml`` registers ``first_run_at`` as "Null until first
+    detector execution, then immutable", so the codec must carry a recorded
+    value through a round trip while leaving ``case_content_sha256`` alone.
+    """
+
+    baseline = decode_case(violation_record)
     record = dict(violation_record)
     record["first_run_at"] = "2026-08-23T00:00:00.000000Z"
-    with pytest.raises(ValueError):
-        decode_case(record)
+    executed = decode_case(record)
+    assert executed.first_run_at == datetime(2026, 8, 23, tzinfo=timezone.utc)
+    assert baseline.first_run_at is None
+    assert case_content_sha256(executed) == case_content_sha256(baseline)
+    assert case_content_sha256(executed) == violation_record["case_content_sha256"]
+    assert json.loads(case_record_line(executed))["first_run_at"] == (
+        "2026-08-23T00:00:00.000000Z"
+    )
+
+
+def test_decoding_refuses_a_malformed_first_run(violation_record):
+    for malformed in ("2026-08-23T00:00:00.000000", "not-a-timestamp", 0):
+        record = dict(violation_record)
+        record["first_run_at"] = malformed
+        with pytest.raises(ValueError):
+            decode_case(record)
 
 
 # U: the generator never executes the registered detector ------------------
 
 
+# The D8 execution harness lives in the same package and must reach the frozen
+# policy - that is its whole purpose. The property this test protects is
+# narrower and unchanged: nothing on the generation path may touch a detector,
+# so the generation modules are enumerated rather than globbed.
+GENERATION_MODULES = (
+    "__init__.py",
+    "codec.py",
+    "deterministic_generator.py",
+    "manifest.py",
+    "models.py",
+    "recipes.py",
+)
+
+
 def test_benchmark_package_never_imports_the_detector():
-    sources = sorted((REPOSITORY_ROOT / "src" / "mandateguard" / "benchmark").rglob("*.py"))
+    package = REPOSITORY_ROOT / "src" / "mandateguard" / "benchmark"
+    sources = [package / name for name in GENERATION_MODULES]
     sources.append(REPOSITORY_ROOT / "scripts" / "generate_tier_ab_benchmark.py")
     assert sources
+    assert all(path.exists() for path in sources)
+    present = {path.name for path in package.glob("*.py")}
+    assert set(GENERATION_MODULES) <= present
     for path in sources:
         text = path.read_text(encoding="utf-8")
         for line in text.splitlines():

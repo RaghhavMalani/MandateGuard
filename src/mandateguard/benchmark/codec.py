@@ -390,15 +390,16 @@ def encode_case(case: BenchmarkCase) -> dict[str, Any]:
     record["case_id"] = case.case_id
     record["case_content_sha256"] = case_content_sha256(case)
     record["label_recorded_at"] = encode_timestamp(case.label_recorded_at)
-    record["first_run_at"] = None
+    record["first_run_at"] = (
+        None if case.first_run_at is None else encode_timestamp(case.first_run_at)
+    )
     record["generator"] = encode_generator_audit(case.generator)
     return record
 
 
 def decode_case(value: Mapping[str, Any]) -> BenchmarkCase:
     generator = value["generator"]
-    if value["first_run_at"] is not None:
-        raise ValueError("the registered Tier A/B corpus must keep first_run_at null")
+    first_run_at = value["first_run_at"]
     case = BenchmarkCase(
         case_id=value["case_id"],
         case_schema_version=value["case_schema_version"],
@@ -421,7 +422,9 @@ def decode_case(value: Mapping[str, Any]) -> BenchmarkCase:
             recipe_id=generator["recipe_id"],
             recipe_parameters=dict(generator["recipe_parameters"]),
         ),
-        first_run_at=None,
+        first_run_at=(
+            None if first_run_at is None else decode_timestamp(first_run_at)
+        ),
     )
     stored = value["case_content_sha256"]
     recomputed = case_content_sha256(case)

@@ -97,7 +97,9 @@ def manifest_record(case: BenchmarkCase, content_sha256: str) -> dict[str, str |
         "label_source": case.label_source,
         "label_recorded_at": encode_timestamp(case.label_recorded_at),
         "case_content_sha256": content_sha256,
-        "first_run_at": None,
+        "first_run_at": (
+            None if case.first_run_at is None else encode_timestamp(case.first_run_at)
+        ),
         "expected_action": case.expected_action,
     }
     if tuple(record) != MANIFEST_CASE_FIELDS:
