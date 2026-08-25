@@ -591,8 +591,15 @@ class TierCAdjudication:
 # The case record
 # ---------------------------------------------------------------------------
 
-#: Hashed content may never change once a case has been executed (protocol 6,
-#: 7.1 batch closure, 17).
+#: Nothing here may change once a case has been executed (protocol 6, 7.1
+#: batch closure, 17).
+#:
+#: The first seven entries are hashed content. ``provenance_origin_audit`` is
+#: not hashed and deliberately stays out of ``case_content_sha256``: it is the
+#: authoring and source-selection timestamps, which are audit metadata rather
+#: than benchmark content. They are protected here instead, because they are
+#: the mechanical evidence the held-out isolation audit reads (protocol 3.1,
+#: 7.1) and must not be rewritten after results are observed.
 IMMUTABLE_AFTER_FIRST_RUN = (
     "ground_truth",
     "family_id",
@@ -601,6 +608,7 @@ IMMUTABLE_AFTER_FIRST_RUN = (
     "evaluation_inputs",
     "semantic_evidence",
     "case_content_sha256",
+    "provenance_origin_audit",
 )
 
 

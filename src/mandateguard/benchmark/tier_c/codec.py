@@ -61,6 +61,8 @@ decoder rejects the semantic constraints that every Tier C case must carry.
 
 from __future__ import annotations
 
+from dataclasses import fields
+from datetime import datetime
 from typing import Any, Mapping
 
 from mandateguard.benchmark.codec import (
@@ -281,14 +283,52 @@ def encode_provenance_origin_content(origin: ProvenanceOrigin) -> dict[str, Any]
     raise TierCCaseError("unknown provenance origin type")
 
 
-def encode_provenance_origin(origin: ProvenanceOrigin) -> dict[str, Any]:
-    """The full origin record, hashed fields plus audit timestamps."""
+def provenance_origin_audit_fields(origin: ProvenanceOrigin) -> tuple[str, ...]:
+    """Origin fields that are audit metadata rather than hashed content.
 
-    record = dict(encode_provenance_origin_content(origin))
-    record["authored_at"] = encode_timestamp(origin.authored_at)
-    if isinstance(origin, ExternalCorpusOrigin):
-        record["source_selected_at"] = encode_timestamp(origin.source_selected_at)
+    Defined as the **structural complement** of
+    :func:`encode_provenance_origin_content` over the origin's declared fields,
+    rather than as a hand-written list. Every origin field is therefore in
+    exactly one of the two projections, so a field added to an origin type in
+    future cannot silently escape both the content digest and the audit
+    immutability check.
+    """
+
+    content = frozenset(encode_provenance_origin_content(origin))
+    declared = tuple(field.name for field in fields(origin))
+    audit = tuple(name for name in declared if name not in content)
+    if len(content) + len(audit) != len(declared):
+        raise TierCCaseError(
+            "provenance origin content projection names a field the origin "
+            "does not declare"
+        )
+    return audit
+
+
+def encode_provenance_origin_audit(origin: ProvenanceOrigin) -> dict[str, Any]:
+    """The origin's audit-only fields, canonically encoded.
+
+    These are excluded from ``case_content_sha256`` by design - they are
+    timestamps, not benchmark content - but they are the mechanical evidence
+    the held-out isolation audit reads (protocol 3.1, 7.1). They are therefore
+    protected against post-execution rewriting by
+    ``validation.immutability_violations``, not by the content digest.
+    """
+
+    record: dict[str, Any] = {}
+    for name in provenance_origin_audit_fields(origin):
+        value = getattr(origin, name)
+        record[name] = encode_timestamp(value) if isinstance(value, datetime) else value
     return record
+
+
+def encode_provenance_origin(origin: ProvenanceOrigin) -> dict[str, Any]:
+    """The full origin record: hashed content fields plus audit fields."""
+
+    return {
+        **encode_provenance_origin_content(origin),
+        **encode_provenance_origin_audit(origin),
+    }
 
 
 def decode_provenance_origin(

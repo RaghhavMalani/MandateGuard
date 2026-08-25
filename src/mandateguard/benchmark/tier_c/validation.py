@@ -33,7 +33,10 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 
-from mandateguard.benchmark.tier_c.codec import case_content_sha256
+from mandateguard.benchmark.tier_c.codec import (
+    case_content_sha256,
+    encode_provenance_origin_audit,
+)
 from mandateguard.benchmark.tier_c.dedup import DuplicateReport, review_duplicates
 from mandateguard.benchmark.tier_c.models import (
     AdjudicationStatus,
@@ -420,8 +423,32 @@ CHECKPOINT_REQUIRED_COUNT = HELD_OUT_TOTAL
 def validate_held_out_checkpoint(
     cases: tuple[TierCCase, ...] | list[TierCCase],
     checkpoint: HeldOutFinalizationCheckpoint,
+    *,
+    detector_freeze_at: datetime | None = None,
+    retired_case_ids: frozenset[str] = frozenset(),
 ) -> tuple[ValidationIssue, ...]:
     """Gate the first held-out execution (protocol 7.1 step 10-12, 7.2, 17).
+
+    This is a **complete standalone gate**. It does not assume the caller
+    already ran the corpus validator: it runs the full ``HELD_OUT_FINAL``
+    validation itself, then adds the checkpoint-specific declared-count checks.
+    A caller therefore cannot slip a malformed 220-record set past the gate
+    merely by invoking the checkpoint directly, and correctness does not depend
+    on undocumented call ordering.
+
+    Delegating this way is safe and non-recursive: ``validate_tier_c_corpus``
+    never invokes checkpoint logic, so the dependency runs strictly one way.
+
+    Inherited from ``HELD_OUT_FINAL`` validation: duplicate ``case_id``,
+    duplicate ``case_content_sha256``, wrong split, invalid family, incorrect
+    family / ground-truth / provenance allocation, unresolved adjudication,
+    missing final label or hash, incomplete second review, exact and normalized
+    duplicates, non-null ``first_run_at``, and the held-out source-isolation
+    audit.
+
+    ``detector_freeze_at`` is optional only so the signature stays additive;
+    omitting it makes the gate report ``MISSING_DETECTOR_FREEZE``, because
+    protocol 17 requires held-out isolation evidence before execution.
 
     No partial, pilot, smoke, or calibration held-out run is reachable through
     this function: it either reports that all 220 held-out cases are finalized
@@ -435,6 +462,14 @@ def validate_held_out_checkpoint(
 
     def add(code: str, message: str, case_id: str | None = None) -> None:
         issues.append(ValidationIssue(code=code, message=message, case_id=case_id))
+
+    corpus_report = validate_tier_c_corpus(
+        case_list,
+        ValidationMode.HELD_OUT_FINAL,
+        detector_freeze_at=detector_freeze_at,
+        retired_case_ids=retired_case_ids,
+    )
+    issues.extend(corpus_report.issues)
 
     held_out = [case for case in case_list if case.split is Split.HELD_OUT]
     for case in case_list:
@@ -451,20 +486,25 @@ def validate_held_out_checkpoint(
         if case.exclusion is None and case.ground_truth is not None
     ]
     labelled = [case for case in executable if case.label_recorded_at is not None]
-    hashed = 0
+    hashed_ids: set[str] = set()
     for case in executable:
         try:
             case_content_sha256(case)
         except TierCCaseError:
             continue
-        hashed += 1
+        hashed_ids.add(case.case_id)
+    hashed = len(hashed_ids)
     unexecuted = [case for case in held_out if case.first_run_at is None]
 
+    # Protocol 7.2 counts distinct finalized cases, so a duplicated case_id
+    # cannot pad a stratum to 220. The corpus validation above already reports
+    # the duplicate; counting distinct IDs here makes the declared total
+    # disagree as well, so the gate fails on two independent grounds.
     observed = {
-        "total_held_out_cases": len(executable),
-        "ground_truth_recorded_count": len(labelled),
+        "total_held_out_cases": len({case.case_id for case in executable}),
+        "ground_truth_recorded_count": len({case.case_id for case in labelled}),
         "content_hash_recorded_count": hashed,
-        "first_run_null_count": len(unexecuted),
+        "first_run_null_count": len({case.case_id for case in unexecuted}),
     }
     declared = {
         "total_held_out_cases": checkpoint.total_held_out_cases,
@@ -502,6 +542,20 @@ def validate_held_out_checkpoint(
 def immutability_violations(before: TierCCase, after: TierCCase) -> tuple[str, ...]:
     """Fields that changed illegally after ``before`` was first executed.
 
+    Two conceptually distinct protections are enforced here:
+
+    *Content immutability* covers everything bound by ``case_content_sha256``.
+    A change there is already detectable as a digest change; it is reported
+    field by field for a usable message.
+
+    *Audit immutability* covers ``provenance_origin`` fields that are
+    deliberately **not** hashed - the authoring and source-selection timestamps.
+    They stay out of the digest because they are audit metadata, not benchmark
+    content, but they are the mechanical evidence the held-out isolation audit
+    reads (protocol 3.1, 7.1). Without this check, an already-executed held-out
+    case could have its authoring timestamp rewritten after results were seen,
+    retro-fitting the isolation guard while the content digest stayed valid.
+
     Returns an empty tuple when ``before`` has never run, since pre-execution
     correction is an ordinary, permitted part of authoring.
     """
@@ -514,6 +568,10 @@ def immutability_violations(before: TierCCase, after: TierCCase) -> tuple[str, .
         return ()
 
     changed: list[str] = []
+    if encode_provenance_origin_audit(before.provenance_origin) != (
+        encode_provenance_origin_audit(after.provenance_origin)
+    ):
+        changed.append("provenance_origin_audit")
     if before.ground_truth is not after.ground_truth:
         changed.append("ground_truth")
     if before.family_id != after.family_id:

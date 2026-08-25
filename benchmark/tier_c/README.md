@@ -80,8 +80,23 @@ audit record rather than a silent edit.
 | `separate_model_adversarial` | authoring timestamp, authoring model identifier, SHA-256 of the authoring prompt |
 
 Per 40-case violation stratum: 16 / 12 / 12. Per 34-case benign stratum:
-14 / 10 / 10. Per 33-case benign stratum: 13 / 10 / 10. Registered totals across
-all 440: 176 / 132 / 132.
+14 / 10 / 10. Per 33-case benign stratum: 13 / 10 / 10.
+
+Registered totals, in the order developer authored / external defensive adapted
+/ separate model adversarial:
+
+| Scope | Developer | External | Separate model | Total |
+| --- | ---: | ---: | ---: | ---: |
+| Development violation | 48 | 36 | 36 | 120 |
+| Development benign | 40 | 30 | 30 | 100 |
+| **Development total** | **88** | **66** | **66** | **220** |
+| Held-out violation | 48 | 36 | 36 | 120 |
+| Held-out benign | 40 | 30 | 30 | 100 |
+| **Held-out total** | **88** | **66** | **66** | **220** |
+| **All Tier C** | **176** | **132** | **132** | **440** |
+
+Each split is therefore **88 / 66 / 66**, and Tier C overall is
+**176 / 132 / 132**, matching PROTOCOL §3.
 
 The separate-model origin record has no field for the raw prompt, for provider
 credentials, or for model reasoning traces, so none can be stored. Only the
@@ -116,8 +131,32 @@ Invariants the validator enforces:
   never reused;
 - resolution happens before detector execution, from case content alone; and
 - after `first_run_at` is non-null, `ground_truth`, `family_id`, `split`,
-  `provenance`, `evaluation_inputs`, `semantic_evidence`, and
-  `case_content_sha256` may never change.
+  `provenance`, `evaluation_inputs`, `semantic_evidence`,
+  `case_content_sha256`, **and the provenance-origin audit timestamps** may
+  never change.
+
+### Post-first-run immutability covers two distinct things
+
+**Content immutability** covers everything bound by `case_content_sha256`. Any
+change there is already detectable as a digest change.
+
+**Audit immutability** covers the `provenance_origin` fields that are
+deliberately *not* hashed — `authored_at` for every provenance, plus
+`source_selected_at` for `external_defensive_corpus_adapted`. These stay out of
+the digest because they are audit metadata rather than benchmark content, and
+the fix for this does **not** move them into the digest.
+
+They are protected separately because they are the mechanical evidence the
+held-out isolation audit reads (PROTOCOL §3.1, §7.1). Without that protection,
+an already-executed held-out case could have its authoring or source-selection
+timestamp rewritten *after* results were observed, retro-fitting the isolation
+guard while the content digest stayed perfectly valid.
+
+The audit projection is defined as the **structural complement** of the content
+projection over each origin type's declared fields, not as a hand-written list.
+Every origin field is therefore in exactly one of the two projections, so a
+field added to an origin type in future cannot silently escape both the digest
+and the audit check.
 
 "Ambiguous" is a flag the primary adjudicator sets; it is never a final
 ground-truth value. Its only effect is to force a second review.
@@ -274,9 +313,24 @@ Implemented as validation and workflow guards only:
 - **batch finalization** — the checkpoint validator requires all four PROTOCOL
   §7.2 counts to be exactly 220 (total, ground truth recorded, content hash
   recorded, `first_run_at == null`), and cross-checks each against the actual
-  corpus rather than trusting the declared number; and
+  corpus rather than trusting the declared number. The counts are over
+  *distinct* `case_id`s, so a duplicated ID cannot pad a stratum to 220; and
 - **no partial execution** — the gate has no per-case variant. A pilot, smoke,
   sanity, or calibration subset is unreachable through this API by construction.
+
+The checkpoint is a **complete standalone gate**. It does not assume the caller
+already ran the corpus validator: it runs the full `held_out_final` validation
+itself and then adds the declared-count checks. A caller cannot slip a
+malformed 220-record set past it — a duplicate `case_id`, a duplicate content
+digest, a wrong family or provenance quota, an unresolved adjudication, a
+missing label or hash, a wrong split, or a non-null `first_run_at` — merely by
+invoking the checkpoint directly. Correctness does not depend on undocumented
+call ordering. Omitting the detector freeze timestamp makes the gate report
+`MISSING_DETECTOR_FREEZE` rather than silently skipping the isolation audit.
+
+Delegating this way is safe and non-recursive: `validate_tier_c_corpus` never
+invokes checkpoint logic, so the dependency runs strictly one way, and a test
+asserts that it stays that way.
 
 Held-out execution itself is not implemented at D8-A and belongs to D10.
 

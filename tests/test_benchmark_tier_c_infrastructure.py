@@ -1167,10 +1167,14 @@ def test_held_out_checkpoint_requires_all_220_cases():
         HELD_OUT_FAMILIES, authored_at=FREEZE_AT + timedelta(days=1)
     )
     assert len(cases) == HELD_OUT_TOTAL
-    assert validate_held_out_checkpoint(cases, _checkpoint()) == ()
+    assert validate_held_out_checkpoint(
+        cases, _checkpoint(), detector_freeze_at=FREEZE_AT
+    ) == ()
 
     short = cases[:-1]
-    issues = validate_held_out_checkpoint(short, _checkpoint())
+    issues = validate_held_out_checkpoint(
+        short, _checkpoint(), detector_freeze_at=FREEZE_AT
+    )
     assert "CHECKPOINT_COUNT_MISMATCH" in {issue.code for issue in issues}
 
 
@@ -1186,6 +1190,7 @@ def test_held_out_checkpoint_rejects_a_declared_count_below_220():
             content_hash_recorded_count=100,
             first_run_null_count=100,
         ),
+        detector_freeze_at=FREEZE_AT,
     )
     codes = {issue.code for issue in issues}
     assert "CHECKPOINT_COUNT_NOT_220" in codes
@@ -1206,14 +1211,18 @@ def test_held_out_checkpoint_requires_first_run_null_for_all():
         adjudication=first.adjudication,
         first_run_at=FREEZE_AT + timedelta(days=20),
     )
-    issues = validate_held_out_checkpoint(executed, _checkpoint())
+    issues = validate_held_out_checkpoint(
+        executed, _checkpoint(), detector_freeze_at=FREEZE_AT
+    )
     codes = {issue.code for issue in issues}
     assert "HELD_OUT_ALREADY_EXECUTED" in codes
     assert "CHECKPOINT_COUNT_MISMATCH" in codes
 
 
 def test_held_out_checkpoint_rejects_non_held_out_cases():
-    issues = validate_held_out_checkpoint([make_case()], _checkpoint())
+    issues = validate_held_out_checkpoint(
+        [make_case()], _checkpoint(), detector_freeze_at=FREEZE_AT
+    )
     assert "NON_HELD_OUT_CASE" in {issue.code for issue in issues}
 
 
@@ -1291,6 +1300,7 @@ def test_immutability_covers_every_registered_field():
         "evaluation_inputs",
         "semantic_evidence",
         "case_content_sha256",
+        "provenance_origin_audit",
     }
 
 
