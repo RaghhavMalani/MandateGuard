@@ -1,3 +1,5 @@
 benchmark/MANIFEST.yaml text eol=lf
 benchmark/cases/tier_ab/*.jsonl text eol=lf
 benchmark/generated/*.json text eol=lf
+benchmark/tier_c/prompts/*.txt text eol=lf
+benchmark/tier_c/prompts/*.sha256 text eol=lf

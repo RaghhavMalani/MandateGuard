@@ -1,0 +1,68 @@
+{
+  "registry_schema_version": "1.0",
+  "registry_kind": "tier_c_development_external_source_registry",
+  "d8_a_frozen_sha": "daed88178d0ff0308a2dc44e9bf996ba8f1abe6b",
+  "content_policy": {
+    "registry_only": true,
+    "individual_source_items_permitted": false,
+    "source_passages_permitted": false,
+    "held_out_sources_permitted": false,
+    "pin_required_before_external_case_import": true,
+    "later_version_requires_new_registry_entry": true
+  },
+  "sources": [
+    {
+      "source_id": "agentdojo-banking-v1",
+      "case_source_name": "AgentDojo Banking",
+      "project_name": "AgentDojo",
+      "canonical_repository_url": "https://github.com/ethz-spylab/agentdojo",
+      "suite_domain": "banking",
+      "intended_version_tag_commit": "repository_commit_sha_or_immutable_release_tag_commit_sha",
+      "selected_commit_sha": null,
+      "source_selected_at": null,
+      "intended_development_families": [
+        {
+          "family_id": "C-DEV-RECURRENCE",
+          "violation_intended": 12,
+          "benign_intended": 10
+        }
+      ],
+      "source_purpose": "Adapt semantic structures involving scheduled or recurring financial obligations, subscriptions, standing or scheduled transactions, and distinctions between one-time and recurring actions.",
+      "prohibited_uses": [
+        "copying prompt-injection attack strings",
+        "adapting injection-task payloads",
+        "publishing reusable attack text"
+      ],
+      "notes": "Use only legitimate user-task, environment, and policy semantics. This registry entry stores no individual source item or passage."
+    },
+    {
+      "source_id": "tau3-bench-retail-v1",
+      "case_source_name": "τ³-bench Retail",
+      "project_name": "τ³-bench",
+      "canonical_repository_url": "https://github.com/sierra-research/tau2-bench",
+      "suite_domain": "retail",
+      "intended_version_tag_commit": "repository_commit_sha_or_immutable_release_tag_commit_sha",
+      "selected_commit_sha": null,
+      "source_selected_at": null,
+      "intended_development_families": [
+        {
+          "family_id": "C-DEV-EXCLUSION",
+          "violation_intended": 12,
+          "benign_intended": 10
+        },
+        {
+          "family_id": "C-DEV-PURPOSE",
+          "violation_intended": 12,
+          "benign_intended": 10
+        }
+      ],
+      "source_purpose": "Adapt policy-constrained retail or customer-service semantic structures and hard-negative distinctions.",
+      "prohibited_uses": [
+        "copying prompt-injection attack strings",
+        "adapting injection-task payloads",
+        "publishing reusable attack text"
+      ],
+      "notes": "Use only legitimate user-task, environment, and policy semantics. This registry entry stores no individual source item or passage."
+    }
+  ]
+}
