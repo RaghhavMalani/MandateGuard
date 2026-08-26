@@ -15,7 +15,7 @@
       "source_id": "agentdojo-banking-v1",
       "case_source_name": "AgentDojo Banking",
       "project_name": "AgentDojo",
-      "canonical_repository_url": "https://github.com/ethz-spylab/agentdojo",
+      "canonical_repository_url": "https://github.com/sequrity-ai/agentdojo",
       "suite_domain": "banking",
       "intended_version_tag_commit": "repository_commit_sha_or_immutable_release_tag_commit_sha",
       "selected_commit_sha": null,

@@ -78,7 +78,7 @@ def test_development_source_registry_is_metadata_only_and_totals_66() -> None:
         "notes",
     }
     expected_urls = {
-        "AgentDojo": "https://github.com/ethz-spylab/agentdojo",
+        "AgentDojo": "https://github.com/sequrity-ai/agentdojo",
         "τ³-bench": "https://github.com/sierra-research/tau2-bench",
     }
     total = 0
