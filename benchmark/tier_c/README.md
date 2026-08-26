@@ -395,6 +395,16 @@ in a subprocess, so it cannot silently drift.
 
 ## Tooling
 
+Developer-authored candidate capture is documented in
+`authoring/dev/README.md`. Its blank TSV worksheet and any resulting candidate
+drafts are authoring artifacts, not committed Tier C corpus cases. The capture
+path forces developer provenance, never assigns ground truth, and never
+computes a final case-content digest.
+
+```bash
+python scripts/capture_developer_tier_c_candidates.py
+```
+
 ```bash
 python scripts/validate_tier_c_corpus.py --split dev --mode partial_development
 ```
