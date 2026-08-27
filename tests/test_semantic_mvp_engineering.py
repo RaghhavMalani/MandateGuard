@@ -52,15 +52,17 @@ RUNNER_MODULE = (
     / "engineering"
     / "semantic_runner.py"
 )
+FROZEN_PRODUCT_BASE = "f6e794546efefd1083fc246515d4c96e9949d859"
+# Derived from git objects at FROZEN_PRODUCT_BASE, not from the working tree.
 FORMAL_FILE_SHA256 = {
     "benchmark/MANIFEST.yaml": (
         "a6ab3c7d826c545b637a11954c3816611f348c21684912daaf393f38ea0aeef1"
     ),
     "benchmark/PROTOCOL.md": (
-        "0c17a8988dae902efffeae047549076138aeb35239545710a580c401e0a287be"
+        "d307b6d0c0ffdf40707285ea384ac3c16e54d899edb75262c87897be1543a0e2"
     ),
     "TAXONOMY.md": (
-        "e1f01b2a013a373b7393ae0f0f52789a21e48705707643752c013295f3d18365"
+        "6d1659d09f7653cc839c17977184c20038c49eb73b5dcfa12210c1ac20d388fd"
     ),
 }
 
@@ -384,7 +386,10 @@ def test_formal_benchmark_files_match_frozen_product_base():
         actual = sha256(
             (REPOSITORY_ROOT / relative_path).read_bytes()
         ).hexdigest()
-        assert actual == expected
+        assert actual == expected, (
+            f"{relative_path} differs from frozen product base "
+            f"{FROZEN_PRODUCT_BASE}"
+        )
     manifest = MANIFEST_PATH.read_text(encoding="utf-8")
     assert len(
         re.findall(r"^  - case_id:", manifest, flags=re.MULTILINE)
