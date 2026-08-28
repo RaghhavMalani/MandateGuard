@@ -67,6 +67,56 @@ FORMAL_FILE_SHA256 = {
 }
 
 
+def _git(
+    repository_root: Path,
+    *arguments: str,
+    check: bool = True,
+) -> subprocess.CompletedProcess[bytes]:
+    return subprocess.run(
+        ["git", *arguments],
+        cwd=repository_root,
+        capture_output=True,
+        check=check,
+    )
+
+
+def _committed_git_object_bytes(
+    repository_root: Path,
+    revision: str,
+    relative_path: str,
+) -> bytes:
+    return _git(
+        repository_root,
+        "show",
+        f"{revision}:{relative_path}",
+    ).stdout
+
+
+def _assert_no_protected_file_drift(
+    repository_root: Path,
+    relative_paths: tuple[str, ...],
+) -> None:
+    checks = (
+        ("unstaged", ("diff", "--quiet", "--", *relative_paths)),
+        (
+            "staged",
+            ("diff", "--cached", "--quiet", "HEAD", "--", *relative_paths),
+        ),
+    )
+    for drift_kind, arguments in checks:
+        completed = _git(repository_root, *arguments, check=False)
+        if completed.returncode == 1:
+            raise AssertionError(
+                f"protected files have {drift_kind} Git drift"
+            )
+        if completed.returncode != 0:
+            detail = completed.stderr.decode(errors="replace").strip()
+            raise AssertionError(
+                f"Git could not check protected-file {drift_kind} drift: "
+                f"{detail}"
+            )
+
+
 @pytest.fixture(scope="module")
 def fixtures():
     return load_fixture_corpus(FIXTURE_PATH)
@@ -381,15 +431,69 @@ def test_engineering_live_artifacts_cannot_enter_benchmark(fixtures, tmp_path):
         )
 
 
-def test_formal_benchmark_files_match_frozen_product_base():
+def test_formal_benchmark_files_match_frozen_product_base(tmp_path):
     for relative_path, expected in FORMAL_FILE_SHA256.items():
         actual = sha256(
-            (REPOSITORY_ROOT / relative_path).read_bytes()
+            _committed_git_object_bytes(
+                REPOSITORY_ROOT,
+                "HEAD",
+                relative_path,
+            )
         ).hexdigest()
         assert actual == expected, (
             f"{relative_path} differs from frozen product base "
             f"{FROZEN_PRODUCT_BASE}"
         )
+
+    protected_paths = tuple(FORMAL_FILE_SHA256)
+    _assert_no_protected_file_drift(REPOSITORY_ROOT, protected_paths)
+
+    synthetic_root = tmp_path / "line-ending-portability"
+    synthetic_root.mkdir()
+    _git(synthetic_root, "init", "--quiet")
+    _git(synthetic_root, "config", "user.name", "MandateGuard Tests")
+    _git(
+        synthetic_root,
+        "config",
+        "user.email",
+        "mandateguard-tests@example.invalid",
+    )
+    _git(synthetic_root, "config", "core.autocrlf", "true")
+
+    synthetic_path = synthetic_root / "protected.md"
+    lf_bytes = b"frozen line one\nfrozen line two\n"
+    crlf_bytes = lf_bytes.replace(b"\n", b"\r\n")
+    synthetic_path.write_bytes(lf_bytes)
+    _git(synthetic_root, "add", "--", "protected.md")
+    _git(synthetic_root, "commit", "--quiet", "-m", "frozen base")
+
+    frozen_digest = sha256(lf_bytes).hexdigest()
+    assert sha256(
+        _committed_git_object_bytes(
+            synthetic_root,
+            "HEAD",
+            "protected.md",
+        )
+    ).hexdigest() == frozen_digest
+
+    synthetic_path.write_bytes(crlf_bytes)
+    assert sha256(synthetic_path.read_bytes()).hexdigest() != frozen_digest
+    assert sha256(
+        _committed_git_object_bytes(
+            synthetic_root,
+            "HEAD",
+            "protected.md",
+        )
+    ).hexdigest() == frozen_digest
+    _assert_no_protected_file_drift(synthetic_root, ("protected.md",))
+
+    synthetic_path.write_bytes(b"genuine content change\r\n")
+    with pytest.raises(AssertionError, match="unstaged Git drift"):
+        _assert_no_protected_file_drift(synthetic_root, ("protected.md",))
+    _git(synthetic_root, "add", "--", "protected.md")
+    with pytest.raises(AssertionError, match="staged Git drift"):
+        _assert_no_protected_file_drift(synthetic_root, ("protected.md",))
+
     manifest = MANIFEST_PATH.read_text(encoding="utf-8")
     assert len(
         re.findall(r"^  - case_id:", manifest, flags=re.MULTILINE)
