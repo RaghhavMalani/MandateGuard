@@ -1,0 +1,71 @@
+{
+  "snapshot_id": "agentic-commerce-catalog-v1",
+  "products": [
+    {
+      "merchant_id": "merchant-scholarly",
+      "sku": "studyglow-desk-lamp",
+      "name": "StudyGlow Desk Lamp",
+      "description": "A compact task lamp for reading desks and focused workspaces.",
+      "effective_unit_price_minor": 129900,
+      "currency": "INR",
+      "recurring": false,
+      "tags": ["desk lamp", "reading", "individual study", "workspace"],
+      "evidence_ids": ["scholarly-terms-v1", "studyglow-evidence-v1"]
+    },
+    {
+      "merchant_id": "merchant-scholarly",
+      "sku": "field-notebook-set",
+      "name": "Field Notebook Set",
+      "description": "Three stitched notebooks for notes, sketches, and field observations.",
+      "effective_unit_price_minor": 49900,
+      "currency": "INR",
+      "recurring": false,
+      "tags": ["notebook", "writing", "study", "paper"],
+      "evidence_ids": ["scholarly-terms-v1", "notebook-evidence-v1"]
+    },
+    {
+      "merchant_id": "merchant-scholarly",
+      "sku": "monthly-study-club",
+      "name": "Monthly Study Club",
+      "description": "A monthly collection of guided reading material and group sessions.",
+      "effective_unit_price_minor": 59900,
+      "currency": "INR",
+      "recurring": true,
+      "tags": ["study", "club", "monthly", "subscription"],
+      "evidence_ids": ["scholarly-terms-v1", "study-club-evidence-v1"]
+    },
+    {
+      "merchant_id": "merchant-academy",
+      "sku": "market-edge-course",
+      "name": "Market Edge Decision Course",
+      "description": "A self-paced course about probability, risk, and rapid market decisions.",
+      "effective_unit_price_minor": 249900,
+      "currency": "INR",
+      "recurring": false,
+      "tags": ["market edge", "decision course", "professional development", "risk"],
+      "evidence_ids": ["academy-terms-v1", "market-edge-evidence-v1"]
+    },
+    {
+      "merchant_id": "merchant-academy",
+      "sku": "tax-planning-guide",
+      "name": "Practical Tax Planning Guide",
+      "description": "A downloadable reference on record keeping and common tax planning workflows.",
+      "effective_unit_price_minor": 79900,
+      "currency": "INR",
+      "recurring": false,
+      "tags": ["tax", "planning", "professional", "reference"],
+      "evidence_ids": ["academy-terms-v1", "tax-guide-evidence-v1"]
+    },
+    {
+      "merchant_id": "merchant-nova",
+      "sku": "flexi-desk-companion",
+      "name": "Flexi Desk Companion",
+      "description": "A digital desk companion with configurable modules and an introductory price.",
+      "effective_unit_price_minor": 99900,
+      "currency": "INR",
+      "recurring": false,
+      "tags": ["flexi", "desk companion", "digital", "workspace"],
+      "evidence_ids": ["nova-terms-v1", "flexi-evidence-v1"]
+    }
+  ]
+}

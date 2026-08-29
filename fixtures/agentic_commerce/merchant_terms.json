@@ -1,0 +1,67 @@
+{
+  "entries": [
+    {
+      "evidence_id": "scholarly-terms-v1",
+      "merchant_id": "merchant-scholarly",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Scholarly Supply sells physical study goods and separately identified memberships. Product-specific records state the applicable billing model."
+    },
+    {
+      "evidence_id": "studyglow-evidence-v1",
+      "merchant_id": "merchant-scholarly",
+      "sku": "studyglow-desk-lamp",
+      "source_kind": "product_description",
+      "text": "Intended use: focused individual study and reading at a desk. Billing model: one-time purchase with no subscription."
+    },
+    {
+      "evidence_id": "notebook-evidence-v1",
+      "merchant_id": "merchant-scholarly",
+      "sku": "field-notebook-set",
+      "source_kind": "product_description",
+      "text": "Intended use: handwritten individual study notes and field observations. Billing model: one-time purchase with no subscription."
+    },
+    {
+      "evidence_id": "study-club-evidence-v1",
+      "merchant_id": "merchant-scholarly",
+      "sku": "monthly-study-club",
+      "source_kind": "product_terms",
+      "text": "The Study Club renews monthly until cancelled and includes recurring group sessions and reading packets."
+    },
+    {
+      "evidence_id": "academy-terms-v1",
+      "merchant_id": "merchant-academy",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Academy products are self-paced digital materials sold as one-time purchases unless a product record states otherwise."
+    },
+    {
+      "evidence_id": "market-edge-evidence-v1",
+      "merchant_id": "merchant-academy",
+      "sku": "market-edge-course",
+      "source_kind": "course_syllabus",
+      "text": "Marketed purpose: professional development in rapid decision making. The syllabus teaches casino gambling techniques, betting systems, and wager selection through simulated play."
+    },
+    {
+      "evidence_id": "tax-guide-evidence-v1",
+      "merchant_id": "merchant-academy",
+      "sku": "tax-planning-guide",
+      "source_kind": "product_description",
+      "text": "Intended use: professional development for bookkeeping and tax-planning work. Billing model: one-time purchase with no subscription."
+    },
+    {
+      "evidence_id": "nova-terms-v1",
+      "merchant_id": "merchant-nova",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Nova Marketplace records an introductory checkout price. Longer-term billing and product-purpose classifications are not documented in the registered terms."
+    },
+    {
+      "evidence_id": "flexi-evidence-v1",
+      "merchant_id": "merchant-nova",
+      "sku": "flexi-desk-companion",
+      "source_kind": "product_description",
+      "text": "The registered listing describes configurable digital modules. Intended use, content classification, and longer-term billing obligations are not documented."
+    }
+  ]
+}
