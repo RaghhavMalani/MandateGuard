@@ -1,0 +1,15 @@
+{
+  "run_id": "smvp-full-live-20260829T060127590Z-437fe794ddbc",
+  "run_started_at": "2026-08-29T06:01:27.590Z",
+  "execution_git_sha": "e4b4131d6b0c3f366bc1fdc58679ff245e702f59",
+  "fixture_source": "fixtures/semantic_mvp/semantic_cases.jsonl",
+  "selection": "all",
+  "fixture_count": 72,
+  "provider": "openai_responses",
+  "model": "gpt-5.6-terra",
+  "detector_version": "1.0",
+  "prompt_version": "1.0",
+  "attempts_per_fixture": 1,
+  "retry_count": 0,
+  "tuning_performed": false
+}

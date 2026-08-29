@@ -1,0 +1,168 @@
+{
+  "run_id": "smvp-full-live-20260829T060127590Z-437fe794ddbc",
+  "run_started_at": "2026-08-29T06:01:27.590Z",
+  "run_ended_at": "2026-08-29T06:05:17.921995Z",
+  "execution_git_sha": "e4b4131d6b0c3f366bc1fdc58679ff245e702f59",
+  "provider": "openai_responses",
+  "model": "gpt-5.6-terra",
+  "detector_version": "1.0",
+  "prompt_version": "1.0",
+  "attempted_fixtures": 72,
+  "completed_fixtures": 72,
+  "semantic_expectation_matches": 68,
+  "action_expectation_matches": 68,
+  "controller_action_matches": 72,
+  "typed_provider_errors": 0,
+  "per_family": {
+    "RECURRENCE": {
+      "matches": 23,
+      "count": 24
+    },
+    "EXCLUSION": {
+      "matches": 23,
+      "count": 24
+    },
+    "PURPOSE": {
+      "matches": 22,
+      "count": 24
+    }
+  },
+  "per_expectation": {
+    "PASS": {
+      "matches": 23,
+      "count": 24
+    },
+    "VIOLATION": {
+      "matches": 21,
+      "count": 24
+    },
+    "ABSTAIN": {
+      "matches": 24,
+      "count": 24
+    }
+  },
+  "per_family_expectation": {
+    "RECURRENCE": {
+      "PASS": {
+        "matches": 8,
+        "count": 8
+      },
+      "VIOLATION": {
+        "matches": 7,
+        "count": 8
+      },
+      "ABSTAIN": {
+        "matches": 8,
+        "count": 8
+      }
+    },
+    "EXCLUSION": {
+      "PASS": {
+        "matches": 8,
+        "count": 8
+      },
+      "VIOLATION": {
+        "matches": 7,
+        "count": 8
+      },
+      "ABSTAIN": {
+        "matches": 8,
+        "count": 8
+      }
+    },
+    "PURPOSE": {
+      "PASS": {
+        "matches": 7,
+        "count": 8
+      },
+      "VIOLATION": {
+        "matches": 7,
+        "count": 8
+      },
+      "ABSTAIN": {
+        "matches": 8,
+        "count": 8
+      }
+    }
+  },
+  "per_difficulty": {
+    "clear": {
+      "matches": 20,
+      "count": 21
+    },
+    "hard": {
+      "matches": 24,
+      "count": 27
+    },
+    "ambiguous": {
+      "matches": 24,
+      "count": 24
+    }
+  },
+  "engineering_expectation_transitions": {
+    "PASS": {
+      "PASS": 23,
+      "VIOLATION": 0,
+      "ABSTAIN": 1
+    },
+    "VIOLATION": {
+      "PASS": 0,
+      "VIOLATION": 21,
+      "ABSTAIN": 3
+    },
+    "ABSTAIN": {
+      "PASS": 0,
+      "VIOLATION": 0,
+      "ABSTAIN": 24
+    }
+  },
+  "latency_ms": {
+    "method": "nearest-rank",
+    "min": 1328,
+    "p50": 1685,
+    "p95": 2899,
+    "max": 3986
+  },
+  "latency_ms_by_family": {
+    "RECURRENCE": {
+      "method": "nearest-rank",
+      "min": 1328,
+      "p50": 1647,
+      "p95": 2729,
+      "max": 3255
+    },
+    "EXCLUSION": {
+      "method": "nearest-rank",
+      "min": 1388,
+      "p50": 1818,
+      "p95": 2327,
+      "max": 2548
+    },
+    "PURPOSE": {
+      "method": "nearest-rank",
+      "min": 1362,
+      "p50": 1654,
+      "p95": 3096,
+      "max": 3986
+    }
+  },
+  "mismatch_fixture_ids": [
+    "SMVP-REC-VIOLATION-005",
+    "SMVP-EXC-VIOLATION-003",
+    "SMVP-PUR-PASS-005",
+    "SMVP-PUR-VIOLATION-004"
+  ],
+  "action_expectation_mismatch_fixture_ids": [
+    "SMVP-REC-VIOLATION-005",
+    "SMVP-EXC-VIOLATION-003",
+    "SMVP-PUR-PASS-005",
+    "SMVP-PUR-VIOLATION-004"
+  ],
+  "controller_failure_fixture_ids": [],
+  "errored_fixture_ids": [],
+  "attempts_per_fixture": 1,
+  "retry_count": 0,
+  "tuning_performed": false,
+  "raw_runner_result": "semantic-mvp-20260829T060517Z.jsonl",
+  "enriched_result": "results.jsonl"
+}
