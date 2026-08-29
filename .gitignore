@@ -4,5 +4,8 @@ __pycache__/
 *.egg-info/
 build/
 dist/
+.env
+.env.*
+!.env.example
 artifacts/engineering/semantic_mvp/*.jsonl
 artifacts/engineering/semantic_mvp/cache/

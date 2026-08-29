@@ -29,6 +29,17 @@ from mandateguard.engineering.semantic_fixtures import (  # noqa: E402
 )
 
 
+def _load_live_environment(dotenv_path: Path | None = None) -> None:
+    """Load optional local live-mode configuration without overriding the shell."""
+
+    from dotenv import load_dotenv
+
+    load_dotenv(
+        dotenv_path=dotenv_path or REPOSITORY_ROOT / ".env",
+        override=False,
+    )
+
+
 def _print_validation(fixtures, selected) -> None:
     families = Counter(item.family for item in fixtures)
     expectations = Counter(item.engineering_expectation for item in fixtures)
@@ -114,6 +125,7 @@ def main(argv: list[str] | None = None) -> int:
         _print_validation(fixtures, selected)
         return 0
 
+    _load_live_environment()
     model_id = args.model_id or os.environ.get("MANDATEGUARD_SEMANTIC_MODEL")
     if not model_id:
         print(

@@ -7,8 +7,10 @@ from collections import Counter
 from datetime import datetime, timezone
 from hashlib import sha256
 import json
+import os
 from pathlib import Path
 import re
+import runpy
 import subprocess
 import sys
 from types import SimpleNamespace
@@ -292,18 +294,101 @@ def test_plain_loading_imports_no_execution_provider_network_or_razorpay():
     assert completed.stdout.strip() == ""
 
 
-@pytest.mark.parametrize("extra", [(), ("--validate-only",)])
-def test_default_and_validate_only_cli_make_zero_model_calls(extra):
-    completed = subprocess.run(
-        [sys.executable, str(RUNNER_SCRIPT), *extra],
-        capture_output=True,
-        text=True,
-        check=True,
-        env={**dict(__import__("os").environ), "OPENAI_API_KEY": "must-not-be-used"},
+def test_default_and_validate_only_cli_make_zero_model_calls(tmp_path):
+    (tmp_path / "dotenv.py").write_text(
+        "raise AssertionError('offline mode imported dotenv')\n",
+        encoding="utf-8",
     )
-    assert "ENGINEERING FIXTURE DIAGNOSTIC" in completed.stdout
-    assert "validation=PASS" in completed.stdout
-    assert "live=false model_calls=0" in completed.stdout
+    child_environment = {
+        **dict(os.environ),
+        "OPENAI_API_KEY": "must-not-be-used",
+    }
+    child_environment["PYTHONPATH"] = os.pathsep.join(
+        filter(
+            None,
+            (str(tmp_path), child_environment.get("PYTHONPATH")),
+        )
+    )
+    for extra in ((), ("--validate-only",)):
+        completed = subprocess.run(
+            [sys.executable, str(RUNNER_SCRIPT), *extra],
+            capture_output=True,
+            text=True,
+            check=True,
+            env=child_environment,
+        )
+        assert "ENGINEERING FIXTURE DIAGNOSTIC" in completed.stdout
+        assert "validation=PASS" in completed.stdout
+        assert "live=false model_calls=0" in completed.stdout
+
+
+def test_live_cli_loads_both_semantic_variables_from_dotenv(
+    tmp_path,
+    monkeypatch,
+):
+    runner_globals = runpy.run_path(
+        str(RUNNER_SCRIPT),
+        run_name="semantic_mvp_runner_under_test",
+    )
+    live_main = runner_globals["main"]
+    live_main.__globals__["REPOSITORY_ROOT"] = tmp_path
+    (tmp_path / ".env").write_text(
+        "OPENAI_API_KEY=synthetic-local-key\n"
+        "MANDATEGUARD_SEMANTIC_MODEL=gpt-5.6-terra\n",
+        encoding="utf-8",
+    )
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.delenv("MANDATEGUARD_SEMANTIC_MODEL", raising=False)
+
+    import mandateguard.engineering.semantic_runner as semantic_runner
+
+    captured: dict[str, str] = {}
+
+    def fake_create_verifier(*, model_id, cache_directory):
+        captured["api_key"] = os.environ["OPENAI_API_KEY"]
+        captured["model_id"] = model_id
+        return object()
+
+    monkeypatch.setattr(
+        semantic_runner,
+        "require_engineering_artifact_path",
+        lambda path, *, repository_root: path,
+    )
+    monkeypatch.setattr(
+        semantic_runner,
+        "create_openai_semantic_verifier",
+        fake_create_verifier,
+    )
+    monkeypatch.setattr(
+        semantic_runner,
+        "run_live_fixtures",
+        lambda fixtures, *, semantic_verifier: (),
+    )
+    monkeypatch.setattr(
+        semantic_runner,
+        "write_live_results",
+        lambda results, output_path, *, repository_root: output_path,
+    )
+
+    exit_code = live_main(
+        [
+            "--live",
+            "--limit",
+            "1",
+            "--fixtures",
+            str(FIXTURE_PATH),
+            "--artifacts-dir",
+            str(tmp_path / "artifacts"),
+            "--cache-dir",
+            str(tmp_path / "cache"),
+        ]
+    )
+
+    assert exit_code == 0
+    assert captured == {
+        "api_key": "synthetic-local-key",
+        "model_id": "gpt-5.6-terra",
+    }
 
 
 def test_cli_selection_flags_are_deterministic(fixtures):
