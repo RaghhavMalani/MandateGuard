@@ -1,0 +1,29 @@
+{
+  "run_id": "smvp-live-20260829T054956741Z-e67e9718c499",
+  "run_started_at": "2026-08-29T05:49:56.735Z",
+  "run_ended_at": "2026-08-29T05:51:39.226217Z",
+  "execution_git_sha": "56c0dadecfed981ad2a4fc6891e3ebfcb0b32f65",
+  "provider": "openai_responses",
+  "model": "gpt-5.6-terra",
+  "detector_version": "1.0",
+  "prompt_version": "1.0",
+  "attempted_fixtures": 9,
+  "semantic_expectation_matches": 9,
+  "controller_action_matches": 9,
+  "typed_provider_errors": 0,
+  "latency_ms": {
+    "method": "nearest-rank",
+    "min": 1421,
+    "p50": 2008,
+    "p95": 4088,
+    "max": 4088
+  },
+  "mismatch_fixture_ids": [],
+  "controller_failure_fixture_ids": [],
+  "errored_fixture_ids": [],
+  "attempts_per_fixture": 1,
+  "retry_count": 0,
+  "tuning_performed": false,
+  "raw_runner_result": "semantic-mvp-20260829T055139Z.jsonl",
+  "enriched_result": "results.jsonl"
+}

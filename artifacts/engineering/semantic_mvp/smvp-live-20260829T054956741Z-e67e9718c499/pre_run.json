@@ -1,0 +1,20 @@
+{
+  "run_id": "smvp-live-20260829T054956741Z-e67e9718c499",
+  "run_started_at": "2026-08-29T05:49:56.735Z",
+  "git_sha": "56c0dadecfed981ad2a4fc6891e3ebfcb0b32f65",
+  "provider": "openai_responses",
+  "model": "gpt-5.6-terra",
+  "detector_version": "1.0",
+  "prompt_version": "1.0",
+  "ordered_fixture_ids": [
+    "SMVP-REC-PASS-001",
+    "SMVP-REC-VIOLATION-001",
+    "SMVP-REC-ABSTAIN-001",
+    "SMVP-EXC-PASS-001",
+    "SMVP-EXC-VIOLATION-001",
+    "SMVP-EXC-ABSTAIN-001",
+    "SMVP-PUR-PASS-001",
+    "SMVP-PUR-VIOLATION-001",
+    "SMVP-PUR-ABSTAIN-001"
+  ]
+}
