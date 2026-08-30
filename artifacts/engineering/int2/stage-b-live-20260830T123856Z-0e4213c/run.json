@@ -1,0 +1,73 @@
+{
+  "artifacts": [
+    "RUN.md",
+    "run.json",
+    "stage_b_execution_plan.json",
+    "stage_b_observations.jsonl",
+    "stage_b_summary.json",
+    "stage_a_stage_b_join.csv"
+  ],
+  "buyer_calls": 0,
+  "claim_scope": "NON-BENCHMARK ENGINEERING DATA",
+  "ended_at_utc": "2026-08-30T13:01:01.750320Z",
+  "execution_plan_embedded_sha256": "8e01d4c27dd6e484481e23df70cea4ca7c979c1ddc1c817cc230cb47e7f9603c",
+  "execution_plan_file_sha256": "6c381390065953f27265684360b8a61d3917336f4b55b19244bc1746d8f97809",
+  "execution_sha": "0e4213c9dedf1d883585bd76980c24bf1aa0608b",
+  "experiment_name": "LIVE STAGE-B SEMANTIC ENGINEERING EXPERIMENT",
+  "frozen_case_manifest_sha256": "b2d4857750b98a1f3629f63c9d294f353fb734b67ab2bcbec8e8f3a057fc6454",
+  "frozen_selection_sha256": "516db7c82e1c8a2eccb0061363d391249864df0245a1b4b9e647604fa511e4a3",
+  "live_execution_started_at_utc": "2026-08-30T13:00:28.350430Z",
+  "model_id": "gpt-5.6-terra",
+  "production_default_comparison": [
+    {
+      "against_condition": "A",
+      "expectation_match_count_delta": 6,
+      "mean_recall_at_k_delta": 1.0,
+      "pass_to_violation_count_delta": 0,
+      "review_count_delta": -5,
+      "violation_to_pass_count_delta": 0
+    },
+    {
+      "against_condition": "B",
+      "expectation_match_count_delta": 0,
+      "mean_recall_at_k_delta": 0.0,
+      "pass_to_violation_count_delta": 0,
+      "review_count_delta": 0,
+      "violation_to_pass_count_delta": 0
+    },
+    {
+      "against_condition": "C",
+      "expectation_match_count_delta": 0,
+      "mean_recall_at_k_delta": 0.0,
+      "pass_to_violation_count_delta": 0,
+      "review_count_delta": 0,
+      "violation_to_pass_count_delta": 0
+    },
+    {
+      "against_condition": "D",
+      "expectation_match_count_delta": 0,
+      "mean_recall_at_k_delta": 0.0,
+      "pass_to_violation_count_delta": 0,
+      "review_count_delta": 0,
+      "violation_to_pass_count_delta": 0
+    },
+    {
+      "against_condition": "F",
+      "expectation_match_count_delta": 0,
+      "mean_recall_at_k_delta": 0.5,
+      "pass_to_violation_count_delta": 0,
+      "review_count_delta": 0,
+      "violation_to_pass_count_delta": 0
+    }
+  ],
+  "provider": "openai_responses",
+  "razorpay_calls": 0,
+  "retries": 0,
+  "run_id": "stage-b-live-20260830T123856Z-0e4213c",
+  "schema_version": "1.0",
+  "semantic_api_calls": 15,
+  "started_at_utc": "2026-08-30T12:38:56.653596Z",
+  "status": "COMPLETED",
+  "systemic_error": null,
+  "tuning_changes": 0
+}

@@ -1,0 +1,1639 @@
+{
+  "actual_semantic_api_calls_at_plan_freeze": 0,
+  "buyer_calls_at_plan_freeze": 0,
+  "detector_version": "1.0",
+  "duplicate_reused_observation_count": 15,
+  "equivalence_classes": [
+    {
+      "canonical_observation_id": "F:INT2-Q-TAX-GUIDE",
+      "member_observation_ids": [
+        "F:INT2-Q-TAX-GUIDE"
+      ],
+      "semantic_input_sha256": "0aa53bc0ab1637469b7a91ce448d4df34dd36f35ebe97127fd8358d5ed7ef397"
+    },
+    {
+      "canonical_observation_id": "C:INT2-Q-NOTEBOOK",
+      "member_observation_ids": [
+        "C:INT2-Q-NOTEBOOK",
+        "D:INT2-Q-NOTEBOOK"
+      ],
+      "semantic_input_sha256": "1c5b0fda84bf996157a22f9ab6dd0f632c749fbc646f27fe5a45ac9242cdae0e"
+    },
+    {
+      "canonical_observation_id": "B:INT2-Q-TAX-GUIDE",
+      "member_observation_ids": [
+        "B:INT2-Q-TAX-GUIDE",
+        "C:INT2-Q-TAX-GUIDE",
+        "D:INT2-Q-TAX-GUIDE",
+        "E:INT2-Q-TAX-GUIDE"
+      ],
+      "semantic_input_sha256": "1efbfee23cf365790866e977487ffbcfe0d17294b0dd881a62e719fa86d2d39f"
+    },
+    {
+      "canonical_observation_id": "F:INT2-Q-STUDYGLOW",
+      "member_observation_ids": [
+        "F:INT2-Q-STUDYGLOW"
+      ],
+      "semantic_input_sha256": "2ee7142d0d4f812a4133d94ca1ddbb5711f7875e1c33265c4677c1d9a975427c"
+    },
+    {
+      "canonical_observation_id": "C:INT2-Q-STUDYGLOW",
+      "member_observation_ids": [
+        "C:INT2-Q-STUDYGLOW",
+        "D:INT2-Q-STUDYGLOW"
+      ],
+      "semantic_input_sha256": "445f1ddb7b19b374dafd8cc6b381d97cd812cf493d2717a0f1175f9f5f049bad"
+    },
+    {
+      "canonical_observation_id": "F:INT2-Q-STUDY-CLUB",
+      "member_observation_ids": [
+        "F:INT2-Q-STUDY-CLUB"
+      ],
+      "semantic_input_sha256": "463dd1f37e3a4daf6d04909e7466562a636b9aa73bb17cca3a1a761fd971bf85"
+    },
+    {
+      "canonical_observation_id": "F:INT2-Q-FLEXI",
+      "member_observation_ids": [
+        "F:INT2-Q-FLEXI"
+      ],
+      "semantic_input_sha256": "6a86d39646e8fb688308451b130d5e7d86225a4cbd2fa32e1994a4396f9d7826"
+    },
+    {
+      "canonical_observation_id": "B:INT2-Q-MARKET-EDGE",
+      "member_observation_ids": [
+        "B:INT2-Q-MARKET-EDGE",
+        "C:INT2-Q-MARKET-EDGE",
+        "D:INT2-Q-MARKET-EDGE",
+        "E:INT2-Q-MARKET-EDGE"
+      ],
+      "semantic_input_sha256": "9b390ca5ad1cc9ecef8152a18cb7c24929a8e0144aa6a7f699318a23f175b0dd"
+    },
+    {
+      "canonical_observation_id": "B:INT2-Q-STUDY-CLUB",
+      "member_observation_ids": [
+        "B:INT2-Q-STUDY-CLUB",
+        "E:INT2-Q-STUDY-CLUB"
+      ],
+      "semantic_input_sha256": "caeac07142bec9baf0d1d0b117376f0f0924ab6348e84bead3f8f7baa46a1ebf"
+    },
+    {
+      "canonical_observation_id": "F:INT2-Q-MARKET-EDGE",
+      "member_observation_ids": [
+        "F:INT2-Q-MARKET-EDGE"
+      ],
+      "semantic_input_sha256": "cb17187b6972a932c451809e88bc978314c2c4100f2158c20fb4db2df0ee69a6"
+    },
+    {
+      "canonical_observation_id": "B:INT2-Q-FLEXI",
+      "member_observation_ids": [
+        "B:INT2-Q-FLEXI",
+        "C:INT2-Q-FLEXI",
+        "D:INT2-Q-FLEXI",
+        "E:INT2-Q-FLEXI"
+      ],
+      "semantic_input_sha256": "cc424bc15a4ed584b8f8751702046bafb73e9ca14cac693e0f8251164dc3b63b"
+    },
+    {
+      "canonical_observation_id": "F:INT2-Q-NOTEBOOK",
+      "member_observation_ids": [
+        "F:INT2-Q-NOTEBOOK"
+      ],
+      "semantic_input_sha256": "ce238744c991b8d12a3261b024d46f7b88b5751f3a211cddc4b5c5ed354e6ff1"
+    },
+    {
+      "canonical_observation_id": "B:INT2-Q-NOTEBOOK",
+      "member_observation_ids": [
+        "B:INT2-Q-NOTEBOOK",
+        "E:INT2-Q-NOTEBOOK"
+      ],
+      "semantic_input_sha256": "d220660c03eae36acff0a1d984a666038ec5af7aa8d2dec440168e6bc59b784e"
+    },
+    {
+      "canonical_observation_id": "C:INT2-Q-STUDY-CLUB",
+      "member_observation_ids": [
+        "C:INT2-Q-STUDY-CLUB",
+        "D:INT2-Q-STUDY-CLUB"
+      ],
+      "semantic_input_sha256": "d3d09d90491579b2ddaac3e0a2b49bcfe7545827707531236ee92a96c1865802"
+    },
+    {
+      "canonical_observation_id": "B:INT2-Q-STUDYGLOW",
+      "member_observation_ids": [
+        "B:INT2-Q-STUDYGLOW",
+        "E:INT2-Q-STUDYGLOW"
+      ],
+      "semantic_input_sha256": "f9883afcb502f7de7b72f47779e296bc2dd5c3125b2ba3ae1d83a993e84e5c76"
+    }
+  ],
+  "evidence_bearing_observation_count": 30,
+  "evidence_insufficient_no_call_count": 6,
+  "execution_plan_sha256": "8e01d4c27dd6e484481e23df70cea4ca7c979c1ddc1c817cc230cb47e7f9603c",
+  "execution_sha": "0e4213c9dedf1d883585bd76980c24bf1aa0608b",
+  "experiment_name": "LIVE STAGE-B SEMANTIC ENGINEERING EXPERIMENT",
+  "experiment_stage": "INT-2 Stage B planning only",
+  "frozen_case_manifest_sha256": "b2d4857750b98a1f3629f63c9d294f353fb734b67ab2bcbec8e8f3a057fc6454",
+  "frozen_selection_sha256": "516db7c82e1c8a2eccb0061363d391249864df0245a1b4b9e647604fa511e4a3",
+  "model_id": "gpt-5.6-terra",
+  "nominal_observation_count": 36,
+  "observations": [
+    {
+      "alpha": null,
+      "canonical_observation_id": null,
+      "condition": {
+        "alpha": null,
+        "configuration_id": "no_retrieval.alpha-na.k-1",
+        "label": "A",
+        "role": "NO_RETRIEVAL CONTROL",
+        "strategy": "no_retrieval",
+        "top_k": 1
+      },
+      "condition_label": "A",
+      "condition_role": "NO_RETRIEVAL CONTROL",
+      "configuration_id": "no_retrieval.alpha-na.k-1",
+      "engineering_expectation": "PASS",
+      "equivalence_class_id": null,
+      "equivalence_class_observation_ids": [],
+      "expected_final_action": "ALLOW",
+      "observation_id": "A:INT2-Q-STUDYGLOW",
+      "planned_semantic_call": false,
+      "projected_reused_observation_ids": [],
+      "query_id": "INT2-Q-STUDYGLOW",
+      "retrieved_evidence_ids": [],
+      "selected_trusted_evidence_ids": [],
+      "semantic_execution": "NOT_EVALUATED",
+      "semantic_input_sha256": null,
+      "semantic_status": "NOT_EVALUATED",
+      "strategy": "no_retrieval",
+      "top_k": 1,
+      "trusted_evidence_count": 0
+    },
+    {
+      "alpha": null,
+      "canonical_observation_id": null,
+      "condition": {
+        "alpha": null,
+        "configuration_id": "no_retrieval.alpha-na.k-1",
+        "label": "A",
+        "role": "NO_RETRIEVAL CONTROL",
+        "strategy": "no_retrieval",
+        "top_k": 1
+      },
+      "condition_label": "A",
+      "condition_role": "NO_RETRIEVAL CONTROL",
+      "configuration_id": "no_retrieval.alpha-na.k-1",
+      "engineering_expectation": "PASS",
+      "equivalence_class_id": null,
+      "equivalence_class_observation_ids": [],
+      "expected_final_action": "ALLOW",
+      "observation_id": "A:INT2-Q-NOTEBOOK",
+      "planned_semantic_call": false,
+      "projected_reused_observation_ids": [],
+      "query_id": "INT2-Q-NOTEBOOK",
+      "retrieved_evidence_ids": [],
+      "selected_trusted_evidence_ids": [],
+      "semantic_execution": "NOT_EVALUATED",
+      "semantic_input_sha256": null,
+      "semantic_status": "NOT_EVALUATED",
+      "strategy": "no_retrieval",
+      "top_k": 1,
+      "trusted_evidence_count": 0
+    },
+    {
+      "alpha": null,
+      "canonical_observation_id": null,
+      "condition": {
+        "alpha": null,
+        "configuration_id": "no_retrieval.alpha-na.k-1",
+        "label": "A",
+        "role": "NO_RETRIEVAL CONTROL",
+        "strategy": "no_retrieval",
+        "top_k": 1
+      },
+      "condition_label": "A",
+      "condition_role": "NO_RETRIEVAL CONTROL",
+      "configuration_id": "no_retrieval.alpha-na.k-1",
+      "engineering_expectation": "VIOLATION",
+      "equivalence_class_id": null,
+      "equivalence_class_observation_ids": [],
+      "expected_final_action": "BLOCK",
+      "observation_id": "A:INT2-Q-STUDY-CLUB",
+      "planned_semantic_call": false,
+      "projected_reused_observation_ids": [],
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "retrieved_evidence_ids": [],
+      "selected_trusted_evidence_ids": [],
+      "semantic_execution": "NOT_EVALUATED",
+      "semantic_input_sha256": null,
+      "semantic_status": "NOT_EVALUATED",
+      "strategy": "no_retrieval",
+      "top_k": 1,
+      "trusted_evidence_count": 0
+    },
+    {
+      "alpha": null,
+      "canonical_observation_id": null,
+      "condition": {
+        "alpha": null,
+        "configuration_id": "no_retrieval.alpha-na.k-1",
+        "label": "A",
+        "role": "NO_RETRIEVAL CONTROL",
+        "strategy": "no_retrieval",
+        "top_k": 1
+      },
+      "condition_label": "A",
+      "condition_role": "NO_RETRIEVAL CONTROL",
+      "configuration_id": "no_retrieval.alpha-na.k-1",
+      "engineering_expectation": "VIOLATION",
+      "equivalence_class_id": null,
+      "equivalence_class_observation_ids": [],
+      "expected_final_action": "BLOCK",
+      "observation_id": "A:INT2-Q-MARKET-EDGE",
+      "planned_semantic_call": false,
+      "projected_reused_observation_ids": [],
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "retrieved_evidence_ids": [],
+      "selected_trusted_evidence_ids": [],
+      "semantic_execution": "NOT_EVALUATED",
+      "semantic_input_sha256": null,
+      "semantic_status": "NOT_EVALUATED",
+      "strategy": "no_retrieval",
+      "top_k": 1,
+      "trusted_evidence_count": 0
+    },
+    {
+      "alpha": null,
+      "canonical_observation_id": null,
+      "condition": {
+        "alpha": null,
+        "configuration_id": "no_retrieval.alpha-na.k-1",
+        "label": "A",
+        "role": "NO_RETRIEVAL CONTROL",
+        "strategy": "no_retrieval",
+        "top_k": 1
+      },
+      "condition_label": "A",
+      "condition_role": "NO_RETRIEVAL CONTROL",
+      "configuration_id": "no_retrieval.alpha-na.k-1",
+      "engineering_expectation": "PASS",
+      "equivalence_class_id": null,
+      "equivalence_class_observation_ids": [],
+      "expected_final_action": "ALLOW",
+      "observation_id": "A:INT2-Q-TAX-GUIDE",
+      "planned_semantic_call": false,
+      "projected_reused_observation_ids": [],
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "retrieved_evidence_ids": [],
+      "selected_trusted_evidence_ids": [],
+      "semantic_execution": "NOT_EVALUATED",
+      "semantic_input_sha256": null,
+      "semantic_status": "NOT_EVALUATED",
+      "strategy": "no_retrieval",
+      "top_k": 1,
+      "trusted_evidence_count": 0
+    },
+    {
+      "alpha": null,
+      "canonical_observation_id": null,
+      "condition": {
+        "alpha": null,
+        "configuration_id": "no_retrieval.alpha-na.k-1",
+        "label": "A",
+        "role": "NO_RETRIEVAL CONTROL",
+        "strategy": "no_retrieval",
+        "top_k": 1
+      },
+      "condition_label": "A",
+      "condition_role": "NO_RETRIEVAL CONTROL",
+      "configuration_id": "no_retrieval.alpha-na.k-1",
+      "engineering_expectation": "ABSTAIN",
+      "equivalence_class_id": null,
+      "equivalence_class_observation_ids": [],
+      "expected_final_action": "REVIEW",
+      "observation_id": "A:INT2-Q-FLEXI",
+      "planned_semantic_call": false,
+      "projected_reused_observation_ids": [],
+      "query_id": "INT2-Q-FLEXI",
+      "retrieved_evidence_ids": [],
+      "selected_trusted_evidence_ids": [],
+      "semantic_execution": "NOT_EVALUATED",
+      "semantic_input_sha256": null,
+      "semantic_status": "NOT_EVALUATED",
+      "strategy": "no_retrieval",
+      "top_k": 1,
+      "trusted_evidence_count": 0
+    },
+    {
+      "alpha": null,
+      "canonical_observation_id": "B:INT2-Q-STUDYGLOW",
+      "condition": {
+        "alpha": null,
+        "configuration_id": "lexical_only.alpha-na.k-5",
+        "label": "B",
+        "role": "LEXICAL BASELINE",
+        "strategy": "lexical_only",
+        "top_k": 5
+      },
+      "condition_label": "B",
+      "condition_role": "LEXICAL BASELINE",
+      "configuration_id": "lexical_only.alpha-na.k-5",
+      "engineering_expectation": "PASS",
+      "equivalence_class_id": "semantic-input:f9883afcb502f7de7b72f47779e296bc2dd5c3125b2ba3ae1d83a993e84e5c76",
+      "equivalence_class_observation_ids": [
+        "B:INT2-Q-STUDYGLOW",
+        "E:INT2-Q-STUDYGLOW"
+      ],
+      "expected_final_action": "ALLOW",
+      "observation_id": "B:INT2-Q-STUDYGLOW",
+      "planned_semantic_call": true,
+      "projected_reused_observation_ids": [
+        "E:INT2-Q-STUDYGLOW"
+      ],
+      "query_id": "INT2-Q-STUDYGLOW",
+      "retrieved_evidence_ids": [
+        "studyglow-evidence-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "scholarly-terms-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "scholarly-terms-v1",
+        "studyglow-evidence-v1"
+      ],
+      "semantic_execution": "EXECUTED_PLANNED",
+      "semantic_input_sha256": "f9883afcb502f7de7b72f47779e296bc2dd5c3125b2ba3ae1d83a993e84e5c76",
+      "semantic_status": "PLANNED",
+      "strategy": "lexical_only",
+      "top_k": 5,
+      "trusted_evidence_count": 2
+    },
+    {
+      "alpha": null,
+      "canonical_observation_id": "B:INT2-Q-NOTEBOOK",
+      "condition": {
+        "alpha": null,
+        "configuration_id": "lexical_only.alpha-na.k-5",
+        "label": "B",
+        "role": "LEXICAL BASELINE",
+        "strategy": "lexical_only",
+        "top_k": 5
+      },
+      "condition_label": "B",
+      "condition_role": "LEXICAL BASELINE",
+      "configuration_id": "lexical_only.alpha-na.k-5",
+      "engineering_expectation": "PASS",
+      "equivalence_class_id": "semantic-input:d220660c03eae36acff0a1d984a666038ec5af7aa8d2dec440168e6bc59b784e",
+      "equivalence_class_observation_ids": [
+        "B:INT2-Q-NOTEBOOK",
+        "E:INT2-Q-NOTEBOOK"
+      ],
+      "expected_final_action": "ALLOW",
+      "observation_id": "B:INT2-Q-NOTEBOOK",
+      "planned_semantic_call": true,
+      "projected_reused_observation_ids": [
+        "E:INT2-Q-NOTEBOOK"
+      ],
+      "query_id": "INT2-Q-NOTEBOOK",
+      "retrieved_evidence_ids": [
+        "notebook-evidence-v1",
+        "studyglow-evidence-v1",
+        "scholarly-terms-v1",
+        "study-club-evidence-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1"
+      ],
+      "semantic_execution": "EXECUTED_PLANNED",
+      "semantic_input_sha256": "d220660c03eae36acff0a1d984a666038ec5af7aa8d2dec440168e6bc59b784e",
+      "semantic_status": "PLANNED",
+      "strategy": "lexical_only",
+      "top_k": 5,
+      "trusted_evidence_count": 2
+    },
+    {
+      "alpha": null,
+      "canonical_observation_id": "B:INT2-Q-STUDY-CLUB",
+      "condition": {
+        "alpha": null,
+        "configuration_id": "lexical_only.alpha-na.k-5",
+        "label": "B",
+        "role": "LEXICAL BASELINE",
+        "strategy": "lexical_only",
+        "top_k": 5
+      },
+      "condition_label": "B",
+      "condition_role": "LEXICAL BASELINE",
+      "configuration_id": "lexical_only.alpha-na.k-5",
+      "engineering_expectation": "VIOLATION",
+      "equivalence_class_id": "semantic-input:caeac07142bec9baf0d1d0b117376f0f0924ab6348e84bead3f8f7baa46a1ebf",
+      "equivalence_class_observation_ids": [
+        "B:INT2-Q-STUDY-CLUB",
+        "E:INT2-Q-STUDY-CLUB"
+      ],
+      "expected_final_action": "BLOCK",
+      "observation_id": "B:INT2-Q-STUDY-CLUB",
+      "planned_semantic_call": true,
+      "projected_reused_observation_ids": [
+        "E:INT2-Q-STUDY-CLUB"
+      ],
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "retrieved_evidence_ids": [
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1",
+        "notebook-evidence-v1",
+        "scholarly-terms-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "scholarly-terms-v1",
+        "study-club-evidence-v1"
+      ],
+      "semantic_execution": "EXECUTED_PLANNED",
+      "semantic_input_sha256": "caeac07142bec9baf0d1d0b117376f0f0924ab6348e84bead3f8f7baa46a1ebf",
+      "semantic_status": "PLANNED",
+      "strategy": "lexical_only",
+      "top_k": 5,
+      "trusted_evidence_count": 2
+    },
+    {
+      "alpha": null,
+      "canonical_observation_id": "B:INT2-Q-MARKET-EDGE",
+      "condition": {
+        "alpha": null,
+        "configuration_id": "lexical_only.alpha-na.k-5",
+        "label": "B",
+        "role": "LEXICAL BASELINE",
+        "strategy": "lexical_only",
+        "top_k": 5
+      },
+      "condition_label": "B",
+      "condition_role": "LEXICAL BASELINE",
+      "configuration_id": "lexical_only.alpha-na.k-5",
+      "engineering_expectation": "VIOLATION",
+      "equivalence_class_id": "semantic-input:9b390ca5ad1cc9ecef8152a18cb7c24929a8e0144aa6a7f699318a23f175b0dd",
+      "equivalence_class_observation_ids": [
+        "B:INT2-Q-MARKET-EDGE",
+        "C:INT2-Q-MARKET-EDGE",
+        "D:INT2-Q-MARKET-EDGE",
+        "E:INT2-Q-MARKET-EDGE"
+      ],
+      "expected_final_action": "BLOCK",
+      "observation_id": "B:INT2-Q-MARKET-EDGE",
+      "planned_semantic_call": true,
+      "projected_reused_observation_ids": [
+        "C:INT2-Q-MARKET-EDGE",
+        "D:INT2-Q-MARKET-EDGE",
+        "E:INT2-Q-MARKET-EDGE"
+      ],
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "retrieved_evidence_ids": [
+        "market-edge-evidence-v1",
+        "tax-guide-evidence-v1",
+        "academy-terms-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "academy-terms-v1",
+        "market-edge-evidence-v1"
+      ],
+      "semantic_execution": "EXECUTED_PLANNED",
+      "semantic_input_sha256": "9b390ca5ad1cc9ecef8152a18cb7c24929a8e0144aa6a7f699318a23f175b0dd",
+      "semantic_status": "PLANNED",
+      "strategy": "lexical_only",
+      "top_k": 5,
+      "trusted_evidence_count": 2
+    },
+    {
+      "alpha": null,
+      "canonical_observation_id": "B:INT2-Q-TAX-GUIDE",
+      "condition": {
+        "alpha": null,
+        "configuration_id": "lexical_only.alpha-na.k-5",
+        "label": "B",
+        "role": "LEXICAL BASELINE",
+        "strategy": "lexical_only",
+        "top_k": 5
+      },
+      "condition_label": "B",
+      "condition_role": "LEXICAL BASELINE",
+      "configuration_id": "lexical_only.alpha-na.k-5",
+      "engineering_expectation": "PASS",
+      "equivalence_class_id": "semantic-input:1efbfee23cf365790866e977487ffbcfe0d17294b0dd881a62e719fa86d2d39f",
+      "equivalence_class_observation_ids": [
+        "B:INT2-Q-TAX-GUIDE",
+        "C:INT2-Q-TAX-GUIDE",
+        "D:INT2-Q-TAX-GUIDE",
+        "E:INT2-Q-TAX-GUIDE"
+      ],
+      "expected_final_action": "ALLOW",
+      "observation_id": "B:INT2-Q-TAX-GUIDE",
+      "planned_semantic_call": true,
+      "projected_reused_observation_ids": [
+        "C:INT2-Q-TAX-GUIDE",
+        "D:INT2-Q-TAX-GUIDE",
+        "E:INT2-Q-TAX-GUIDE"
+      ],
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "retrieved_evidence_ids": [
+        "tax-guide-evidence-v1",
+        "academy-terms-v1",
+        "market-edge-evidence-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "academy-terms-v1",
+        "tax-guide-evidence-v1"
+      ],
+      "semantic_execution": "EXECUTED_PLANNED",
+      "semantic_input_sha256": "1efbfee23cf365790866e977487ffbcfe0d17294b0dd881a62e719fa86d2d39f",
+      "semantic_status": "PLANNED",
+      "strategy": "lexical_only",
+      "top_k": 5,
+      "trusted_evidence_count": 2
+    },
+    {
+      "alpha": null,
+      "canonical_observation_id": "B:INT2-Q-FLEXI",
+      "condition": {
+        "alpha": null,
+        "configuration_id": "lexical_only.alpha-na.k-5",
+        "label": "B",
+        "role": "LEXICAL BASELINE",
+        "strategy": "lexical_only",
+        "top_k": 5
+      },
+      "condition_label": "B",
+      "condition_role": "LEXICAL BASELINE",
+      "configuration_id": "lexical_only.alpha-na.k-5",
+      "engineering_expectation": "ABSTAIN",
+      "equivalence_class_id": "semantic-input:cc424bc15a4ed584b8f8751702046bafb73e9ca14cac693e0f8251164dc3b63b",
+      "equivalence_class_observation_ids": [
+        "B:INT2-Q-FLEXI",
+        "C:INT2-Q-FLEXI",
+        "D:INT2-Q-FLEXI",
+        "E:INT2-Q-FLEXI"
+      ],
+      "expected_final_action": "REVIEW",
+      "observation_id": "B:INT2-Q-FLEXI",
+      "planned_semantic_call": true,
+      "projected_reused_observation_ids": [
+        "C:INT2-Q-FLEXI",
+        "D:INT2-Q-FLEXI",
+        "E:INT2-Q-FLEXI"
+      ],
+      "query_id": "INT2-Q-FLEXI",
+      "retrieved_evidence_ids": [
+        "flexi-evidence-v1",
+        "nova-terms-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "nova-terms-v1",
+        "flexi-evidence-v1"
+      ],
+      "semantic_execution": "EXECUTED_PLANNED",
+      "semantic_input_sha256": "cc424bc15a4ed584b8f8751702046bafb73e9ca14cac693e0f8251164dc3b63b",
+      "semantic_status": "PLANNED",
+      "strategy": "lexical_only",
+      "top_k": 5,
+      "trusted_evidence_count": 2
+    },
+    {
+      "alpha": null,
+      "canonical_observation_id": "C:INT2-Q-STUDYGLOW",
+      "condition": {
+        "alpha": null,
+        "configuration_id": "semantic_only.alpha-na.k-3",
+        "label": "C",
+        "role": "SEMANTIC BASELINE",
+        "strategy": "semantic_only",
+        "top_k": 3
+      },
+      "condition_label": "C",
+      "condition_role": "SEMANTIC BASELINE",
+      "configuration_id": "semantic_only.alpha-na.k-3",
+      "engineering_expectation": "PASS",
+      "equivalence_class_id": "semantic-input:445f1ddb7b19b374dafd8cc6b381d97cd812cf493d2717a0f1175f9f5f049bad",
+      "equivalence_class_observation_ids": [
+        "C:INT2-Q-STUDYGLOW",
+        "D:INT2-Q-STUDYGLOW"
+      ],
+      "expected_final_action": "ALLOW",
+      "observation_id": "C:INT2-Q-STUDYGLOW",
+      "planned_semantic_call": true,
+      "projected_reused_observation_ids": [
+        "D:INT2-Q-STUDYGLOW"
+      ],
+      "query_id": "INT2-Q-STUDYGLOW",
+      "retrieved_evidence_ids": [
+        "studyglow-evidence-v1",
+        "notebook-evidence-v1",
+        "scholarly-terms-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "scholarly-terms-v1",
+        "studyglow-evidence-v1"
+      ],
+      "semantic_execution": "EXECUTED_PLANNED",
+      "semantic_input_sha256": "445f1ddb7b19b374dafd8cc6b381d97cd812cf493d2717a0f1175f9f5f049bad",
+      "semantic_status": "PLANNED",
+      "strategy": "semantic_only",
+      "top_k": 3,
+      "trusted_evidence_count": 2
+    },
+    {
+      "alpha": null,
+      "canonical_observation_id": "C:INT2-Q-NOTEBOOK",
+      "condition": {
+        "alpha": null,
+        "configuration_id": "semantic_only.alpha-na.k-3",
+        "label": "C",
+        "role": "SEMANTIC BASELINE",
+        "strategy": "semantic_only",
+        "top_k": 3
+      },
+      "condition_label": "C",
+      "condition_role": "SEMANTIC BASELINE",
+      "configuration_id": "semantic_only.alpha-na.k-3",
+      "engineering_expectation": "PASS",
+      "equivalence_class_id": "semantic-input:1c5b0fda84bf996157a22f9ab6dd0f632c749fbc646f27fe5a45ac9242cdae0e",
+      "equivalence_class_observation_ids": [
+        "C:INT2-Q-NOTEBOOK",
+        "D:INT2-Q-NOTEBOOK"
+      ],
+      "expected_final_action": "ALLOW",
+      "observation_id": "C:INT2-Q-NOTEBOOK",
+      "planned_semantic_call": true,
+      "projected_reused_observation_ids": [
+        "D:INT2-Q-NOTEBOOK"
+      ],
+      "query_id": "INT2-Q-NOTEBOOK",
+      "retrieved_evidence_ids": [
+        "notebook-evidence-v1",
+        "studyglow-evidence-v1",
+        "scholarly-terms-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1"
+      ],
+      "semantic_execution": "EXECUTED_PLANNED",
+      "semantic_input_sha256": "1c5b0fda84bf996157a22f9ab6dd0f632c749fbc646f27fe5a45ac9242cdae0e",
+      "semantic_status": "PLANNED",
+      "strategy": "semantic_only",
+      "top_k": 3,
+      "trusted_evidence_count": 2
+    },
+    {
+      "alpha": null,
+      "canonical_observation_id": "C:INT2-Q-STUDY-CLUB",
+      "condition": {
+        "alpha": null,
+        "configuration_id": "semantic_only.alpha-na.k-3",
+        "label": "C",
+        "role": "SEMANTIC BASELINE",
+        "strategy": "semantic_only",
+        "top_k": 3
+      },
+      "condition_label": "C",
+      "condition_role": "SEMANTIC BASELINE",
+      "configuration_id": "semantic_only.alpha-na.k-3",
+      "engineering_expectation": "VIOLATION",
+      "equivalence_class_id": "semantic-input:d3d09d90491579b2ddaac3e0a2b49bcfe7545827707531236ee92a96c1865802",
+      "equivalence_class_observation_ids": [
+        "C:INT2-Q-STUDY-CLUB",
+        "D:INT2-Q-STUDY-CLUB"
+      ],
+      "expected_final_action": "BLOCK",
+      "observation_id": "C:INT2-Q-STUDY-CLUB",
+      "planned_semantic_call": true,
+      "projected_reused_observation_ids": [
+        "D:INT2-Q-STUDY-CLUB"
+      ],
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "retrieved_evidence_ids": [
+        "study-club-evidence-v1",
+        "scholarly-terms-v1",
+        "studyglow-evidence-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "scholarly-terms-v1",
+        "study-club-evidence-v1"
+      ],
+      "semantic_execution": "EXECUTED_PLANNED",
+      "semantic_input_sha256": "d3d09d90491579b2ddaac3e0a2b49bcfe7545827707531236ee92a96c1865802",
+      "semantic_status": "PLANNED",
+      "strategy": "semantic_only",
+      "top_k": 3,
+      "trusted_evidence_count": 2
+    },
+    {
+      "alpha": null,
+      "canonical_observation_id": "B:INT2-Q-MARKET-EDGE",
+      "condition": {
+        "alpha": null,
+        "configuration_id": "semantic_only.alpha-na.k-3",
+        "label": "C",
+        "role": "SEMANTIC BASELINE",
+        "strategy": "semantic_only",
+        "top_k": 3
+      },
+      "condition_label": "C",
+      "condition_role": "SEMANTIC BASELINE",
+      "configuration_id": "semantic_only.alpha-na.k-3",
+      "engineering_expectation": "VIOLATION",
+      "equivalence_class_id": "semantic-input:9b390ca5ad1cc9ecef8152a18cb7c24929a8e0144aa6a7f699318a23f175b0dd",
+      "equivalence_class_observation_ids": [
+        "B:INT2-Q-MARKET-EDGE",
+        "C:INT2-Q-MARKET-EDGE",
+        "D:INT2-Q-MARKET-EDGE",
+        "E:INT2-Q-MARKET-EDGE"
+      ],
+      "expected_final_action": "BLOCK",
+      "observation_id": "C:INT2-Q-MARKET-EDGE",
+      "planned_semantic_call": false,
+      "projected_reused_observation_ids": [
+        "C:INT2-Q-MARKET-EDGE",
+        "D:INT2-Q-MARKET-EDGE",
+        "E:INT2-Q-MARKET-EDGE"
+      ],
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "retrieved_evidence_ids": [
+        "market-edge-evidence-v1",
+        "tax-guide-evidence-v1",
+        "academy-terms-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "academy-terms-v1",
+        "market-edge-evidence-v1"
+      ],
+      "semantic_execution": "REUSED_IDENTICAL_INPUT_PLANNED",
+      "semantic_input_sha256": "9b390ca5ad1cc9ecef8152a18cb7c24929a8e0144aa6a7f699318a23f175b0dd",
+      "semantic_status": "PLANNED",
+      "strategy": "semantic_only",
+      "top_k": 3,
+      "trusted_evidence_count": 2
+    },
+    {
+      "alpha": null,
+      "canonical_observation_id": "B:INT2-Q-TAX-GUIDE",
+      "condition": {
+        "alpha": null,
+        "configuration_id": "semantic_only.alpha-na.k-3",
+        "label": "C",
+        "role": "SEMANTIC BASELINE",
+        "strategy": "semantic_only",
+        "top_k": 3
+      },
+      "condition_label": "C",
+      "condition_role": "SEMANTIC BASELINE",
+      "configuration_id": "semantic_only.alpha-na.k-3",
+      "engineering_expectation": "PASS",
+      "equivalence_class_id": "semantic-input:1efbfee23cf365790866e977487ffbcfe0d17294b0dd881a62e719fa86d2d39f",
+      "equivalence_class_observation_ids": [
+        "B:INT2-Q-TAX-GUIDE",
+        "C:INT2-Q-TAX-GUIDE",
+        "D:INT2-Q-TAX-GUIDE",
+        "E:INT2-Q-TAX-GUIDE"
+      ],
+      "expected_final_action": "ALLOW",
+      "observation_id": "C:INT2-Q-TAX-GUIDE",
+      "planned_semantic_call": false,
+      "projected_reused_observation_ids": [
+        "C:INT2-Q-TAX-GUIDE",
+        "D:INT2-Q-TAX-GUIDE",
+        "E:INT2-Q-TAX-GUIDE"
+      ],
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "retrieved_evidence_ids": [
+        "tax-guide-evidence-v1",
+        "academy-terms-v1",
+        "market-edge-evidence-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "academy-terms-v1",
+        "tax-guide-evidence-v1"
+      ],
+      "semantic_execution": "REUSED_IDENTICAL_INPUT_PLANNED",
+      "semantic_input_sha256": "1efbfee23cf365790866e977487ffbcfe0d17294b0dd881a62e719fa86d2d39f",
+      "semantic_status": "PLANNED",
+      "strategy": "semantic_only",
+      "top_k": 3,
+      "trusted_evidence_count": 2
+    },
+    {
+      "alpha": null,
+      "canonical_observation_id": "B:INT2-Q-FLEXI",
+      "condition": {
+        "alpha": null,
+        "configuration_id": "semantic_only.alpha-na.k-3",
+        "label": "C",
+        "role": "SEMANTIC BASELINE",
+        "strategy": "semantic_only",
+        "top_k": 3
+      },
+      "condition_label": "C",
+      "condition_role": "SEMANTIC BASELINE",
+      "configuration_id": "semantic_only.alpha-na.k-3",
+      "engineering_expectation": "ABSTAIN",
+      "equivalence_class_id": "semantic-input:cc424bc15a4ed584b8f8751702046bafb73e9ca14cac693e0f8251164dc3b63b",
+      "equivalence_class_observation_ids": [
+        "B:INT2-Q-FLEXI",
+        "C:INT2-Q-FLEXI",
+        "D:INT2-Q-FLEXI",
+        "E:INT2-Q-FLEXI"
+      ],
+      "expected_final_action": "REVIEW",
+      "observation_id": "C:INT2-Q-FLEXI",
+      "planned_semantic_call": false,
+      "projected_reused_observation_ids": [
+        "C:INT2-Q-FLEXI",
+        "D:INT2-Q-FLEXI",
+        "E:INT2-Q-FLEXI"
+      ],
+      "query_id": "INT2-Q-FLEXI",
+      "retrieved_evidence_ids": [
+        "flexi-evidence-v1",
+        "nova-terms-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "nova-terms-v1",
+        "flexi-evidence-v1"
+      ],
+      "semantic_execution": "REUSED_IDENTICAL_INPUT_PLANNED",
+      "semantic_input_sha256": "cc424bc15a4ed584b8f8751702046bafb73e9ca14cac693e0f8251164dc3b63b",
+      "semantic_status": "PLANNED",
+      "strategy": "semantic_only",
+      "top_k": 3,
+      "trusted_evidence_count": 2
+    },
+    {
+      "alpha": 0.0,
+      "canonical_observation_id": "C:INT2-Q-STUDYGLOW",
+      "condition": {
+        "alpha": 0.0,
+        "configuration_id": "hybrid.alpha-0.00.k-3",
+        "label": "D",
+        "role": "BEST HYBRID",
+        "strategy": "hybrid",
+        "top_k": 3
+      },
+      "condition_label": "D",
+      "condition_role": "BEST HYBRID",
+      "configuration_id": "hybrid.alpha-0.00.k-3",
+      "engineering_expectation": "PASS",
+      "equivalence_class_id": "semantic-input:445f1ddb7b19b374dafd8cc6b381d97cd812cf493d2717a0f1175f9f5f049bad",
+      "equivalence_class_observation_ids": [
+        "C:INT2-Q-STUDYGLOW",
+        "D:INT2-Q-STUDYGLOW"
+      ],
+      "expected_final_action": "ALLOW",
+      "observation_id": "D:INT2-Q-STUDYGLOW",
+      "planned_semantic_call": false,
+      "projected_reused_observation_ids": [
+        "D:INT2-Q-STUDYGLOW"
+      ],
+      "query_id": "INT2-Q-STUDYGLOW",
+      "retrieved_evidence_ids": [
+        "studyglow-evidence-v1",
+        "notebook-evidence-v1",
+        "scholarly-terms-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "scholarly-terms-v1",
+        "studyglow-evidence-v1"
+      ],
+      "semantic_execution": "REUSED_IDENTICAL_INPUT_PLANNED",
+      "semantic_input_sha256": "445f1ddb7b19b374dafd8cc6b381d97cd812cf493d2717a0f1175f9f5f049bad",
+      "semantic_status": "PLANNED",
+      "strategy": "hybrid",
+      "top_k": 3,
+      "trusted_evidence_count": 2
+    },
+    {
+      "alpha": 0.0,
+      "canonical_observation_id": "C:INT2-Q-NOTEBOOK",
+      "condition": {
+        "alpha": 0.0,
+        "configuration_id": "hybrid.alpha-0.00.k-3",
+        "label": "D",
+        "role": "BEST HYBRID",
+        "strategy": "hybrid",
+        "top_k": 3
+      },
+      "condition_label": "D",
+      "condition_role": "BEST HYBRID",
+      "configuration_id": "hybrid.alpha-0.00.k-3",
+      "engineering_expectation": "PASS",
+      "equivalence_class_id": "semantic-input:1c5b0fda84bf996157a22f9ab6dd0f632c749fbc646f27fe5a45ac9242cdae0e",
+      "equivalence_class_observation_ids": [
+        "C:INT2-Q-NOTEBOOK",
+        "D:INT2-Q-NOTEBOOK"
+      ],
+      "expected_final_action": "ALLOW",
+      "observation_id": "D:INT2-Q-NOTEBOOK",
+      "planned_semantic_call": false,
+      "projected_reused_observation_ids": [
+        "D:INT2-Q-NOTEBOOK"
+      ],
+      "query_id": "INT2-Q-NOTEBOOK",
+      "retrieved_evidence_ids": [
+        "notebook-evidence-v1",
+        "studyglow-evidence-v1",
+        "scholarly-terms-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1"
+      ],
+      "semantic_execution": "REUSED_IDENTICAL_INPUT_PLANNED",
+      "semantic_input_sha256": "1c5b0fda84bf996157a22f9ab6dd0f632c749fbc646f27fe5a45ac9242cdae0e",
+      "semantic_status": "PLANNED",
+      "strategy": "hybrid",
+      "top_k": 3,
+      "trusted_evidence_count": 2
+    },
+    {
+      "alpha": 0.0,
+      "canonical_observation_id": "C:INT2-Q-STUDY-CLUB",
+      "condition": {
+        "alpha": 0.0,
+        "configuration_id": "hybrid.alpha-0.00.k-3",
+        "label": "D",
+        "role": "BEST HYBRID",
+        "strategy": "hybrid",
+        "top_k": 3
+      },
+      "condition_label": "D",
+      "condition_role": "BEST HYBRID",
+      "configuration_id": "hybrid.alpha-0.00.k-3",
+      "engineering_expectation": "VIOLATION",
+      "equivalence_class_id": "semantic-input:d3d09d90491579b2ddaac3e0a2b49bcfe7545827707531236ee92a96c1865802",
+      "equivalence_class_observation_ids": [
+        "C:INT2-Q-STUDY-CLUB",
+        "D:INT2-Q-STUDY-CLUB"
+      ],
+      "expected_final_action": "BLOCK",
+      "observation_id": "D:INT2-Q-STUDY-CLUB",
+      "planned_semantic_call": false,
+      "projected_reused_observation_ids": [
+        "D:INT2-Q-STUDY-CLUB"
+      ],
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "retrieved_evidence_ids": [
+        "study-club-evidence-v1",
+        "scholarly-terms-v1",
+        "studyglow-evidence-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "scholarly-terms-v1",
+        "study-club-evidence-v1"
+      ],
+      "semantic_execution": "REUSED_IDENTICAL_INPUT_PLANNED",
+      "semantic_input_sha256": "d3d09d90491579b2ddaac3e0a2b49bcfe7545827707531236ee92a96c1865802",
+      "semantic_status": "PLANNED",
+      "strategy": "hybrid",
+      "top_k": 3,
+      "trusted_evidence_count": 2
+    },
+    {
+      "alpha": 0.0,
+      "canonical_observation_id": "B:INT2-Q-MARKET-EDGE",
+      "condition": {
+        "alpha": 0.0,
+        "configuration_id": "hybrid.alpha-0.00.k-3",
+        "label": "D",
+        "role": "BEST HYBRID",
+        "strategy": "hybrid",
+        "top_k": 3
+      },
+      "condition_label": "D",
+      "condition_role": "BEST HYBRID",
+      "configuration_id": "hybrid.alpha-0.00.k-3",
+      "engineering_expectation": "VIOLATION",
+      "equivalence_class_id": "semantic-input:9b390ca5ad1cc9ecef8152a18cb7c24929a8e0144aa6a7f699318a23f175b0dd",
+      "equivalence_class_observation_ids": [
+        "B:INT2-Q-MARKET-EDGE",
+        "C:INT2-Q-MARKET-EDGE",
+        "D:INT2-Q-MARKET-EDGE",
+        "E:INT2-Q-MARKET-EDGE"
+      ],
+      "expected_final_action": "BLOCK",
+      "observation_id": "D:INT2-Q-MARKET-EDGE",
+      "planned_semantic_call": false,
+      "projected_reused_observation_ids": [
+        "C:INT2-Q-MARKET-EDGE",
+        "D:INT2-Q-MARKET-EDGE",
+        "E:INT2-Q-MARKET-EDGE"
+      ],
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "retrieved_evidence_ids": [
+        "market-edge-evidence-v1",
+        "tax-guide-evidence-v1",
+        "academy-terms-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "academy-terms-v1",
+        "market-edge-evidence-v1"
+      ],
+      "semantic_execution": "REUSED_IDENTICAL_INPUT_PLANNED",
+      "semantic_input_sha256": "9b390ca5ad1cc9ecef8152a18cb7c24929a8e0144aa6a7f699318a23f175b0dd",
+      "semantic_status": "PLANNED",
+      "strategy": "hybrid",
+      "top_k": 3,
+      "trusted_evidence_count": 2
+    },
+    {
+      "alpha": 0.0,
+      "canonical_observation_id": "B:INT2-Q-TAX-GUIDE",
+      "condition": {
+        "alpha": 0.0,
+        "configuration_id": "hybrid.alpha-0.00.k-3",
+        "label": "D",
+        "role": "BEST HYBRID",
+        "strategy": "hybrid",
+        "top_k": 3
+      },
+      "condition_label": "D",
+      "condition_role": "BEST HYBRID",
+      "configuration_id": "hybrid.alpha-0.00.k-3",
+      "engineering_expectation": "PASS",
+      "equivalence_class_id": "semantic-input:1efbfee23cf365790866e977487ffbcfe0d17294b0dd881a62e719fa86d2d39f",
+      "equivalence_class_observation_ids": [
+        "B:INT2-Q-TAX-GUIDE",
+        "C:INT2-Q-TAX-GUIDE",
+        "D:INT2-Q-TAX-GUIDE",
+        "E:INT2-Q-TAX-GUIDE"
+      ],
+      "expected_final_action": "ALLOW",
+      "observation_id": "D:INT2-Q-TAX-GUIDE",
+      "planned_semantic_call": false,
+      "projected_reused_observation_ids": [
+        "C:INT2-Q-TAX-GUIDE",
+        "D:INT2-Q-TAX-GUIDE",
+        "E:INT2-Q-TAX-GUIDE"
+      ],
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "retrieved_evidence_ids": [
+        "tax-guide-evidence-v1",
+        "academy-terms-v1",
+        "market-edge-evidence-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "academy-terms-v1",
+        "tax-guide-evidence-v1"
+      ],
+      "semantic_execution": "REUSED_IDENTICAL_INPUT_PLANNED",
+      "semantic_input_sha256": "1efbfee23cf365790866e977487ffbcfe0d17294b0dd881a62e719fa86d2d39f",
+      "semantic_status": "PLANNED",
+      "strategy": "hybrid",
+      "top_k": 3,
+      "trusted_evidence_count": 2
+    },
+    {
+      "alpha": 0.0,
+      "canonical_observation_id": "B:INT2-Q-FLEXI",
+      "condition": {
+        "alpha": 0.0,
+        "configuration_id": "hybrid.alpha-0.00.k-3",
+        "label": "D",
+        "role": "BEST HYBRID",
+        "strategy": "hybrid",
+        "top_k": 3
+      },
+      "condition_label": "D",
+      "condition_role": "BEST HYBRID",
+      "configuration_id": "hybrid.alpha-0.00.k-3",
+      "engineering_expectation": "ABSTAIN",
+      "equivalence_class_id": "semantic-input:cc424bc15a4ed584b8f8751702046bafb73e9ca14cac693e0f8251164dc3b63b",
+      "equivalence_class_observation_ids": [
+        "B:INT2-Q-FLEXI",
+        "C:INT2-Q-FLEXI",
+        "D:INT2-Q-FLEXI",
+        "E:INT2-Q-FLEXI"
+      ],
+      "expected_final_action": "REVIEW",
+      "observation_id": "D:INT2-Q-FLEXI",
+      "planned_semantic_call": false,
+      "projected_reused_observation_ids": [
+        "C:INT2-Q-FLEXI",
+        "D:INT2-Q-FLEXI",
+        "E:INT2-Q-FLEXI"
+      ],
+      "query_id": "INT2-Q-FLEXI",
+      "retrieved_evidence_ids": [
+        "flexi-evidence-v1",
+        "nova-terms-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "nova-terms-v1",
+        "flexi-evidence-v1"
+      ],
+      "semantic_execution": "REUSED_IDENTICAL_INPUT_PLANNED",
+      "semantic_input_sha256": "cc424bc15a4ed584b8f8751702046bafb73e9ca14cac693e0f8251164dc3b63b",
+      "semantic_status": "PLANNED",
+      "strategy": "hybrid",
+      "top_k": 3,
+      "trusted_evidence_count": 2
+    },
+    {
+      "alpha": 0.4,
+      "canonical_observation_id": "B:INT2-Q-STUDYGLOW",
+      "condition": {
+        "alpha": 0.4,
+        "configuration_id": "production.hybrid.alpha-0.40.k-5",
+        "label": "E",
+        "role": "PRODUCTION DEFAULT",
+        "strategy": "hybrid",
+        "top_k": 5
+      },
+      "condition_label": "E",
+      "condition_role": "PRODUCTION DEFAULT",
+      "configuration_id": "production.hybrid.alpha-0.40.k-5",
+      "engineering_expectation": "PASS",
+      "equivalence_class_id": "semantic-input:f9883afcb502f7de7b72f47779e296bc2dd5c3125b2ba3ae1d83a993e84e5c76",
+      "equivalence_class_observation_ids": [
+        "B:INT2-Q-STUDYGLOW",
+        "E:INT2-Q-STUDYGLOW"
+      ],
+      "expected_final_action": "ALLOW",
+      "observation_id": "E:INT2-Q-STUDYGLOW",
+      "planned_semantic_call": false,
+      "projected_reused_observation_ids": [
+        "E:INT2-Q-STUDYGLOW"
+      ],
+      "query_id": "INT2-Q-STUDYGLOW",
+      "retrieved_evidence_ids": [
+        "studyglow-evidence-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "scholarly-terms-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "scholarly-terms-v1",
+        "studyglow-evidence-v1"
+      ],
+      "semantic_execution": "REUSED_IDENTICAL_INPUT_PLANNED",
+      "semantic_input_sha256": "f9883afcb502f7de7b72f47779e296bc2dd5c3125b2ba3ae1d83a993e84e5c76",
+      "semantic_status": "PLANNED",
+      "strategy": "hybrid",
+      "top_k": 5,
+      "trusted_evidence_count": 2
+    },
+    {
+      "alpha": 0.4,
+      "canonical_observation_id": "B:INT2-Q-NOTEBOOK",
+      "condition": {
+        "alpha": 0.4,
+        "configuration_id": "production.hybrid.alpha-0.40.k-5",
+        "label": "E",
+        "role": "PRODUCTION DEFAULT",
+        "strategy": "hybrid",
+        "top_k": 5
+      },
+      "condition_label": "E",
+      "condition_role": "PRODUCTION DEFAULT",
+      "configuration_id": "production.hybrid.alpha-0.40.k-5",
+      "engineering_expectation": "PASS",
+      "equivalence_class_id": "semantic-input:d220660c03eae36acff0a1d984a666038ec5af7aa8d2dec440168e6bc59b784e",
+      "equivalence_class_observation_ids": [
+        "B:INT2-Q-NOTEBOOK",
+        "E:INT2-Q-NOTEBOOK"
+      ],
+      "expected_final_action": "ALLOW",
+      "observation_id": "E:INT2-Q-NOTEBOOK",
+      "planned_semantic_call": false,
+      "projected_reused_observation_ids": [
+        "E:INT2-Q-NOTEBOOK"
+      ],
+      "query_id": "INT2-Q-NOTEBOOK",
+      "retrieved_evidence_ids": [
+        "notebook-evidence-v1",
+        "studyglow-evidence-v1",
+        "scholarly-terms-v1",
+        "study-club-evidence-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1"
+      ],
+      "semantic_execution": "REUSED_IDENTICAL_INPUT_PLANNED",
+      "semantic_input_sha256": "d220660c03eae36acff0a1d984a666038ec5af7aa8d2dec440168e6bc59b784e",
+      "semantic_status": "PLANNED",
+      "strategy": "hybrid",
+      "top_k": 5,
+      "trusted_evidence_count": 2
+    },
+    {
+      "alpha": 0.4,
+      "canonical_observation_id": "B:INT2-Q-STUDY-CLUB",
+      "condition": {
+        "alpha": 0.4,
+        "configuration_id": "production.hybrid.alpha-0.40.k-5",
+        "label": "E",
+        "role": "PRODUCTION DEFAULT",
+        "strategy": "hybrid",
+        "top_k": 5
+      },
+      "condition_label": "E",
+      "condition_role": "PRODUCTION DEFAULT",
+      "configuration_id": "production.hybrid.alpha-0.40.k-5",
+      "engineering_expectation": "VIOLATION",
+      "equivalence_class_id": "semantic-input:caeac07142bec9baf0d1d0b117376f0f0924ab6348e84bead3f8f7baa46a1ebf",
+      "equivalence_class_observation_ids": [
+        "B:INT2-Q-STUDY-CLUB",
+        "E:INT2-Q-STUDY-CLUB"
+      ],
+      "expected_final_action": "BLOCK",
+      "observation_id": "E:INT2-Q-STUDY-CLUB",
+      "planned_semantic_call": false,
+      "projected_reused_observation_ids": [
+        "E:INT2-Q-STUDY-CLUB"
+      ],
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "retrieved_evidence_ids": [
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1",
+        "notebook-evidence-v1",
+        "scholarly-terms-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "scholarly-terms-v1",
+        "study-club-evidence-v1"
+      ],
+      "semantic_execution": "REUSED_IDENTICAL_INPUT_PLANNED",
+      "semantic_input_sha256": "caeac07142bec9baf0d1d0b117376f0f0924ab6348e84bead3f8f7baa46a1ebf",
+      "semantic_status": "PLANNED",
+      "strategy": "hybrid",
+      "top_k": 5,
+      "trusted_evidence_count": 2
+    },
+    {
+      "alpha": 0.4,
+      "canonical_observation_id": "B:INT2-Q-MARKET-EDGE",
+      "condition": {
+        "alpha": 0.4,
+        "configuration_id": "production.hybrid.alpha-0.40.k-5",
+        "label": "E",
+        "role": "PRODUCTION DEFAULT",
+        "strategy": "hybrid",
+        "top_k": 5
+      },
+      "condition_label": "E",
+      "condition_role": "PRODUCTION DEFAULT",
+      "configuration_id": "production.hybrid.alpha-0.40.k-5",
+      "engineering_expectation": "VIOLATION",
+      "equivalence_class_id": "semantic-input:9b390ca5ad1cc9ecef8152a18cb7c24929a8e0144aa6a7f699318a23f175b0dd",
+      "equivalence_class_observation_ids": [
+        "B:INT2-Q-MARKET-EDGE",
+        "C:INT2-Q-MARKET-EDGE",
+        "D:INT2-Q-MARKET-EDGE",
+        "E:INT2-Q-MARKET-EDGE"
+      ],
+      "expected_final_action": "BLOCK",
+      "observation_id": "E:INT2-Q-MARKET-EDGE",
+      "planned_semantic_call": false,
+      "projected_reused_observation_ids": [
+        "C:INT2-Q-MARKET-EDGE",
+        "D:INT2-Q-MARKET-EDGE",
+        "E:INT2-Q-MARKET-EDGE"
+      ],
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "retrieved_evidence_ids": [
+        "market-edge-evidence-v1",
+        "tax-guide-evidence-v1",
+        "academy-terms-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "academy-terms-v1",
+        "market-edge-evidence-v1"
+      ],
+      "semantic_execution": "REUSED_IDENTICAL_INPUT_PLANNED",
+      "semantic_input_sha256": "9b390ca5ad1cc9ecef8152a18cb7c24929a8e0144aa6a7f699318a23f175b0dd",
+      "semantic_status": "PLANNED",
+      "strategy": "hybrid",
+      "top_k": 5,
+      "trusted_evidence_count": 2
+    },
+    {
+      "alpha": 0.4,
+      "canonical_observation_id": "B:INT2-Q-TAX-GUIDE",
+      "condition": {
+        "alpha": 0.4,
+        "configuration_id": "production.hybrid.alpha-0.40.k-5",
+        "label": "E",
+        "role": "PRODUCTION DEFAULT",
+        "strategy": "hybrid",
+        "top_k": 5
+      },
+      "condition_label": "E",
+      "condition_role": "PRODUCTION DEFAULT",
+      "configuration_id": "production.hybrid.alpha-0.40.k-5",
+      "engineering_expectation": "PASS",
+      "equivalence_class_id": "semantic-input:1efbfee23cf365790866e977487ffbcfe0d17294b0dd881a62e719fa86d2d39f",
+      "equivalence_class_observation_ids": [
+        "B:INT2-Q-TAX-GUIDE",
+        "C:INT2-Q-TAX-GUIDE",
+        "D:INT2-Q-TAX-GUIDE",
+        "E:INT2-Q-TAX-GUIDE"
+      ],
+      "expected_final_action": "ALLOW",
+      "observation_id": "E:INT2-Q-TAX-GUIDE",
+      "planned_semantic_call": false,
+      "projected_reused_observation_ids": [
+        "C:INT2-Q-TAX-GUIDE",
+        "D:INT2-Q-TAX-GUIDE",
+        "E:INT2-Q-TAX-GUIDE"
+      ],
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "retrieved_evidence_ids": [
+        "tax-guide-evidence-v1",
+        "academy-terms-v1",
+        "market-edge-evidence-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "academy-terms-v1",
+        "tax-guide-evidence-v1"
+      ],
+      "semantic_execution": "REUSED_IDENTICAL_INPUT_PLANNED",
+      "semantic_input_sha256": "1efbfee23cf365790866e977487ffbcfe0d17294b0dd881a62e719fa86d2d39f",
+      "semantic_status": "PLANNED",
+      "strategy": "hybrid",
+      "top_k": 5,
+      "trusted_evidence_count": 2
+    },
+    {
+      "alpha": 0.4,
+      "canonical_observation_id": "B:INT2-Q-FLEXI",
+      "condition": {
+        "alpha": 0.4,
+        "configuration_id": "production.hybrid.alpha-0.40.k-5",
+        "label": "E",
+        "role": "PRODUCTION DEFAULT",
+        "strategy": "hybrid",
+        "top_k": 5
+      },
+      "condition_label": "E",
+      "condition_role": "PRODUCTION DEFAULT",
+      "configuration_id": "production.hybrid.alpha-0.40.k-5",
+      "engineering_expectation": "ABSTAIN",
+      "equivalence_class_id": "semantic-input:cc424bc15a4ed584b8f8751702046bafb73e9ca14cac693e0f8251164dc3b63b",
+      "equivalence_class_observation_ids": [
+        "B:INT2-Q-FLEXI",
+        "C:INT2-Q-FLEXI",
+        "D:INT2-Q-FLEXI",
+        "E:INT2-Q-FLEXI"
+      ],
+      "expected_final_action": "REVIEW",
+      "observation_id": "E:INT2-Q-FLEXI",
+      "planned_semantic_call": false,
+      "projected_reused_observation_ids": [
+        "C:INT2-Q-FLEXI",
+        "D:INT2-Q-FLEXI",
+        "E:INT2-Q-FLEXI"
+      ],
+      "query_id": "INT2-Q-FLEXI",
+      "retrieved_evidence_ids": [
+        "flexi-evidence-v1",
+        "nova-terms-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "nova-terms-v1",
+        "flexi-evidence-v1"
+      ],
+      "semantic_execution": "REUSED_IDENTICAL_INPUT_PLANNED",
+      "semantic_input_sha256": "cc424bc15a4ed584b8f8751702046bafb73e9ca14cac693e0f8251164dc3b63b",
+      "semantic_status": "PLANNED",
+      "strategy": "hybrid",
+      "top_k": 5,
+      "trusted_evidence_count": 2
+    },
+    {
+      "alpha": null,
+      "canonical_observation_id": "F:INT2-Q-STUDYGLOW",
+      "condition": {
+        "alpha": null,
+        "configuration_id": "lexical_only.alpha-na.k-1",
+        "label": "F",
+        "role": "LOW-EVIDENCE STRESS CONDITION",
+        "strategy": "lexical_only",
+        "top_k": 1
+      },
+      "condition_label": "F",
+      "condition_role": "LOW-EVIDENCE STRESS CONDITION",
+      "configuration_id": "lexical_only.alpha-na.k-1",
+      "engineering_expectation": "PASS",
+      "equivalence_class_id": "semantic-input:2ee7142d0d4f812a4133d94ca1ddbb5711f7875e1c33265c4677c1d9a975427c",
+      "equivalence_class_observation_ids": [
+        "F:INT2-Q-STUDYGLOW"
+      ],
+      "expected_final_action": "ALLOW",
+      "observation_id": "F:INT2-Q-STUDYGLOW",
+      "planned_semantic_call": true,
+      "projected_reused_observation_ids": [],
+      "query_id": "INT2-Q-STUDYGLOW",
+      "retrieved_evidence_ids": [
+        "studyglow-evidence-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "studyglow-evidence-v1"
+      ],
+      "semantic_execution": "EXECUTED_PLANNED",
+      "semantic_input_sha256": "2ee7142d0d4f812a4133d94ca1ddbb5711f7875e1c33265c4677c1d9a975427c",
+      "semantic_status": "PLANNED",
+      "strategy": "lexical_only",
+      "top_k": 1,
+      "trusted_evidence_count": 1
+    },
+    {
+      "alpha": null,
+      "canonical_observation_id": "F:INT2-Q-NOTEBOOK",
+      "condition": {
+        "alpha": null,
+        "configuration_id": "lexical_only.alpha-na.k-1",
+        "label": "F",
+        "role": "LOW-EVIDENCE STRESS CONDITION",
+        "strategy": "lexical_only",
+        "top_k": 1
+      },
+      "condition_label": "F",
+      "condition_role": "LOW-EVIDENCE STRESS CONDITION",
+      "configuration_id": "lexical_only.alpha-na.k-1",
+      "engineering_expectation": "PASS",
+      "equivalence_class_id": "semantic-input:ce238744c991b8d12a3261b024d46f7b88b5751f3a211cddc4b5c5ed354e6ff1",
+      "equivalence_class_observation_ids": [
+        "F:INT2-Q-NOTEBOOK"
+      ],
+      "expected_final_action": "ALLOW",
+      "observation_id": "F:INT2-Q-NOTEBOOK",
+      "planned_semantic_call": true,
+      "projected_reused_observation_ids": [],
+      "query_id": "INT2-Q-NOTEBOOK",
+      "retrieved_evidence_ids": [
+        "notebook-evidence-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "notebook-evidence-v1"
+      ],
+      "semantic_execution": "EXECUTED_PLANNED",
+      "semantic_input_sha256": "ce238744c991b8d12a3261b024d46f7b88b5751f3a211cddc4b5c5ed354e6ff1",
+      "semantic_status": "PLANNED",
+      "strategy": "lexical_only",
+      "top_k": 1,
+      "trusted_evidence_count": 1
+    },
+    {
+      "alpha": null,
+      "canonical_observation_id": "F:INT2-Q-STUDY-CLUB",
+      "condition": {
+        "alpha": null,
+        "configuration_id": "lexical_only.alpha-na.k-1",
+        "label": "F",
+        "role": "LOW-EVIDENCE STRESS CONDITION",
+        "strategy": "lexical_only",
+        "top_k": 1
+      },
+      "condition_label": "F",
+      "condition_role": "LOW-EVIDENCE STRESS CONDITION",
+      "configuration_id": "lexical_only.alpha-na.k-1",
+      "engineering_expectation": "VIOLATION",
+      "equivalence_class_id": "semantic-input:463dd1f37e3a4daf6d04909e7466562a636b9aa73bb17cca3a1a761fd971bf85",
+      "equivalence_class_observation_ids": [
+        "F:INT2-Q-STUDY-CLUB"
+      ],
+      "expected_final_action": "BLOCK",
+      "observation_id": "F:INT2-Q-STUDY-CLUB",
+      "planned_semantic_call": true,
+      "projected_reused_observation_ids": [],
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "retrieved_evidence_ids": [
+        "study-club-evidence-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "study-club-evidence-v1"
+      ],
+      "semantic_execution": "EXECUTED_PLANNED",
+      "semantic_input_sha256": "463dd1f37e3a4daf6d04909e7466562a636b9aa73bb17cca3a1a761fd971bf85",
+      "semantic_status": "PLANNED",
+      "strategy": "lexical_only",
+      "top_k": 1,
+      "trusted_evidence_count": 1
+    },
+    {
+      "alpha": null,
+      "canonical_observation_id": "F:INT2-Q-MARKET-EDGE",
+      "condition": {
+        "alpha": null,
+        "configuration_id": "lexical_only.alpha-na.k-1",
+        "label": "F",
+        "role": "LOW-EVIDENCE STRESS CONDITION",
+        "strategy": "lexical_only",
+        "top_k": 1
+      },
+      "condition_label": "F",
+      "condition_role": "LOW-EVIDENCE STRESS CONDITION",
+      "configuration_id": "lexical_only.alpha-na.k-1",
+      "engineering_expectation": "VIOLATION",
+      "equivalence_class_id": "semantic-input:cb17187b6972a932c451809e88bc978314c2c4100f2158c20fb4db2df0ee69a6",
+      "equivalence_class_observation_ids": [
+        "F:INT2-Q-MARKET-EDGE"
+      ],
+      "expected_final_action": "BLOCK",
+      "observation_id": "F:INT2-Q-MARKET-EDGE",
+      "planned_semantic_call": true,
+      "projected_reused_observation_ids": [],
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "retrieved_evidence_ids": [
+        "market-edge-evidence-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "market-edge-evidence-v1"
+      ],
+      "semantic_execution": "EXECUTED_PLANNED",
+      "semantic_input_sha256": "cb17187b6972a932c451809e88bc978314c2c4100f2158c20fb4db2df0ee69a6",
+      "semantic_status": "PLANNED",
+      "strategy": "lexical_only",
+      "top_k": 1,
+      "trusted_evidence_count": 1
+    },
+    {
+      "alpha": null,
+      "canonical_observation_id": "F:INT2-Q-TAX-GUIDE",
+      "condition": {
+        "alpha": null,
+        "configuration_id": "lexical_only.alpha-na.k-1",
+        "label": "F",
+        "role": "LOW-EVIDENCE STRESS CONDITION",
+        "strategy": "lexical_only",
+        "top_k": 1
+      },
+      "condition_label": "F",
+      "condition_role": "LOW-EVIDENCE STRESS CONDITION",
+      "configuration_id": "lexical_only.alpha-na.k-1",
+      "engineering_expectation": "PASS",
+      "equivalence_class_id": "semantic-input:0aa53bc0ab1637469b7a91ce448d4df34dd36f35ebe97127fd8358d5ed7ef397",
+      "equivalence_class_observation_ids": [
+        "F:INT2-Q-TAX-GUIDE"
+      ],
+      "expected_final_action": "ALLOW",
+      "observation_id": "F:INT2-Q-TAX-GUIDE",
+      "planned_semantic_call": true,
+      "projected_reused_observation_ids": [],
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "retrieved_evidence_ids": [
+        "tax-guide-evidence-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "tax-guide-evidence-v1"
+      ],
+      "semantic_execution": "EXECUTED_PLANNED",
+      "semantic_input_sha256": "0aa53bc0ab1637469b7a91ce448d4df34dd36f35ebe97127fd8358d5ed7ef397",
+      "semantic_status": "PLANNED",
+      "strategy": "lexical_only",
+      "top_k": 1,
+      "trusted_evidence_count": 1
+    },
+    {
+      "alpha": null,
+      "canonical_observation_id": "F:INT2-Q-FLEXI",
+      "condition": {
+        "alpha": null,
+        "configuration_id": "lexical_only.alpha-na.k-1",
+        "label": "F",
+        "role": "LOW-EVIDENCE STRESS CONDITION",
+        "strategy": "lexical_only",
+        "top_k": 1
+      },
+      "condition_label": "F",
+      "condition_role": "LOW-EVIDENCE STRESS CONDITION",
+      "configuration_id": "lexical_only.alpha-na.k-1",
+      "engineering_expectation": "ABSTAIN",
+      "equivalence_class_id": "semantic-input:6a86d39646e8fb688308451b130d5e7d86225a4cbd2fa32e1994a4396f9d7826",
+      "equivalence_class_observation_ids": [
+        "F:INT2-Q-FLEXI"
+      ],
+      "expected_final_action": "REVIEW",
+      "observation_id": "F:INT2-Q-FLEXI",
+      "planned_semantic_call": true,
+      "projected_reused_observation_ids": [],
+      "query_id": "INT2-Q-FLEXI",
+      "retrieved_evidence_ids": [
+        "flexi-evidence-v1"
+      ],
+      "selected_trusted_evidence_ids": [
+        "flexi-evidence-v1"
+      ],
+      "semantic_execution": "EXECUTED_PLANNED",
+      "semantic_input_sha256": "6a86d39646e8fb688308451b130d5e7d86225a4cbd2fa32e1994a4396f9d7826",
+      "semantic_status": "PLANNED",
+      "strategy": "lexical_only",
+      "top_k": 1,
+      "trusted_evidence_count": 1
+    }
+  ],
+  "planned_at_utc": "2026-08-30T12:38:56.653596Z",
+  "predicted_semantic_api_calls": 15,
+  "prompt_version": "1.0",
+  "provider": "openai_responses",
+  "razorpay_calls_at_plan_freeze": 0,
+  "run_id": "stage-b-live-20260830T123856Z-0e4213c",
+  "schema_version": "1.0",
+  "unique_semantic_input_count": 15,
+  "zero_evidence_observation_count": 6
+}

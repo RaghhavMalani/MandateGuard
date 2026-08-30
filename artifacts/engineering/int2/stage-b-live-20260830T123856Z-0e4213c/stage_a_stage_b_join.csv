@@ -1,0 +1,7 @@
+condition_label,condition_role,configuration_id,stage_a_all_required_count,stage_a_query_count,stage_a_mean_recall_at_k,stage_a_mean_precision_at_k,stage_a_mean_reciprocal_rank,stage_a_required_evidence_miss_count,stage_a_mean_retrieved_evidence_volume,stage_b_expectation_matches,stage_b_expected_observation_count,violation_to_pass_count,pass_to_violation_count,violation_to_review_count,pass_to_review_count,abstain_expectation_to_review_count,overall_review_count,review_rate,not_evaluated_review_count,not_evaluated_review_rate,semantic_abstain_review_count,semantic_abstain_review_rate
+A,NO_RETRIEVAL CONTROL,no_retrieval.alpha-na.k-1,0,6,0.0,0.0,0.0,12,0.0,0,6,0,0,2,3,1,6,1.0,6,1.0,0,0.0
+B,LEXICAL BASELINE,lexical_only.alpha-na.k-5,6,6,1.0,0.6388888888888888,1.0,0,3.3333333333333335,6,6,0,0,0,0,1,1,0.16666666666666666,0,0.0,1,0.16666666666666666
+C,SEMANTIC BASELINE,semantic_only.alpha-na.k-3,6,6,1.0,0.7222222222222222,1.0,0,2.8333333333333335,6,6,0,0,0,0,1,1,0.16666666666666666,0,0.0,1,0.16666666666666666
+D,BEST HYBRID,hybrid.alpha-0.00.k-3,6,6,1.0,0.7222222222222222,1.0,0,2.8333333333333335,6,6,0,0,0,0,1,1,0.16666666666666666,0,0.0,1,0.16666666666666666
+E,PRODUCTION DEFAULT,production.hybrid.alpha-0.40.k-5,6,6,1.0,0.6388888888888888,1.0,0,3.3333333333333335,6,6,0,0,0,0,1,1,0.16666666666666666,0,0.0,1,0.16666666666666666
+F,LOW-EVIDENCE STRESS CONDITION,lexical_only.alpha-na.k-1,0,6,0.5,1.0,1.0,6,1.0,6,6,0,0,0,0,1,1,0.16666666666666666,0,0.0,1,0.16666666666666666
