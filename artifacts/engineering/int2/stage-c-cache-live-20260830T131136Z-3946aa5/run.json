@@ -1,0 +1,28 @@
+{
+  "artifacts": [
+    "RUN.md",
+    "run.json",
+    "cache_observations.jsonl",
+    "mutation_invalidation.jsonl",
+    "cache_summary.json"
+  ],
+  "buyer_calls": 0,
+  "claim_scope": "NON-BENCHMARK ENGINEERING DATA",
+  "ended_at_utc": "2026-08-30T13:19:16.365143Z",
+  "execution_sha": "3946aa50c477881b1b085e35b60c9a411b6c8d64",
+  "experiment_failure": null,
+  "experiment_name": "LIVE CACHE ENGINEERING EXPERIMENT",
+  "live_execution_started_at_utc": "2026-08-30T13:19:10.181699Z",
+  "model_id": "gpt-5.6-terra",
+  "provider": "openai_responses",
+  "razorpay_calls": 0,
+  "retries": 0,
+  "run_id": "stage-c-cache-live-20260830T131136Z-3946aa5",
+  "schema_version": "1.0",
+  "semantic_api_calls": 3,
+  "stage_b_plan_file_sha256": "6c381390065953f27265684360b8a61d3917336f4b55b19244bc1746d8f97809",
+  "started_at_utc": "2026-08-30T13:11:36.479792Z",
+  "status": "COMPLETED",
+  "systemic_error": null,
+  "tuning_changes": 0
+}
