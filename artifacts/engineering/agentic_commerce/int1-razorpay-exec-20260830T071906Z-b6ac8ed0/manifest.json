@@ -1,0 +1,52 @@
+{
+  "run_id": "int1-razorpay-exec-20260830T071906Z-b6ac8ed0",
+  "diagnostic_label": "SECOND RAZORPAY TEST MODE EXECUTION DIAGNOSTIC",
+  "status": "STOPPED_PRE_EXECUTION",
+  "stop_reason": "The configured MandateGuard execution HMAC key is shorter than the mandatory 32 UTF-8-byte minimum.",
+  "branch": "feat/agentic-commerce-intelligence",
+  "execution_sha": "8f22432ba913e23f9437543fc64905e61a445750",
+  "started_at": "2026-08-30T07:19:06.478697Z",
+  "ended_at": "2026-08-30T07:19:22.099235Z",
+  "previous_run_preserved": "int1-razorpay-exec-20260830T070624Z-ae6bd048",
+  "exact_intent": "Buy the StudyGlow Desk Lamp under INR 2000 for individual study; avoid subscriptions.",
+  "requested_live_ai": true,
+  "requested_execution": true,
+  "top_level_checkout_attempts": 0,
+  "models": {
+    "buyer": "gpt-5.6-terra",
+    "buyer_resolution": "documented semantic-model fallback",
+    "embedding": "text-embedding-3-small",
+    "semantic": "gpt-5.6-terra"
+  },
+  "preflight": {
+    "branch_match": true,
+    "head_match": true,
+    "worktree_clean": true,
+    "python": "3.12.0",
+    "full_suite": "452 passed",
+    "dotenv_git_ignored": true,
+    "target_worktree_dotenv_present": false,
+    "configured_dotenv_found": true,
+    "openai_api_key": "SET",
+    "razorpay_key_id": "SET_TEST",
+    "razorpay_key_id_prefix_valid": true,
+    "razorpay_key_secret": "SET",
+    "execution_hmac_key": "SET_LT_32_UTF8_BYTES",
+    "execution_hmac_key_minimum_satisfied": false
+  },
+  "fresh_state": {
+    "run_id_created": true,
+    "semantic_cache_created": false,
+    "reason": "Credential precondition failed before checkout state initialization."
+  },
+  "integrity": {
+    "retries": 0,
+    "tuning_changes": 0,
+    "source_changed": false,
+    "fixtures_changed": false,
+    "benchmark_changed": false,
+    "secrets_persisted": 0,
+    "openai_api_calls": 0,
+    "razorpay_api_calls": 0
+  }
+}

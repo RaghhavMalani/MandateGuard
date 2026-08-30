@@ -1,0 +1,64 @@
+{
+  "run_id": "int1-razorpay-exec-20260830T071906Z-b6ac8ed0",
+  "status": "STOPPED_PRE_EXECUTION",
+  "ai_buyer": {
+    "model": "gpt-5.6-terra",
+    "tool_rounds": 0,
+    "ordered_tools": [],
+    "selected_merchant": null,
+    "selected_sku": null,
+    "quantity": null,
+    "amount": null,
+    "currency": null
+  },
+  "rag": {
+    "embedding_model": "text-embedding-3-small",
+    "retrieval_query": null,
+    "retrieval_query_sha256": null,
+    "trusted_evidence_ids": [],
+    "trusted_evidence_count": 0,
+    "cache_status": "NOT_CREATED"
+  },
+  "authorization": {
+    "semantic_model": "gpt-5.6-terra",
+    "deterministic_action": "NOT_RUN",
+    "semantic_verdict": "NOT_RUN",
+    "final_action": "NOT_RUN"
+  },
+  "capability": {
+    "exists": false,
+    "signature_valid": null,
+    "expiry_valid": null,
+    "unused_before_execution": null,
+    "test_environment_matched": null,
+    "account_scope_matched": null,
+    "authorized_transaction_hash": null,
+    "actual_transaction_hash": null,
+    "transaction_hash_matched": null,
+    "authorized_request_hash": null,
+    "actual_request_hash": null,
+    "request_hash_matched": null,
+    "consumed": null,
+    "replay_rejected_locally_without_network": null,
+    "signature_material_persisted": false
+  },
+  "razorpay_test_mode": {
+    "credentials_present": true,
+    "key_id_prefix_valid": true,
+    "execution_request_attempted": false,
+    "api_execution_calls": 0,
+    "order_created": false,
+    "order_id": null,
+    "amount": null,
+    "currency": null,
+    "receipt": null,
+    "status": null
+  },
+  "failure": {
+    "stage": "PRE_FLIGHT_EXECUTION_HMAC_KEY",
+    "reason": "MANDATEGUARD_EXECUTION_HMAC_KEY did not satisfy the required minimum of 32 UTF-8 bytes.",
+    "configuration_adjusted": false,
+    "retry_attempted": false,
+    "bypass_attempted": false
+  }
+}
