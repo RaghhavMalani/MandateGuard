@@ -99,6 +99,13 @@ hybrid_score = alpha * lexical_score + (1 - alpha) * semantic_score
 hidden reranker, or learned post-processing step. Equal scores use the stable
 document ID as the final tie-break.
 
+Retrieval depth affects semantic sensitivity because only retrieved trusted
+merchant evidence enters authorization. If Tier A/B is otherwise clean and the
+ranked window contains no such evidence, evidence sufficiency is `INSUFFICIENT`
+and the product returns `REVIEW` without semantic evaluation or cache access;
+it does not allow on missing evidence. This boundary does not establish that
+recall is solved or that the default `top_k=5` is optimal.
+
 The offline experiment harness exposes three variants—no retrieval, lexical
 only, and hybrid—for later ablation work. It does not run an experiment or
 claim that RAG improves quality.

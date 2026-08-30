@@ -17,11 +17,17 @@ from mandateguard.intelligence.offline import (
     ResponsesUsageCapture,
     TimedSemanticModel,
 )
-from mandateguard.intelligence.orchestration import run_agentic_checkout
+from mandateguard.intelligence.orchestration import (
+    NO_TRUSTED_EVIDENCE_RETRIEVED,
+    InsufficientEvidenceAuthorizationResult,
+    run_agentic_checkout,
+)
 from mandateguard.intelligence.retrieval import (
     HashingEmbeddingProvider,
     HybridRetriever,
 )
+from mandateguard.models.decision import DecisionAction
+from mandateguard.semantic.cache import InMemorySemanticCache
 from mandateguard.semantic.verifier import SemanticVerifier
 from tests.intelligence_factories import (
     ALLOW_INTENT,
@@ -34,6 +40,21 @@ from tests.intelligence_factories import (
     make_store,
     run_offline,
 )
+
+
+class _RecordingSemanticCache:
+    def __init__(self):
+        self.delegate = InMemorySemanticCache()
+        self.get_calls = 0
+        self.put_calls = 0
+
+    def get(self, request):
+        self.get_calls += 1
+        return self.delegate.get(request)
+
+    def put(self, request, record):
+        self.put_calls += 1
+        self.delegate.put(request, record)
 
 
 @pytest.mark.parametrize(
@@ -71,7 +92,148 @@ def test_three_offline_product_journeys(tmp_path, intent, expected, merchant, sk
         for item in result.trace.authorization["tier_a_statuses"]
     )
     assert result.trace.authorization["tier_b_findings"] == []
+    assert result.trace.authorization["evidence_sufficiency"] == "SUFFICIENT"
+    assert result.trace.authorization["reason_code"] is None
+    assert result.trace.authorization["semantic_status"] == "EVALUATED"
+    assert result.trace.retrieval["trusted_evidence_selected_count"] > 0
     cache.close()
+
+
+@pytest.mark.parametrize(
+    ("intent", "alpha", "merchant_id", "prime_allow_cache"),
+    [
+        (ALLOW_INTENT, 0.0, "merchant-scholarly", True),
+        (ALLOW_INTENT, 0.4, "merchant-scholarly", True),
+        (ALLOW_INTENT, 1.0, "merchant-scholarly", True),
+        (BLOCK_INTENT, 0.4, "merchant-academy", False),
+    ],
+    ids=(
+        "allow-alpha-0",
+        "allow-alpha-0.4",
+        "allow-alpha-1",
+        "block-oriented-alpha-0.4",
+    ),
+)
+def test_no_trusted_evidence_retrieved_returns_bounded_review(
+    tmp_path,
+    intent,
+    alpha,
+    merchant_id,
+    prime_allow_cache,
+):
+    store = make_store()
+    model = DeterministicSemanticModel()
+    cache = _RecordingSemanticCache()
+    verifier = SemanticVerifier(model=TimedSemanticModel(model), cache=cache)
+    retriever = HybridRetriever(HashingEmbeddingProvider())
+
+    if prime_allow_cache:
+        earlier = run_agentic_checkout(
+            user_intent=intent,
+            buyer=DeterministicCommerceBuyer(store),
+            store=store,
+            retriever=retriever,
+            semantic_verifier=verifier,
+            evaluated_at=NOW,
+            alpha=alpha,
+        )
+        assert earlier.trace.decision == "ALLOW"
+        assert len(model.calls) == 1
+
+    buyer_only_prose = "BUYER_ONLY_PROSE_MUST_NOT_BECOME_TRUSTED_EVIDENCE"
+    base = DeterministicCommerceBuyer(store).purchase(intent)
+    buyer = ScriptedBuyer(
+        BuyerOutput(
+            proposal=replace(base.proposal, reason=buyer_only_prose),
+            interpreted_intent=base.interpreted_intent,
+            model_id="scripted-buyer-v1",
+        )
+    )
+    client = RecordingOrdersClient()
+    runtime, ledger = make_execution_runtime(tmp_path, merchant_id, client)
+    model_calls_before = len(model.calls)
+    cache_gets_before = cache.get_calls
+    cache_puts_before = cache.put_calls
+    cache_records_before = len(cache.delegate.records)
+
+    try:
+        result = run_agentic_checkout(
+            user_intent=intent,
+            buyer=buyer,
+            store=store,
+            retriever=retriever,
+            semantic_verifier=verifier,
+            evaluated_at=NOW,
+            top_k=2,
+            alpha=alpha,
+            execute=True,
+            execution_runtime=runtime,
+            decision_nonce="insufficient_evidence_nonce_12345",
+        )
+    finally:
+        ledger.close()
+
+    authorization = result.authorization_result
+    assert isinstance(authorization, InsufficientEvidenceAuthorizationResult)
+    assert authorization.final_action is DecisionAction.REVIEW
+    assert authorization.semantic_decision is None
+    assert authorization.reason_code == NO_TRUSTED_EVIDENCE_RETRIEVED
+    assert len(model.calls) == model_calls_before
+    assert cache.get_calls == cache_gets_before
+    assert cache.put_calls == cache_puts_before
+    assert len(cache.delegate.records) == cache_records_before
+
+    assert len(result.retrieval.ranked_documents) == 2
+    assert all(
+        item.document.source_type.value != "merchant_evidence"
+        for item in result.retrieval.ranked_documents
+    )
+    assert all(
+        buyer_only_prose not in item.document.text
+        for item in result.retrieval.ranked_documents
+    )
+
+    trace = result.trace.to_mapping()
+    assert json.loads(json.dumps(trace)) == trace
+    assert trace["retrieval"]["query"]
+    assert len(trace["retrieval"]["query_sha256"]) == 64
+    assert trace["retrieval"]["top_k"] == 2
+    assert trace["retrieval"]["alpha"] == alpha
+    assert len(trace["retrieval"]["scores"]) == 2
+    assert trace["retrieval"]["evidence_ids"] == []
+    assert trace["retrieval"]["trusted_evidence_selected_count"] == 0
+    assert trace["retrieval"]["trusted_evidence_selected_ids"] == []
+    assert all(
+        item["status"] == "PASS"
+        for item in trace["authorization"]["tier_a_statuses"]
+    )
+    assert trace["authorization"]["tier_b_findings"] == []
+    assert trace["authorization"]["evidence_sufficiency"] == "INSUFFICIENT"
+    assert trace["authorization"]["reason_code"] == (
+        NO_TRUSTED_EVIDENCE_RETRIEVED
+    )
+    assert trace["authorization"]["semantic_status"] == "NOT_EVALUATED"
+    assert trace["authorization"]["semantic_verdict"] is None
+    assert trace["authorization"]["semantic_reason"] == []
+    assert trace["cache"] == {
+        "status": None,
+        "key_prefix": None,
+        "integrity_failure": False,
+        "failure_reason": None,
+        "lookup_performed": False,
+        "write_performed": False,
+    }
+    assert trace["decision"] == "REVIEW"
+    assert trace["execution"] == {
+        "status": "not_authorized",
+        "detail": None,
+    }
+    assert trace["timings"]["semantic_latency_ms"] == 0.0
+    assert trace["usage"]["semantic_input_tokens"] is None
+    assert trace["usage"]["semantic_output_tokens"] is None
+    assert result.execution_authorization is None
+    assert result.execution_result is None
+    assert client.calls == []
 
 
 def test_exact_repeat_hits_semantic_cache_and_skips_model(tmp_path):

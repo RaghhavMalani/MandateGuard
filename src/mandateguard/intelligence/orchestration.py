@@ -51,6 +51,7 @@ from mandateguard.intelligence.retrieval.query import (
 )
 from mandateguard.intelligence.store import TrustedCommerceStore
 from mandateguard.models.decision import DecisionAction
+from mandateguard.models.decision import DeterministicDecision, decide_deterministically
 from mandateguard.models.mandate import (
     HardConstraints,
     IssuerAttestation,
@@ -64,6 +65,8 @@ from mandateguard.models.transaction import (
     TransactionLine,
     TransactionPayload,
 )
+from mandateguard.policy.tier_a import evaluate_tier_a
+from mandateguard.policy.tier_b import evaluate_tier_b
 from mandateguard.replay.scenario import ReplayScenario
 from mandateguard.semantic.cache import (
     InMemorySemanticCache,
@@ -85,6 +88,29 @@ from mandateguard.semantic.verifier import SemanticMode, SemanticVerifier
 
 class AgenticCheckoutError(RuntimeError):
     pass
+
+
+NO_TRUSTED_EVIDENCE_RETRIEVED = "NO_TRUSTED_EVIDENCE_RETRIEVED"
+
+
+@dataclass(frozen=True, slots=True)
+class InsufficientEvidenceAuthorizationResult:
+    """Product-level REVIEW when Tier C has no retrieved trusted evidence."""
+
+    deterministic_decision: DeterministicDecision
+    semantic_decision: None = None
+    final_action: DecisionAction = DecisionAction.REVIEW
+    semantic_constraints_present: bool = True
+    evidence_sufficiency: str = "INSUFFICIENT"
+    reason_code: str = NO_TRUSTED_EVIDENCE_RETRIEVED
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.deterministic_decision, DeterministicDecision):
+            raise TypeError("deterministic_decision must be DeterministicDecision")
+        if self.deterministic_decision.action is not DecisionAction.ALLOW:
+            raise ValueError(
+                "insufficient semantic evidence can only bound deterministic ALLOW"
+            )
 
 
 @dataclass(frozen=True, slots=True)
@@ -109,7 +135,9 @@ class AgenticCheckoutResult:
     mandate: Mandate
     transaction: Transaction
     retrieval: RetrievalResult
-    authorization_result: AuthorizationResult
+    authorization_result: (
+        AuthorizationResult | InsufficientEvidenceAuthorizationResult
+    )
     execution_authorization: SignedExecutionAuthorization | None
     execution_result: ExecutionReceipt | ExecutionRefusal | None
 
@@ -252,7 +280,7 @@ def _selected_semantic_evidence(
     retrieval: RetrievalResult,
     store: TrustedCommerceStore,
     proposal: PurchaseProposal,
-) -> SemanticEvidence:
+) -> SemanticEvidence | None:
     entries = []
     for ranked in retrieval.ranked_documents:
         document = ranked.document
@@ -268,9 +296,7 @@ def _selected_semantic_evidence(
         entries.extend(resolved)
     unique = {entry.evidence_id: entry for entry in entries}
     if not unique:
-        raise AgenticCheckoutError(
-            "retrieval produced no trusted merchant evidence for semantic authorization"
-        )
+        return None
     bundle = SemanticEvidenceBundle(
         merchant_id=proposal.merchant_id,
         entries=tuple(unique.values()),
@@ -278,6 +304,33 @@ def _selected_semantic_evidence(
     return SemanticEvidence(
         bundle=bundle,
         semantic_evidence_sha256=semantic_evidence_sha256(bundle),
+    )
+
+
+def _deterministic_decision(scenario: ReplayScenario) -> DeterministicDecision:
+    tier_a_results = evaluate_tier_a(
+        mandate=scenario.mandate,
+        transaction=scenario.transaction,
+        catalog_snapshot=scenario.catalog_snapshot,
+        server_time=scenario.server_time,
+        nonce_state=scenario.nonce_state,
+        committed_hashes=scenario.psp_committed_hashes,
+    )
+    tier_b_findings = evaluate_tier_b(
+        mandate=scenario.mandate,
+        transaction=scenario.transaction,
+    )
+    return decide_deterministically(
+        replay_seed=scenario.replay_seed,
+        evaluated_at=scenario.evaluated_at,
+        transaction_sha256=transaction_body_sha256(scenario.transaction),
+        catalog_snapshot_sha256=(
+            catalog_snapshot_sha256(scenario.catalog_snapshot)
+            if scenario.catalog_snapshot is not None
+            else None
+        ),
+        tier_a_results=tier_a_results,
+        tier_b_findings=tier_b_findings,
     )
 
 
@@ -316,7 +369,9 @@ def _safe_authorize(
     return authorize_transaction(**kwargs), True, failure_reason
 
 
-def _authorization_trace(result: AuthorizationResult) -> dict[str, Any]:
+def _authorization_trace(
+    result: AuthorizationResult | InsufficientEvidenceAuthorizationResult,
+) -> dict[str, Any]:
     deterministic = result.deterministic_decision
     semantic = result.semantic_decision
     return {
@@ -340,10 +395,25 @@ def _authorization_trace(result: AuthorizationResult) -> dict[str, Any]:
             if finding.family.value.startswith("B")
         ],
         "semantic_verdict": semantic.verdict.value if semantic is not None else None,
+        "semantic_status": (
+            "NOT_EVALUATED"
+            if isinstance(result, InsufficientEvidenceAuthorizationResult)
+            else "EVALUATED" if semantic is not None else "NOT_REQUIRED"
+        ),
         "semantic_reason": (
             [item.reason for item in semantic.constraint_results]
             if semantic is not None
             else []
+        ),
+        "evidence_sufficiency": (
+            result.evidence_sufficiency
+            if isinstance(result, InsufficientEvidenceAuthorizationResult)
+            else "SUFFICIENT"
+        ),
+        "reason_code": (
+            result.reason_code
+            if isinstance(result, InsufficientEvidenceAuthorizationResult)
+            else None
         ),
     }
 
@@ -439,20 +509,48 @@ def run_agentic_checkout(
         evaluated_at=now,
     )
     authorization_started = perf_counter()
-    authorization, cache_failed, cache_failure_reason = _safe_authorize(
-        scenario=scenario,
-        semantic_evidence=semantic_evidence,
-        semantic_verifier=semantic_verifier,
-    )
+    if semantic_evidence is None:
+        deterministic = _deterministic_decision(scenario)
+        semantic_constraints_present = bool(mandate.payload.constraints.semantic)
+        if (
+            deterministic.action is DecisionAction.ALLOW
+            and semantic_constraints_present
+        ):
+            authorization: (
+                AuthorizationResult | InsufficientEvidenceAuthorizationResult
+            ) = InsufficientEvidenceAuthorizationResult(
+                deterministic_decision=deterministic
+            )
+        else:
+            authorization = AuthorizationResult(
+                deterministic_decision=deterministic,
+                semantic_decision=None,
+                final_action=deterministic.action,
+                semantic_constraints_present=semantic_constraints_present,
+            )
+        cache_failed = False
+        cache_failure_reason = None
+        cache_status = None
+    else:
+        authorization, cache_failed, cache_failure_reason = _safe_authorize(
+            scenario=scenario,
+            semantic_evidence=semantic_evidence,
+            semantic_verifier=semantic_verifier,
+        )
+        cache = semantic_verifier.cache
+        cache_status = getattr(cache, "last_status", None)
+        if cache_failed:
+            cache_status = CacheStatus.MISS
     authorization_latency_ms = (perf_counter() - authorization_started) * 1000.0
-    cache = semantic_verifier.cache
-    cache_status = getattr(cache, "last_status", None)
-    if cache_failed:
-        cache_status = CacheStatus.MISS
     semantic_latency_ms = 0.0
     semantic_input_tokens: int | None = None
     semantic_output_tokens: int | None = None
-    if cache_status is not CacheStatus.HIT and not cache_failed:
+    semantic_evaluated = authorization.semantic_decision is not None
+    if (
+        semantic_evaluated
+        and cache_status is not CacheStatus.HIT
+        and not cache_failed
+    ):
         semantic_latency_ms = float(
             getattr(semantic_verifier.model, "last_latency_ms", 0.0)
         )
@@ -541,6 +639,19 @@ def run_agentic_checkout(
                 for item in retrieval.ranked_documents
                 if item.document.evidence_id is not None
             ],
+            "trusted_evidence_selected_count": (
+                len(semantic_evidence.bundle.entries)
+                if semantic_evidence is not None
+                else 0
+            ),
+            "trusted_evidence_selected_ids": (
+                [
+                    entry.evidence_id
+                    for entry in semantic_evidence.bundle.entries
+                ]
+                if semantic_evidence is not None
+                else []
+            ),
             "scores": [
                 {
                     "document_id": item.score.document_id,
@@ -558,6 +669,12 @@ def run_agentic_checkout(
             "key_prefix": initial_cache_key[:12] if initial_cache_key else None,
             "integrity_failure": cache_failed,
             "failure_reason": cache_failure_reason,
+            "lookup_performed": semantic_evaluated,
+            "write_performed": (
+                semantic_evaluated
+                and cache_status is CacheStatus.MISS
+                and not cache_failed
+            ),
         },
         decision=authorization.final_action.value,
         execution={
