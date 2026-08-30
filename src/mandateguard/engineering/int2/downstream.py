@@ -14,6 +14,13 @@ from mandateguard.engineering.int2.models import (
     RetrievalConfiguration,
     RetrievalObservation,
 )
+from mandateguard.models.decision import DecisionAction, decide_deterministically
+from mandateguard.core.hashing import (
+    catalog_snapshot_sha256,
+    transaction_body_sha256,
+)
+from mandateguard.policy.tier_a import evaluate_tier_a
+from mandateguard.policy.tier_b import evaluate_tier_b
 from mandateguard.replay.scenario import ReplayScenario
 from mandateguard.semantic.evidence import (
     SemanticEvidence,
@@ -22,6 +29,9 @@ from mandateguard.semantic.evidence import (
     semantic_evidence_sha256,
 )
 from mandateguard.semantic.verifier import SemanticMode, SemanticVerifier
+
+
+NO_TRUSTED_EVIDENCE_RETRIEVED = "NO_TRUSTED_EVIDENCE_RETRIEVED"
 
 
 class AuthorizationTransition(str, Enum):
@@ -67,11 +77,15 @@ class DownstreamAuthorizationObservation:
     query_id: str
     configuration: RetrievalConfiguration
     engineering_expectation: EngineeringExpectation
-    semantic_verdict: str
+    semantic_verdict: str | None
     final_action: str
     retrieved_evidence_ids: tuple[str, ...]
     transition: AuthorizationTransition
     authorization_latency_ms: float
+    deterministic_action: str = "ALLOW"
+    semantic_status: str = "EVALUATED"
+    reason_code: str | None = None
+    semantic_api_calls: int = 1
 
     @property
     def unsafe_direction_transition(self) -> bool:
@@ -84,7 +98,7 @@ class DownstreamAuthorizationObservation:
 def _selected_semantic_evidence(
     case: DownstreamAuthorizationCase,
     retrieved_evidence_ids: tuple[str, ...],
-) -> SemanticEvidence:
+) -> SemanticEvidence | None:
     by_id = {item.evidence_id: item for item in case.eligible_evidence}
     selected: list[SemanticEvidenceEntry] = []
     seen: set[str] = set()
@@ -99,10 +113,7 @@ def _selected_semantic_evidence(
                 f"retrieved evidence {evidence_id!r} is outside the case scope"
             ) from error
     if not selected:
-        raise Int2ExperimentError(
-            "Stage B requires at least one retrieved evidence item; "
-            "no_retrieval remains a Stage-A condition"
-        )
+        return None
     bundle = SemanticEvidenceBundle(
         merchant_id=case.scenario.transaction.payload.merchant_id,
         entries=tuple(selected),
@@ -111,6 +122,43 @@ def _selected_semantic_evidence(
         bundle=bundle,
         semantic_evidence_sha256=semantic_evidence_sha256(bundle),
     )
+
+
+def selected_semantic_evidence(
+    case: DownstreamAuthorizationCase,
+    retrieved_evidence_ids: tuple[str, ...],
+) -> SemanticEvidence | None:
+    """Resolve only case-frozen trusted evidence, or return bounded insufficiency."""
+
+    return _selected_semantic_evidence(case, retrieved_evidence_ids)
+
+
+def _deterministic_action(case: DownstreamAuthorizationCase) -> DecisionAction:
+    scenario = case.scenario
+    tier_a = evaluate_tier_a(
+        mandate=scenario.mandate,
+        transaction=scenario.transaction,
+        catalog_snapshot=scenario.catalog_snapshot,
+        server_time=scenario.server_time,
+        nonce_state=scenario.nonce_state,
+        committed_hashes=scenario.psp_committed_hashes,
+    )
+    tier_b = evaluate_tier_b(
+        mandate=scenario.mandate,
+        transaction=scenario.transaction,
+    )
+    return decide_deterministically(
+        replay_seed=scenario.replay_seed,
+        evaluated_at=scenario.evaluated_at,
+        transaction_sha256=transaction_body_sha256(scenario.transaction),
+        catalog_snapshot_sha256=(
+            catalog_snapshot_sha256(scenario.catalog_snapshot)
+            if scenario.catalog_snapshot is not None
+            else None
+        ),
+        tier_a_results=tier_a,
+        tier_b_findings=tier_b,
+    ).action
 
 
 def _transition(
@@ -177,6 +225,30 @@ def execute_selected_downstream(
         semantic_evidence = _selected_semantic_evidence(case, evidence_ids)
         scenario = case.scenario
         started = clock_ns()
+        if semantic_evidence is None:
+            deterministic_action = _deterministic_action(case)
+            if deterministic_action is not DecisionAction.ALLOW:
+                raise Int2ExperimentError(
+                    "no-evidence Stage-B cases must be deterministic ALLOW"
+                )
+            latency = max(0.0, (clock_ns() - started) / 1_000_000.0)
+            results.append(
+                DownstreamAuthorizationObservation(
+                    query_id=case.query_id,
+                    configuration=selected.configuration,
+                    engineering_expectation=case.engineering_expectation,
+                    semantic_verdict=None,
+                    final_action="REVIEW",
+                    retrieved_evidence_ids=evidence_ids,
+                    transition=AuthorizationTransition.EXPECTED_TO_REVIEW,
+                    authorization_latency_ms=latency,
+                    deterministic_action="ALLOW",
+                    semantic_status="NOT_EVALUATED",
+                    reason_code=NO_TRUSTED_EVIDENCE_RETRIEVED,
+                    semantic_api_calls=0,
+                )
+            )
+            continue
         authorization = authorize_transaction(
             mandate=scenario.mandate,
             transaction=scenario.transaction,
@@ -209,6 +281,12 @@ def execute_selected_downstream(
                     case.engineering_expectation, verdict, final_action
                 ),
                 authorization_latency_ms=latency,
+                deterministic_action=(
+                    authorization.deterministic_decision.action.value
+                ),
+                semantic_status="EVALUATED",
+                reason_code=None,
+                semantic_api_calls=1,
             )
         )
     return tuple(results)

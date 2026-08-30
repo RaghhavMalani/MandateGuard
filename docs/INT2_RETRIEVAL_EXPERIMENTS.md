@@ -144,6 +144,23 @@ semantic evidence bundle.
 
 ## Stage B: selected downstream authorization
 
+Stage-B semantic engineering cases were frozen after Stage-A retrieval
+configuration selection but before any Stage-B semantic-model execution.
+Stage A influenced which retrieval **conditions** are evaluated; it did not
+determine the semantic expectations. Those expectations come only from the
+pre-existing synthetic commerce catalog, merchant evidence, product semantics,
+and MandateGuard policy semantics. Stage B remains non-benchmark engineering
+experimentation, and its expectations are not held-out labels or benchmark
+ground truth.
+
+Preview the six frozen cases and their deterministic actions without buyer,
+semantic-model, or payment calls:
+
+```powershell
+$env:PYTHONPATH = "src"
+python scripts/preview_int2_stage_b_cases.py
+```
+
 Semantic execution is not part of the Stage-A grid. A caller must first create
 a timestamped `DownstreamSelection` containing exact query/configuration pairs
 and rationale. `execute_selected_downstream` also requires
@@ -164,8 +181,9 @@ authorization transitions:
 - `NONE`
 
 These are not precision, recall, accuracy, or generalization metrics.
-`no_retrieval` remains a Stage-A condition because an empty evidence bundle is
-not sent to a semantic provider.
+For `no_retrieval`, the experiment helper records `NOT_EVALUATED`, a null
+semantic verdict, `REVIEW`, and `NO_TRUSTED_EVIDENCE_RETRIEVED`; it makes zero
+semantic-provider calls and never fabricates trusted evidence.
 
 ## Exact-input cache experiment
 

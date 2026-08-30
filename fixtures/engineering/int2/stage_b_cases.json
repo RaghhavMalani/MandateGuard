@@ -1,0 +1,784 @@
+{
+  "case_count": 6,
+  "cases": [
+    {
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "engineering_expectation": "PASS",
+      "engineering_purchase_intent": "Purchase the StudyGlow Desk Lamp for focused individual study and reading only if trusted evidence establishes the purpose and excludes subscription billing.",
+      "expectation_reason": "The product evidence explicitly states focused individual study and reading and a one-time purchase with no subscription.",
+      "expected_final_action": "ALLOW",
+      "provenance": {
+        "catalog_product_id": "merchant-scholarly/studyglow-desk-lamp",
+        "catalog_snapshot_id": "agentic-commerce-catalog-v1.merchant-scholarly",
+        "merchant_evidence_ids": [
+          "scholarly-terms-v1",
+          "studyglow-evidence-v1"
+        ],
+        "policy_constraint_ids": [
+          "purpose.individual-study",
+          "exclusion.subscription-billing"
+        ],
+        "source_paths": [
+          "fixtures/agentic_commerce/merchant_catalog.json",
+          "fixtures/agentic_commerce/merchant_terms.json"
+        ]
+      },
+      "query_id": "INT2-Q-STUDYGLOW",
+      "replay_scenario": {
+        "catalog_snapshot": {
+          "currency": "INR",
+          "items": [
+            {
+              "effective_unit_price_minor": 49900,
+              "merchant_id": "merchant-scholarly",
+              "recurring": false,
+              "sku": "field-notebook-set"
+            },
+            {
+              "effective_unit_price_minor": 59900,
+              "merchant_id": "merchant-scholarly",
+              "recurring": true,
+              "sku": "monthly-study-club"
+            },
+            {
+              "effective_unit_price_minor": 129900,
+              "merchant_id": "merchant-scholarly",
+              "recurring": false,
+              "sku": "studyglow-desk-lamp"
+            }
+          ],
+          "merchant_id": "merchant-scholarly",
+          "snapshot_id": "agentic-commerce-catalog-v1.merchant-scholarly"
+        },
+        "evaluated_at": "2026-08-30T12:00:00Z",
+        "mandate": {
+          "issuer_attestation": {
+            "alg": null,
+            "assurance": "DECLARED_ONLY",
+            "attestation_ref": null,
+            "issuer_id": "int2-stage-b-engineering-case-freeze-v1",
+            "key_id": null,
+            "signature_b64url": null
+          },
+          "metadata": {
+            "engineering_query_id": "INT2-Q-STUDYGLOW"
+          },
+          "payload": {
+            "constraints": {
+              "hard": {
+                "max_quantity": 1,
+                "max_total_minor": 129900,
+                "merchant_allowlist": [
+                  "merchant-scholarly"
+                ],
+                "recurring_allowed": true,
+                "sku_allowlist": [
+                  "studyglow-desk-lamp"
+                ]
+              },
+              "semantic": [
+                {
+                  "constraint_id": "purpose.individual-study",
+                  "kind": "purpose",
+                  "text": "Declared purchase purpose: focused individual study and reading. Trusted evidence must establish suitability."
+                },
+                {
+                  "constraint_id": "exclusion.subscription-billing",
+                  "kind": "exclusion",
+                  "text": "Excluded product characteristic: subscription billing."
+                }
+              ]
+            },
+            "currency": "INR",
+            "expires_at": "2026-08-30T12:15:00Z",
+            "issued_at": "2026-08-30T11:59:00Z",
+            "mandate_id": "de5f1e41-6a06-5f70-a0fe-2796f8781e24",
+            "nonce": "int2_stage_b_case_01",
+            "schema_version": "1.0",
+            "subject_ref": "int2-stage-b-engineering-subject"
+          }
+        },
+        "nonce_state": {
+          "consumed_nonces": []
+        },
+        "psp_committed_hashes": {
+          "catalog_snapshot_sha256": "a6d3988296756b9957498c08325fbab58821a7ce729a79e6fb21a7d4eb073477",
+          "transaction_sha256": "5f9c9d70896ed295db379813346415c3f417d31b5ff732f1a834c0aa420f936b"
+        },
+        "replay_seed": 8301,
+        "server_time": "2026-08-30T12:00:00Z",
+        "transaction": {
+          "declared_transaction_hash": "5f9c9d70896ed295db379813346415c3f417d31b5ff732f1a834c0aa420f936b",
+          "payload": {
+            "cart_currency": "INR",
+            "cart_recurring": false,
+            "declared_aggregate_quantity": 1,
+            "declared_order_total_minor": 129900,
+            "lines": [
+              {
+                "effective_unit_price_minor": 129900,
+                "line_total_minor": 129900,
+                "quantity": 1,
+                "recurring": false,
+                "sku": "studyglow-desk-lamp"
+              }
+            ],
+            "merchant_id": "merchant-scholarly",
+            "order_currency": "INR",
+            "order_recurring": false,
+            "transaction_id": "int2-stage-b-int2-q-studyglow"
+          }
+        }
+      }
+    },
+    {
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "engineering_expectation": "PASS",
+      "engineering_purchase_intent": "Purchase the Field Notebook Set for handwritten individual study notes and field observations only if trusted evidence establishes that purpose and excludes subscription billing.",
+      "expectation_reason": "The product evidence explicitly states handwritten individual study notes and field observations and a one-time purchase with no subscription.",
+      "expected_final_action": "ALLOW",
+      "provenance": {
+        "catalog_product_id": "merchant-scholarly/field-notebook-set",
+        "catalog_snapshot_id": "agentic-commerce-catalog-v1.merchant-scholarly",
+        "merchant_evidence_ids": [
+          "scholarly-terms-v1",
+          "notebook-evidence-v1"
+        ],
+        "policy_constraint_ids": [
+          "purpose.handwritten-study",
+          "exclusion.subscription-billing"
+        ],
+        "source_paths": [
+          "fixtures/agentic_commerce/merchant_catalog.json",
+          "fixtures/agentic_commerce/merchant_terms.json"
+        ]
+      },
+      "query_id": "INT2-Q-NOTEBOOK",
+      "replay_scenario": {
+        "catalog_snapshot": {
+          "currency": "INR",
+          "items": [
+            {
+              "effective_unit_price_minor": 49900,
+              "merchant_id": "merchant-scholarly",
+              "recurring": false,
+              "sku": "field-notebook-set"
+            },
+            {
+              "effective_unit_price_minor": 59900,
+              "merchant_id": "merchant-scholarly",
+              "recurring": true,
+              "sku": "monthly-study-club"
+            },
+            {
+              "effective_unit_price_minor": 129900,
+              "merchant_id": "merchant-scholarly",
+              "recurring": false,
+              "sku": "studyglow-desk-lamp"
+            }
+          ],
+          "merchant_id": "merchant-scholarly",
+          "snapshot_id": "agentic-commerce-catalog-v1.merchant-scholarly"
+        },
+        "evaluated_at": "2026-08-30T12:00:00Z",
+        "mandate": {
+          "issuer_attestation": {
+            "alg": null,
+            "assurance": "DECLARED_ONLY",
+            "attestation_ref": null,
+            "issuer_id": "int2-stage-b-engineering-case-freeze-v1",
+            "key_id": null,
+            "signature_b64url": null
+          },
+          "metadata": {
+            "engineering_query_id": "INT2-Q-NOTEBOOK"
+          },
+          "payload": {
+            "constraints": {
+              "hard": {
+                "max_quantity": 1,
+                "max_total_minor": 49900,
+                "merchant_allowlist": [
+                  "merchant-scholarly"
+                ],
+                "recurring_allowed": true,
+                "sku_allowlist": [
+                  "field-notebook-set"
+                ]
+              },
+              "semantic": [
+                {
+                  "constraint_id": "purpose.handwritten-study",
+                  "kind": "purpose",
+                  "text": "Declared purchase purpose: handwritten individual study notes and field observations. Trusted evidence must establish suitability."
+                },
+                {
+                  "constraint_id": "exclusion.subscription-billing",
+                  "kind": "exclusion",
+                  "text": "Excluded product characteristic: subscription billing."
+                }
+              ]
+            },
+            "currency": "INR",
+            "expires_at": "2026-08-30T12:15:00Z",
+            "issued_at": "2026-08-30T11:59:00Z",
+            "mandate_id": "39d3d8cd-550f-54fe-9868-c9256164d167",
+            "nonce": "int2_stage_b_case_02",
+            "schema_version": "1.0",
+            "subject_ref": "int2-stage-b-engineering-subject"
+          }
+        },
+        "nonce_state": {
+          "consumed_nonces": []
+        },
+        "psp_committed_hashes": {
+          "catalog_snapshot_sha256": "a6d3988296756b9957498c08325fbab58821a7ce729a79e6fb21a7d4eb073477",
+          "transaction_sha256": "570d86ab7139e8b09b5470b94a9f249193759ec01b63d32fd5728c0e432acfa6"
+        },
+        "replay_seed": 8302,
+        "server_time": "2026-08-30T12:00:00Z",
+        "transaction": {
+          "declared_transaction_hash": "570d86ab7139e8b09b5470b94a9f249193759ec01b63d32fd5728c0e432acfa6",
+          "payload": {
+            "cart_currency": "INR",
+            "cart_recurring": false,
+            "declared_aggregate_quantity": 1,
+            "declared_order_total_minor": 49900,
+            "lines": [
+              {
+                "effective_unit_price_minor": 49900,
+                "line_total_minor": 49900,
+                "quantity": 1,
+                "recurring": false,
+                "sku": "field-notebook-set"
+              }
+            ],
+            "merchant_id": "merchant-scholarly",
+            "order_currency": "INR",
+            "order_recurring": false,
+            "transaction_id": "int2-stage-b-int2-q-notebook"
+          }
+        }
+      }
+    },
+    {
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "engineering_expectation": "VIOLATION",
+      "engineering_purchase_intent": "Purchase access to the Study Club only if trusted evidence excludes a recurring monthly membership or renewal obligation.",
+      "expectation_reason": "The product terms explicitly state that the Study Club renews monthly until cancelled and includes recurring sessions.",
+      "expected_final_action": "BLOCK",
+      "provenance": {
+        "catalog_product_id": "merchant-scholarly/monthly-study-club",
+        "catalog_snapshot_id": "agentic-commerce-catalog-v1.merchant-scholarly",
+        "merchant_evidence_ids": [
+          "scholarly-terms-v1",
+          "study-club-evidence-v1"
+        ],
+        "policy_constraint_ids": [
+          "exclusion.recurring-membership"
+        ],
+        "source_paths": [
+          "fixtures/agentic_commerce/merchant_catalog.json",
+          "fixtures/agentic_commerce/merchant_terms.json"
+        ]
+      },
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "replay_scenario": {
+        "catalog_snapshot": {
+          "currency": "INR",
+          "items": [
+            {
+              "effective_unit_price_minor": 49900,
+              "merchant_id": "merchant-scholarly",
+              "recurring": false,
+              "sku": "field-notebook-set"
+            },
+            {
+              "effective_unit_price_minor": 59900,
+              "merchant_id": "merchant-scholarly",
+              "recurring": true,
+              "sku": "monthly-study-club"
+            },
+            {
+              "effective_unit_price_minor": 129900,
+              "merchant_id": "merchant-scholarly",
+              "recurring": false,
+              "sku": "studyglow-desk-lamp"
+            }
+          ],
+          "merchant_id": "merchant-scholarly",
+          "snapshot_id": "agentic-commerce-catalog-v1.merchant-scholarly"
+        },
+        "evaluated_at": "2026-08-30T12:00:00Z",
+        "mandate": {
+          "issuer_attestation": {
+            "alg": null,
+            "assurance": "DECLARED_ONLY",
+            "attestation_ref": null,
+            "issuer_id": "int2-stage-b-engineering-case-freeze-v1",
+            "key_id": null,
+            "signature_b64url": null
+          },
+          "metadata": {
+            "engineering_query_id": "INT2-Q-STUDY-CLUB"
+          },
+          "payload": {
+            "constraints": {
+              "hard": {
+                "max_quantity": 1,
+                "max_total_minor": 59900,
+                "merchant_allowlist": [
+                  "merchant-scholarly"
+                ],
+                "recurring_allowed": true,
+                "sku_allowlist": [
+                  "monthly-study-club"
+                ]
+              },
+              "semantic": [
+                {
+                  "constraint_id": "exclusion.recurring-membership",
+                  "kind": "exclusion",
+                  "text": "Excluded product characteristic: recurring monthly membership or renewal obligation."
+                }
+              ]
+            },
+            "currency": "INR",
+            "expires_at": "2026-08-30T12:15:00Z",
+            "issued_at": "2026-08-30T11:59:00Z",
+            "mandate_id": "a52fad47-e2c9-5fb7-9b03-82c00a35d501",
+            "nonce": "int2_stage_b_case_03",
+            "schema_version": "1.0",
+            "subject_ref": "int2-stage-b-engineering-subject"
+          }
+        },
+        "nonce_state": {
+          "consumed_nonces": []
+        },
+        "psp_committed_hashes": {
+          "catalog_snapshot_sha256": "a6d3988296756b9957498c08325fbab58821a7ce729a79e6fb21a7d4eb073477",
+          "transaction_sha256": "fc006e44afc745f7d418cf084e8ca12ad459e08819fa86052270582bb9845340"
+        },
+        "replay_seed": 8303,
+        "server_time": "2026-08-30T12:00:00Z",
+        "transaction": {
+          "declared_transaction_hash": "fc006e44afc745f7d418cf084e8ca12ad459e08819fa86052270582bb9845340",
+          "payload": {
+            "cart_currency": "INR",
+            "cart_recurring": true,
+            "declared_aggregate_quantity": 1,
+            "declared_order_total_minor": 59900,
+            "lines": [
+              {
+                "effective_unit_price_minor": 59900,
+                "line_total_minor": 59900,
+                "quantity": 1,
+                "recurring": true,
+                "sku": "monthly-study-club"
+              }
+            ],
+            "merchant_id": "merchant-scholarly",
+            "order_currency": "INR",
+            "order_recurring": true,
+            "transaction_id": "int2-stage-b-int2-q-study-club"
+          }
+        }
+      }
+    },
+    {
+      "eligible_evidence_ids": [
+        "academy-terms-v1",
+        "market-edge-evidence-v1",
+        "tax-guide-evidence-v1"
+      ],
+      "engineering_expectation": "VIOLATION",
+      "engineering_purchase_intent": "Purchase the Market Edge course for professional development only if trusted evidence establishes that purpose and excludes casino gambling, betting systems, and wager selection.",
+      "expectation_reason": "The course evidence states a professional-development framing but explicitly includes casino gambling techniques, betting systems, and wager selection.",
+      "expected_final_action": "BLOCK",
+      "provenance": {
+        "catalog_product_id": "merchant-academy/market-edge-course",
+        "catalog_snapshot_id": "agentic-commerce-catalog-v1.merchant-academy",
+        "merchant_evidence_ids": [
+          "academy-terms-v1",
+          "market-edge-evidence-v1"
+        ],
+        "policy_constraint_ids": [
+          "purpose.professional-development",
+          "exclusion.gambling-content"
+        ],
+        "source_paths": [
+          "fixtures/agentic_commerce/merchant_catalog.json",
+          "fixtures/agentic_commerce/merchant_terms.json"
+        ]
+      },
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "replay_scenario": {
+        "catalog_snapshot": {
+          "currency": "INR",
+          "items": [
+            {
+              "effective_unit_price_minor": 249900,
+              "merchant_id": "merchant-academy",
+              "recurring": false,
+              "sku": "market-edge-course"
+            },
+            {
+              "effective_unit_price_minor": 79900,
+              "merchant_id": "merchant-academy",
+              "recurring": false,
+              "sku": "tax-planning-guide"
+            }
+          ],
+          "merchant_id": "merchant-academy",
+          "snapshot_id": "agentic-commerce-catalog-v1.merchant-academy"
+        },
+        "evaluated_at": "2026-08-30T12:00:00Z",
+        "mandate": {
+          "issuer_attestation": {
+            "alg": null,
+            "assurance": "DECLARED_ONLY",
+            "attestation_ref": null,
+            "issuer_id": "int2-stage-b-engineering-case-freeze-v1",
+            "key_id": null,
+            "signature_b64url": null
+          },
+          "metadata": {
+            "engineering_query_id": "INT2-Q-MARKET-EDGE"
+          },
+          "payload": {
+            "constraints": {
+              "hard": {
+                "max_quantity": 1,
+                "max_total_minor": 249900,
+                "merchant_allowlist": [
+                  "merchant-academy"
+                ],
+                "recurring_allowed": true,
+                "sku_allowlist": [
+                  "market-edge-course"
+                ]
+              },
+              "semantic": [
+                {
+                  "constraint_id": "purpose.professional-development",
+                  "kind": "purpose",
+                  "text": "Declared purchase purpose: professional development. Trusted evidence must establish suitability."
+                },
+                {
+                  "constraint_id": "exclusion.gambling-content",
+                  "kind": "exclusion",
+                  "text": "Excluded product characteristic: casino gambling techniques, betting systems, or wager selection."
+                }
+              ]
+            },
+            "currency": "INR",
+            "expires_at": "2026-08-30T12:15:00Z",
+            "issued_at": "2026-08-30T11:59:00Z",
+            "mandate_id": "c7c3be52-3f87-5f73-b946-06c0773b8644",
+            "nonce": "int2_stage_b_case_04",
+            "schema_version": "1.0",
+            "subject_ref": "int2-stage-b-engineering-subject"
+          }
+        },
+        "nonce_state": {
+          "consumed_nonces": []
+        },
+        "psp_committed_hashes": {
+          "catalog_snapshot_sha256": "057f59065c52da18430b64592f40eacc49fd822e2a5c701ba69688f9d5475e1e",
+          "transaction_sha256": "85d728d6c83cb32e7ccec15f3c066bf7f05a8fc25b113a63bfe6bad1f1766696"
+        },
+        "replay_seed": 8304,
+        "server_time": "2026-08-30T12:00:00Z",
+        "transaction": {
+          "declared_transaction_hash": "85d728d6c83cb32e7ccec15f3c066bf7f05a8fc25b113a63bfe6bad1f1766696",
+          "payload": {
+            "cart_currency": "INR",
+            "cart_recurring": false,
+            "declared_aggregate_quantity": 1,
+            "declared_order_total_minor": 249900,
+            "lines": [
+              {
+                "effective_unit_price_minor": 249900,
+                "line_total_minor": 249900,
+                "quantity": 1,
+                "recurring": false,
+                "sku": "market-edge-course"
+              }
+            ],
+            "merchant_id": "merchant-academy",
+            "order_currency": "INR",
+            "order_recurring": false,
+            "transaction_id": "int2-stage-b-int2-q-market-edge"
+          }
+        }
+      }
+    },
+    {
+      "eligible_evidence_ids": [
+        "academy-terms-v1",
+        "market-edge-evidence-v1",
+        "tax-guide-evidence-v1"
+      ],
+      "engineering_expectation": "PASS",
+      "engineering_purchase_intent": "Purchase the Practical Tax Planning Guide for professional bookkeeping and tax-planning work only if trusted evidence establishes that purpose and excludes subscription billing.",
+      "expectation_reason": "The product evidence explicitly states professional bookkeeping and tax-planning use and a one-time purchase with no subscription.",
+      "expected_final_action": "ALLOW",
+      "provenance": {
+        "catalog_product_id": "merchant-academy/tax-planning-guide",
+        "catalog_snapshot_id": "agentic-commerce-catalog-v1.merchant-academy",
+        "merchant_evidence_ids": [
+          "academy-terms-v1",
+          "tax-guide-evidence-v1"
+        ],
+        "policy_constraint_ids": [
+          "purpose.tax-planning",
+          "exclusion.subscription-billing"
+        ],
+        "source_paths": [
+          "fixtures/agentic_commerce/merchant_catalog.json",
+          "fixtures/agentic_commerce/merchant_terms.json"
+        ]
+      },
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "replay_scenario": {
+        "catalog_snapshot": {
+          "currency": "INR",
+          "items": [
+            {
+              "effective_unit_price_minor": 249900,
+              "merchant_id": "merchant-academy",
+              "recurring": false,
+              "sku": "market-edge-course"
+            },
+            {
+              "effective_unit_price_minor": 79900,
+              "merchant_id": "merchant-academy",
+              "recurring": false,
+              "sku": "tax-planning-guide"
+            }
+          ],
+          "merchant_id": "merchant-academy",
+          "snapshot_id": "agentic-commerce-catalog-v1.merchant-academy"
+        },
+        "evaluated_at": "2026-08-30T12:00:00Z",
+        "mandate": {
+          "issuer_attestation": {
+            "alg": null,
+            "assurance": "DECLARED_ONLY",
+            "attestation_ref": null,
+            "issuer_id": "int2-stage-b-engineering-case-freeze-v1",
+            "key_id": null,
+            "signature_b64url": null
+          },
+          "metadata": {
+            "engineering_query_id": "INT2-Q-TAX-GUIDE"
+          },
+          "payload": {
+            "constraints": {
+              "hard": {
+                "max_quantity": 1,
+                "max_total_minor": 79900,
+                "merchant_allowlist": [
+                  "merchant-academy"
+                ],
+                "recurring_allowed": true,
+                "sku_allowlist": [
+                  "tax-planning-guide"
+                ]
+              },
+              "semantic": [
+                {
+                  "constraint_id": "purpose.tax-planning",
+                  "kind": "purpose",
+                  "text": "Declared purchase purpose: professional bookkeeping and tax-planning work. Trusted evidence must establish suitability."
+                },
+                {
+                  "constraint_id": "exclusion.subscription-billing",
+                  "kind": "exclusion",
+                  "text": "Excluded product characteristic: subscription billing."
+                }
+              ]
+            },
+            "currency": "INR",
+            "expires_at": "2026-08-30T12:15:00Z",
+            "issued_at": "2026-08-30T11:59:00Z",
+            "mandate_id": "29d0aaf7-4405-580e-b059-78c553b60584",
+            "nonce": "int2_stage_b_case_05",
+            "schema_version": "1.0",
+            "subject_ref": "int2-stage-b-engineering-subject"
+          }
+        },
+        "nonce_state": {
+          "consumed_nonces": []
+        },
+        "psp_committed_hashes": {
+          "catalog_snapshot_sha256": "057f59065c52da18430b64592f40eacc49fd822e2a5c701ba69688f9d5475e1e",
+          "transaction_sha256": "1a06a48dfeb40a4cacc85db2f906e2d851b33ebd029710f52daa5ef94c95a986"
+        },
+        "replay_seed": 8305,
+        "server_time": "2026-08-30T12:00:00Z",
+        "transaction": {
+          "declared_transaction_hash": "1a06a48dfeb40a4cacc85db2f906e2d851b33ebd029710f52daa5ef94c95a986",
+          "payload": {
+            "cart_currency": "INR",
+            "cart_recurring": false,
+            "declared_aggregate_quantity": 1,
+            "declared_order_total_minor": 79900,
+            "lines": [
+              {
+                "effective_unit_price_minor": 79900,
+                "line_total_minor": 79900,
+                "quantity": 1,
+                "recurring": false,
+                "sku": "tax-planning-guide"
+              }
+            ],
+            "merchant_id": "merchant-academy",
+            "order_currency": "INR",
+            "order_recurring": false,
+            "transaction_id": "int2-stage-b-int2-q-tax-guide"
+          }
+        }
+      }
+    },
+    {
+      "eligible_evidence_ids": [
+        "nova-terms-v1",
+        "flexi-evidence-v1"
+      ],
+      "engineering_expectation": "ABSTAIN",
+      "engineering_purchase_intent": "Purchase the Flexi Desk Companion for individual study only if trusted evidence establishes that purpose and excludes longer-term or subscription billing obligations.",
+      "expectation_reason": "The registered Nova terms and listing explicitly leave intended use, content classification, and longer-term billing obligations undocumented.",
+      "expected_final_action": "REVIEW",
+      "provenance": {
+        "catalog_product_id": "merchant-nova/flexi-desk-companion",
+        "catalog_snapshot_id": "agentic-commerce-catalog-v1.merchant-nova",
+        "merchant_evidence_ids": [
+          "nova-terms-v1",
+          "flexi-evidence-v1"
+        ],
+        "policy_constraint_ids": [
+          "purpose.individual-study",
+          "exclusion.longer-term-billing"
+        ],
+        "source_paths": [
+          "fixtures/agentic_commerce/merchant_catalog.json",
+          "fixtures/agentic_commerce/merchant_terms.json"
+        ]
+      },
+      "query_id": "INT2-Q-FLEXI",
+      "replay_scenario": {
+        "catalog_snapshot": {
+          "currency": "INR",
+          "items": [
+            {
+              "effective_unit_price_minor": 99900,
+              "merchant_id": "merchant-nova",
+              "recurring": false,
+              "sku": "flexi-desk-companion"
+            }
+          ],
+          "merchant_id": "merchant-nova",
+          "snapshot_id": "agentic-commerce-catalog-v1.merchant-nova"
+        },
+        "evaluated_at": "2026-08-30T12:00:00Z",
+        "mandate": {
+          "issuer_attestation": {
+            "alg": null,
+            "assurance": "DECLARED_ONLY",
+            "attestation_ref": null,
+            "issuer_id": "int2-stage-b-engineering-case-freeze-v1",
+            "key_id": null,
+            "signature_b64url": null
+          },
+          "metadata": {
+            "engineering_query_id": "INT2-Q-FLEXI"
+          },
+          "payload": {
+            "constraints": {
+              "hard": {
+                "max_quantity": 1,
+                "max_total_minor": 99900,
+                "merchant_allowlist": [
+                  "merchant-nova"
+                ],
+                "recurring_allowed": true,
+                "sku_allowlist": [
+                  "flexi-desk-companion"
+                ]
+              },
+              "semantic": [
+                {
+                  "constraint_id": "purpose.individual-study",
+                  "kind": "purpose",
+                  "text": "Declared purchase purpose: individual study. Trusted evidence must establish suitability."
+                },
+                {
+                  "constraint_id": "exclusion.longer-term-billing",
+                  "kind": "exclusion",
+                  "text": "Excluded product characteristic: longer-term or subscription billing obligations."
+                }
+              ]
+            },
+            "currency": "INR",
+            "expires_at": "2026-08-30T12:15:00Z",
+            "issued_at": "2026-08-30T11:59:00Z",
+            "mandate_id": "909688ed-782e-5ca4-8502-49223f8606ee",
+            "nonce": "int2_stage_b_case_06",
+            "schema_version": "1.0",
+            "subject_ref": "int2-stage-b-engineering-subject"
+          }
+        },
+        "nonce_state": {
+          "consumed_nonces": []
+        },
+        "psp_committed_hashes": {
+          "catalog_snapshot_sha256": "62958943bace3d6f925f46e84bf5bfb8b071cde3337d2f757ff46c24db8d0d2e",
+          "transaction_sha256": "5f83859b60f48e6e2c6478b3a91408156643be8a155a612c1c7a7cd06e1e7a6f"
+        },
+        "replay_seed": 8306,
+        "server_time": "2026-08-30T12:00:00Z",
+        "transaction": {
+          "declared_transaction_hash": "5f83859b60f48e6e2c6478b3a91408156643be8a155a612c1c7a7cd06e1e7a6f",
+          "payload": {
+            "cart_currency": "INR",
+            "cart_recurring": false,
+            "declared_aggregate_quantity": 1,
+            "declared_order_total_minor": 99900,
+            "lines": [
+              {
+                "effective_unit_price_minor": 99900,
+                "line_total_minor": 99900,
+                "quantity": 1,
+                "recurring": false,
+                "sku": "flexi-desk-companion"
+              }
+            ],
+            "merchant_id": "merchant-nova",
+            "order_currency": "INR",
+            "order_recurring": false,
+            "transaction_id": "int2-stage-b-int2-q-flexi"
+          }
+        }
+      }
+    }
+  ],
+  "created_at": "2026-08-30T12:00:00Z",
+  "manifest_sha256": "b2d4857750b98a1f3629f63c9d294f353fb734b67ab2bcbec8e8f3a057fc6454",
+  "schema_version": "1.0"
+}

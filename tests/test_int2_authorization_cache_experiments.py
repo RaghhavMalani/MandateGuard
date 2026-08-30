@@ -16,6 +16,7 @@ from mandateguard.engineering.int2.cache import CacheExperimentHarness
 from mandateguard.engineering.int2.downstream import (
     AuthorizationTransition,
     DownstreamAuthorizationCase,
+    NO_TRUSTED_EVIDENCE_RETRIEVED,
     execute_selected_downstream,
 )
 from mandateguard.engineering.int2.models import (
@@ -190,7 +191,7 @@ def test_downstream_reuses_existing_controller_and_records_engineering_transitio
     }.issubset(results[0].retrieved_evidence_ids)
 
 
-def test_no_retrieval_cannot_be_sent_to_semantic_provider():
+def test_no_retrieval_is_not_evaluated_and_never_sent_to_semantic_provider():
     case = _case()
     observation = _retrieval(
         case,
@@ -198,18 +199,26 @@ def test_no_retrieval_cannot_be_sent_to_semantic_provider():
             strategy=RetrievalStrategy.NO_RETRIEVAL, top_k=1
         ),
     )
+    model = ScriptedSemanticModel(model_output("PASS", "PASS"))
     verifier = SemanticVerifier(
-        model=ScriptedSemanticModel(model_output("PASS", "PASS")),
+        model=model,
         cache=InMemorySemanticCache(),
     )
-    with pytest.raises(Int2ExperimentError, match="Stage B requires"):
-        execute_selected_downstream(
-            (case,),
-            (observation,),
-            _selection(observation),
-            semantic_verifier=verifier,
-            allow_semantic_execution=True,
-        )
+    results = execute_selected_downstream(
+        (case,),
+        (observation,),
+        _selection(observation),
+        semantic_verifier=verifier,
+        allow_semantic_execution=True,
+    )
+    assert len(results) == 1
+    assert results[0].semantic_status == "NOT_EVALUATED"
+    assert results[0].semantic_verdict is None
+    assert results[0].final_action == "REVIEW"
+    assert results[0].reason_code == NO_TRUSTED_EVIDENCE_RETRIEVED
+    assert results[0].semantic_api_calls == 0
+    assert results[0].retrieved_evidence_ids == ()
+    assert model.calls == []
 
 
 def test_cache_experiment_has_one_miss_call_zero_hit_calls_and_all_mutation_misses():
