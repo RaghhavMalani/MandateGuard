@@ -1,0 +1,3 @@
+cache_status,semantic_provider_calls,semantic_latency_ms,authorization_latency_ms,total_latency_ms,semantic_input_tokens,semantic_output_tokens,estimated_api_cost
+MISS,1,0.021,0.4118,0.4121,,,
+HIT,0,0.0,0.267,0.2672,0,0,

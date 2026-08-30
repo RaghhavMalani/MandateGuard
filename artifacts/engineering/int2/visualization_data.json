@@ -1,0 +1,6277 @@
+{
+  "cache_miss_vs_hit_latency_cost": [],
+  "latency_vs_strategy": [
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0003,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0003,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0002,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1025,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.059,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0532,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0506,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1635,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1407,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1356,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1338,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1976,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1807,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1775,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1903,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1746,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1719,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1812,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1833,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1834,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.2311,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1866,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1855,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1847,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1915,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1878,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1864,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1799,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1721,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1735,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1737,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0002,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0477,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0444,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0445,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0425,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1487,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1445,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1368,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1326,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1739,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1667,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1661,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.166,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1811,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1797,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.182,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1827,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.165,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1644,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1774,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.181,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1659,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1648,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.165,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1653,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1652,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1652,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.171,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1932,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0002,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0002,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0454,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0396,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0381,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0378,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1331,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1411,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1433,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1424,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1796,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1644,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.2439,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.2041,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.186,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1765,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1702,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1706,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1728,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1721,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1773,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.2456,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1939,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1849,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1762,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1872,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1791,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1837,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1775,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1854,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0471,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0385,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0454,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0331,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1231,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1196,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1194,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1199,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1537,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1503,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1514,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1504,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1501,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1739,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1522,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1579,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1529,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1541,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.153,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1613,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1517,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1519,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1509,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1496,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1605,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1761,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1707,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1633,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0399,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0365,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0356,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0359,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.122,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.124,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1252,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1213,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1532,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1554,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1582,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1555,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1601,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.162,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1543,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1511,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1493,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1512,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1537,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1511,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1486,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1499,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1491,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1497,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1519,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1548,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1505,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1496,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0002,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0002,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0358,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0302,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0278,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0276,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0929,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0883,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0885,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0881,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1364,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.114,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1181,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1513,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1156,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1125,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1182,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1128,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1135,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1137,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1126,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1143,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.113,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1125,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1119,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1196,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1125,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1132,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1112,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1107,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    }
+  ],
+  "mrr_vs_strategy": [
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0003,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0003,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0002,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1025,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.059,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0532,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0506,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1635,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1407,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1356,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1338,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1976,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1807,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1775,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1903,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1746,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1719,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1812,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1833,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1834,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.2311,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1866,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1855,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1847,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1915,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1878,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1864,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1799,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1721,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1735,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1737,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0002,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0477,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0444,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0445,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0425,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1487,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1445,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1368,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1326,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1739,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1667,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1661,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.166,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1811,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1797,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.182,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1827,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.165,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1644,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1774,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.181,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1659,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1648,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.165,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1653,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1652,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1652,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.171,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1932,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0002,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0002,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0454,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0396,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0381,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0378,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1331,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1411,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1433,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1424,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1796,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1644,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.2439,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.2041,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.186,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1765,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1702,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1706,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1728,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1721,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1773,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.2456,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1939,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1849,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1762,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1872,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1791,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1837,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1775,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1854,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0471,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0385,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0454,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0331,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1231,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1196,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1194,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1199,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1537,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1503,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1514,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1504,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1501,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1739,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1522,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1579,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1529,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1541,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.153,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1613,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1517,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1519,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1509,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1496,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1605,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1761,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1707,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1633,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0399,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0365,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0356,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0359,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.122,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.124,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1252,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1213,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1532,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1554,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1582,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1555,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1601,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.162,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1543,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1511,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1493,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1512,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1537,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1511,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1486,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1499,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1491,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1497,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1519,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1548,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1505,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1496,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0002,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0002,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0358,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0302,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0278,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0276,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0929,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0883,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0885,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0881,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1364,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.114,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1181,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1513,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1156,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1125,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1182,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1128,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1135,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1137,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1126,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1143,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.113,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1125,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1119,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1196,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1125,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1132,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1112,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1107,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    }
+  ],
+  "recall_at_k_vs_alpha": [
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1976,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1807,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1775,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1903,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1746,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1719,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1812,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1833,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1834,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.2311,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1866,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1855,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1847,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1915,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1878,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1864,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1799,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1721,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1735,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1737,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1739,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1667,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1661,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.166,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1811,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1797,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.182,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1827,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.165,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1644,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1774,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.181,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1659,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1648,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.165,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1653,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1652,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1652,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.171,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1932,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1796,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1644,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.2439,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.2041,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.186,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1765,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1702,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1706,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1728,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1721,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1773,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.2456,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1939,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1849,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1762,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1872,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1791,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1837,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1775,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1854,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1537,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1503,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1514,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1504,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1501,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1739,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1522,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1579,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1529,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1541,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.153,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1613,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1517,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1519,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1509,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1496,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1605,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1761,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1707,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1633,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1532,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1554,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1582,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1555,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1601,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.162,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1543,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1511,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1493,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1512,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1537,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1511,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1486,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1499,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1491,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1497,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1519,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1548,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1505,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1496,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1364,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.114,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1181,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1513,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1156,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1125,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1182,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1128,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1135,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1137,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1126,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1143,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.113,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1125,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1119,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1196,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1125,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1132,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1112,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1107,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    }
+  ],
+  "recall_at_k_vs_k": [
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0003,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0003,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0002,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1025,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.059,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0532,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0506,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1635,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1407,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1356,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1338,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1976,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1807,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1775,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1903,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1746,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1719,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1812,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1833,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1834,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.2311,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1866,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1855,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1847,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1915,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1878,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1864,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1799,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1721,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1735,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1737,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0002,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0477,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0444,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0445,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0425,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1487,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1445,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1368,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1326,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1739,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1667,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1661,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.166,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1811,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1797,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.182,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1827,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.165,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1644,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1774,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.181,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1659,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1648,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.165,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1653,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1652,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1652,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.171,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1932,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0002,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0002,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0454,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0396,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0381,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0378,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1331,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1411,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1433,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1424,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1796,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1644,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.2439,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.2041,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.186,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1765,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1702,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1706,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1728,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1721,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1773,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.2456,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1939,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1849,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1762,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1872,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1791,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1837,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1775,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1854,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0471,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0385,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0454,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0331,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1231,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1196,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1194,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1199,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1537,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1503,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1514,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1504,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1501,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1739,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1522,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1579,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1529,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1541,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.153,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1613,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1517,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1519,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1509,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1496,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1605,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1761,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1707,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1633,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0399,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0365,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0356,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0359,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.122,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.124,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1252,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1213,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1532,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1554,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1582,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1555,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1601,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.162,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1543,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1511,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1493,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1512,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1537,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1511,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1486,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1499,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1491,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1497,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1519,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1548,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1505,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1496,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0002,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0002,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "retrieval_latency_ms": 0.0001,
+      "retrieval_strategy": "no_retrieval",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0358,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0302,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0278,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0276,
+      "retrieval_strategy": "lexical_only",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0929,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0883,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 2
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0885,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 3
+    },
+    {
+      "alpha": null,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.0881,
+      "retrieval_strategy": "semantic_only",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1364,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.114,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1181,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1513,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1156,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1125,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1182,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.25,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1128,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1135,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1137,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1126,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.5,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1143,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.113,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1125,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1119,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.75,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1196,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 0.5,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1125,
+      "retrieval_strategy": "hybrid",
+      "top_k": 1
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1132,
+      "retrieval_strategy": "hybrid",
+      "top_k": 2
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1112,
+      "retrieval_strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 1.0,
+      "query_id": "INT2-Q-FLEXI",
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_latency_ms": 0.1107,
+      "retrieval_strategy": "hybrid",
+      "top_k": 5
+    }
+  ],
+  "review_rate_vs_retrieval_configuration": [],
+  "unsafe_direction_transitions_vs_configuration": []
+}

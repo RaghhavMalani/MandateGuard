@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "catalog_id": "agentic-commerce-catalog-v1",
+  "annotations": [
+    {
+      "query_id": "INT2-Q-STUDYGLOW",
+      "relevant_evidence_ids": ["scholarly-terms-v1", "studyglow-evidence-v1"],
+      "required_evidence_ids": ["scholarly-terms-v1", "studyglow-evidence-v1"]
+    },
+    {
+      "query_id": "INT2-Q-NOTEBOOK",
+      "relevant_evidence_ids": ["scholarly-terms-v1", "notebook-evidence-v1"],
+      "required_evidence_ids": ["scholarly-terms-v1", "notebook-evidence-v1"]
+    },
+    {
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "relevant_evidence_ids": ["scholarly-terms-v1", "study-club-evidence-v1"],
+      "required_evidence_ids": ["scholarly-terms-v1", "study-club-evidence-v1"]
+    },
+    {
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "relevant_evidence_ids": ["academy-terms-v1", "market-edge-evidence-v1"],
+      "required_evidence_ids": ["academy-terms-v1", "market-edge-evidence-v1"]
+    },
+    {
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "relevant_evidence_ids": ["academy-terms-v1", "tax-guide-evidence-v1"],
+      "required_evidence_ids": ["academy-terms-v1", "tax-guide-evidence-v1"]
+    },
+    {
+      "query_id": "INT2-Q-FLEXI",
+      "relevant_evidence_ids": ["nova-terms-v1", "flexi-evidence-v1"],
+      "required_evidence_ids": ["nova-terms-v1", "flexi-evidence-v1"]
+    }
+  ]
+}

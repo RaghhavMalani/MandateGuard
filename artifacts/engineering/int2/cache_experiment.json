@@ -1,0 +1,81 @@
+{
+  "case_id": "INT2-CACHE-SMVP-001",
+  "cold_semantic_miss": {
+    "authorization_latency_ms": 0.4118,
+    "cache_status": "MISS",
+    "cost": {
+      "estimated_api_cost": null,
+      "priced_categories": [],
+      "unpriced_categories": []
+    },
+    "final_action": "REVIEW",
+    "semantic_latency_ms": 0.021,
+    "semantic_provider_calls": 1,
+    "semantic_verdict": "ABSTAIN",
+    "token_usage": {
+      "buyer_input_tokens": null,
+      "buyer_output_tokens": null,
+      "embedding_tokens": null,
+      "semantic_input_tokens": null,
+      "semantic_output_tokens": null
+    },
+    "total_latency_ms": 0.4121
+  },
+  "detector_version": "1.0",
+  "exact_input_semantic_hit": {
+    "authorization_latency_ms": 0.267,
+    "cache_status": "HIT",
+    "cost": {
+      "estimated_api_cost": null,
+      "priced_categories": [],
+      "unpriced_categories": [
+        "semantic_input",
+        "semantic_output"
+      ]
+    },
+    "final_action": "REVIEW",
+    "semantic_latency_ms": 0.0,
+    "semantic_provider_calls": 0,
+    "semantic_verdict": "ABSTAIN",
+    "token_usage": {
+      "buyer_input_tokens": null,
+      "buyer_output_tokens": null,
+      "embedding_tokens": null,
+      "semantic_input_tokens": 0,
+      "semantic_output_tokens": 0
+    },
+    "total_latency_ms": 0.2672
+  },
+  "mutation_checks": [
+    {
+      "cache_status": "MISS",
+      "input_name": "evidence",
+      "semantic_provider_calls": 0
+    },
+    {
+      "cache_status": "MISS",
+      "input_name": "mandate",
+      "semantic_provider_calls": 0
+    },
+    {
+      "cache_status": "MISS",
+      "input_name": "transaction",
+      "semantic_provider_calls": 0
+    },
+    {
+      "cache_status": "MISS",
+      "input_name": "model",
+      "semantic_provider_calls": 0
+    },
+    {
+      "cache_status": "MISS",
+      "input_name": "prompt",
+      "semantic_provider_calls": 0
+    }
+  ],
+  "prompt_version": "1.0",
+  "razorpay_calls": 0,
+  "schema_version": "1.0",
+  "semantic_model_id": "offline-semantic-fake-v1",
+  "total_semantic_provider_calls": 1
+}

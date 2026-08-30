@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "selection_id": "int2-stage-b-initial-selection",
+  "recorded_at": "2026-08-30T00:00:00Z",
+  "status": "RECORDED_NOT_EXECUTED",
+  "rationale": "Explicit representative configurations for later semantic execution after Stage-A review; this file does not authorize or report a live run.",
+  "selections": [
+    {
+      "query_id": "INT2-Q-STUDYGLOW",
+      "configuration_id": "lexical_only.alpha-na.k-2",
+      "retrieval_strategy": "lexical_only",
+      "alpha": null,
+      "top_k": 2
+    },
+    {
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "configuration_id": "semantic_only.alpha-na.k-2",
+      "retrieval_strategy": "semantic_only",
+      "alpha": null,
+      "top_k": 2
+    },
+    {
+      "query_id": "INT2-Q-FLEXI",
+      "configuration_id": "hybrid.alpha-0.50.k-2",
+      "retrieval_strategy": "hybrid",
+      "alpha": 0.5,
+      "top_k": 2
+    }
+  ]
+}

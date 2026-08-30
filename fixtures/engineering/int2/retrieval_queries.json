@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "catalog_id": "agentic-commerce-catalog-v1",
+  "queries": [
+    {
+      "query_id": "INT2-Q-STUDYGLOW",
+      "merchant_id": "merchant-scholarly",
+      "sku": "studyglow-desk-lamp",
+      "query": "StudyGlow desk lamp for focused individual study and reading; one-time purchase with no subscription"
+    },
+    {
+      "query_id": "INT2-Q-NOTEBOOK",
+      "merchant_id": "merchant-scholarly",
+      "sku": "field-notebook-set",
+      "query": "field notebook set for handwritten individual study notes and observations; one-time purchase"
+    },
+    {
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "merchant_id": "merchant-scholarly",
+      "sku": "monthly-study-club",
+      "query": "monthly study club recurring membership with group sessions and reading packets"
+    },
+    {
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "merchant_id": "merchant-academy",
+      "sku": "market-edge-course",
+      "query": "Market Edge professional development course involving casino gambling betting systems and wager selection"
+    },
+    {
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "merchant_id": "merchant-academy",
+      "sku": "tax-planning-guide",
+      "query": "tax planning guide for professional bookkeeping and record keeping; one-time purchase"
+    },
+    {
+      "query_id": "INT2-Q-FLEXI",
+      "merchant_id": "merchant-nova",
+      "sku": "flexi-desk-companion",
+      "query": "Flexi Desk Companion intended use content classification and longer-term billing obligations"
+    }
+  ]
+}
