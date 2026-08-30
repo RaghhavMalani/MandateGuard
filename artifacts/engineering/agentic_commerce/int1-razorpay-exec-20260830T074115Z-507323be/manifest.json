@@ -1,0 +1,36 @@
+{
+  "artifacts": [
+    "RUN.md",
+    "manifest.json",
+    "execution.json",
+    "trace.json",
+    "semantic_cache.sqlite3",
+    "execution_ledger.sqlite3"
+  ],
+  "branch": "feat/agentic-commerce-intelligence",
+  "call_counts": {
+    "buyer": 3,
+    "embedding": 1,
+    "razorpay": 1,
+    "semantic": 1,
+    "top_level_checkout": 1
+  },
+  "diagnostic_label": "THIRD RAZORPAY TEST MODE EXECUTION DIAGNOSTIC",
+  "ended_at": "2026-08-30T07:41:31.205012Z",
+  "exact_intent": "Buy the StudyGlow Desk Lamp under INR 2000 for individual study; avoid subscriptions.",
+  "execution_sha": "dc588074fec152c63f7d11013aa2af4577b1fcf9",
+  "fresh_execution_ledger": "execution_ledger.sqlite3",
+  "fresh_semantic_cache": "semantic_cache.sqlite3",
+  "full_suite": "452 passed",
+  "models": {
+    "buyer": "gpt-5.6-terra",
+    "embedding": "text-embedding-3-small",
+    "semantic": "gpt-5.6-terra"
+  },
+  "razorpay_execution_call_limit": 1,
+  "run_id": "int1-razorpay-exec-20260830T074115Z-507323be",
+  "sdk_max_retries": 0,
+  "started_at": "2026-08-30T07:41:15.623673Z",
+  "status": "EXECUTED",
+  "top_level_checkout_limit": 1
+}

@@ -1,0 +1,162 @@
+{
+  "authorization": {
+    "evidence_sufficiency": "SUFFICIENT",
+    "reason_code": null,
+    "semantic_reason": [
+      "Product record states a one-time purchase with no subscription.",
+      "Product record states a one-time purchase with no subscription.",
+      "Product record identifies focused individual study and reading as intended use."
+    ],
+    "semantic_status": "EVALUATED",
+    "semantic_verdict": "PASS",
+    "tier_a_statuses": [
+      {
+        "family": "A1",
+        "reason": null,
+        "status": "PASS"
+      },
+      {
+        "family": "A2",
+        "reason": null,
+        "status": "PASS"
+      },
+      {
+        "family": "A3",
+        "reason": null,
+        "status": "PASS"
+      },
+      {
+        "family": "A4",
+        "reason": null,
+        "status": "PASS"
+      },
+      {
+        "family": "A5",
+        "reason": null,
+        "status": "PASS"
+      },
+      {
+        "family": "A6",
+        "reason": null,
+        "status": "PASS"
+      },
+      {
+        "family": "A7",
+        "reason": null,
+        "status": "PASS"
+      },
+      {
+        "family": "A8",
+        "reason": null,
+        "status": "PASS"
+      }
+    ],
+    "tier_b_findings": []
+  },
+  "buyer": {
+    "interpreted_intent": {
+      "currency": "INR",
+      "exclusions": [
+        "subscriptions",
+        "recurring billing"
+      ],
+      "max_total_minor": 200000,
+      "merchant_allowlist": null,
+      "purpose": "individual study",
+      "quantity": 1,
+      "recurring_allowed": false,
+      "sku_allowlist": [
+        "studyglow-desk-lamp"
+      ]
+    },
+    "reason": "StudyGlow Desk Lamp is a one-time purchase intended for focused individual study and desk reading, priced below INR 2,000.",
+    "selected_merchant": "merchant-scholarly",
+    "selected_sku": "studyglow-desk-lamp"
+  },
+  "cache": {
+    "failure_reason": null,
+    "integrity_failure": false,
+    "key_prefix": "f1870e68eb0a",
+    "lookup_performed": true,
+    "status": "MISS",
+    "write_performed": true
+  },
+  "decision": "ALLOW",
+  "execution": {
+    "detail": null,
+    "status": "executed"
+  },
+  "models": {
+    "buyer_model": "gpt-5.6-terra",
+    "embedding_model": "text-embedding-3-small",
+    "semantic_model": "gpt-5.6-terra"
+  },
+  "retrieval": {
+    "alpha": 0.4,
+    "evidence_ids": [
+      "studyglow-evidence-v1",
+      "scholarly-terms-v1"
+    ],
+    "query": "{\"candidate\":{\"currency\":\"INR\",\"declared_total_minor\":129900,\"merchant_id\":\"merchant-scholarly\",\"quantity\":1,\"requested_evidence_ids\":[\"scholarly-terms-v1\",\"studyglow-evidence-v1\"],\"sku\":\"studyglow-desk-lamp\"},\"mandate\":{\"currency\":\"INR\",\"hard\":{\"max_quantity\":1,\"max_total_minor\":200000,\"merchant_allowlist\":null,\"recurring_allowed\":false,\"sku_allowlist\":[\"studyglow-desk-lamp\"]},\"semantic\":[{\"constraint_id\":\"purpose.1\",\"kind\":\"purpose\",\"text\":\"Declared purchase purpose: individual study. Trusted evidence must establish suitability.\"},{\"constraint_id\":\"exclusion.1\",\"kind\":\"exclusion\",\"text\":\"Excluded product characteristic: subscriptions.\"},{\"constraint_id\":\"exclusion.2\",\"kind\":\"exclusion\",\"text\":\"Excluded product characteristic: recurring billing.\"}]},\"trusted_product_context\":{\"currency\":\"INR\",\"description\":\"A compact task lamp for reading desks and focused workspaces.\",\"effective_unit_price_minor\":129900,\"evidence_ids\":[\"scholarly-terms-v1\",\"studyglow-evidence-v1\"],\"merchant_id\":\"merchant-scholarly\",\"name\":\"StudyGlow Desk Lamp\",\"recurring\":false,\"sku\":\"studyglow-desk-lamp\",\"tags\":[\"desk lamp\",\"reading\",\"individual study\",\"workspace\"]},\"user_intent\":\"Buy the StudyGlow Desk Lamp under INR 2000 for individual study; avoid subscriptions.\"}",
+    "query_sha256": "a94a0289ed2a25c7ac474d790010be9a53a727eac3cc38e33c416d167a1dd774",
+    "scores": [
+      {
+        "document_id": "mandate.hard",
+        "hybrid_score": 0.7852508067532786,
+        "lexical_score": 1.0,
+        "semantic_score": 0.642084677922131,
+        "source_type": "mandate_clause"
+      },
+      {
+        "document_id": "mandate.purpose.1",
+        "hybrid_score": 0.5892732849428612,
+        "lexical_score": 0.6188513656756718,
+        "semantic_score": 0.5695545644543208,
+        "source_type": "mandate_clause"
+      },
+      {
+        "document_id": "evidence.studyglow-evidence-v1",
+        "hybrid_score": 0.4741126763107658,
+        "lexical_score": 0.4546147938284487,
+        "semantic_score": 0.4871112646323106,
+        "source_type": "merchant_evidence"
+      },
+      {
+        "document_id": "evidence.scholarly-terms-v1",
+        "hybrid_score": 0.37620562440095334,
+        "lexical_score": 0.2902358686889283,
+        "semantic_score": 0.4335187948756367,
+        "source_type": "merchant_evidence"
+      },
+      {
+        "document_id": "mandate.exclusion.1",
+        "hybrid_score": 0.3185037659659768,
+        "lexical_score": 0.24540712766936604,
+        "semantic_score": 0.3672348581637173,
+        "source_type": "mandate_clause"
+      }
+    ],
+    "top_k": 5,
+    "trusted_evidence_selected_count": 2,
+    "trusted_evidence_selected_ids": [
+      "scholarly-terms-v1",
+      "studyglow-evidence-v1"
+    ]
+  },
+  "timings": {
+    "authorization_latency_ms": 2332.4566000374034,
+    "buyer_latency_ms": 0.001600012183189392,
+    "embedding_latency_ms": 2725.5301999975927,
+    "retrieval_latency_ms": 2726.9564000307582,
+    "semantic_latency_ms": 2326.0892999824136,
+    "total_latency_ms": 5304.459500010125
+  },
+  "usage": {
+    "buyer_input_tokens": 2734,
+    "buyer_output_tokens": 279,
+    "embedding_input_tokens": 425,
+    "semantic_input_tokens": 580,
+    "semantic_output_tokens": 127
+  },
+  "user_intent": "Buy the StudyGlow Desk Lamp under INR 2000 for individual study; avoid subscriptions."
+}
