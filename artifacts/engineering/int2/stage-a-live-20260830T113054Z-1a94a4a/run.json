@@ -1,0 +1,57 @@
+{
+  "calls": {
+    "buyer_calls": 0,
+    "embedding_provider_calls": 1,
+    "razorpay_calls": 0,
+    "semantic_verifier_calls": 0
+  },
+  "embedding": {
+    "embedding_api_calls": 1,
+    "embedding_input_tokens": 289,
+    "embedding_precompute_latency_ms": 5550.828,
+    "manual_retries": 0,
+    "model": "text-embedding-3-small",
+    "provider": "OpenAIEmbeddingProvider",
+    "unique_document_texts": 9,
+    "unique_query_texts": 6,
+    "unique_texts_total": 15,
+    "vector_dimension": 1536,
+    "vector_precompute_design": "Exact-text deduplication followed by one batch request for all 15 unique query and document texts; one immutable EmbeddingSnapshot reused by all semantic-only and hybrid configurations."
+  },
+  "execution_sha": "1a94a4a77dd6cf05ffccd92f83d313d447ae3cbb",
+  "experiment_name": "LIVE RETRIEVAL ENGINEERING EXPERIMENT",
+  "experiment_stage": "INT-2 Stage A retrieval only",
+  "matrix": {
+    "configurations": 32,
+    "hybrid_alphas": [
+      0.0,
+      0.25,
+      0.5,
+      0.75,
+      1.0
+    ],
+    "observations": 192,
+    "queries": 6,
+    "top_k": [
+      1,
+      2,
+      3,
+      5
+    ]
+  },
+  "protected_inputs": {
+    "benchmark_changes": 0,
+    "catalog_or_evidence_changes": 0,
+    "int1_evidence_changes": 0,
+    "relevance_annotation_changes": 0,
+    "source_changes": 0,
+    "taxonomy_changes": 0
+  },
+  "run_end_utc": "2026-08-30T11:36:59.349Z",
+  "run_id": "stage-a-live-20260830T113054Z-1a94a4a",
+  "run_start_utc": "2026-08-30T11:30:54.141Z",
+  "schema_version": "1.0",
+  "semantic_stage_b_started": false,
+  "stage_b_selection_frozen_at_utc": "2026-08-30T11:36:59.345Z",
+  "status": "COMPLETE_STAGE_A_STOP"
+}

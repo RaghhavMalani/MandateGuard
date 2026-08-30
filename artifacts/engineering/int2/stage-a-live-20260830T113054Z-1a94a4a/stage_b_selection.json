@@ -1,0 +1,118 @@
+{
+  "execution_sha": "1a94a4a77dd6cf05ffccd92f83d313d447ae3cbb",
+  "experiment_name": "LIVE RETRIEVAL ENGINEERING EXPERIMENT",
+  "manifest_status": "FROZEN_IMMUTABLE",
+  "recorded_at_utc": "2026-08-30T11:36:59.345Z",
+  "run_id": "stage-a-live-20260830T113054Z-1a94a4a",
+  "schema_version": "1.0",
+  "selections": [
+    {
+      "alpha": null,
+      "appeared_in_stage_a_sweep": true,
+      "configuration_id": "no_retrieval.alpha-na.k-1",
+      "label": "A",
+      "role": "NO_RETRIEVAL CONTROL",
+      "selection_rule": "Minimum top_k is the deterministic representative because all no-retrieval cells return identical empty evidence.",
+      "stage_a_metrics": {
+        "all_required_retrieval_count": 0,
+        "insufficient_evidence_risk_proxy": 6,
+        "mean_precision_at_k": 0.0,
+        "mean_recall_at_k": 0.0,
+        "mean_reciprocal_rank": 0.0,
+        "query_count": 6,
+        "required_evidence_miss_count": 12
+      },
+      "strategy": "no_retrieval",
+      "top_k": 1
+    },
+    {
+      "alpha": null,
+      "appeared_in_stage_a_sweep": true,
+      "configuration_id": "lexical_only.alpha-na.k-5",
+      "label": "B",
+      "role": "LEXICAL BASELINE",
+      "selection_rule": "Lexicographic maximum: all-required count, mean Recall@k, MRR, then minimum top_k.",
+      "stage_a_metrics": {
+        "all_required_retrieval_count": 6,
+        "insufficient_evidence_risk_proxy": 0,
+        "mean_precision_at_k": 0.6388888888888888,
+        "mean_recall_at_k": 1.0,
+        "mean_reciprocal_rank": 1.0,
+        "query_count": 6,
+        "required_evidence_miss_count": 0
+      },
+      "strategy": "lexical_only",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "appeared_in_stage_a_sweep": true,
+      "configuration_id": "semantic_only.alpha-na.k-3",
+      "label": "C",
+      "role": "SEMANTIC BASELINE",
+      "selection_rule": "Lexicographic maximum: all-required count, mean Recall@k, MRR, then minimum top_k.",
+      "stage_a_metrics": {
+        "all_required_retrieval_count": 6,
+        "insufficient_evidence_risk_proxy": 0,
+        "mean_precision_at_k": 0.7222222222222222,
+        "mean_recall_at_k": 1.0,
+        "mean_reciprocal_rank": 1.0,
+        "query_count": 6,
+        "required_evidence_miss_count": 0
+      },
+      "strategy": "semantic_only",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.0,
+      "appeared_in_stage_a_sweep": true,
+      "configuration_id": "hybrid.alpha-0.00.k-3",
+      "label": "D",
+      "role": "BEST HYBRID",
+      "selection_rule": "Lexicographic maximum: all-required count, mean Recall@k, MRR, minimum top_k, alpha closest to 0.5, then smaller alpha.",
+      "stage_a_metrics": {
+        "all_required_retrieval_count": 6,
+        "insufficient_evidence_risk_proxy": 0,
+        "mean_precision_at_k": 0.7222222222222222,
+        "mean_recall_at_k": 1.0,
+        "mean_reciprocal_rank": 1.0,
+        "query_count": 6,
+        "required_evidence_miss_count": 0
+      },
+      "strategy": "hybrid",
+      "top_k": 3
+    },
+    {
+      "alpha": 0.4,
+      "appeared_in_stage_a_sweep": false,
+      "configuration_id": "production.hybrid.alpha-0.40.k-5",
+      "label": "E",
+      "role": "PRODUCTION DEFAULT",
+      "selection_rule": "Predeclared existing production configuration; retained independently of the Stage-A alpha sweep.",
+      "stage_a_metrics": null,
+      "strategy": "hybrid",
+      "top_k": 5
+    },
+    {
+      "alpha": null,
+      "appeared_in_stage_a_sweep": true,
+      "configuration_id": "lexical_only.alpha-na.k-1",
+      "label": "F",
+      "role": "LOW-EVIDENCE STRESS CONDITION",
+      "selection_rule": "Maximum required-evidence miss count among configurations retrieving at least one relevant trusted evidence item on at least two queries. Deterministic ties: maximum risk proxy, minimum all-required count, minimum Recall@k, minimum MRR, minimum top_k, strategy order lexical/semantic/hybrid, alpha closest to 0.5, then smaller alpha.",
+      "stage_a_metrics": {
+        "all_required_retrieval_count": 0,
+        "insufficient_evidence_risk_proxy": 0,
+        "mean_precision_at_k": 1.0,
+        "mean_recall_at_k": 0.5,
+        "mean_reciprocal_rank": 1.0,
+        "query_count": 6,
+        "required_evidence_miss_count": 6
+      },
+      "strategy": "lexical_only",
+      "top_k": 1
+    }
+  ],
+  "semantic_outcomes_available_or_inspected": false,
+  "semantic_stage_b_calls_made_before_freeze": 0
+}
