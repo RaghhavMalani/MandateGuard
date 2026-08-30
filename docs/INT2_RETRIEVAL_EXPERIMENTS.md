@@ -47,18 +47,80 @@ python scripts/run_int2_retrieval_experiments.py
 ```
 
 The default embedding provider is deterministic token hashing. It performs no
-network or semantic-model calls. Unit tests use exact fake vectors.
+network or semantic-model calls even when `OPENAI_API_KEY` is present. Unit
+tests use exact fake vectors.
 
 For every query/configuration, the harness records Recall@k, Precision@k,
 reciprocal rank when applicable, whether all required evidence was retrieved,
-the first required-evidence rank, retrieval latency, embedding latency,
-embedding calls, and embedding token usage when available.
+the first required-evidence rank, retrieval latency, and whether the
+observation used precomputed vectors.
 
 Duplicate retrieved evidence IDs are scored once at their first rank. If a
 query has no relevant evidence, recall and the all-required flag are vacuously
 1/true, precision is 0, and reciprocal rank/first-required rank are null.
 If fewer unique documents exist than k, precision uses the number actually
 returned.
+
+## One-time embedding precomputation
+
+Embeddings are generated once per experiment run, before the configuration
+matrix is evaluated. `precompute_embeddings` deduplicates every query and
+document text by exact SHA-256 identity, submits the unique texts in a single
+batched provider call, and returns an immutable `EmbeddingSnapshot` holding the
+text-hash-to-vector mapping, the identifiers each text came from, the model ID,
+the vector dimension, the provider call count, input tokens when the provider
+reports them, and the precompute latency. `run_stage_a_sweep` performs the
+precompute and then evaluates the matrix, so both modes share one algorithm.
+
+`ExperimentRetriever` consumes that snapshot and never calls a provider itself.
+Semantic and hybrid cells read vectors by exact text; a text absent from the
+snapshot, or a hash whose stored text differs from the requested text, is an
+error rather than a silent merge onto the wrong vector. The snapshot refuses a
+provider call count above two, so a run whose embedding calls scale with the
+matrix cannot be recorded as valid.
+
+For the six frozen queries this is 15 unique texts (6 query texts and 9 document
+texts) in 1 provider call, reused across all 192 observations. Embedding inside
+each cell would instead issue one call per semantic or hybrid cell.
+
+## Embedding and latency accounting
+
+Embedding accounting is a property of the run, not of an observation, and is
+reported exactly once in the `embedding` block of `retrieval_summary.json`:
+`embedding_model`, `vector_dimension`, `unique_query_texts`,
+`unique_document_texts`, `unique_texts_total`, `embedding_api_calls`,
+`embedding_input_tokens`, and `embedding_precompute_latency_ms`. Optional
+`CostRates` price that single token count once.
+
+Per-observation `retrieval_latency_ms` measures ranking, scoring, and top-k
+selection against already-available vectors. It excludes embedding generation,
+so the one-time precompute cost is never attributed to each observation. Each
+observation also records `embedding_source`: `precomputed` for semantic and
+hybrid, `not_used` for lexical-only and no-retrieval.
+
+## Live embedding opt-in
+
+Live embeddings are opt-in and off by default:
+
+```powershell
+$env:PYTHONPATH = "src"
+python scripts/run_int2_retrieval_experiments.py --live-embeddings
+```
+
+With `--live-embeddings` the runner loads a local `.env` without overriding
+existing environment variables, requires `OPENAI_API_KEY`, resolves the model
+from `MANDATEGUARD_EMBEDDING_MODEL` (default `text-embedding-3-small`), and
+constructs the existing `OpenAIEmbeddingProvider`. There is no second OpenAI
+embedding implementation.
+
+The provider is resolved before any fixture is loaded, so a live run without
+credentials fails as a configuration error before any observation is produced.
+Live mode never falls back to the offline provider. The runner reports the
+resolved provider class and model ID, and never prints a key. Only embeddings
+are live: the Stage-A sweep makes no buyer, semantic-verifier, or Razorpay call.
+
+No live Stage-A run has been performed or interpreted. The infrastructure
+existing is not a result.
 
 ## Separate relevance annotations
 
@@ -148,5 +210,5 @@ Generated files live under `artifacts/engineering/int2/`, never under
 - `visualization_data.json`
 
 Latency values are measurements of the local run and are not deterministic
-fixtures. Rankings, fake embeddings, matrix membership, metrics, and raw token
-counts are reproducible for identical inputs.
+fixtures. Rankings, offline embeddings, matrix membership, metrics, and raw
+token counts are reproducible for identical inputs.

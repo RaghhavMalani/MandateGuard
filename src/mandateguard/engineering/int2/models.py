@@ -30,6 +30,17 @@ class RetrievalStrategy(str, Enum):
     HYBRID = "hybrid"
 
 
+class EmbeddingSource(str, Enum):
+    """Where an observation's semantic vectors came from.
+
+    Stage A embeds every unique text once before the configuration matrix is
+    evaluated, so no observation ever generates an embedding of its own.
+    """
+
+    NOT_USED = "not_used"
+    PRECOMPUTED = "precomputed"
+
+
 def _identifier(value: object, name: str) -> str:
     if not isinstance(value, str) or not _IDENTIFIER_RE.fullmatch(value):
         raise Int2ExperimentError(f"{name} must be a bounded identifier")
@@ -235,12 +246,17 @@ class RetrievalMetrics:
 
 @dataclass(frozen=True, slots=True)
 class ExperimentRetrievalResult:
+    """One configuration cell.
+
+    `retrieval_latency_ms` times ranking, scoring, and top-k selection only.
+    Embedding generation happens once per experiment run and is reported at
+    experiment level on the `EmbeddingSnapshot`, never per observation.
+    """
+
     configuration: RetrievalConfiguration
     ranked_documents: tuple[RankedDocument, ...]
     retrieval_latency_ms: float
-    embedding_latency_ms: float
-    embedding_calls: int
-    embedding_input_tokens: int | None
+    embedding_source: EmbeddingSource
 
     def __post_init__(self) -> None:
         if not isinstance(self.configuration, RetrievalConfiguration):
@@ -250,12 +266,20 @@ class ExperimentRetrievalResult:
         ):
             raise Int2ExperimentError("ranked_documents is invalid")
         _nonnegative_number(self.retrieval_latency_ms, "retrieval_latency_ms")
-        _nonnegative_number(self.embedding_latency_ms, "embedding_latency_ms")
-        if self.embedding_calls not in {0, 1}:
-            raise Int2ExperimentError("embedding_calls must be zero or one")
-        _nonnegative_int_or_none(
-            self.embedding_input_tokens, "embedding_input_tokens"
+        if not isinstance(self.embedding_source, EmbeddingSource):
+            raise Int2ExperimentError("embedding_source must be EmbeddingSource")
+        semantic = self.configuration.strategy in {
+            RetrievalStrategy.SEMANTIC_ONLY,
+            RetrievalStrategy.HYBRID,
+        }
+        expected = (
+            EmbeddingSource.PRECOMPUTED if semantic else EmbeddingSource.NOT_USED
         )
+        if self.embedding_source is not expected:
+            raise Int2ExperimentError(
+                f"{self.configuration.strategy.value} requires "
+                f"embedding_source {expected.value}"
+            )
 
     @property
     def retrieved_evidence_ids(self) -> tuple[str, ...]:

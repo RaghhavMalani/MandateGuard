@@ -11,4 +11,6 @@ requires-python = ">=3.12"
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
-addopts = "-ra"
+# The sandboxed Windows temp root can deny the default pytest basetemp,
+# so keep scratch directories inside the repo-local ignored cache.
+addopts = "-ra --basetemp=.pytest_cache/int2-stage-a-basetemp"

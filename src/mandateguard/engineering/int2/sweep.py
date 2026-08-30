@@ -3,7 +3,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from time import perf_counter_ns
+from typing import Callable
 
+from mandateguard.engineering.int2.embeddings import (
+    EmbeddingSnapshot,
+    precompute_embeddings,
+)
 from mandateguard.engineering.int2.models import (
     ExperimentQuery,
     RelevanceManifest,
@@ -15,6 +21,7 @@ from mandateguard.engineering.int2.retrieval import (
     ExperimentRetriever,
     compute_retrieval_metrics,
 )
+from mandateguard.intelligence.retrieval.embeddings import EmbeddingProvider
 
 
 @dataclass(frozen=True, slots=True)
@@ -62,3 +69,32 @@ class RetrievalSweepHarness:
                     )
                 )
         return tuple(observations)
+
+
+@dataclass(frozen=True, slots=True)
+class StageASweepResult:
+    """Observations plus the single embedding generation that fed them."""
+
+    observations: tuple[RetrievalObservation, ...]
+    embedding_snapshot: EmbeddingSnapshot
+
+
+def run_stage_a_sweep(
+    queries: tuple[ExperimentQuery, ...],
+    relevance_manifest: RelevanceManifest,
+    provider: EmbeddingProvider,
+    *,
+    configurations: tuple[RetrievalConfiguration, ...] | None = None,
+    clock_ns: Callable[[], int] = perf_counter_ns,
+) -> StageASweepResult:
+    """Embed every unique text once, then evaluate the configuration matrix.
+
+    Both the offline and live modes take this path, so the two runs differ
+    only by which provider produced the snapshot.
+    """
+
+    snapshot = precompute_embeddings(queries, provider, clock_ns=clock_ns)
+    observations = RetrievalSweepHarness(
+        ExperimentRetriever(snapshot, clock_ns=clock_ns)
+    ).run(queries, relevance_manifest, configurations=configurations)
+    return StageASweepResult(observations=observations, embedding_snapshot=snapshot)

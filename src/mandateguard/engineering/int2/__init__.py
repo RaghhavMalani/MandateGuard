@@ -4,6 +4,7 @@ from mandateguard.engineering.int2.models import (
     CostEstimate,
     CostRates,
     DownstreamSelection,
+    EmbeddingSource,
     ExperimentQuery,
     ExperimentRetrievalResult,
     Int2ExperimentError,
@@ -20,6 +21,14 @@ from mandateguard.engineering.int2.models import (
     estimate_api_cost,
     retrieval_matrix,
 )
+from mandateguard.engineering.int2.embeddings import (
+    EmbeddingSnapshot,
+    MAX_PROVIDER_CALLS,
+    UniqueEmbeddingInputs,
+    precompute_embeddings,
+    text_key,
+    unique_embedding_inputs,
+)
 from mandateguard.engineering.int2.retrieval import (
     ExperimentRetriever,
     compute_retrieval_metrics,
@@ -31,7 +40,11 @@ from mandateguard.engineering.int2.fixtures import (
     load_query_corpus,
     load_relevance_manifest,
 )
-from mandateguard.engineering.int2.sweep import RetrievalSweepHarness
+from mandateguard.engineering.int2.sweep import (
+    RetrievalSweepHarness,
+    StageASweepResult,
+    run_stage_a_sweep,
+)
 from mandateguard.engineering.int2.downstream import (
     AuthorizationTransition,
     DownstreamAuthorizationCase,
@@ -45,6 +58,7 @@ from mandateguard.engineering.int2.cache import (
     CacheRunObservation,
 )
 from mandateguard.engineering.int2.artifacts import (
+    embedding_experiment_record,
     require_engineering_output,
     retrieval_observation_record,
     write_cache_experiment,
@@ -64,10 +78,13 @@ __all__ = [
     "DownstreamAuthorizationCase",
     "DownstreamAuthorizationObservation",
     "DownstreamSelection",
+    "EmbeddingSnapshot",
+    "EmbeddingSource",
     "ExperimentQuery",
     "ExperimentRetrievalResult",
     "ExperimentRetriever",
     "Int2ExperimentError",
+    "MAX_PROVIDER_CALLS",
     "RelevanceAnnotation",
     "RelevanceManifest",
     "RetrievalQueryCorpus",
@@ -80,16 +97,23 @@ __all__ = [
     "SUPPORTED_ALPHAS",
     "SUPPORTED_TOP_K",
     "SelectedRetrievalConfiguration",
+    "StageASweepResult",
     "TokenUsage",
+    "UniqueEmbeddingInputs",
     "compute_retrieval_metrics",
     "build_experiment_queries",
+    "embedding_experiment_record",
     "estimate_api_cost",
     "execute_selected_downstream",
     "load_query_corpus",
     "load_relevance_manifest",
+    "precompute_embeddings",
     "require_engineering_output",
     "retrieval_observation_record",
     "retrieval_matrix",
+    "run_stage_a_sweep",
+    "text_key",
+    "unique_embedding_inputs",
     "write_cache_experiment",
     "write_downstream_results",
     "write_downstream_selection",

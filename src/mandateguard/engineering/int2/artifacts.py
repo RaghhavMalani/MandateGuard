@@ -12,6 +12,7 @@ from statistics import fmean
 from typing import Iterable
 
 from mandateguard.engineering.int2.cache import CacheExperimentResult
+from mandateguard.engineering.int2.embeddings import EmbeddingSnapshot
 from mandateguard.engineering.int2.downstream import (
     DownstreamAuthorizationObservation,
 )
@@ -64,16 +65,14 @@ def _configuration_record(observation: RetrievalObservation) -> dict[str, object
 
 def retrieval_observation_record(
     observation: RetrievalObservation,
-    *,
-    cost_rates: CostRates | None = None,
 ) -> dict[str, object]:
-    """Serialize retrieval facts and scores without any authorization verdict."""
+    """Serialize retrieval facts and scores without any authorization verdict.
+
+    Embedding calls, tokens, and precompute latency belong to the experiment
+    run, not to an observation, so they are reported once in the summary.
+    """
 
     retrieval = observation.retrieval
-    cost = estimate_api_cost(
-        TokenUsage(embedding_tokens=retrieval.embedding_input_tokens),
-        cost_rates,
-    )
     return {
         "schema_version": "1.0",
         "experiment_stage": "retrieval_only",
@@ -100,22 +99,41 @@ def retrieval_observation_record(
         },
         "timings": {
             "retrieval_latency_ms": retrieval.retrieval_latency_ms,
-            "embedding_latency_ms": retrieval.embedding_latency_ms,
         },
-        "usage": {
-            "embedding_calls": retrieval.embedding_calls,
-            "embedding_tokens": retrieval.embedding_input_tokens,
-        },
-        "cost": {
-            "estimated_api_cost": cost.estimated_api_cost,
-            "priced_categories": list(cost.priced_categories),
-            "unpriced_categories": list(cost.unpriced_categories),
-        },
+        "embedding_source": retrieval.embedding_source.value,
+    }
+
+
+def embedding_experiment_record(
+    snapshot: EmbeddingSnapshot,
+    *,
+    cost_rates: CostRates | None = None,
+) -> dict[str, object]:
+    """Serialize the run-level embedding accounting exactly once."""
+
+    if not isinstance(snapshot, EmbeddingSnapshot):
+        raise TypeError("snapshot must be EmbeddingSnapshot")
+    cost = estimate_api_cost(
+        TokenUsage(embedding_tokens=snapshot.input_token_count), cost_rates
+    )
+    return {
+        "embedding_model": snapshot.model_id,
+        "vector_dimension": snapshot.vector_dimension,
+        "unique_document_texts": snapshot.unique_document_texts,
+        "unique_query_texts": snapshot.unique_query_texts,
+        "unique_texts_total": snapshot.unique_text_count,
+        "embedding_api_calls": snapshot.provider_call_count,
+        "embedding_input_tokens": snapshot.input_token_count,
+        "embedding_precompute_latency_ms": snapshot.precompute_latency_ms,
+        "estimated_api_cost": cost.estimated_api_cost,
+        "priced_categories": list(cost.priced_categories),
+        "unpriced_categories": list(cost.unpriced_categories),
     }
 
 
 def _summary(
     observations: tuple[RetrievalObservation, ...],
+    embedding_snapshot: EmbeddingSnapshot | None,
     cost_rates: CostRates | None,
 ) -> dict[str, object]:
     grouped: dict[str, list[RetrievalObservation]] = defaultdict(list)
@@ -132,16 +150,6 @@ def _summary(
             for item in values
             if item.metrics.reciprocal_rank is not None
         ]
-        estimates = [
-            estimate_api_cost(
-                TokenUsage(
-                    embedding_tokens=item.retrieval.embedding_input_tokens
-                ),
-                cost_rates,
-            ).estimated_api_cost
-            for item in values
-        ]
-        priced_estimates = [item for item in estimates if item is not None]
         by_configuration.append(
             {
                 "configuration_id": configuration_id,
@@ -165,18 +173,7 @@ def _summary(
                 "mean_retrieval_latency_ms": fmean(
                     item.retrieval.retrieval_latency_ms for item in values
                 ),
-                "mean_embedding_latency_ms": fmean(
-                    item.retrieval.embedding_latency_ms for item in values
-                ),
-                "embedding_calls": sum(
-                    item.retrieval.embedding_calls for item in values
-                ),
-                "embedding_tokens": sum(
-                    item.retrieval.embedding_input_tokens or 0 for item in values
-                ),
-                "estimated_api_cost": (
-                    sum(priced_estimates) if priced_estimates else None
-                ),
+                "embedding_source": values[0].retrieval.embedding_source.value,
             }
         )
     return {
@@ -196,6 +193,13 @@ def _summary(
             "top_k": list(SUPPORTED_TOP_K),
         },
         "by_configuration": by_configuration,
+        "embedding": (
+            None
+            if embedding_snapshot is None
+            else embedding_experiment_record(
+                embedding_snapshot, cost_rates=cost_rates
+            )
+        ),
     }
 
 
@@ -217,6 +221,7 @@ def write_retrieval_artifacts(
     output_directory: Path,
     *,
     repository_root: Path,
+    embedding_snapshot: EmbeddingSnapshot | None = None,
     cost_rates: CostRates | None = None,
 ) -> tuple[Path, ...]:
     if not isinstance(observations, tuple) or not observations:
@@ -230,9 +235,7 @@ def write_retrieval_artifacts(
         for observation in observations:
             stream.write(
                 json.dumps(
-                    retrieval_observation_record(
-                        observation, cost_rates=cost_rates
-                    ),
+                    retrieval_observation_record(observation),
                     ensure_ascii=False,
                     sort_keys=True,
                     separators=(",", ":"),
@@ -241,7 +244,9 @@ def write_retrieval_artifacts(
                 + "\n"
             )
     summary_path = output / "retrieval_summary.json"
-    _write_json(summary_path, _summary(observations, cost_rates))
+    _write_json(
+        summary_path, _summary(observations, embedding_snapshot, cost_rates)
+    )
 
     common_rows = [
         {

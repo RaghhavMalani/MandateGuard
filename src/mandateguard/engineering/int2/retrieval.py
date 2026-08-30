@@ -12,9 +12,10 @@ from mandateguard.intelligence.models import (
     RetrievalDocument,
     RetrievalScore,
 )
-from mandateguard.intelligence.retrieval.embeddings import EmbeddingProvider
 from mandateguard.intelligence.retrieval.lexical import lexical_scores
+from mandateguard.engineering.int2.embeddings import EmbeddingSnapshot
 from mandateguard.engineering.int2.models import (
+    EmbeddingSource,
     ExperimentQuery,
     ExperimentRetrievalResult,
     RelevanceAnnotation,
@@ -59,9 +60,14 @@ def _deduplicate_ranked_evidence(
 
 @dataclass(frozen=True, slots=True)
 class ExperimentRetriever:
-    """Four-condition retriever isolated from the INT-1 production defaults."""
+    """Four-condition retriever isolated from the INT-1 production defaults.
 
-    embedding_provider: EmbeddingProvider | None
+    The retriever never calls an embedding provider. Semantic and hybrid
+    configurations read vectors from an `EmbeddingSnapshot` produced once per
+    experiment run, so retrieval latency measures ranking work alone.
+    """
+
+    embedding_snapshot: EmbeddingSnapshot | None
     clock_ns: Callable[[], int] = perf_counter_ns
 
     def retrieve(
@@ -82,9 +88,7 @@ class ExperimentRetriever:
                 retrieval_latency_ms=_milliseconds(
                     retrieval_started, self.clock_ns()
                 ),
-                embedding_latency_ms=0.0,
-                embedding_calls=0,
-                embedding_input_tokens=None,
+                embedding_source=EmbeddingSource.NOT_USED,
             )
 
         documents = query.documents
@@ -97,34 +101,24 @@ class ExperimentRetriever:
             lexical = lexical_scores(query.query, documents)
 
         semantic = {item.document_id: 0.0 for item in documents}
-        embedding_latency_ms = 0.0
-        embedding_calls = 0
-        embedding_input_tokens: int | None = None
+        embedding_source = EmbeddingSource.NOT_USED
         if strategy in {
             RetrievalStrategy.SEMANTIC_ONLY,
             RetrievalStrategy.HYBRID,
         }:
-            if self.embedding_provider is None:
+            snapshot = self.embedding_snapshot
+            if snapshot is None:
                 raise ValueError(
-                    f"{strategy.value} requires an embedding provider"
+                    f"{strategy.value} requires a precomputed embedding snapshot"
                 )
-            embedding_started = self.clock_ns()
-            batch = self.embedding_provider.embed(
-                (query.query, *(item.text for item in documents))
-            )
-            embedding_latency_ms = _milliseconds(
-                embedding_started, self.clock_ns()
-            )
-            embedding_calls = 1
-            if len(batch.vectors) != len(documents) + 1:
-                raise ValueError("embedding provider returned invalid cardinality")
+            query_vector = snapshot.vector_for(query.query)
             semantic = {
-                document.document_id: _cosine(batch.vectors[0], vector)
-                for document, vector in zip(
-                    documents, batch.vectors[1:], strict=True
+                document.document_id: _cosine(
+                    query_vector, snapshot.vector_for(document.text)
                 )
+                for document in documents
             }
-            embedding_input_tokens = batch.input_tokens
+            embedding_source = EmbeddingSource.PRECOMPUTED
 
         ranked: list[RankedDocument] = []
         for document in documents:
@@ -184,9 +178,7 @@ class ExperimentRetriever:
             configuration=configuration,
             ranked_documents=tuple(ranked[: configuration.top_k]),
             retrieval_latency_ms=_milliseconds(retrieval_started, finished),
-            embedding_latency_ms=embedding_latency_ms,
-            embedding_calls=embedding_calls,
-            embedding_input_tokens=embedding_input_tokens,
+            embedding_source=embedding_source,
         )
 
 

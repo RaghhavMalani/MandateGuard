@@ -13,12 +13,14 @@ from mandateguard.engineering.int2.artifacts import (
     retrieval_observation_record,
     write_retrieval_artifacts,
 )
+from mandateguard.engineering.int2.embeddings import precompute_embeddings
 from mandateguard.engineering.int2.fixtures import (
     build_experiment_queries,
     load_query_corpus,
     load_relevance_manifest,
 )
 from mandateguard.engineering.int2.models import (
+    EmbeddingSource,
     ExperimentQuery,
     Int2ExperimentError,
     RelevanceAnnotation,
@@ -31,10 +33,14 @@ from mandateguard.engineering.int2.retrieval import (
     ExperimentRetriever,
     compute_retrieval_metrics,
 )
-from mandateguard.engineering.int2.sweep import RetrievalSweepHarness
+from mandateguard.engineering.int2.sweep import (
+    RetrievalSweepHarness,
+    run_stage_a_sweep,
+)
 from mandateguard.intelligence.models import RetrievalDocument, RetrievalSource
 from mandateguard.intelligence.retrieval.embeddings import (
     EmbeddingBatch,
+    HashingEmbeddingProvider,
     MappingEmbeddingProvider,
 )
 from mandateguard.intelligence.store import TrustedCommerceStore
@@ -90,6 +96,12 @@ class RecordingEmbeddingProvider:
         )
 
 
+def _snapshot(provider, query: ExperimentQuery | None = None):
+    """Precompute exactly as the Stage-A runner does, before any retrieval."""
+
+    return precompute_embeddings((query or _query(),), provider)
+
+
 def _annotation(
     *, relevant=("evidence.banana",), required=("evidence.banana",)
 ) -> RelevanceAnnotation:
@@ -138,41 +150,68 @@ def test_empty_relevant_set_is_vacuously_complete_and_has_no_mrr():
     assert metrics.rank_of_first_required is None
 
 
-def test_no_retrieval_returns_no_documents_or_embedding_calls():
-    provider = RecordingEmbeddingProvider()
-    result = ExperimentRetriever(provider).retrieve(
+def test_no_retrieval_does_not_depend_on_semantic_vectors():
+    result = ExperimentRetriever(None).retrieve(
         _query(),
         RetrievalConfiguration(
             strategy=RetrievalStrategy.NO_RETRIEVAL, top_k=5
         ),
     )
     assert result.ranked_documents == ()
-    assert result.embedding_calls == 0
-    assert provider.calls == []
+    assert result.embedding_source is EmbeddingSource.NOT_USED
 
 
-def test_lexical_only_does_not_call_embedding_backend():
-    provider = RecordingEmbeddingProvider()
-    result = ExperimentRetriever(provider).retrieve(
+def test_lexical_only_does_not_depend_on_semantic_vectors():
+    result = ExperimentRetriever(None).retrieve(
         _query(),
         RetrievalConfiguration(
             strategy=RetrievalStrategy.LEXICAL_ONLY, top_k=2
         ),
     )
     assert result.ranked_documents[0].document.evidence_id == "evidence.apple"
-    assert result.embedding_calls == 0
-    assert provider.calls == []
+    assert result.embedding_source is EmbeddingSource.NOT_USED
+    assert all(item.score.semantic_score == 0.0 for item in result.ranked_documents)
+
+
+def test_semantic_and_hybrid_read_the_precomputed_snapshot():
+    provider = RecordingEmbeddingProvider()
+    snapshot = _snapshot(provider)
+    retriever = ExperimentRetriever(snapshot)
+    assert len(provider.calls) == 1
+
+    for configuration in (
+        RetrievalConfiguration(
+            strategy=RetrievalStrategy.SEMANTIC_ONLY, top_k=2
+        ),
+        RetrievalConfiguration(
+            strategy=RetrievalStrategy.HYBRID, alpha=0.5, top_k=2
+        ),
+    ):
+        result = retriever.retrieve(_query(), configuration)
+        assert result.embedding_source is EmbeddingSource.PRECOMPUTED
+    # Retrieval never adds a provider call on top of the one precompute.
+    assert len(provider.calls) == 1
+
+
+def test_semantic_retrieval_without_a_snapshot_is_refused():
+    with pytest.raises(ValueError, match="precomputed embedding snapshot"):
+        ExperimentRetriever(None).retrieve(
+            _query(),
+            RetrievalConfiguration(
+                strategy=RetrievalStrategy.SEMANTIC_ONLY, top_k=2
+            ),
+        )
 
 
 def test_semantic_only_ignores_lexical_scoring(monkeypatch):
-    provider = RecordingEmbeddingProvider()
+    snapshot = _snapshot(RecordingEmbeddingProvider())
     monkeypatch.setattr(
         "mandateguard.engineering.int2.retrieval.lexical_scores",
         lambda *_args: (_ for _ in ()).throw(
             AssertionError("lexical scoring must not run")
         ),
     )
-    result = ExperimentRetriever(provider).retrieve(
+    result = ExperimentRetriever(snapshot).retrieve(
         _query(),
         RetrievalConfiguration(
             strategy=RetrievalStrategy.SEMANTIC_ONLY, top_k=2
@@ -180,12 +219,11 @@ def test_semantic_only_ignores_lexical_scoring(monkeypatch):
     )
     assert result.ranked_documents[0].document.evidence_id == "evidence.banana"
     assert all(item.score.lexical_score == 0.0 for item in result.ranked_documents)
-    assert result.embedding_calls == 1
+    assert result.embedding_source is EmbeddingSource.PRECOMPUTED
 
 
 def test_hybrid_alpha_boundaries_equal_pure_rankings():
-    provider = RecordingEmbeddingProvider()
-    retriever = ExperimentRetriever(provider)
+    retriever = ExperimentRetriever(_snapshot(RecordingEmbeddingProvider()))
     semantic = retriever.retrieve(
         _query(),
         RetrievalConfiguration(
@@ -310,9 +348,10 @@ def test_relevance_annotations_never_enter_embedding_inputs():
             ),
         ),
     )
-    RetrievalSweepHarness(ExperimentRetriever(provider)).run(
+    run_stage_a_sweep(
         (_query(),),
         relevance,
+        provider,
         configurations=(
             RetrievalConfiguration(
                 strategy=RetrievalStrategy.SEMANTIC_ONLY, top_k=1
@@ -324,9 +363,7 @@ def test_relevance_annotations_never_enter_embedding_inputs():
 
 
 def test_retrieval_records_never_contain_authorization_verdicts():
-    observation = RetrievalSweepHarness(
-        ExperimentRetriever(RecordingEmbeddingProvider())
-    ).run(
+    observation = RetrievalSweepHarness(ExperimentRetriever(None)).run(
         (_query(),),
         RelevanceManifest(
             schema_version="1.0",
@@ -353,32 +390,79 @@ def test_full_fixture_sweep_writes_192_non_benchmark_records(tmp_path):
         catalog_path=CATALOG_FIXTURES / "merchant_catalog.json",
         merchant_terms_path=CATALOG_FIXTURES / "merchant_terms.json",
     )
-    observations = RetrievalSweepHarness(
-        ExperimentRetriever(
-            MappingEmbeddingProvider(
-                {
-                    text: (1.0, float(index % 2))
-                    for query in build_experiment_queries(corpus, store)
-                    for index, text in enumerate(
-                        (query.query, *(item.text for item in query.documents))
-                    )
-                }
-            )
-        )
-    ).run(build_experiment_queries(corpus, store), relevance)
+    queries = build_experiment_queries(corpus, store)
+    result = run_stage_a_sweep(
+        queries,
+        relevance,
+        MappingEmbeddingProvider(
+            {
+                text: (1.0, float(index % 2))
+                for query in queries
+                for index, text in enumerate(
+                    (query.query, *(item.text for item in query.documents))
+                )
+            }
+        ),
+    )
+    observations = result.observations
     paths = write_retrieval_artifacts(
         observations,
         tmp_path / "artifacts" / "engineering" / "int2",
         repository_root=tmp_path,
+        embedding_snapshot=result.embedding_snapshot,
     )
+    assert len(retrieval_matrix()) == 32
+    assert len(queries) == 6
     assert len(observations) == 6 * 32 == 192
     assert len((paths[0]).read_text(encoding="utf-8").splitlines()) == 192
+    summary = json.loads(paths[1].read_text(encoding="utf-8"))
+    assert summary["observation_count"] == 192
+    # Embedding accounting is reported once, not multiplied across the matrix.
+    assert summary["embedding"]["embedding_api_calls"] == 1
+    assert summary["embedding"]["unique_texts_total"] == 15
+    assert summary["embedding"]["unique_query_texts"] == 6
+    assert summary["embedding"]["unique_document_texts"] == 9
     with pytest.raises(ValueError, match="benchmark"):
         write_retrieval_artifacts(
             observations,
             tmp_path / "benchmark" / "int2",
             repository_root=tmp_path,
         )
+
+
+def test_precomputed_snapshot_reproduces_direct_offline_rankings():
+    """Offline behavior is unchanged by moving embedding out of the cell."""
+
+    corpus = load_query_corpus(INT2_FIXTURES / "retrieval_queries.json")
+    relevance = load_relevance_manifest(INT2_FIXTURES / "relevance_manifest.json")
+    store = TrustedCommerceStore.from_files(
+        catalog_path=CATALOG_FIXTURES / "merchant_catalog.json",
+        merchant_terms_path=CATALOG_FIXTURES / "merchant_terms.json",
+    )
+    queries = build_experiment_queries(corpus, store)
+
+    first = run_stage_a_sweep(queries, relevance, HashingEmbeddingProvider())
+    second = run_stage_a_sweep(queries, relevance, HashingEmbeddingProvider())
+
+    def ranking(result):
+        return [
+            (
+                item.query_id,
+                item.retrieval.configuration.configuration_id,
+                item.retrieval.retrieved_evidence_ids,
+                item.metrics.recall_at_k,
+                item.metrics.precision_at_k,
+                item.metrics.reciprocal_rank,
+                item.metrics.all_required_retrieved,
+                item.metrics.rank_of_first_required,
+            )
+            for item in result.observations
+        ]
+
+    assert ranking(first) == ranking(second)
+    assert first.embedding_snapshot.vectors_by_text_hash == (
+        second.embedding_snapshot.vectors_by_text_hash
+    )
 
 
 def test_default_cli_makes_zero_live_or_network_calls(tmp_path):
