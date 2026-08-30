@@ -1,0 +1,90 @@
+{
+  "run_id": "int1-razorpay-exec-20260830T070624Z-ae6bd048",
+  "diagnostic_label": "RAZORPAY TEST MODE EXECUTION DIAGNOSTIC",
+  "status": "STOPPED_PRE_EXECUTION",
+  "stop_reason": "Razorpay Test Mode credentials and the execution HMAC key were not configured; the required execution boundary could not be established.",
+  "branch": "feat/agentic-commerce-intelligence",
+  "execution_sha": "f684b15eedfa422b6f43fd8e1ab071c32ce07644",
+  "started_at": "2026-08-30T07:06:24.732763Z",
+  "ended_at": "2026-08-30T07:06:51.906643Z",
+  "exact_intent": "Buy the StudyGlow Desk Lamp under INR 2000 for individual study; avoid subscriptions.",
+  "requested_execution": true,
+  "top_level_checkout_attempts": 0,
+  "models": {
+    "buyer": "gpt-5.6-terra",
+    "embedding": "text-embedding-3-small",
+    "semantic": "gpt-5.6-terra"
+  },
+  "unchanged_configuration": {
+    "alpha": true,
+    "top_k": true,
+    "tool_budget": true,
+    "prompts": true,
+    "catalog": true,
+    "merchant_evidence": true,
+    "mandate": true
+  },
+  "preflight": {
+    "branch_match": true,
+    "head_match": true,
+    "worktree_clean": true,
+    "python": "3.12.0",
+    "full_suite": "452 passed",
+    "openai_api_key": "SET",
+    "razorpay_key_id": "UNSET_OR_NOT_TEST",
+    "razorpay_key_secret": "UNSET",
+    "execution_hmac_key": "UNSET_OR_TOO_SHORT",
+    "test_mode_certain": false
+  },
+  "fresh_semantic_cache": {
+    "created": false,
+    "reason": "Pre-execution credential gate failed before live checkout setup."
+  },
+  "ai": {
+    "buyer_proposal_typed_and_valid": null,
+    "buyer_tool_rounds": 0,
+    "buyer_tool_sequence": [],
+    "selected_merchant": null,
+    "selected_sku": null,
+    "retrieved_trusted_evidence_ids": [],
+    "trusted_evidence_count": 0,
+    "semantic_verdict": "NOT_RUN",
+    "final_authorization": "NOT_RUN",
+    "cache_status": "NOT_CREATED"
+  },
+  "boundary": {
+    "signed_capability_exists": false,
+    "capability_valid": null,
+    "capability_unexpired": null,
+    "capability_single_use": null,
+    "transaction_hash_matched": null,
+    "request_hash_matched": null,
+    "mandate_hash": null,
+    "transaction_hash": null,
+    "request_hash": null,
+    "capability_bound_transaction_hash": null,
+    "capability_bound_request_hash": null,
+    "signature_material_persisted": false
+  },
+  "razorpay_test_mode": {
+    "configured": false,
+    "provider": "Razorpay Test Mode",
+    "request_attempted": false,
+    "execution_calls": 0,
+    "order_created": false,
+    "order_id": null,
+    "amount": null,
+    "currency": null,
+    "receipt": null,
+    "status": null
+  },
+  "integrity": {
+    "retries": 0,
+    "tuning_changes": 0,
+    "secrets_persisted": 0,
+    "benchmark_changed": false,
+    "source_changed": false,
+    "external_openai_calls": 0,
+    "external_razorpay_calls": 0
+  }
+}
