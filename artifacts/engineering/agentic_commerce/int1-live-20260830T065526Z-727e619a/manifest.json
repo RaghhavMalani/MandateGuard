@@ -1,0 +1,55 @@
+{
+  "branch": "feat/agentic-commerce-intelligence",
+  "claims_excluded": [
+    "benchmark accuracy",
+    "precision",
+    "recall",
+    "generalization",
+    "production latency",
+    "production cost"
+  ],
+  "configuration": {
+    "alpha": 0.4,
+    "execute": false,
+    "max_tool_rounds": 8,
+    "sdk_max_retries": 0,
+    "top_k": 5
+  },
+  "diagnostic_label": "NON-BENCHMARK LIVE ENGINEERING DIAGNOSTIC",
+  "execution_sha": "4fcc0fefb20892d0619101c5a3086c1ea808a5b3",
+  "models": {
+    "buyer": "gpt-5.6-terra",
+    "buyer_source": "MANDATEGUARD_SEMANTIC_MODEL fallback",
+    "embedding": "text-embedding-3-small",
+    "semantic": "gpt-5.6-terra"
+  },
+  "ordered_scenarios": [
+    {
+      "expected_final_action": "ALLOW",
+      "intent": "Buy the StudyGlow Desk Lamp under INR 2000 for individual study; avoid subscriptions.",
+      "key": "allow",
+      "scenario": "StudyGlow Desk Lamp"
+    },
+    {
+      "expected_final_action": "BLOCK",
+      "intent": "Buy the Market Edge Decision Course under INR 3000 for professional development; avoid gambling.",
+      "key": "block",
+      "scenario": "Market Edge Decision Course"
+    },
+    {
+      "expected_final_action": "REVIEW",
+      "intent": "Buy the Flexi Desk Companion under INR 1500 for individual study; avoid subscriptions.",
+      "key": "review",
+      "scenario": "Flexi Desk Companion"
+    }
+  ],
+  "preflight": {
+    "dotenv_source": "MandateGuard-worktrees/semantic-mvp/.env",
+    "full_suite": "452 passed",
+    "openai_api_key": "SET",
+    "python": "3.12.0",
+    "worktree_clean_before_temporary_runner": true
+  },
+  "run_id": "int1-live-20260830T065526Z-727e619a",
+  "started_at": "2026-08-30T06:55:26.742Z"
+}

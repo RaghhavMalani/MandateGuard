@@ -1,0 +1,444 @@
+{
+  "api_call_delta": {
+    "buyer": 3,
+    "embedding": 1,
+    "semantic": 1
+  },
+  "authorization": {
+    "cache_lookup_performed": true,
+    "cache_status": "MISS",
+    "cache_write_performed": true,
+    "decision_reason_code": null,
+    "deterministic_tier_ab_action": "ALLOW",
+    "evidence_sufficiency": "SUFFICIENT",
+    "execution_authorization_created": false,
+    "execution_status": "not_requested",
+    "final_action": "REVIEW",
+    "normalized_short_reasons": [
+      "Evidence does not document whether the product is a subscription.",
+      "Evidence does not document longer-term or recurring billing obligations.",
+      "Evidence does not establish suitability for individual study."
+    ],
+    "semantic_detector_version": "1.0",
+    "semantic_input_sha256": "bc1f97ef754c0adc45aa762b4b0fc9ae44ccb633defe380b113a5b2f30fefc09",
+    "semantic_model": "gpt-5.6-terra",
+    "semantic_prompt_version": "1.0",
+    "semantic_status": "EVALUATED",
+    "semantic_verdict": "ABSTAIN",
+    "tier_a_statuses": [
+      {
+        "family": "A1",
+        "reason": null,
+        "status": "PASS"
+      },
+      {
+        "family": "A2",
+        "reason": null,
+        "status": "PASS"
+      },
+      {
+        "family": "A3",
+        "reason": null,
+        "status": "PASS"
+      },
+      {
+        "family": "A4",
+        "reason": null,
+        "status": "PASS"
+      },
+      {
+        "family": "A5",
+        "reason": null,
+        "status": "PASS"
+      },
+      {
+        "family": "A6",
+        "reason": null,
+        "status": "PASS"
+      },
+      {
+        "family": "A7",
+        "reason": null,
+        "status": "PASS"
+      },
+      {
+        "family": "A8",
+        "reason": null,
+        "status": "PASS"
+      }
+    ],
+    "tier_b_findings": []
+  },
+  "buyer": {
+    "api_call_count": 3,
+    "exceeded_tool_budget": false,
+    "malformed_tool_call": false,
+    "max_tool_rounds": 8,
+    "ordered_tool_calls": [
+      {
+        "argument_decode_error": null,
+        "name": "search_catalog",
+        "normalized_safe_arguments": {
+          "filters": {
+            "currency": "INR",
+            "limit": 10,
+            "max_unit_price_minor": 150000,
+            "merchant_ids": null,
+            "recurring": false,
+            "sku_ids": null
+          },
+          "query": "Flexi Desk Companion"
+        },
+        "order": 1,
+        "result": {
+          "count": 4,
+          "identifiers": [
+            "merchant-nova/flexi-desk-companion",
+            "merchant-scholarly/studyglow-desk-lamp",
+            "merchant-academy/tax-planning-guide",
+            "merchant-scholarly/field-notebook-set"
+          ],
+          "kind": "products"
+        },
+        "round": 1,
+        "strict_argument_compatible": true,
+        "typed_error": null,
+        "unexpected_extra_args": false,
+        "unknown_tool": false
+      },
+      {
+        "argument_decode_error": null,
+        "name": "get_merchant_evidence",
+        "normalized_safe_arguments": {
+          "merchant_id": "merchant-nova",
+          "sku": "flexi-desk-companion"
+        },
+        "order": 2,
+        "result": {
+          "count": 2,
+          "identifiers": [
+            "nova-terms-v1",
+            "flexi-evidence-v1"
+          ],
+          "kind": "evidence"
+        },
+        "round": 2,
+        "strict_argument_compatible": true,
+        "typed_error": null,
+        "unexpected_extra_args": false,
+        "unknown_tool": false
+      },
+      {
+        "argument_decode_error": null,
+        "name": "propose_purchase",
+        "normalized_safe_arguments": {
+          "interpreted_intent": {
+            "currency": "INR",
+            "exclusions": [
+              "subscriptions",
+              "recurring billing"
+            ],
+            "max_total_minor": 150000,
+            "merchant_allowlist": null,
+            "purpose": "individual study",
+            "quantity": 1,
+            "recurring_allowed": false,
+            "sku_allowlist": null
+          },
+          "proposal": {
+            "currency": "INR",
+            "declared_total_minor": 99900,
+            "merchant_id": "merchant-nova",
+            "quantity": 1,
+            "reason": "Flexi Desk Companion is listed at INR 999.00, within the INR 1,500.00 cap, and the catalog marks it as non-recurring. Its configurable digital modules appear suitable for a personal desk/study setup; registered evidence does not document longer-term billing obligations or intended-use classification.",
+            "selected_evidence_ids": [
+              "nova-terms-v1",
+              "flexi-evidence-v1"
+            ],
+            "sku": "flexi-desk-companion",
+            "user_intent_summary": "One Flexi Desk Companion for individual study, under INR 1,500, excluding subscriptions."
+          }
+        },
+        "order": 3,
+        "result": {
+          "count": 1,
+          "identifiers": [
+            "merchant-nova/flexi-desk-companion"
+          ],
+          "kind": "proposal"
+        },
+        "round": 3,
+        "strict_argument_compatible": true,
+        "typed_error": null,
+        "unexpected_extra_args": false,
+        "unknown_tool": false
+      }
+    ],
+    "terminated_normally": true,
+    "tool_boundary_violation_count": 0,
+    "tool_round_count": 3,
+    "unexpected_extra_args": false,
+    "unknown_tool": false
+  },
+  "cache_call_delta": {
+    "lookup": 1,
+    "write": 1
+  },
+  "elapsed_wall_ms": 8438.173100003041,
+  "ended_at": "2026-08-30T06:56:10.459Z",
+  "exact_user_intent": "Buy the Flexi Desk Companion under INR 1500 for individual study; avoid subscriptions.",
+  "expectation_match": true,
+  "expected_final_action": "REVIEW",
+  "full_checkout_trace": {
+    "authorization": {
+      "evidence_sufficiency": "SUFFICIENT",
+      "reason_code": null,
+      "semantic_reason": [
+        "Evidence does not document whether the product is a subscription.",
+        "Evidence does not document longer-term or recurring billing obligations.",
+        "Evidence does not establish suitability for individual study."
+      ],
+      "semantic_status": "EVALUATED",
+      "semantic_verdict": "ABSTAIN",
+      "tier_a_statuses": [
+        {
+          "family": "A1",
+          "reason": null,
+          "status": "PASS"
+        },
+        {
+          "family": "A2",
+          "reason": null,
+          "status": "PASS"
+        },
+        {
+          "family": "A3",
+          "reason": null,
+          "status": "PASS"
+        },
+        {
+          "family": "A4",
+          "reason": null,
+          "status": "PASS"
+        },
+        {
+          "family": "A5",
+          "reason": null,
+          "status": "PASS"
+        },
+        {
+          "family": "A6",
+          "reason": null,
+          "status": "PASS"
+        },
+        {
+          "family": "A7",
+          "reason": null,
+          "status": "PASS"
+        },
+        {
+          "family": "A8",
+          "reason": null,
+          "status": "PASS"
+        }
+      ],
+      "tier_b_findings": []
+    },
+    "buyer": {
+      "interpreted_intent": {
+        "currency": "INR",
+        "exclusions": [
+          "subscriptions",
+          "recurring billing"
+        ],
+        "max_total_minor": 150000,
+        "merchant_allowlist": null,
+        "purpose": "individual study",
+        "quantity": 1,
+        "recurring_allowed": false,
+        "sku_allowlist": null
+      },
+      "reason": "Flexi Desk Companion is listed at INR 999.00, within the INR 1,500.00 cap, and the catalog marks it as non-recurring. Its configurable digital modules appear suitable for a personal desk/study setup; registered evidence does not document longer-term billing obligations or intended-use classification.",
+      "selected_merchant": "merchant-nova",
+      "selected_sku": "flexi-desk-companion"
+    },
+    "cache": {
+      "failure_reason": null,
+      "integrity_failure": false,
+      "key_prefix": "bc1f97ef754c",
+      "lookup_performed": true,
+      "status": "MISS",
+      "write_performed": true
+    },
+    "decision": "REVIEW",
+    "execution": {
+      "detail": null,
+      "status": "not_requested"
+    },
+    "models": {
+      "buyer_model": "gpt-5.6-terra",
+      "embedding_model": "text-embedding-3-small",
+      "semantic_model": "gpt-5.6-terra"
+    },
+    "retrieval": {
+      "alpha": 0.4,
+      "evidence_ids": [
+        "nova-terms-v1",
+        "flexi-evidence-v1"
+      ],
+      "query": "{\"candidate\":{\"currency\":\"INR\",\"declared_total_minor\":99900,\"merchant_id\":\"merchant-nova\",\"quantity\":1,\"requested_evidence_ids\":[\"nova-terms-v1\",\"flexi-evidence-v1\"],\"sku\":\"flexi-desk-companion\"},\"mandate\":{\"currency\":\"INR\",\"hard\":{\"max_quantity\":1,\"max_total_minor\":150000,\"merchant_allowlist\":null,\"recurring_allowed\":false,\"sku_allowlist\":null},\"semantic\":[{\"constraint_id\":\"purpose.1\",\"kind\":\"purpose\",\"text\":\"Declared purchase purpose: individual study. Trusted evidence must establish suitability.\"},{\"constraint_id\":\"exclusion.1\",\"kind\":\"exclusion\",\"text\":\"Excluded product characteristic: subscriptions.\"},{\"constraint_id\":\"exclusion.2\",\"kind\":\"exclusion\",\"text\":\"Excluded product characteristic: recurring billing.\"}]},\"trusted_product_context\":{\"currency\":\"INR\",\"description\":\"A digital desk companion with configurable modules and an introductory price.\",\"effective_unit_price_minor\":99900,\"evidence_ids\":[\"nova-terms-v1\",\"flexi-evidence-v1\"],\"merchant_id\":\"merchant-nova\",\"name\":\"Flexi Desk Companion\",\"recurring\":false,\"sku\":\"flexi-desk-companion\",\"tags\":[\"flexi\",\"desk companion\",\"digital\",\"workspace\"]},\"user_intent\":\"Buy the Flexi Desk Companion under INR 1500 for individual study; avoid subscriptions.\"}",
+      "query_sha256": "2f1b803041ab3e104680cf4b2371d949a27e17ac5ad7c202185f7dbb539041fa",
+      "scores": [
+        {
+          "document_id": "mandate.hard",
+          "hybrid_score": 0.6969594641346688,
+          "lexical_score": 1.0,
+          "semantic_score": 0.49493244022444804,
+          "source_type": "mandate_clause"
+        },
+        {
+          "document_id": "mandate.purpose.1",
+          "hybrid_score": 0.6473431855761507,
+          "lexical_score": 0.7681581317063357,
+          "semantic_score": 0.5667998881560273,
+          "source_type": "mandate_clause"
+        },
+        {
+          "document_id": "evidence.nova-terms-v1",
+          "hybrid_score": 0.4782195407882345,
+          "lexical_score": 0.6337871828089937,
+          "semantic_score": 0.3745077794410616,
+          "source_type": "merchant_evidence"
+        },
+        {
+          "document_id": "evidence.flexi-evidence-v1",
+          "hybrid_score": 0.39186631416667883,
+          "lexical_score": 0.3821258731832035,
+          "semantic_score": 0.39835994148899573,
+          "source_type": "merchant_evidence"
+        },
+        {
+          "document_id": "mandate.exclusion.1",
+          "hybrid_score": 0.3646749004874521,
+          "lexical_score": 0.29520657762997027,
+          "semantic_score": 0.4109871157257733,
+          "source_type": "mandate_clause"
+        }
+      ],
+      "top_k": 5,
+      "trusted_evidence_selected_count": 2,
+      "trusted_evidence_selected_ids": [
+        "nova-terms-v1",
+        "flexi-evidence-v1"
+      ]
+    },
+    "timings": {
+      "authorization_latency_ms": 1807.3222999810241,
+      "buyer_latency_ms": 6294.326700037345,
+      "embedding_latency_ms": 330.54890000494197,
+      "retrieval_latency_ms": 335.6212999788113,
+      "semantic_latency_ms": 1789.834900002461,
+      "total_latency_ms": 8438.043800008018
+    },
+    "usage": {
+      "buyer_input_tokens": 2727,
+      "buyer_output_tokens": 359,
+      "embedding_input_tokens": 397,
+      "semantic_input_tokens": 575,
+      "semantic_output_tokens": 124
+    },
+    "user_intent": "Buy the Flexi Desk Companion under INR 1500 for individual study; avoid subscriptions."
+  },
+  "models": {
+    "buyer": "gpt-5.6-terra",
+    "embedding": "text-embedding-3-small",
+    "semantic": "gpt-5.6-terra"
+  },
+  "observability": {
+    "authorization_latency_ms": 1807.3222999810241,
+    "buyer_input_tokens": 2727,
+    "buyer_latency_ms": 6294.326700037345,
+    "buyer_output_tokens": 359,
+    "embedding_input_tokens": 397,
+    "embedding_latency_ms": 330.54890000494197,
+    "lexical_latency_ms": 0.554499973077327,
+    "retrieval_latency_ms": 335.6212999788113,
+    "semantic_input_tokens": 575,
+    "semantic_latency_ms": 1789.834900002461,
+    "semantic_output_tokens": 124,
+    "total_latency_ms": 8438.043800008018
+  },
+  "provider_typed_error": null,
+  "razorpay_execution_calls": 0,
+  "retries": 0,
+  "retrieval": {
+    "alpha": 0.4,
+    "embedding_latency_ms": 330.54890000494197,
+    "embedding_model": "text-embedding-3-small",
+    "lexical_latency_ms": 0.554499973077327,
+    "query": "{\"candidate\":{\"currency\":\"INR\",\"declared_total_minor\":99900,\"merchant_id\":\"merchant-nova\",\"quantity\":1,\"requested_evidence_ids\":[\"nova-terms-v1\",\"flexi-evidence-v1\"],\"sku\":\"flexi-desk-companion\"},\"mandate\":{\"currency\":\"INR\",\"hard\":{\"max_quantity\":1,\"max_total_minor\":150000,\"merchant_allowlist\":null,\"recurring_allowed\":false,\"sku_allowlist\":null},\"semantic\":[{\"constraint_id\":\"purpose.1\",\"kind\":\"purpose\",\"text\":\"Declared purchase purpose: individual study. Trusted evidence must establish suitability.\"},{\"constraint_id\":\"exclusion.1\",\"kind\":\"exclusion\",\"text\":\"Excluded product characteristic: subscriptions.\"},{\"constraint_id\":\"exclusion.2\",\"kind\":\"exclusion\",\"text\":\"Excluded product characteristic: recurring billing.\"}]},\"trusted_product_context\":{\"currency\":\"INR\",\"description\":\"A digital desk companion with configurable modules and an introductory price.\",\"effective_unit_price_minor\":99900,\"evidence_ids\":[\"nova-terms-v1\",\"flexi-evidence-v1\"],\"merchant_id\":\"merchant-nova\",\"name\":\"Flexi Desk Companion\",\"recurring\":false,\"sku\":\"flexi-desk-companion\",\"tags\":[\"flexi\",\"desk companion\",\"digital\",\"workspace\"]},\"user_intent\":\"Buy the Flexi Desk Companion under INR 1500 for individual study; avoid subscriptions.\"}",
+    "query_sha256": "2f1b803041ab3e104680cf4b2371d949a27e17ac5ad7c202185f7dbb539041fa",
+    "ranked_evidence": [
+      {
+        "document_id": "mandate.hard",
+        "hybrid_score": 0.6969594641346688,
+        "lexical_score": 1.0,
+        "semantic_score": 0.49493244022444804,
+        "source_type": "mandate_clause"
+      },
+      {
+        "document_id": "mandate.purpose.1",
+        "hybrid_score": 0.6473431855761507,
+        "lexical_score": 0.7681581317063357,
+        "semantic_score": 0.5667998881560273,
+        "source_type": "mandate_clause"
+      },
+      {
+        "document_id": "evidence.nova-terms-v1",
+        "hybrid_score": 0.4782195407882345,
+        "lexical_score": 0.6337871828089937,
+        "semantic_score": 0.3745077794410616,
+        "source_type": "merchant_evidence"
+      },
+      {
+        "document_id": "evidence.flexi-evidence-v1",
+        "hybrid_score": 0.39186631416667883,
+        "lexical_score": 0.3821258731832035,
+        "semantic_score": 0.39835994148899573,
+        "source_type": "merchant_evidence"
+      },
+      {
+        "document_id": "mandate.exclusion.1",
+        "hybrid_score": 0.3646749004874521,
+        "lexical_score": 0.29520657762997027,
+        "semantic_score": 0.4109871157257733,
+        "source_type": "mandate_clause"
+      }
+    ],
+    "top_k": 5,
+    "total_retrieval_latency_ms": 335.6212999788113,
+    "trusted_evidence_ids_resolved_into_authorization": [
+      "nova-terms-v1",
+      "flexi-evidence-v1"
+    ],
+    "trusted_evidence_selected_count": 2
+  },
+  "run_id": "int1-live-20260830T065526Z-727e619a",
+  "scenario": "Flexi Desk Companion",
+  "scenario_key": "review",
+  "selected_product": {
+    "currency": "INR",
+    "declared_total_minor": 99900,
+    "merchant_id": "merchant-nova",
+    "proposal_reason": "Flexi Desk Companion is listed at INR 999.00, within the INR 1,500.00 cap, and the catalog marks it as non-recurring. Its configurable digital modules appear suitable for a personal desk/study setup; registered evidence does not document longer-term billing obligations or intended-use classification.",
+    "quantity": 1,
+    "selected_evidence_ids": [
+      "nova-terms-v1",
+      "flexi-evidence-v1"
+    ],
+    "sku": "flexi-desk-companion"
+  },
+  "started_at": "2026-08-30T06:56:02.020Z",
+  "top_level_checkout_attempts": 1,
+  "typed_error": null
+}
