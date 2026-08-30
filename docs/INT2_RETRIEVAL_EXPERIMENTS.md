@@ -2,17 +2,20 @@
 
 ## Status and scope
 
-INT-2 is reproducible, non-benchmark engineering experimentation. Its query
+> **NON-BENCHMARK ENGINEERING EXPERIMENTATION.**
+
+INT-2 is reproducible engineering experimentation, not a benchmark. Its query
 corpus, scoring annotations, outputs, and lifecycle are separate from
 `benchmark/`. Retrieval records contain no MandateGuard verdict, expected
-action, benchmark label, or ground-truth field.
+action, benchmark label, or ground-truth field. INT-2 does not demonstrate
+generalization.
 
 The infrastructure does not alter the INT-1 authorization, semantic prompt,
 buyer prompt, model defaults, or catalog behavior. Stage B calls the existing
 `SemanticVerifier` and `authorize_transaction` controller. The cache harness
 uses the same interfaces and has no payment-execution or Razorpay dependency.
 
-## Hypotheses
+## Pre-run hypotheses
 
 H1: Hybrid retrieval improves relevant-evidence Recall@k over lexical-only.
 
@@ -23,9 +26,9 @@ H3: Content-addressed semantic caching substantially reduces repeat
 authorization latency without reusing results across changed authorization
 inputs.
 
-These are hypotheses, not findings. No hypothesis is supported merely because
-the harness or an engineering artifact exists. Interpretation requires a
-reviewed experiment run and must remain separate from benchmark claims.
+These were hypotheses, not findings or benchmark claims. The completed runs
+are interpreted below. In particular, the results do not support a causal
+claim that better retrieval caused better authorization.
 
 ## Stage A: retrieval-only sweep
 
@@ -55,11 +58,38 @@ reciprocal rank when applicable, whether all required evidence was retrieved,
 the first required-evidence rank, retrieval latency, and whether the
 observation used precomputed vectors.
 
-Duplicate retrieved evidence IDs are scored once at their first rank. If a
-query has no relevant evidence, recall and the all-required flag are vacuously
-1/true, precision is 0, and reciprocal rank/first-required rank are null.
-If fewer unique documents exist than k, precision uses the number actually
-returned.
+Let `D_k` be the first `k` unique retrieved evidence IDs, with duplicates
+scored once at their first rank. The per-query metrics are:
+
+```text
+Recall@k                = |D_k ∩ Relevant| / |Relevant|
+Precision@k             = |D_k ∩ Relevant| / |D_k|
+all_required_retrieved  = Required ⊆ D_k
+```
+
+Precision uses documents actually returned, not nominal `k`. If a query has no
+relevant evidence, recall and the all-required flag are vacuously 1/true,
+precision is 0, and reciprocal rank/first-required rank are null. Reported
+aggregate Recall@k and Precision@k values are macro-averages across the six
+queries. For this frozen corpus, `Relevant = Required`, and each query has
+exactly two annotated items.
+
+## Stage-A result
+
+On six synthetic engineering queries, semantic retrieval recovered both
+annotated required evidence items for every query by k=3, while lexical
+retrieval required k=5.
+
+The corresponding macro-average Precision@k values were 0.722222 for semantic
+at k=3 and 0.638889 for lexical at k=5. They are measured at different `k` and
+do not establish that semantic ranking is generally better. Retrieval quality
+varied substantially across conditions while downstream engineering outcomes
+remained stable on the six evidence-bearing cases.
+
+Stage-B condition C (`semantic_only`, k=3) and condition D (`hybrid`,
+alpha=0, k=3) were operationally identical, with identical semantic-input
+hashes for 6/6 cases. They are not independent evidence and must not be counted
+as separate support for a finding.
 
 ## One-time embedding precomputation
 
@@ -98,9 +128,9 @@ so the one-time precompute cost is never attributed to each observation. Each
 observation also records `embedding_source`: `precomputed` for semantic and
 hybrid, `not_used` for lexical-only and no-retrieval.
 
-## Live embedding opt-in
+## Live embedding execution
 
-Live embeddings are opt-in and off by default:
+Live embeddings remain opt-in and off by default:
 
 ```powershell
 $env:PYTHONPATH = "src"
@@ -119,8 +149,10 @@ Live mode never falls back to the offline provider. The runner reports the
 resolved provider class and model ID, and never prints a key. Only embeddings
 are live: the Stage-A sweep makes no buyer, semantic-verifier, or Razorpay call.
 
-No live Stage-A run has been performed or interpreted. The infrastructure
-existing is not a result.
+The frozen Stage-A live run used one batched embedding request for all 15
+unique texts, made no buyer, semantic-verifier, or Razorpay calls, and stopped
+after the retrieval sweep. No experiment was rerun for this documentation
+review.
 
 ## Separate relevance annotations
 
@@ -185,22 +217,63 @@ For `no_retrieval`, the experiment helper records `NOT_EVALUATED`, a null
 semantic verdict, `REVIEW`, and `NO_TRUSTED_EVIDENCE_RETRIEVED`; it makes zero
 semantic-provider calls and never fabricates trusted evidence.
 
+### Stage-B result and interpretation
+
+Complete absence of trusted evidence produced NOT_EVALUATED -> REVIEW.
+
+Among the evidence-bearing conditions, retrieval quality varied substantially
+while downstream engineering outcomes remained aligned with all six frozen
+expectations. Most notably:
+
+> Lexical k=1 retrieved only one of two annotated required evidence items per
+> query on average (Recall@k=0.5), yet downstream authorization outcomes
+> remained aligned with all six frozen engineering expectations.
+
+This motivates studying decision-sufficient evidence sets, but does not prove
+which evidence was actually necessary. It does not show that retrieval failure
+always degrades to `REVIEW`, that RAG improved authorization quality, or that
+any one retrieval strategy generally outperformed another.
+
+The Stage-B table contains 36 nominal observations: six zero-evidence control
+observations and 30 evidence-bearing observations. Those observations contain
+only 15 unique semantic inputs, each executed live once; exact-input reuse did
+not create independent model observations. Conditions C and D shared identical
+semantic-input hashes in all 6/6 cases and are operationally identical rather
+than independent evidence.
+
 ## Exact-input cache experiment
+
+Across three frozen engineering cases, exact-input cache hits eliminated
+repeat semantic API calls and 1,905 semantic tokens.
+
+Observed median total latency was approximately 1.9 s cold -> approximately
+3 ms warm. This is `n=3`, with one cold and one warm observation per case. The
+cold path includes a live API round-trip. These are engineering latency
+measurements, not production throughput.
 
 The cache harness compares a cold semantic MISS with an immediate exact-input
 HIT using a fresh or caller-supplied cache. It records semantic provider calls,
 semantic latency, authorization latency, total latency, raw token usage, cache
-status, semantic verdict, and final action. The default runner uses the
-existing deterministic offline semantic fake:
+status, semantic verdict, and final action. The repository's default runner
+uses the existing deterministic offline semantic fake:
 
 ```powershell
 $env:PYTHONPATH = "src"
 python scripts/run_int2_cache_experiment.py
 ```
 
-This runner is separate from Stage A and makes zero live calls. Mutation probes
-perform cache lookups only and require MISS for changes to evidence, mandate,
-transaction, model, and prompt. The harness cannot execute Razorpay.
+That default runner is separate from Stage A and makes zero live calls. The
+preserved Stage-C artifact records the separately authorized live cold calls
+and zero warm calls. Mutation probes perform cache lookups only and require
+MISS for changes to evidence, mandate, transaction, model, and prompt. The
+harness cannot execute Razorpay.
+
+Across 15 mutations spanning evidence, mandate, transaction, model and prompt,
+all 15 invalidated the cache. Stage C also tampered one cached `VIOLATION`
+toward `PASS`, and the integrity checker rejected it without a provider or
+Razorpay call. Prior INT-1 engineering tests exercised additional corruption
+variants; those tests are broader integrity evidence and are distinct from the
+single Stage-C tamper.
 
 ## Cost accounting
 
@@ -230,3 +303,23 @@ Generated files live under `artifacts/engineering/int2/`, never under
 Latency values are measurements of the local run and are not deterministic
 fixtures. Rankings, offline embeddings, matrix membership, metrics, and raw
 token counts are reproducible for identical inputs.
+
+## Limitations
+
+INT-2 has six synthetic semantic cases and a nine-document evidence corpus.
+The relevance and required-evidence annotations were manually authored. The
+Stage-B cases were frozen after Stage-A condition selection but before any
+Stage-B semantic execution. Stage B contains 15 unique semantic inputs, not 36
+independent model observations, and used one live semantic execution per unique
+input. Stage C has three cache cases.
+
+There is no held-out corpus, no repeated stochastic trials, and no
+distribution-shift or adversarial evaluation. These constraints preclude
+benchmark, generalization, and broad comparative-ranking claims.
+
+## What INT-2 taught us
+
+Annotated retrieval recall was not predictive of downstream decision changes
+on this small corpus. This negative result motivates studying evidence
+sufficiency and value-of-information rather than optimizing retrieval depth
+alone.
