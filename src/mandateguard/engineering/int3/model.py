@@ -1,13 +1,9 @@
-"""Interpretable L2-regularized logistic-regression sufficiency baseline.
+"""Preregistered StandardScaler + L2 logistic sufficiency baseline.
 
-Fitting delegates to scikit-learn's L2 ``LogisticRegression``.  Inference does
-not: a fitted model stores its intercept and one coefficient per frozen
-feature, and ``predict_proba`` evaluates the logistic link directly.  That
-keeps the deployed decision path auditable, keeps scikit-learn out of the
-prediction dependency chain, and lets the offline demo and the tests construct
-an explicit model from synthetic coefficients without any training data.
-
-No model is trained in INT-3A: live subset labels do not exist yet.
+The 14-dimensional runtime feature manifest and all pipeline hyperparameters
+are frozen before INT-3 subset labels exist. Fitting delegates to a
+scikit-learn Pipeline. A fitted immutable value stores the scaler statistics
+and standardized-space logistic coefficients so inference remains auditable.
 """
 
 from __future__ import annotations
@@ -16,20 +12,24 @@ from dataclasses import dataclass
 import math
 from typing import Sequence
 
-from mandateguard.engineering.int3.features import (
-    FEATURE_NAMES,
-    assert_no_target_leakage,
+from mandateguard.engineering.int3.features import assert_no_target_leakage
+from mandateguard.engineering.int3.model_manifest import (
+    MODEL_FEATURE_NAMES,
+    MODEL_PIPELINE_SPEC,
 )
 from mandateguard.engineering.int3.models import Int3ExperimentError, probability
 
 
 DEFAULT_L2_INVERSE_STRENGTH = 1.0
-DEFAULT_MAX_ITERATIONS = 1000
+DEFAULT_MAX_ITERATIONS = 2000
+DEFAULT_SOLVER = "lbfgs"
+DEFAULT_RANDOM_STATE = 0
+DEFAULT_TOLERANCE = 0.0001
 DEFAULT_SUFFICIENCY_THRESHOLD = 0.5
 
 
 class SufficiencyModelNotFittedError(Int3ExperimentError):
-    """predict/predict_proba was called before the model had coefficients."""
+    """predict/predict_proba was called before the pipeline was fitted."""
 
 
 class SufficiencyModelUnavailableError(Int3ExperimentError):
@@ -45,9 +45,11 @@ def _matrix(value: object, name: str) -> tuple[tuple[float, ...], ...]:
         raise SufficiencyTrainingDataError(f"{name} must be a non-empty sequence")
     rows: list[tuple[float, ...]] = []
     for row in value:
-        if not isinstance(row, (list, tuple)) or len(row) != len(FEATURE_NAMES):
+        if not isinstance(row, (list, tuple)) or len(row) != len(
+            MODEL_FEATURE_NAMES
+        ):
             raise SufficiencyTrainingDataError(
-                f"{name} rows must have exactly {len(FEATURE_NAMES)} features"
+                f"{name} rows must have exactly {len(MODEL_FEATURE_NAMES)} features"
             )
         parsed: list[float] = []
         for item in row:
@@ -82,72 +84,98 @@ def _targets(value: object, name: str, expected: int) -> tuple[int, ...]:
 
 
 def _sigmoid(value: float) -> float:
-    # Split by sign so neither branch can overflow math.exp.
     if value >= 0.0:
         return 1.0 / (1.0 + math.exp(-value))
     scaled = math.exp(value)
     return scaled / (1.0 + scaled)
 
 
+def _finite_vector(
+    value: tuple[float, ...] | None,
+    *,
+    name: str,
+    positive: bool,
+) -> tuple[float, ...] | None:
+    if value is None:
+        return None
+    if not isinstance(value, tuple) or len(value) != len(MODEL_FEATURE_NAMES):
+        raise Int3ExperimentError(
+            f"{name} must supply one value per preregistered model feature"
+        )
+    parsed: list[float] = []
+    for item in value:
+        if (
+            isinstance(item, bool)
+            or not isinstance(item, (int, float))
+            or not math.isfinite(float(item))
+            or (positive and float(item) <= 0.0)
+        ):
+            qualifier = "positive finite" if positive else "finite"
+            raise Int3ExperimentError(f"{name} must contain {qualifier} numbers")
+        parsed.append(float(item))
+    return tuple(parsed)
+
+
 @dataclass(frozen=True, slots=True)
 class SufficiencyModel:
-    """A frozen, fully specified logistic sufficiency model.
+    """Immutable preregistered pipeline state.
 
-    ``coefficients`` and ``intercept`` are null until the model is fitted.  A
-    fitted instance is immutable; ``fit`` returns a new instance rather than
-    mutating the caller's model.
+    Hyperparameters are fields for audit visibility, but construction rejects
+    any value that differs from the preregistered manifest.
     """
 
-    feature_names: tuple[str, ...] = FEATURE_NAMES
+    feature_names: tuple[str, ...] = MODEL_FEATURE_NAMES
     coefficients: tuple[float, ...] | None = None
     intercept: float | None = None
+    scaler_mean: tuple[float, ...] | None = None
+    scaler_scale: tuple[float, ...] | None = None
     l2_inverse_regularization_strength: float = DEFAULT_L2_INVERSE_STRENGTH
     max_iterations: int = DEFAULT_MAX_ITERATIONS
+    solver: str = DEFAULT_SOLVER
+    random_state: int = DEFAULT_RANDOM_STATE
+    tolerance: float = DEFAULT_TOLERANCE
+    class_weight: None = None
     training_row_count: int | None = None
 
     def __post_init__(self) -> None:
         assert_no_target_leakage(self.feature_names)
-        if self.feature_names != FEATURE_NAMES:
-            raise Int3ExperimentError("feature_names must be the frozen FEATURE_NAMES")
-        if (
-            isinstance(self.l2_inverse_regularization_strength, bool)
-            or not isinstance(
-                self.l2_inverse_regularization_strength, (int, float)
+        if self.feature_names != MODEL_FEATURE_NAMES:
+            raise Int3ExperimentError(
+                "feature_names must be the frozen MODEL_FEATURE_NAMES"
             )
-            or not math.isfinite(float(self.l2_inverse_regularization_strength))
-            or float(self.l2_inverse_regularization_strength) <= 0.0
+        frozen_hyperparameters = (
+            float(self.l2_inverse_regularization_strength) == 1.0
+            and self.max_iterations == 2000
+            and self.solver == "lbfgs"
+            and self.random_state == 0
+            and float(self.tolerance) == 0.0001
+            and self.class_weight is None
+        )
+        if not frozen_hyperparameters:
+            raise Int3ExperimentError(
+                "model hyperparameters differ from the preregistered pipeline"
+            )
+        state = (
+            self.coefficients,
+            self.intercept,
+            self.scaler_mean,
+            self.scaler_scale,
+        )
+        if any(item is None for item in state) and not all(
+            item is None for item in state
         ):
             raise Int3ExperimentError(
-                "l2_inverse_regularization_strength must be a positive number"
-            )
-        if (
-            isinstance(self.max_iterations, bool)
-            or not isinstance(self.max_iterations, int)
-            or self.max_iterations < 1
-        ):
-            raise Int3ExperimentError("max_iterations must be a positive integer")
-        if (self.coefficients is None) != (self.intercept is None):
-            raise Int3ExperimentError(
-                "coefficients and intercept must be set together"
+                "coefficients, intercept, scaler_mean, and scaler_scale must be set together"
             )
         if self.coefficients is not None:
-            if not isinstance(self.coefficients, tuple) or len(
-                self.coefficients
-            ) != len(FEATURE_NAMES):
-                raise Int3ExperimentError(
-                    "coefficients must supply one weight per frozen feature"
-                )
-            if not all(
-                not isinstance(item, bool)
-                and isinstance(item, (int, float))
-                and math.isfinite(float(item))
-                for item in self.coefficients
-            ):
-                raise Int3ExperimentError("coefficients must be finite numbers")
-            object.__setattr__(
-                self,
-                "coefficients",
-                tuple(float(item) for item in self.coefficients),
+            coefficients = _finite_vector(
+                self.coefficients, name="coefficients", positive=False
+            )
+            mean = _finite_vector(
+                self.scaler_mean, name="scaler_mean", positive=False
+            )
+            scale = _finite_vector(
+                self.scaler_scale, name="scaler_scale", positive=True
             )
             if (
                 isinstance(self.intercept, bool)
@@ -155,7 +183,10 @@ class SufficiencyModel:
                 or not math.isfinite(float(self.intercept))
             ):
                 raise Int3ExperimentError("intercept must be a finite number")
+            object.__setattr__(self, "coefficients", coefficients)
             object.__setattr__(self, "intercept", float(self.intercept))
+            object.__setattr__(self, "scaler_mean", mean)
+            object.__setattr__(self, "scaler_scale", scale)
         if self.training_row_count is not None and (
             isinstance(self.training_row_count, bool)
             or not isinstance(self.training_row_count, int)
@@ -169,42 +200,60 @@ class SufficiencyModel:
     def is_fitted(self) -> bool:
         return self.coefficients is not None
 
+    @property
+    def pipeline_spec(self) -> dict[str, object]:
+        return {
+            "steps": tuple(MODEL_PIPELINE_SPEC["steps"]),
+            "standard_scaler": dict(MODEL_PIPELINE_SPEC["standard_scaler"]),
+            "logistic_regression": dict(
+                MODEL_PIPELINE_SPEC["logistic_regression"]
+            ),
+            "hyperparameter_tuning_after_labels": False,
+        }
+
     @classmethod
     def from_coefficients(
         cls,
         *,
         coefficients: Sequence[float],
         intercept: float,
-        l2_inverse_regularization_strength: float = DEFAULT_L2_INVERSE_STRENGTH,
+        scaler_mean: Sequence[float] | None = None,
+        scaler_scale: Sequence[float] | None = None,
     ) -> SufficiencyModel:
-        """Build an explicit model without training, for demos and tests."""
+        """Build explicit synthetic fitted state without training."""
 
+        mean = (
+            tuple(0.0 for _ in MODEL_FEATURE_NAMES)
+            if scaler_mean is None
+            else tuple(scaler_mean)
+        )
+        scale = (
+            tuple(1.0 for _ in MODEL_FEATURE_NAMES)
+            if scaler_scale is None
+            else tuple(scaler_scale)
+        )
         return cls(
-            feature_names=FEATURE_NAMES,
             coefficients=tuple(coefficients),
             intercept=intercept,
-            l2_inverse_regularization_strength=l2_inverse_regularization_strength,
+            scaler_mean=mean,
+            scaler_scale=scale,
         )
 
     def weights(self) -> dict[str, float]:
-        """Return the interpretable per-feature weight mapping."""
+        """Return standardized-space per-feature logistic coefficients."""
 
         if self.coefficients is None:
             raise SufficiencyModelNotFittedError(
                 "an unfitted sufficiency model has no weights"
             )
-        return dict(zip(FEATURE_NAMES, self.coefficients, strict=True))
+        return dict(zip(MODEL_FEATURE_NAMES, self.coefficients, strict=True))
 
     def fit(
         self,
         feature_matrix: Sequence[Sequence[float]],
         targets: Sequence[bool],
     ) -> SufficiencyModel:
-        """Fit L2 logistic regression and return a new fitted model.
-
-        INT-3A never calls this on real data: ``decision_stable`` labels do not
-        exist until subsets are executed live.
-        """
+        """Fit the frozen pipeline and return new immutable fitted state."""
 
         rows = _matrix(feature_matrix, "feature_matrix")
         labels = _targets(targets, "targets", len(rows))
@@ -214,52 +263,68 @@ class SufficiencyModel:
             )
         try:
             from sklearn.linear_model import LogisticRegression
+            from sklearn.pipeline import Pipeline
+            from sklearn.preprocessing import StandardScaler
         except ImportError as error:  # pragma: no cover - environment dependent
             raise SufficiencyModelUnavailableError(
-                "fitting the sufficiency model requires the optional "
-                "scikit-learn engineering dependency"
+                "fitting the sufficiency model requires scikit-learn"
             ) from error
-        estimator = LogisticRegression(
-            # scikit-learn 1.8+ expresses pure L2 as l1_ratio=0; leaving the
-            # deprecated ``penalty`` argument unset keeps this forward-safe.
-            l1_ratio=0.0,
-            C=float(self.l2_inverse_regularization_strength),
-            solver="lbfgs",
-            max_iter=int(self.max_iterations),
-            fit_intercept=True,
+        pipeline = Pipeline(
+            steps=(
+                ("standard_scaler", StandardScaler(with_mean=True, with_std=True)),
+                (
+                    "logistic_regression",
+                    LogisticRegression(
+                        l1_ratio=0.0,
+                        C=1.0,
+                        solver="lbfgs",
+                        max_iter=2000,
+                        fit_intercept=True,
+                        random_state=0,
+                        class_weight=None,
+                        tol=0.0001,
+                    ),
+                ),
+            )
         )
-        estimator.fit([list(row) for row in rows], list(labels))
-        coefficients = tuple(float(item) for item in estimator.coef_[0])
-        intercept = float(estimator.intercept_[0])
+        pipeline.fit([list(row) for row in rows], list(labels))
+        scaler = pipeline.named_steps["standard_scaler"]
+        estimator = pipeline.named_steps["logistic_regression"]
         return SufficiencyModel(
-            feature_names=FEATURE_NAMES,
-            coefficients=coefficients,
-            intercept=intercept,
-            l2_inverse_regularization_strength=(
-                self.l2_inverse_regularization_strength
-            ),
-            max_iterations=self.max_iterations,
+            coefficients=tuple(float(item) for item in estimator.coef_[0]),
+            intercept=float(estimator.intercept_[0]),
+            scaler_mean=tuple(float(item) for item in scaler.mean_),
+            scaler_scale=tuple(float(item) for item in scaler.scale_),
             training_row_count=len(rows),
         )
 
     def predict_proba(
         self, feature_matrix: Sequence[Sequence[float]]
     ) -> tuple[float, ...]:
-        """Return P(decision_stable = True) for each row, in row order."""
+        """Return P(single-execution action stability) for each raw row."""
 
-        if self.coefficients is None or self.intercept is None:
+        if (
+            self.coefficients is None
+            or self.intercept is None
+            or self.scaler_mean is None
+            or self.scaler_scale is None
+        ):
             raise SufficiencyModelNotFittedError(
-                "predict_proba requires a fitted sufficiency model"
+                "predict_proba requires a fitted sufficiency pipeline"
             )
         rows = _matrix(feature_matrix, "feature_matrix")
-        coefficients = self.coefficients
-        intercept = self.intercept
         return tuple(
             _sigmoid(
-                intercept
+                self.intercept
                 + sum(
-                    weight * value
-                    for weight, value in zip(coefficients, row, strict=True)
+                    weight * ((value - mean) / scale)
+                    for weight, value, mean, scale in zip(
+                        self.coefficients,
+                        row,
+                        self.scaler_mean,
+                        self.scaler_scale,
+                        strict=True,
+                    )
                 )
             )
             for row in rows
@@ -271,13 +336,6 @@ class SufficiencyModel:
         *,
         threshold: float = DEFAULT_SUFFICIENCY_THRESHOLD,
     ) -> tuple[bool, ...]:
-        """Return the hard sufficiency label at an explicit threshold.
-
-        The threshold is a caller-supplied argument, not a hidden constant.
-        Production control should use the expected-loss controller instead of a
-        bare threshold.
-        """
-
         probability(threshold, "threshold")
         return tuple(
             value >= float(threshold) for value in self.predict_proba(feature_matrix)

@@ -3,7 +3,7 @@
 A row carries three strictly separated regions:
 
 * ``provenance`` -- identity and frozen reference facts, never model input;
-* ``features``   -- the pre-inference feature mapping (see ``features.py``);
+* ``features``   -- the complete diagnostic pre-inference mapping;
 * ``decision_stable`` -- the engineering target, null until live subset
   execution supplies an observed subset action.
 
@@ -31,6 +31,10 @@ from mandateguard.engineering.int3.features import (
 from mandateguard.engineering.int3.models import (
     Int3ExperimentError,
     REFERENCE_ACTIONS,
+)
+from mandateguard.engineering.int3.model_manifest import (
+    MODEL_FEATURE_NAMES,
+    model_feature_vector,
 )
 
 
@@ -131,7 +135,15 @@ class SufficiencyDatasetRow:
 
     @property
     def vector(self) -> tuple[float, ...]:
+        """Return all diagnostic features in diagnostic manifest order."""
+
         return feature_vector(self.features)
+
+    @property
+    def model_vector(self) -> tuple[float, ...]:
+        """Return only preregistered runtime-deployable model features."""
+
+        return model_feature_vector(self.features)
 
     def with_label(self, value: bool) -> SufficiencyDatasetRow:
         """Return a labeled copy; the plan's own rows stay unlabeled."""
@@ -159,8 +171,10 @@ class SufficiencyDataset:
 
     def __post_init__(self) -> None:
         assert_no_target_leakage(self.feature_names)
-        if self.feature_names != FEATURE_NAMES:
-            raise Int3ExperimentError("feature_names must be the frozen FEATURE_NAMES")
+        if self.feature_names != MODEL_FEATURE_NAMES:
+            raise Int3ExperimentError(
+                "feature_names must be the frozen MODEL_FEATURE_NAMES"
+            )
         if not isinstance(self.rows, tuple) or not self.rows:
             raise Int3ExperimentError("rows must be a non-empty tuple")
         if not all(isinstance(item, SufficiencyDatasetRow) for item in self.rows):
@@ -190,7 +204,23 @@ class SufficiencyDataset:
         return not self.unlabeled_rows
 
     def feature_matrix(self) -> tuple[tuple[float, ...], ...]:
+        """Return the preregistered deployable model matrix."""
+
+        return self.model_feature_matrix()
+
+    def model_feature_matrix(self) -> tuple[tuple[float, ...], ...]:
+        return tuple(item.model_vector for item in self.rows)
+
+    def diagnostic_feature_matrix(self) -> tuple[tuple[float, ...], ...]:
         return tuple(item.vector for item in self.rows)
+
+    @property
+    def model_feature_names(self) -> tuple[str, ...]:
+        return self.feature_names
+
+    @property
+    def diagnostic_feature_names(self) -> tuple[str, ...]:
+        return FEATURE_NAMES
 
     def targets(self) -> tuple[bool, ...]:
         if not self.is_fully_labeled:
@@ -213,7 +243,10 @@ class SufficiencyDataset:
 def build_dataset(rows: Iterable[SufficiencyDatasetRow]) -> SufficiencyDataset:
     """Build the strict dataset from already-validated rows."""
 
-    return SufficiencyDataset(feature_names=FEATURE_NAMES, rows=tuple(rows))
+    return SufficiencyDataset(
+        feature_names=MODEL_FEATURE_NAMES,
+        rows=tuple(rows),
+    )
 
 
 def dataset_csv_columns() -> tuple[str, ...]:

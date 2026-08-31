@@ -14,7 +14,7 @@ def main() -> int:
             candidate = (
                 f" candidate={scenario.candidate_evidence_id} "
                 f"counterfactual_p={scenario.counterfactual_p_sufficient:.2f} "
-                f"voi={scenario.voi:.4f}"
+                f"net_voi={scenario.voi:.4f}"
             )
         print(
             f"{scenario.scenario_id} p_sufficient={scenario.p_sufficient:.2f} "

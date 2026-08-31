@@ -1,10 +1,4 @@
-"""Safety composition boundary for evidence-sufficiency advice.
-
-INT-3 is an evidence-routing layer, never an authorization authority.  A Tier
-A/B BLOCK or REVIEW is final for this layer.  Even when Tier A/B allows the
-flow to continue, DECIDE means only "proceed to the existing semantic
-verifier"; it never means ALLOW and never reaches execution directly.
-"""
+"""Non-authorizing composition boundary for sufficiency control."""
 
 from __future__ import annotations
 
@@ -20,9 +14,9 @@ from mandateguard.models.decision import DecisionAction
 
 
 class SufficiencyRoute(str, Enum):
-    """The only routes this learned layer can emit."""
+    """Routing outcomes; deliberately contains neither ALLOW nor BLOCK."""
 
-    BLOCK = "BLOCK"
+    TIER_AB_TERMINAL = "TIER_AB_TERMINAL"
     REVIEW = "REVIEW"
     RETRIEVE_MORE = "RETRIEVE_MORE"
     PROCEED_TO_SEMANTIC = "PROCEED_TO_SEMANTIC"
@@ -30,19 +24,19 @@ class SufficiencyRoute(str, Enum):
 
 @dataclass(frozen=True, slots=True)
 class SafeSufficiencyDecision:
-    """A controller recommendation after deterministic precedence is applied."""
-
     tier_ab_action: DecisionAction
-    controller_action: ControllerAction
+    controller_action: ControllerAction | None
     selected_route: SufficiencyRoute
     reason: str
 
     def __post_init__(self) -> None:
         if not isinstance(self.tier_ab_action, DecisionAction):
             raise Int3ExperimentError("tier_ab_action must be DecisionAction")
-        if not isinstance(self.controller_action, ControllerAction):
+        if self.controller_action is not None and not isinstance(
+            self.controller_action, ControllerAction
+        ):
             raise Int3ExperimentError(
-                "controller_action must be ControllerAction"
+                "controller_action must be ControllerAction or null"
             )
         if not isinstance(self.selected_route, SufficiencyRoute):
             raise Int3ExperimentError("selected_route must be SufficiencyRoute")
@@ -50,18 +44,23 @@ class SafeSufficiencyDecision:
             raise Int3ExperimentError("reason must be non-empty")
         expected = _expected_route(self.tier_ab_action, self.controller_action)
         if self.selected_route is not expected:
-            raise Int3ExperimentError(
-                "selected_route violates Tier A/B or semantic-verifier precedence"
-            )
+            raise Int3ExperimentError("selected_route violates safety precedence")
 
 
 def _expected_route(
-    tier_ab_action: DecisionAction, controller_action: ControllerAction
+    tier_ab_action: DecisionAction,
+    controller_action: ControllerAction | None,
 ) -> SufficiencyRoute:
-    if tier_ab_action is DecisionAction.BLOCK:
-        return SufficiencyRoute.BLOCK
-    if tier_ab_action is DecisionAction.REVIEW:
-        return SufficiencyRoute.REVIEW
+    if tier_ab_action is not DecisionAction.ALLOW:
+        if controller_action is not None:
+            raise Int3ExperimentError(
+                "the learned controller must not run after Tier A/B BLOCK or REVIEW"
+            )
+        return SufficiencyRoute.TIER_AB_TERMINAL
+    if controller_action is None:
+        raise Int3ExperimentError(
+            "Tier A/B ALLOW requires a sufficiency controller decision"
+        )
     return {
         ControllerAction.DECIDE: SufficiencyRoute.PROCEED_TO_SEMANTIC,
         ControllerAction.RETRIEVE_MORE: SufficiencyRoute.RETRIEVE_MORE,
@@ -70,37 +69,43 @@ def _expected_route(
 
 
 def enforce_sufficiency_safety_boundary(
-    *, tier_ab_action: DecisionAction, controller: ControllerDecision
+    *,
+    tier_ab_action: DecisionAction,
+    controller: ControllerDecision | None = None,
 ) -> SafeSufficiencyDecision:
-    """Apply immutable policy precedence to learned sufficiency advice.
+    """Apply Tier A/B precedence without emitting an authorization action.
 
-    The result has no ALLOW route.  Existing semantic verification, execution
-    capability checks, the execution ledger, and the Razorpay gate remain
-    downstream and authoritative.
+    Tier A/B terminal decisions bypass the learned controller. After Tier A/B
+    ALLOW, DECIDE means only proceed to the existing semantic verifier. Signed
+    capability checks, semantic output composition, and the Razorpay gate stay
+    authoritative downstream.
     """
 
     if not isinstance(tier_ab_action, DecisionAction):
         raise TypeError("tier_ab_action must be DecisionAction")
-    if not isinstance(controller, ControllerDecision):
-        raise TypeError("controller must be ControllerDecision")
-    route = _expected_route(tier_ab_action, controller.selected_action)
-    if tier_ab_action is not DecisionAction.ALLOW:
+    if controller is not None and not isinstance(controller, ControllerDecision):
+        raise TypeError("controller must be ControllerDecision or null")
+    controller_action = (
+        controller.selected_action if controller is not None else None
+    )
+    route = _expected_route(tier_ab_action, controller_action)
+    if route is SufficiencyRoute.TIER_AB_TERMINAL:
         reason = (
             f"Tier A/B {tier_ab_action.value} is authoritative; the learned "
-            f"{controller.selected_action.value} recommendation is ignored."
+            "sufficiency controller is not invoked."
         )
     elif route is SufficiencyRoute.PROCEED_TO_SEMANTIC:
         reason = (
-            "Evidence is routed to the existing semantic verifier; INT-3 does "
-            "not authorize or invoke execution."
+            "Proceed to the existing semantic verifier; INT-3 does not emit "
+            "ALLOW/BLOCK or invoke execution."
         )
     elif route is SufficiencyRoute.RETRIEVE_MORE:
-        reason = "Acquire the ranked missing trusted evidence before semantic inference."
+        reason = "Acquire the selected trusted evidence, then reassess once."
     else:
-        reason = "Escalate to REVIEW without changing an authorization outcome."
+        reason = "Escalate to REVIEW without changing authorization precedence."
     return SafeSufficiencyDecision(
         tier_ab_action=tier_ab_action,
-        controller_action=controller.selected_action,
+        controller_action=controller_action,
         selected_route=route,
         reason=reason,
     )

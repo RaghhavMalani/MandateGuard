@@ -111,6 +111,11 @@ FEATURE_NAMES: tuple[str, ...] = (
     "evidence_text_kchars_mean",
 )
 
+# Explicit role alias: the complete 36-field extractor is retained for
+# analysis/artifacts, while model_manifest.MODEL_FEATURE_NAMES is the only
+# deployable learning input order.
+DIAGNOSTIC_FEATURE_NAMES = FEATURE_NAMES
+
 
 FEATURE_DEFINITIONS: Mapping[str, str] = MappingProxyType(
     {

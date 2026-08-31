@@ -1,8 +1,7 @@
 """Strict, network-free INT-3A plan artifact construction.
 
-Only ``subset_plan.jsonl`` is writable in this milestone.  Live subset result
-and labeled CSV writers intentionally do not live here because no subset has
-been semantically executed yet.
+This module writes the diagnostic subset plan and the preregistered deployable
+feature manifest. Live result and labeled CSV writers remain unavailable.
 """
 
 from __future__ import annotations
@@ -28,10 +27,16 @@ from mandateguard.engineering.int3.models import (
     SubsetObservation,
     SubsetPlan,
 )
+from mandateguard.engineering.int3.model_manifest import (
+    MODEL_FEATURE_MANIFEST_SHA256,
+    MODEL_FEATURE_NAMES,
+    model_feature_manifest_payload,
+)
 from mandateguard.engineering.int3.subsets import build_subset_feature_input
 
 
 SUBSET_PLAN_FILENAME = "subset_plan.jsonl"
+MODEL_FEATURE_MANIFEST_FILENAME = "model_feature_manifest.json"
 FUTURE_SUBSET_RESULTS_FILENAME = "subset_results.jsonl"
 FUTURE_SUFFICIENCY_DATASET_FILENAME = "sufficiency_dataset.csv"
 
@@ -147,7 +152,13 @@ def subset_plan_record(
         ),
         "future_subset_observed_final_action": observation.observed_final_action,
         "decision_stable": observation.decision_stable,
-        "features": {name: float(features[name]) for name in FEATURE_NAMES},
+        "diagnostic_features": {
+            name: float(features[name]) for name in FEATURE_NAMES
+        },
+        "model_features": {
+            name: float(features[name]) for name in MODEL_FEATURE_NAMES
+        },
+        "model_feature_manifest_sha256": MODEL_FEATURE_MANIFEST_SHA256,
         "reference_provenance": {
             "source_run_id": reference.source_run_id,
             "source_observation_id": reference.source_observation_id,
@@ -203,4 +214,27 @@ def write_subset_plan_jsonl(
                 )
                 + "\n"
             )
+    return output_path
+
+
+def write_model_feature_manifest(output_path: Path) -> Path:
+    """Exclusively create the preregistered deployable feature manifest."""
+
+    if not isinstance(output_path, Path):
+        raise TypeError("output_path must be pathlib.Path")
+    record = {
+        **model_feature_manifest_payload(),
+        "manifest_sha256": MODEL_FEATURE_MANIFEST_SHA256,
+    }
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open("x", encoding="utf-8", newline="\n") as stream:
+        stream.write(
+            json.dumps(
+                record,
+                ensure_ascii=False,
+                sort_keys=True,
+                indent=2,
+            )
+            + "\n"
+        )
     return output_path

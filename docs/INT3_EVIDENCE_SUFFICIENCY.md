@@ -1,45 +1,32 @@
 # INT-3 evidence sufficiency and value of information
 
-## Scope and thesis
+## Scope, target, and limits
 
-INT-3 is non-benchmark engineering infrastructure. It asks one narrow question:
-
-> Given a subset of trusted evidence, is that subset sufficient to preserve the
-> authorization decision made using the full eligible trusted evidence?
-
-For a future executed subset, the target is defined only as:
+INT-3 is non-benchmark engineering infrastructure. It asks whether a subset of
+trusted evidence preserves the authorization action observed once with the
+frozen full eligible-evidence input:
 
 ```text
-decision_stable = subset_final_action == full_reference_action
+decision_stable = subset_final_action == frozen_full_evidence_final_action
 ```
 
-This is an engineering decision-stability target. It is not a label for human
-intent, policy correctness, factual truth, or whether the full-evidence action
-was correct. Semantic expectation labels are never reused as sufficiency labels.
+The registered name of this target is **SINGLE-EXECUTION ACTION STABILITY**.
+It is not true human intent, semantic correctness, probability of correctness,
+or causal evidence necessity. It is also not evidence that the frozen
+full-evidence action was correct. Semantic expectation labels are never reused
+as sufficiency labels.
 
-INT-2 demonstrated a retrieval-recall / decision-stability mismatch on the six
-frozen engineering cases: annotated retrieval quality varied while the observed
-downstream authorization actions remained stable across the evidence-bearing
-conditions. That result motivates the sufficiency hypothesis. It does **not**
-prove which evidence was necessary, that a learned sufficiency model will work,
-or that any result generalizes beyond these six synthetic cases.
+No INT-3 subset semantic execution or stability label was observed before the
+methodology and artifacts in this document were frozen. The future live dataset
+uses one no-retry semantic execution for each previously unseen unique exact
+semantic input.
 
-## Frozen source and full-evidence reference
+## Frozen sources and subset plan
 
-INT-3A reads, without modifying:
-
-- the six frozen Stage-B cases and their `ReplayScenario` values;
-- the frozen query and relevance manifests;
-- the eligible merchant evidence and catalog;
-- Stage-A retrieval scores; and
-- condition E (`PRODUCTION DEFAULT`) from the frozen Stage-B observations.
-
-Condition E retrieved the complete eligible trusted-evidence set for each case.
-Its already-recorded semantic behavior, final action, semantic input hash, model,
-prompt version, and detector version become the full-evidence reference. INT-3A
-does not recompute that result and does not make a semantic-model call.
-
-## Subset plan
+INT-3 reads the six frozen Stage-B cases, queries, catalog, eligible merchant
+evidence, Stage-A retrieval scores, and Stage-B condition E full-evidence
+references without modifying INT-1 or INT-2. It does not recompute the
+full-evidence references.
 
 Every non-empty subset is enumerated in stable `(subset size, eligible order)`
 order. A stable bit mask over eligible-evidence order forms the observation ID:
@@ -47,8 +34,6 @@ order. A stable bit mask over eligible-evidence order forms the observation ID:
 ```text
 INT3:<query_id>:m<eligible-order-bitmask>
 ```
-
-The per-query plan sizes are:
 
 | Query | Eligible evidence | Non-empty subsets |
 | --- | ---: | ---: |
@@ -60,161 +45,227 @@ The per-query plan sizes are:
 | `INT2-Q-FLEXI` | 2 | 3 |
 | **Total** |  | **62** |
 
-Building a semantic request and hashing its canonical input is local input
-construction, not semantic inference. Exact semantic-input equivalence classes
-are recorded for future call deduplication. Every planned row retains null
-`future_subset_observed_semantic_behavior`,
-`future_subset_observed_final_action`, and `decision_stable` values.
+The 62 observations are correlated subsets, not 62 independent commerce
+cases. The independent grouping unit is the six frozen queries.
 
-INT-3A creates only:
+## Diagnostic features versus deployable model features
 
-```text
-artifacts/engineering/int3/subset_plan.jsonl
-```
+The original 36-feature extractor remains available for diagnostics and
+artifact inspection. It is not the model schema. The deployable model uses the
+following frozen ordered 14-feature manifest:
 
-`subset_results.jsonl` and `sufficiency_dataset.csv` are future artifact names;
-they are intentionally absent because no live subset labels exist.
+1. `evidence_count`
+2. `evidence_fraction`
+3. `sku_scoped_evidence_fraction`
+4. `merchant_scope_evidence_present`
+5. `product_scope_evidence_present`
+6. `max_score`
+7. `mean_score`
+8. `score_margin`
+9. `source_kind_count`
+10. `source_kind_diversity`
+11. `constraint_count`
+12. `constraint_family_purpose`
+13. `constraint_family_exclusion`
+14. `evidence_text_kchars_mean`
 
-## Pre-inference features and leakage protection
+All 14 are available at runtime before subset semantic inference. The
+purpose/exclusion indicators are derived from actual runtime mandate constraint
+`kind` values, never query ID, case ID, or an engineering fixture label.
+Case-family one-hot diagnostics are consequently excluded as redundant.
 
-All model features are available before subset semantic inference. The frozen
-feature vector contains:
-
-- evidence amount: count, eligible fraction, SKU-scoped count/fraction, and
-  merchant/product scope presence;
-- retrieval availability and generic max/mean/min/margin statistics;
-- lexical, semantic, and hybrid max/mean/min/margin statistics;
-- source-kind count and diversity;
-- required-annotation and relevant-annotation fractions;
-- constraint count and purpose/exclusion indicators;
-- explicit one-hot case families (`PURPOSE_AND_EXCLUSION`, `EXCLUSION_ONLY`,
-  `PURPOSE_ONLY`, and `OTHER`); and
-- total and mean evidence text length in thousands of characters.
-
-The generic score statistics intentionally equal the fixed INT-2 production
-hybrid channel; explicit hybrid names are also retained so all requested score
-channels are discoverable.
-
-Target leakage is prevented in three layers:
-
-1. `SubsetFeatureInput` has no field for a subset verdict, final action,
-   engineering expectation, full-reference result, or target.
-2. `FEATURE_NAMES` is frozen and checked against forbidden fields and leaky
-   name fragments at import time.
-3. Dataset provenance, features, and `decision_stable` are structurally
-   separated. Model matrices contain only the feature mapping.
-
-The reference action and semantic behavior are valid plan provenance, but they
-can never enter the model feature vector.
-
-## Leave-one-query-out evaluation
-
-Future evaluation uses six-fold leave-one-query-out splitting. Each fold holds
-out every subset from exactly one query and trains on every subset from the
-other five queries. No random subset split is supported. The split validator
-proves that train and test query sets are disjoint, the test set contains every
-subset of its held-out query, and each fold partitions all rows exactly once.
-
-This avoids leaking shared mandate, transaction, catalog, evidence text, and
-query structure from one query's subsets into both train and test.
-
-## Interpretable baseline
-
-The baseline is scikit-learn L2-regularized logistic regression with `fit`,
-`predict_proba`, and `predict`. Fitted coefficients and the intercept are stored
-in immutable model state, and probability inference evaluates the logistic link
-directly. INT-3A does not fit the model on real rows because all 62 targets are
-null.
-
-Logistic regression was selected instead of deep learning because the future
-engineering dataset is small, coefficients are inspectable, probabilistic
-outputs are suitable for calibration analysis, and additional model complexity
-would not be justified by six query groups. This choice is a baseline design,
-not evidence that the model will be calibrated or useful.
-
-## Evaluation metrics
-
-Future folds report:
-
-- Brier score;
-- false-SUFFICIENT count and the unsafe share of predicted-SUFFICIENT rows;
-- false-SUFFICIENT rate among truly unstable rows and over all rows;
-- false-INSUFFICIENT count and corresponding prediction-, class-, and
-  whole-fold-denominator rates;
-- review/escalation count and rate; and
-- ROC-AUC only when both target classes exist in the fold.
-
-Generic accuracy is deliberately absent. False-SUFFICIENT is the
-safety-sensitive metric because it marks a subset predicted safe to decide on
-that did not preserve the frozen full-evidence action.
-
-## Expected-loss controller
-
-For an explicit `p_sufficient` and engineering costs, the pure controller uses:
+The 22 diagnostic-only fields are:
 
 ```text
-L(DECIDE)        = (1 - p_sufficient) * C_UNSTABLE_DECISION
-L(RETRIEVE_MORE) = C_RETRIEVE
-L(REVIEW)        = C_REVIEW
+sku_scoped_evidence_count
+retrieval_scores_available
+min_score
+lexical_max_score
+lexical_mean_score
+lexical_min_score
+lexical_score_margin
+semantic_max_score
+semantic_mean_score
+semantic_min_score
+semantic_score_margin
+hybrid_max_score
+hybrid_mean_score
+hybrid_min_score
+hybrid_score_margin
+required_annotation_fraction
+relevant_annotation_fraction
+case_family_purpose_and_exclusion
+case_family_exclusion_only
+case_family_purpose_only
+case_family_other
+evidence_text_kchars_total
 ```
 
-It returns all three losses, the minimum-loss action, and the substituted
-calculation as its reason. There is no unexplained probability threshold.
-Equal losses use the explicit safety order `REVIEW`, `RETRIEVE_MORE`, `DECIDE`.
+In particular, `required_annotation_fraction` and
+`relevant_annotation_fraction` depend on manually authored evaluation oracles.
+They are useful diagnostics but unavailable for ordinary production requests,
+so they cannot enter learning or inference.
 
-`DECIDE` means only “proceed to the existing semantic decision path.” It does
-not mean authorization `ALLOW`.
+No model feature encodes query/case identity, engineering expectation,
+full-reference action or verdict, subset outcome, `decision_stable`, or a
+relevance/required oracle label. Dataset APIs keep the 36-feature diagnostic
+matrix separate from the 14-feature model matrix.
 
-## Counterfactual value of information
-
-For every remaining eligible evidence item `e`, the VoI planner constructs the
-pre-inference feature vector for `E ∪ {e}` and computes:
+The preregistration artifact is
+`artifacts/engineering/int3/model_feature_manifest.json`. Its canonical SHA-256
+is:
 
 ```text
-delta_p = P(sufficient | E + e) - P(sufficient | E)
-voi     = delta_p / acquisition_cost(e)
+b5201911ac47dd1f17059431d88f4a2c4287875a1025821ebabcf8330a811f20
 ```
 
-Costs must be finite and strictly positive. Candidates are ranked by descending
-VoI, then probability gain, then frozen eligible order. The planner neither
-fetches evidence nor invokes the semantic provider.
+## Frozen model pipeline
+
+The deliberately small baseline is a scikit-learn pipeline:
+
+```text
+StandardScaler(with_mean=True, with_std=True)
+LogisticRegression(
+    penalty="l2",
+    C=1.0,
+    solver="lbfgs",
+    max_iter=2000,
+    fit_intercept=True,
+    random_state=0,
+    class_weight=None,
+    tol=0.0001,
+)
+```
+
+No class weighting or hyperparameter tuning may be selected after INT-3 labels
+are observed. The small linear model is deliberate: there are only six grouped
+engineering units, and interpretability and calibration matter more than model
+capacity.
+
+## Evaluation protocol and metrics
+
+Evaluation remains six-fold leave-one-query-out. Each fold holds out every
+subset from one query and trains on the other five. Random subset splits and
+generic random-split performance are not supported because they would put
+shared mandate, transaction, evidence, catalog, and query structure into both
+train and test.
+
+Future fold reports retain Brier score, false-SUFFICIENT, and
+false-INSUFFICIENT counts/rates. ROC-AUC is reported only when both target
+classes exist. Generic accuracy is not a headline metric.
+
+## One-step expected-loss controller
+
+For current sufficiency probability `p_current`:
+
+```text
+L_DECIDE = (1 - p_current) * C_UNSTABLE_DECISION
+L_REVIEW = C_REVIEW
+```
+
+For each missing eligible evidence item `e`, the model evaluates the
+counterfactual runtime features for `E union {e}` and supplies `p_after_e`:
+
+```text
+L_RETRIEVE(e) = C_ACQUIRE(e) + min(
+    (1 - p_after_e) * C_UNSTABLE_DECISION,
+    C_REVIEW,
+)
+
+best_retrieval = argmin_e L_RETRIEVE(e)
+overall_action = argmin(L_DECIDE, L_REVIEW, best L_RETRIEVE)
+```
+
+The controller returns the full decomposition: current decide/review losses
+and, for every candidate, acquisition cost, post-acquisition decide/review
+losses, best terminal action/loss, and total retrieval loss. When no evidence
+remains, `RETRIEVE_MORE` is unavailable. Equal overall losses use the explicit
+safety order `REVIEW`, `RETRIEVE_MORE`, `DECIDE`.
+
+## Net value of information
+
+The primary VoI is expected engineering-loss reduction, not probability gain
+divided by cost:
+
+```text
+L_BASE = min(L_DECIDE, L_REVIEW)
+
+L_AFTER(e) = C_ACQUIRE(e) + min(
+    (1 - p_after_e) * C_UNSTABLE_DECISION,
+    C_REVIEW,
+)
+
+NET_VOI(e) = L_BASE - L_AFTER(e)
+```
+
+Higher is better; positive `NET_VOI` means acquisition lowers expected loss.
+`delta_p = p_after_e - p_current` is retained only as a diagnostic and
+tie-breaker. The planner constructs counterfactual features locally and never
+fetches evidence or invokes the semantic provider.
 
 ## Safety boundary
 
-INT-3 has no `ALLOW` route and cannot override:
+The learned controller emits only `DECIDE`, `RETRIEVE_MORE`, or `REVIEW`.
+`DECIDE` means proceed to the existing semantic path; it does not mean
+authorization `ALLOW`. The sufficiency layer never emits `ALLOW` or `BLOCK` and
+never overrides Tier A/B `BLOCK` or `REVIEW`, the semantic verifier, signed
+capability and ledger checks, or the Razorpay execution gate.
 
-- Tier A/B `BLOCK`;
-- Tier A/B `REVIEW`;
-- the existing semantic verifier;
-- execution capability and ledger checks; or
-- the Razorpay execution gate.
+## Exact prior-result reuse and frozen live plan
 
-A Tier A/B `BLOCK` or `REVIEW` is authoritative. After Tier A/B `ALLOW`, the
-only learned-layer routes are `PROCEED_TO_SEMANTIC`, `RETRIEVE_MORE`, and
-`REVIEW`. Payment execution remains outside INT-3.
+Prior reuse is bound to the immutable INT-2 Stage-B
+`stage_b_observations.jsonl` at commit
+`3946aa50c477881b1b085e35b60c9a411b6c8d64`. The source file SHA-256 is:
 
-## Offline synthetic demonstration
+```text
+311ec367c29299bbc0d90831c35c08d87e0c8ed5acd1353bcd5777cbc9bd0a75
+```
 
-`scripts/run_int3_offline_demo.py` uses fixed synthetic probabilities and
-costs. It demonstrates:
+Reuse requires exact equality of `semantic_input_sha256`. Fuzzy matching,
+same-product assumptions, and same-evidence-ID assumptions are forbidden. A
+matched subset carries the immutable observed semantic result and source
+commit/file/run/observation provenance, and requires zero future API calls.
+Unmatched results remain null and `decision_stable` remains null in the plan.
 
-- A: high sufficiency -> `DECIDE`;
-- B: low sufficiency plus valuable missing evidence -> `RETRIEVE_MORE`; and
-- C: low sufficiency plus low-value expensive evidence -> `REVIEW`.
+The frozen plan contains:
 
-The demo makes zero semantic-provider, evidence-fetch, buyer, or Razorpay calls.
+| Measure | Count |
+| --- | ---: |
+| Nominal subset observations | 62 |
+| Unique exact semantic-input hashes | 62 |
+| Prior exact-result matches | 15 |
+| New unique live inputs | 47 |
+| Predicted future semantic API calls | 47 |
 
-Generate the plan with Python 3.12 from the repository root (with `src` on the
-Python import path):
+Each future new exact input permits one attempt and zero retries. The plan is at
+`artifacts/engineering/int3/subset_live_execution_plan.json`; its canonical
+SHA-256 is:
+
+```text
+ed6f5c57cbea9ca0399b021c3516e829fa5cb51f7e025a1f003e9b0b1cfd284d
+```
+
+The file was built before live subset execution and must not be modified after
+outcomes are observed.
+
+## Offline commands
+
+From the repository root with Python 3.12 and `src` on the import path:
 
 ```powershell
 python scripts/generate_int3_subset_plan.py
+python scripts/freeze_int3_methodology.py --created-at <timezone-aware-ISO-8601>
+python scripts/run_int3_offline_demo.py
 ```
+
+These commands perform local construction only. The methodology freeze and
+synthetic demo make zero semantic-provider, evidence-fetch, buyer, or Razorpay
+calls. `subset_results.jsonl` and `sufficiency_dataset.csv` remain future
+artifacts because no new INT-3 labels exist.
 
 ## Future research path
 
-If live subset execution later supplies defensible labels, follow-on work could
-study calibration, active learning for selecting informative subset executions,
-contextual bandits for cost-aware evidence acquisition, and constrained
-reinforcement learning for sequential retrieval policies. None of active
-learning, contextual bandits, or constrained RL is implemented in INT-3A.
+After authorized live execution supplies defensible labels, follow-on work may
+study calibration, active selection of informative subsets, contextual bandits,
+or constrained sequential retrieval. None of those methods is implemented or
+justified by the current six-query engineering dataset.

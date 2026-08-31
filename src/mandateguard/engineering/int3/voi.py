@@ -1,10 +1,4 @@
-"""Counterfactual value-of-information ranking for missing evidence.
-
-The planner is offline and side-effect free.  It constructs the feature vector
-that *would* exist after adding each remaining eligible evidence item, asks an
-already-fitted sufficiency model for probabilities, and ranks candidates by
-probability gain per unit acquisition cost.  It never fetches evidence.
-"""
+"""Counterfactual expected-loss value of information for missing evidence."""
 
 from __future__ import annotations
 
@@ -12,15 +6,22 @@ from dataclasses import dataclass, replace
 import math
 from typing import Callable, Mapping
 
+from mandateguard.engineering.int3.controller import (
+    ControllerAction,
+    ControllerCosts,
+    RetrievalCandidate,
+    decide_expected_loss,
+    retrieval_expected_loss,
+)
 from mandateguard.engineering.int3.features import (
     SubsetFeatureInput,
     extract_subset_features,
-    feature_vector,
 )
 from mandateguard.engineering.int3.model import (
     SufficiencyModel,
     SufficiencyModelNotFittedError,
 )
+from mandateguard.engineering.int3.model_manifest import model_feature_vector
 from mandateguard.engineering.int3.models import (
     Int3ExperimentError,
     positive_number,
@@ -33,7 +34,7 @@ FeatureExtractor = Callable[[SubsetFeatureInput], Mapping[str, float]]
 
 @dataclass(frozen=True, slots=True)
 class EvidenceValueCandidate:
-    """One missing evidence item and its counterfactual model value."""
+    """One-step loss reduction for one missing trusted-evidence item."""
 
     rank: int
     evidence_id: str
@@ -41,7 +42,15 @@ class EvidenceValueCandidate:
     counterfactual_probability: float
     delta_p: float
     acquisition_cost: float
-    voi: float
+    baseline_decide_loss: float
+    baseline_review_loss: float
+    baseline_best_terminal_loss: float
+    after_decide_loss: float
+    after_review_loss: float
+    after_best_terminal_action: ControllerAction
+    after_best_terminal_loss: float
+    expected_loss_after_acquisition: float
+    net_voi: float
     counterfactual_evidence_ids: tuple[str, ...]
 
     def __post_init__(self) -> None:
@@ -50,16 +59,50 @@ class EvidenceValueCandidate:
         if not isinstance(self.evidence_id, str) or not self.evidence_id:
             raise Int3ExperimentError("evidence_id must be non-empty")
         current = probability(self.current_probability, "current_probability")
-        counterfactual = probability(
+        after = probability(
             self.counterfactual_probability, "counterfactual_probability"
         )
         cost = positive_number(self.acquisition_cost, "acquisition_cost")
-        expected_delta = counterfactual - current
-        if not math.isclose(self.delta_p, expected_delta, rel_tol=0.0, abs_tol=1e-12):
-            raise Int3ExperimentError("delta_p must equal counterfactual minus current")
-        expected_voi = expected_delta / cost
-        if not math.isclose(self.voi, expected_voi, rel_tol=0.0, abs_tol=1e-12):
-            raise Int3ExperimentError("voi must equal delta_p / acquisition_cost")
+        if not math.isclose(
+            self.delta_p, after - current, rel_tol=0.0, abs_tol=1e-12
+        ):
+            raise Int3ExperimentError("delta_p is inconsistent")
+        expected_baseline = min(self.baseline_decide_loss, self.baseline_review_loss)
+        if not math.isclose(
+            self.baseline_best_terminal_loss,
+            expected_baseline,
+            rel_tol=0.0,
+            abs_tol=1e-12,
+        ):
+            raise Int3ExperimentError("baseline loss is inconsistent")
+        expected_after_terminal = min(self.after_decide_loss, self.after_review_loss)
+        if not math.isclose(
+            self.after_best_terminal_loss,
+            expected_after_terminal,
+            rel_tol=0.0,
+            abs_tol=1e-12,
+        ):
+            raise Int3ExperimentError("after-acquisition terminal loss is inconsistent")
+        expected_after = cost + expected_after_terminal
+        if not math.isclose(
+            self.expected_loss_after_acquisition,
+            expected_after,
+            rel_tol=0.0,
+            abs_tol=1e-12,
+        ):
+            raise Int3ExperimentError("after-acquisition loss is inconsistent")
+        if not math.isclose(
+            self.net_voi,
+            expected_baseline - expected_after,
+            rel_tol=0.0,
+            abs_tol=1e-12,
+        ):
+            raise Int3ExperimentError("net_voi must be expected loss reduction")
+        if self.after_best_terminal_action not in (
+            ControllerAction.DECIDE,
+            ControllerAction.REVIEW,
+        ):
+            raise Int3ExperimentError("after terminal action is invalid")
         if (
             not isinstance(self.counterfactual_evidence_ids, tuple)
             or self.evidence_id not in self.counterfactual_evidence_ids
@@ -67,6 +110,19 @@ class EvidenceValueCandidate:
             raise Int3ExperimentError(
                 "counterfactual_evidence_ids must contain the candidate"
             )
+
+    @property
+    def voi(self) -> float:
+        """Primary VoI alias; it is net expected-loss reduction, not delta/cost."""
+
+        return self.net_voi
+
+    def as_retrieval_candidate(self) -> RetrievalCandidate:
+        return RetrievalCandidate(
+            evidence_id=self.evidence_id,
+            p_after=self.counterfactual_probability,
+            acquisition_cost=self.acquisition_cost,
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -77,7 +133,12 @@ class _UnrankedCandidate:
     counterfactual_probability: float
     delta_p: float
     acquisition_cost: float
-    voi: float
+    after_decide_loss: float
+    after_review_loss: float
+    after_best_terminal_action: ControllerAction
+    after_best_terminal_loss: float
+    expected_loss_after_acquisition: float
+    net_voi: float
     counterfactual_evidence_ids: tuple[str, ...]
 
 
@@ -86,16 +147,11 @@ def rank_evidence_by_voi(
     current: SubsetFeatureInput,
     remaining_evidence_ids: tuple[str, ...],
     model: SufficiencyModel,
+    costs: ControllerCosts,
     acquisition_costs: Mapping[str, float],
     feature_extractor: FeatureExtractor = extract_subset_features,
 ) -> tuple[EvidenceValueCandidate, ...]:
-    """Rank one-step evidence additions by ``delta_p / acquisition_cost``.
-
-    ``remaining_evidence_ids`` may be a selected portion of the eligible
-    complement, but every listed item must be eligible and absent from the
-    current subset.  Counterfactual subsets always preserve frozen eligible
-    order, so feature construction and output are deterministic.
-    """
+    """Rank one-step acquisitions by net reduction in expected loss."""
 
     if not isinstance(current, SubsetFeatureInput):
         raise TypeError("current must be SubsetFeatureInput")
@@ -107,6 +163,8 @@ def rank_evidence_by_voi(
         raise TypeError("model must be SufficiencyModel")
     if not model.is_fitted:
         raise SufficiencyModelNotFittedError("VoI planning requires a fitted model")
+    if not isinstance(costs, ControllerCosts):
+        raise TypeError("costs must be ControllerCosts")
     if not isinstance(acquisition_costs, Mapping):
         raise TypeError("acquisition_costs must be a mapping")
     if not callable(feature_extractor):
@@ -126,9 +184,15 @@ def rank_evidence_by_voi(
                 f"missing acquisition cost for evidence {evidence_id!r}"
             )
 
-    current_features = feature_extractor(current)
-    current_probability = model.predict_proba((feature_vector(current_features),))[0]
+    current_probability = model.predict_proba(
+        (model_feature_vector(feature_extractor(current)),)
+    )[0]
     current_probability = probability(current_probability, "current_probability")
+    baseline_decide = decide_expected_loss(
+        p_sufficient=current_probability, costs=costs
+    )
+    baseline_review = costs.review
+    baseline_best = min(baseline_decide, baseline_review)
 
     unranked: list[_UnrankedCandidate] = []
     for evidence_id in remaining_evidence_ids:
@@ -137,26 +201,35 @@ def rank_evidence_by_voi(
             item for item in eligible if item.evidence_id in selected
         )
         counterfactual = replace(current, subset_evidence=counterfactual_evidence)
-        counterfactual_features = feature_extractor(counterfactual)
-        counterfactual_probability = model.predict_proba(
-            (feature_vector(counterfactual_features),)
+        after_probability = model.predict_proba(
+            (model_feature_vector(feature_extractor(counterfactual)),)
         )[0]
-        counterfactual_probability = probability(
-            counterfactual_probability, "counterfactual_probability"
-        )
+        after_probability = probability(after_probability, "p_after")
         cost = positive_number(
-            acquisition_costs[evidence_id], f"acquisition_cost({evidence_id})"
+            acquisition_costs[evidence_id], f"C_ACQUIRE({evidence_id})"
         )
-        delta = counterfactual_probability - current_probability
+        retrieval = retrieval_expected_loss(
+            candidate=RetrievalCandidate(
+                evidence_id=evidence_id,
+                p_after=after_probability,
+                acquisition_cost=cost,
+            ),
+            costs=costs,
+        )
         unranked.append(
             _UnrankedCandidate(
                 evidence_id=evidence_id,
                 eligible_index=eligible_ids.index(evidence_id),
                 current_probability=current_probability,
-                counterfactual_probability=counterfactual_probability,
-                delta_p=delta,
+                counterfactual_probability=after_probability,
+                delta_p=after_probability - current_probability,
                 acquisition_cost=cost,
-                voi=delta / cost,
+                after_decide_loss=retrieval.decide_after_loss,
+                after_review_loss=retrieval.review_after_loss,
+                after_best_terminal_action=retrieval.best_terminal_action,
+                after_best_terminal_loss=retrieval.best_terminal_loss,
+                expected_loss_after_acquisition=retrieval.total_expected_loss,
+                net_voi=baseline_best - retrieval.total_expected_loss,
                 counterfactual_evidence_ids=tuple(
                     item.evidence_id for item in counterfactual_evidence
                 ),
@@ -165,7 +238,7 @@ def rank_evidence_by_voi(
 
     ordered = sorted(
         unranked,
-        key=lambda item: (-item.voi, -item.delta_p, item.eligible_index),
+        key=lambda item: (-item.net_voi, -item.delta_p, item.eligible_index),
     )
     return tuple(
         EvidenceValueCandidate(
@@ -175,7 +248,15 @@ def rank_evidence_by_voi(
             counterfactual_probability=item.counterfactual_probability,
             delta_p=item.delta_p,
             acquisition_cost=item.acquisition_cost,
-            voi=item.voi,
+            baseline_decide_loss=baseline_decide,
+            baseline_review_loss=baseline_review,
+            baseline_best_terminal_loss=baseline_best,
+            after_decide_loss=item.after_decide_loss,
+            after_review_loss=item.after_review_loss,
+            after_best_terminal_action=item.after_best_terminal_action,
+            after_best_terminal_loss=item.after_best_terminal_loss,
+            expected_loss_after_acquisition=item.expected_loss_after_acquisition,
+            net_voi=item.net_voi,
             counterfactual_evidence_ids=item.counterfactual_evidence_ids,
         )
         for index, item in enumerate(ordered, start=1)

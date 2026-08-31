@@ -32,6 +32,10 @@ from mandateguard.engineering.int3.models import (
     Int3ExperimentError,
     subset_counts_by_query,
 )
+from mandateguard.engineering.int3.model_manifest import (
+    MODEL_FEATURE_MANIFEST_SHA256,
+    MODEL_FEATURE_NAMES,
+)
 from mandateguard.engineering.int3.splits import (
     assert_no_query_leakage,
     leave_one_query_out_folds,
@@ -219,7 +223,9 @@ def test_plan_build_does_not_mutate_frozen_cases_or_evidence():
 def test_feature_dataset_is_strict_finite_and_unlabeled(int3_inputs):
     dataset = int3_inputs.dataset
     assert len(dataset.rows) == 62
-    assert dataset.feature_names == FEATURE_NAMES
+    assert dataset.feature_names == MODEL_FEATURE_NAMES
+    assert dataset.model_feature_names == MODEL_FEATURE_NAMES
+    assert dataset.diagnostic_feature_names == FEATURE_NAMES
     assert dataset.is_fully_labeled is False
     assert len(dataset.unlabeled_rows) == 62
     assert dataset.labeled_rows == ()
@@ -315,7 +321,15 @@ def test_subset_plan_artifact_contains_62_plan_rows_and_no_result_artifacts(
         assert record["future_subset_observed_semantic_behavior"] is None
         assert record["future_subset_observed_final_action"] is None
         assert record["decision_stable"] is None
-        assert tuple(record["features"]) == tuple(sorted(FEATURE_NAMES))
+        assert tuple(record["diagnostic_features"]) == tuple(
+            sorted(FEATURE_NAMES)
+        )
+        assert tuple(record["model_features"]) == tuple(
+            sorted(MODEL_FEATURE_NAMES)
+        )
+        assert record["model_feature_manifest_sha256"] == (
+            MODEL_FEATURE_MANIFEST_SHA256
+        )
         assert record["external_calls"] == {
             "evidence_fetch_calls": 0,
             "razorpay_calls": 0,

@@ -1,0 +1,2826 @@
+{
+  "base_commit": "7fe60059d857399b4a40a0d85317459d00c3f7ec",
+  "canonical_sha256": "ed6f5c57cbea9ca0399b021c3516e829fa5cb51f7e025a1f003e9b0b1cfd284d",
+  "created_at": "2026-08-31T04:09:47.326865Z",
+  "detector_version": "1.0",
+  "execution_policy": {
+    "deduplication_key": "exact semantic_input_sha256",
+    "fuzzy_reuse_allowed": false,
+    "new_input_max_attempts": 1,
+    "new_input_retries": 0,
+    "prior_exact_results_make_api_calls": false
+  },
+  "model_feature_manifest_sha256": "b5201911ac47dd1f17059431d88f4a2c4287875a1025821ebabcf8330a811f20",
+  "model_id": "gpt-5.6-terra",
+  "new_unique_input_count": 47,
+  "nominal_observation_count": 62,
+  "observations": [
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m1000",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-STUDYGLOW:m1000",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "semantic_input_sha256": "40dd8f1b558504623f1f90c7b19d3636dea8fe551a7b2b67a95fbd4f330f441f",
+      "subset_evidence_ids": [
+        "scholarly-terms-v1"
+      ],
+      "subset_size": 1
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m0100",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-STUDYGLOW:m0100",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "semantic_input_sha256": "9d74f2f600518e9d40915b549e6170c29e35525fa787dbffd900fe27e5af5e09",
+      "subset_evidence_ids": [
+        "notebook-evidence-v1"
+      ],
+      "subset_size": 1
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m0010",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-STUDYGLOW:m0010",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "semantic_input_sha256": "8642f65ea236d4fd8ebcad7364f535f1738cc05f76ea721285730630566e7efa",
+      "subset_evidence_ids": [
+        "study-club-evidence-v1"
+      ],
+      "subset_size": 1
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m0001",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-STUDYGLOW:m0001",
+      "observed_semantic_result": {
+        "constraint_results": [
+          {
+            "constraint_id": "exclusion.subscription-billing",
+            "reason": "Evidence states a one-time purchase with no subscription.",
+            "status": "PASS"
+          },
+          {
+            "constraint_id": "purpose.individual-study",
+            "reason": "Evidence states the product is intended for focused individual study and reading at a desk.",
+            "status": "PASS"
+          }
+        ],
+        "observed_final_action": "ALLOW",
+        "observed_semantic_behavior": "PASS",
+        "provider_response_id": "resp_093a83e05df97417016a94298309c887d0b99c111a517c8510",
+        "reason": "Evidence states a one-time purchase with no subscription.; Evidence states the product is intended for focused individual study and reading at a desk.",
+        "reason_code": null,
+        "semantic_output_sha256": "a1e64cc6945fbe8da702f9169e1b26d854be499c3121dbda3082b9dff09fd3d8",
+        "semantic_verdict": "PASS"
+      },
+      "planned_new_semantic_api_call": false,
+      "prior_exact_match": true,
+      "prior_observation_id": "F:INT2-Q-STUDYGLOW",
+      "prior_result_provenance": {
+        "exact_match_field": "semantic_input_sha256",
+        "prior_observation_id": "F:INT2-Q-STUDYGLOW",
+        "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+        "source_commit": "3946aa50c477881b1b085e35b60c9a411b6c8d64",
+        "source_file_sha256": "311ec367c29299bbc0d90831c35c08d87e0c8ed5acd1353bcd5777cbc9bd0a75",
+        "source_path": "artifacts/engineering/int2/stage-b-live-20260830T123856Z-0e4213c/stage_b_observations.jsonl"
+      },
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "query_id": "INT2-Q-STUDYGLOW",
+      "semantic_input_sha256": "2ee7142d0d4f812a4133d94ca1ddbb5711f7875e1c33265c4677c1d9a975427c",
+      "subset_evidence_ids": [
+        "studyglow-evidence-v1"
+      ],
+      "subset_size": 1
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m1100",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-STUDYGLOW:m1100",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "semantic_input_sha256": "fb5f44acf62fea5e0ee17a169b66447f4ef4e230a73ba2a2f5eb738e2641445c",
+      "subset_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1"
+      ],
+      "subset_size": 2
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m1010",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-STUDYGLOW:m1010",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "semantic_input_sha256": "d5e369c9e4ce4e9273f7a45c831fb244325660c0a6f110336bf0986ad7b2929f",
+      "subset_evidence_ids": [
+        "scholarly-terms-v1",
+        "study-club-evidence-v1"
+      ],
+      "subset_size": 2
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m1001",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-STUDYGLOW:m1001",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "semantic_input_sha256": "621a860ecbd6993286a2b57bb1a5c0cb6e5a0d70925a71c38f5cd02769f6312b",
+      "subset_evidence_ids": [
+        "scholarly-terms-v1",
+        "studyglow-evidence-v1"
+      ],
+      "subset_size": 2
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m0110",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-STUDYGLOW:m0110",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "semantic_input_sha256": "73006d21c04633fe1a80545f5187a2b169ee88ad25d07032997747fb341a9efd",
+      "subset_evidence_ids": [
+        "notebook-evidence-v1",
+        "study-club-evidence-v1"
+      ],
+      "subset_size": 2
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m0101",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-STUDYGLOW:m0101",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "semantic_input_sha256": "0337082d266cae103e542af368399460fa060ca419be688a7eb2cc31e03f7413",
+      "subset_evidence_ids": [
+        "notebook-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "subset_size": 2
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m0011",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-STUDYGLOW:m0011",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "semantic_input_sha256": "d18fc9fabd3d87712522a3c5ab80d983be46feb3f574a8700a0a613df08d8ed3",
+      "subset_evidence_ids": [
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "subset_size": 2
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m1110",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-STUDYGLOW:m1110",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "semantic_input_sha256": "4151ab4b42aa6615429867123341d8f2112fcaf2d4e0968a14491fa7b0aea7b7",
+      "subset_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1"
+      ],
+      "subset_size": 3
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m1101",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-STUDYGLOW:m1101",
+      "observed_semantic_result": {
+        "constraint_results": [
+          {
+            "constraint_id": "exclusion.subscription-billing",
+            "reason": "Product record states one-time purchase with no subscription.",
+            "status": "PASS"
+          },
+          {
+            "constraint_id": "purpose.individual-study",
+            "reason": "Product record states intended use is focused individual study and reading at a desk.",
+            "status": "PASS"
+          }
+        ],
+        "observed_final_action": "ALLOW",
+        "observed_semantic_behavior": "PASS",
+        "provider_response_id": "resp_0fbeb420a43022bc016a94297c889487d09c7955fdb5a52852",
+        "reason": "Product record states one-time purchase with no subscription.; Product record states intended use is focused individual study and reading at a desk.",
+        "reason_code": null,
+        "semantic_output_sha256": "035be24802933349876262f163ad780b30600bb42f0da87ac170f2470f90ba50",
+        "semantic_verdict": "PASS"
+      },
+      "planned_new_semantic_api_call": false,
+      "prior_exact_match": true,
+      "prior_observation_id": "C:INT2-Q-STUDYGLOW",
+      "prior_result_provenance": {
+        "exact_match_field": "semantic_input_sha256",
+        "prior_observation_id": "C:INT2-Q-STUDYGLOW",
+        "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+        "source_commit": "3946aa50c477881b1b085e35b60c9a411b6c8d64",
+        "source_file_sha256": "311ec367c29299bbc0d90831c35c08d87e0c8ed5acd1353bcd5777cbc9bd0a75",
+        "source_path": "artifacts/engineering/int2/stage-b-live-20260830T123856Z-0e4213c/stage_b_observations.jsonl"
+      },
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "query_id": "INT2-Q-STUDYGLOW",
+      "semantic_input_sha256": "445f1ddb7b19b374dafd8cc6b381d97cd812cf493d2717a0f1175f9f5f049bad",
+      "subset_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "subset_size": 3
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m1011",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-STUDYGLOW:m1011",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "semantic_input_sha256": "56b1b4c6740965c1c1d8df86dfcffd2216ebedae68ae0e93bf7462a8ed1f7ece",
+      "subset_evidence_ids": [
+        "scholarly-terms-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "subset_size": 3
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m0111",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-STUDYGLOW:m0111",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "semantic_input_sha256": "d801c28c1bb7cb4bea7e18462197092e619419bcd4ebf48c583cbf28c0e793f6",
+      "subset_evidence_ids": [
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "subset_size": 3
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m1111",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-STUDYGLOW:m1111",
+      "observed_semantic_result": {
+        "constraint_results": [
+          {
+            "constraint_id": "exclusion.subscription-billing",
+            "reason": "Product-specific evidence states it is a one-time purchase with no subscription.",
+            "status": "PASS"
+          },
+          {
+            "constraint_id": "purpose.individual-study",
+            "reason": "Product description identifies intended use as focused individual study and reading at a desk.",
+            "status": "PASS"
+          }
+        ],
+        "observed_final_action": "ALLOW",
+        "observed_semantic_behavior": "PASS",
+        "provider_response_id": "resp_0a7e175bd89a75a4016a94296cdb8487d08957d5b3ed022f32",
+        "reason": "Product-specific evidence states it is a one-time purchase with no subscription.; Product description identifies intended use as focused individual study and reading at a desk.",
+        "reason_code": null,
+        "semantic_output_sha256": "b3d1de5cca8ee0f6f7db570e4fb70d2a764f430ad945a4a50210801d515772ba",
+        "semantic_verdict": "PASS"
+      },
+      "planned_new_semantic_api_call": false,
+      "prior_exact_match": true,
+      "prior_observation_id": "B:INT2-Q-STUDYGLOW",
+      "prior_result_provenance": {
+        "exact_match_field": "semantic_input_sha256",
+        "prior_observation_id": "B:INT2-Q-STUDYGLOW",
+        "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+        "source_commit": "3946aa50c477881b1b085e35b60c9a411b6c8d64",
+        "source_file_sha256": "311ec367c29299bbc0d90831c35c08d87e0c8ed5acd1353bcd5777cbc9bd0a75",
+        "source_path": "artifacts/engineering/int2/stage-b-live-20260830T123856Z-0e4213c/stage_b_observations.jsonl"
+      },
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "query_id": "INT2-Q-STUDYGLOW",
+      "semantic_input_sha256": "f9883afcb502f7de7b72f47779e296bc2dd5c3125b2ba3ae1d83a993e84e5c76",
+      "subset_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "subset_size": 4
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m1000",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-NOTEBOOK:m1000",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "semantic_input_sha256": "4fc26a1bacb6289649c6a744d69845a184d32252c953349ca75b07dbb6d84798",
+      "subset_evidence_ids": [
+        "scholarly-terms-v1"
+      ],
+      "subset_size": 1
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m0100",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-NOTEBOOK:m0100",
+      "observed_semantic_result": {
+        "constraint_results": [
+          {
+            "constraint_id": "exclusion.subscription-billing",
+            "reason": "Evidence states a one-time purchase with no subscription.",
+            "status": "PASS"
+          },
+          {
+            "constraint_id": "purpose.handwritten-study",
+            "reason": "Evidence states the product is intended for handwritten individual study notes and field observations.",
+            "status": "PASS"
+          }
+        ],
+        "observed_final_action": "ALLOW",
+        "observed_semantic_behavior": "PASS",
+        "provider_response_id": "resp_03e3e9614791ab42016a9429849df087d0b39dc998551bb9d0",
+        "reason": "Evidence states a one-time purchase with no subscription.; Evidence states the product is intended for handwritten individual study notes and field observations.",
+        "reason_code": null,
+        "semantic_output_sha256": "524b595a6a1cc822cdaf426454357c779139c448b710373539f536149193008d",
+        "semantic_verdict": "PASS"
+      },
+      "planned_new_semantic_api_call": false,
+      "prior_exact_match": true,
+      "prior_observation_id": "F:INT2-Q-NOTEBOOK",
+      "prior_result_provenance": {
+        "exact_match_field": "semantic_input_sha256",
+        "prior_observation_id": "F:INT2-Q-NOTEBOOK",
+        "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+        "source_commit": "3946aa50c477881b1b085e35b60c9a411b6c8d64",
+        "source_file_sha256": "311ec367c29299bbc0d90831c35c08d87e0c8ed5acd1353bcd5777cbc9bd0a75",
+        "source_path": "artifacts/engineering/int2/stage-b-live-20260830T123856Z-0e4213c/stage_b_observations.jsonl"
+      },
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "query_id": "INT2-Q-NOTEBOOK",
+      "semantic_input_sha256": "ce238744c991b8d12a3261b024d46f7b88b5751f3a211cddc4b5c5ed354e6ff1",
+      "subset_evidence_ids": [
+        "notebook-evidence-v1"
+      ],
+      "subset_size": 1
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m0010",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-NOTEBOOK:m0010",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "semantic_input_sha256": "34f76fc99cfdb52b78aa210b2c64f2b0cfeae5adae84916c8891942edeec082e",
+      "subset_evidence_ids": [
+        "study-club-evidence-v1"
+      ],
+      "subset_size": 1
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m0001",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-NOTEBOOK:m0001",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "semantic_input_sha256": "5088cfe410df7eee2fa7cc543656c0baa6bb61fb671657cdf5642165a97bbd62",
+      "subset_evidence_ids": [
+        "studyglow-evidence-v1"
+      ],
+      "subset_size": 1
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m1100",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-NOTEBOOK:m1100",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "semantic_input_sha256": "32bcb37c484cc84febe25b87b80b56248126f6853bfc55daba8fe4d78e51abe9",
+      "subset_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1"
+      ],
+      "subset_size": 2
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m1010",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-NOTEBOOK:m1010",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "semantic_input_sha256": "919bbea9265e7434a00fca63ef1dabab5951b015f9c27e39bc7e982f9d09e265",
+      "subset_evidence_ids": [
+        "scholarly-terms-v1",
+        "study-club-evidence-v1"
+      ],
+      "subset_size": 2
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m1001",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-NOTEBOOK:m1001",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "semantic_input_sha256": "94b2a4a1d9ad7418f440e2d0ea0fa0da66cd901554c252929be8abae7124f985",
+      "subset_evidence_ids": [
+        "scholarly-terms-v1",
+        "studyglow-evidence-v1"
+      ],
+      "subset_size": 2
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m0110",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-NOTEBOOK:m0110",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "semantic_input_sha256": "7595debded3b83cd184d4d9d25661eb09bbc7cb5d0e4cf10859b720d8ed9edca",
+      "subset_evidence_ids": [
+        "notebook-evidence-v1",
+        "study-club-evidence-v1"
+      ],
+      "subset_size": 2
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m0101",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-NOTEBOOK:m0101",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "semantic_input_sha256": "1b86311da7b6afc13e325becd9bd259f6be587c77f5930b9c86ed6b2ee234ef8",
+      "subset_evidence_ids": [
+        "notebook-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "subset_size": 2
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m0011",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-NOTEBOOK:m0011",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "semantic_input_sha256": "5b81276f457a28a3c811ba66b671158e049401615d08a20bc9af2fbfb9253370",
+      "subset_evidence_ids": [
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "subset_size": 2
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m1110",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-NOTEBOOK:m1110",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "semantic_input_sha256": "fa57dd349014c68bc8c0b498b6067cbd851eb95bb69e31c742fe8a386c725df9",
+      "subset_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1"
+      ],
+      "subset_size": 3
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m1101",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-NOTEBOOK:m1101",
+      "observed_semantic_result": {
+        "constraint_results": [
+          {
+            "constraint_id": "exclusion.subscription-billing",
+            "reason": "Product-specific evidence states a one-time purchase with no subscription.",
+            "status": "PASS"
+          },
+          {
+            "constraint_id": "purpose.handwritten-study",
+            "reason": "Product-specific evidence states intended use is handwritten individual study notes and field observations.",
+            "status": "PASS"
+          }
+        ],
+        "observed_final_action": "ALLOW",
+        "observed_semantic_behavior": "PASS",
+        "provider_response_id": "resp_0a951719a38c3e77016a94297f264087d082398694cb0101c0",
+        "reason": "Product-specific evidence states a one-time purchase with no subscription.; Product-specific evidence states intended use is handwritten individual study notes and field observations.",
+        "reason_code": null,
+        "semantic_output_sha256": "a8c6c6e3acc34223e6b01b5c88c513e3712921bf63cb582466821d0d0e1e933f",
+        "semantic_verdict": "PASS"
+      },
+      "planned_new_semantic_api_call": false,
+      "prior_exact_match": true,
+      "prior_observation_id": "C:INT2-Q-NOTEBOOK",
+      "prior_result_provenance": {
+        "exact_match_field": "semantic_input_sha256",
+        "prior_observation_id": "C:INT2-Q-NOTEBOOK",
+        "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+        "source_commit": "3946aa50c477881b1b085e35b60c9a411b6c8d64",
+        "source_file_sha256": "311ec367c29299bbc0d90831c35c08d87e0c8ed5acd1353bcd5777cbc9bd0a75",
+        "source_path": "artifacts/engineering/int2/stage-b-live-20260830T123856Z-0e4213c/stage_b_observations.jsonl"
+      },
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "query_id": "INT2-Q-NOTEBOOK",
+      "semantic_input_sha256": "1c5b0fda84bf996157a22f9ab6dd0f632c749fbc646f27fe5a45ac9242cdae0e",
+      "subset_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "subset_size": 3
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m1011",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-NOTEBOOK:m1011",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "semantic_input_sha256": "2c1ca0d62da5580f5b6bb2136f69d07f8a5bc75dd525dbb7a2ac380a75041c14",
+      "subset_evidence_ids": [
+        "scholarly-terms-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "subset_size": 3
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m0111",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-NOTEBOOK:m0111",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "semantic_input_sha256": "d912904e67ff0c8c3ab7462c854b910ef9721563faae17d44009aead956ba36a",
+      "subset_evidence_ids": [
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "subset_size": 3
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m1111",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-NOTEBOOK:m1111",
+      "observed_semantic_result": {
+        "constraint_results": [
+          {
+            "constraint_id": "exclusion.subscription-billing",
+            "reason": "Product-specific evidence states a one-time purchase with no subscription.",
+            "status": "PASS"
+          },
+          {
+            "constraint_id": "purpose.handwritten-study",
+            "reason": "Product description explicitly states intended use for handwritten individual study notes and field observations.",
+            "status": "PASS"
+          }
+        ],
+        "observed_final_action": "ALLOW",
+        "observed_semantic_behavior": "PASS",
+        "provider_response_id": "resp_0a2f0455d8ff52a3016a94296fbea887d09a9b3ed4a86e34b7",
+        "reason": "Product-specific evidence states a one-time purchase with no subscription.; Product description explicitly states intended use for handwritten individual study notes and field observations.",
+        "reason_code": null,
+        "semantic_output_sha256": "d82942aa4c02b3477637519c57fcd5d066f46d300c2ffa1b3e6911851b05033d",
+        "semantic_verdict": "PASS"
+      },
+      "planned_new_semantic_api_call": false,
+      "prior_exact_match": true,
+      "prior_observation_id": "B:INT2-Q-NOTEBOOK",
+      "prior_result_provenance": {
+        "exact_match_field": "semantic_input_sha256",
+        "prior_observation_id": "B:INT2-Q-NOTEBOOK",
+        "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+        "source_commit": "3946aa50c477881b1b085e35b60c9a411b6c8d64",
+        "source_file_sha256": "311ec367c29299bbc0d90831c35c08d87e0c8ed5acd1353bcd5777cbc9bd0a75",
+        "source_path": "artifacts/engineering/int2/stage-b-live-20260830T123856Z-0e4213c/stage_b_observations.jsonl"
+      },
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "query_id": "INT2-Q-NOTEBOOK",
+      "semantic_input_sha256": "d220660c03eae36acff0a1d984a666038ec5af7aa8d2dec440168e6bc59b784e",
+      "subset_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "subset_size": 4
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1000",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "BLOCK",
+      "full_reference_semantic_behavior": "VIOLATION",
+      "observation_id": "INT3:INT2-Q-STUDY-CLUB:m1000",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "semantic_input_sha256": "a0bf96c8ca3bf354add9ac0a3b34104064d626fc0bbc5b0af75f7188aebf60e3",
+      "subset_evidence_ids": [
+        "scholarly-terms-v1"
+      ],
+      "subset_size": 1
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0100",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "BLOCK",
+      "full_reference_semantic_behavior": "VIOLATION",
+      "observation_id": "INT3:INT2-Q-STUDY-CLUB:m0100",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "semantic_input_sha256": "f8523d35e899b10e3d30dd9aa55bbf2b01cc623e9988fe7e5f54f851ac8ffb02",
+      "subset_evidence_ids": [
+        "notebook-evidence-v1"
+      ],
+      "subset_size": 1
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0010",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "full_reference_action": "BLOCK",
+      "full_reference_semantic_behavior": "VIOLATION",
+      "observation_id": "INT3:INT2-Q-STUDY-CLUB:m0010",
+      "observed_semantic_result": {
+        "constraint_results": [
+          {
+            "constraint_id": "exclusion.recurring-membership",
+            "reason": "Product terms state that the Study Club renews monthly until cancelled, indicating a recurring renewal obligation.",
+            "status": "VIOLATION"
+          }
+        ],
+        "observed_final_action": "BLOCK",
+        "observed_semantic_behavior": "VIOLATION",
+        "provider_response_id": "resp_05199a40115b1794016a94298629cc87d08be555e88afeb8b8",
+        "reason": "Product terms state that the Study Club renews monthly until cancelled, indicating a recurring renewal obligation.",
+        "reason_code": null,
+        "semantic_output_sha256": "fd740d0e9c925852593853d074a51637fd4b5f1f5ac297425746b3f4bdbd5d29",
+        "semantic_verdict": "VIOLATION"
+      },
+      "planned_new_semantic_api_call": false,
+      "prior_exact_match": true,
+      "prior_observation_id": "F:INT2-Q-STUDY-CLUB",
+      "prior_result_provenance": {
+        "exact_match_field": "semantic_input_sha256",
+        "prior_observation_id": "F:INT2-Q-STUDY-CLUB",
+        "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+        "source_commit": "3946aa50c477881b1b085e35b60c9a411b6c8d64",
+        "source_file_sha256": "311ec367c29299bbc0d90831c35c08d87e0c8ed5acd1353bcd5777cbc9bd0a75",
+        "source_path": "artifacts/engineering/int2/stage-b-live-20260830T123856Z-0e4213c/stage_b_observations.jsonl"
+      },
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "semantic_input_sha256": "463dd1f37e3a4daf6d04909e7466562a636b9aa73bb17cca3a1a761fd971bf85",
+      "subset_evidence_ids": [
+        "study-club-evidence-v1"
+      ],
+      "subset_size": 1
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0001",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "BLOCK",
+      "full_reference_semantic_behavior": "VIOLATION",
+      "observation_id": "INT3:INT2-Q-STUDY-CLUB:m0001",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "semantic_input_sha256": "87d690d5cbd4491852baf540646485d3f6733712384c0795070eb498405ebc15",
+      "subset_evidence_ids": [
+        "studyglow-evidence-v1"
+      ],
+      "subset_size": 1
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1100",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "BLOCK",
+      "full_reference_semantic_behavior": "VIOLATION",
+      "observation_id": "INT3:INT2-Q-STUDY-CLUB:m1100",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "semantic_input_sha256": "3e0111d02c7732729393427df54a973117bf95e41e7c23b25f5c14e2e53e3b12",
+      "subset_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1"
+      ],
+      "subset_size": 2
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1010",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "BLOCK",
+      "full_reference_semantic_behavior": "VIOLATION",
+      "observation_id": "INT3:INT2-Q-STUDY-CLUB:m1010",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "semantic_input_sha256": "d5653473929d6b13bab85f84d57eb0af6644dbe4906816c447d1bfd2af86f68b",
+      "subset_evidence_ids": [
+        "scholarly-terms-v1",
+        "study-club-evidence-v1"
+      ],
+      "subset_size": 2
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1001",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "BLOCK",
+      "full_reference_semantic_behavior": "VIOLATION",
+      "observation_id": "INT3:INT2-Q-STUDY-CLUB:m1001",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "semantic_input_sha256": "3333c8a4146169226349d403df41cf4ce812c7850269bc4fc15d01f3f0b228b6",
+      "subset_evidence_ids": [
+        "scholarly-terms-v1",
+        "studyglow-evidence-v1"
+      ],
+      "subset_size": 2
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0110",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "BLOCK",
+      "full_reference_semantic_behavior": "VIOLATION",
+      "observation_id": "INT3:INT2-Q-STUDY-CLUB:m0110",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "semantic_input_sha256": "39cee3017f08fd277783fe28ceb84f34cbfb3a9e0f6a9452c3f54fca21538653",
+      "subset_evidence_ids": [
+        "notebook-evidence-v1",
+        "study-club-evidence-v1"
+      ],
+      "subset_size": 2
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0101",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "BLOCK",
+      "full_reference_semantic_behavior": "VIOLATION",
+      "observation_id": "INT3:INT2-Q-STUDY-CLUB:m0101",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "semantic_input_sha256": "4284abd180f3aeb291553112169479d0b8594d7fa9cf438252709db2d2e9fa69",
+      "subset_evidence_ids": [
+        "notebook-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "subset_size": 2
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0011",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "BLOCK",
+      "full_reference_semantic_behavior": "VIOLATION",
+      "observation_id": "INT3:INT2-Q-STUDY-CLUB:m0011",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "semantic_input_sha256": "7bdd1c8ee41cad2a5eaf6bae63577ce01d9a9b6c60cbd01d79bac2525d5b73c6",
+      "subset_evidence_ids": [
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "subset_size": 2
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1110",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "BLOCK",
+      "full_reference_semantic_behavior": "VIOLATION",
+      "observation_id": "INT3:INT2-Q-STUDY-CLUB:m1110",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "semantic_input_sha256": "0a80734858d1089265d170d30b34388677f7db9ca1f0855e6088c393869fb867",
+      "subset_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1"
+      ],
+      "subset_size": 3
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1101",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "BLOCK",
+      "full_reference_semantic_behavior": "VIOLATION",
+      "observation_id": "INT3:INT2-Q-STUDY-CLUB:m1101",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "semantic_input_sha256": "98db3119878a23ff833d712e335ee262b7d777437ed9d35c21466d41ee6fb47b",
+      "subset_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "subset_size": 3
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1011",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "full_reference_action": "BLOCK",
+      "full_reference_semantic_behavior": "VIOLATION",
+      "observation_id": "INT3:INT2-Q-STUDY-CLUB:m1011",
+      "observed_semantic_result": {
+        "constraint_results": [
+          {
+            "constraint_id": "exclusion.recurring-membership",
+            "reason": "Product terms state that the Study Club renews monthly until cancelled.",
+            "status": "VIOLATION"
+          }
+        ],
+        "observed_final_action": "BLOCK",
+        "observed_semantic_behavior": "VIOLATION",
+        "provider_response_id": "resp_0560f3456e77dc45016a942980eaf887d0951170b101c4adf7",
+        "reason": "Product terms state that the Study Club renews monthly until cancelled.",
+        "reason_code": null,
+        "semantic_output_sha256": "f58b51492a0d657763b1e971fd9952a8513e5ceafdabeed34df23f719a4acb68",
+        "semantic_verdict": "VIOLATION"
+      },
+      "planned_new_semantic_api_call": false,
+      "prior_exact_match": true,
+      "prior_observation_id": "C:INT2-Q-STUDY-CLUB",
+      "prior_result_provenance": {
+        "exact_match_field": "semantic_input_sha256",
+        "prior_observation_id": "C:INT2-Q-STUDY-CLUB",
+        "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+        "source_commit": "3946aa50c477881b1b085e35b60c9a411b6c8d64",
+        "source_file_sha256": "311ec367c29299bbc0d90831c35c08d87e0c8ed5acd1353bcd5777cbc9bd0a75",
+        "source_path": "artifacts/engineering/int2/stage-b-live-20260830T123856Z-0e4213c/stage_b_observations.jsonl"
+      },
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "semantic_input_sha256": "d3d09d90491579b2ddaac3e0a2b49bcfe7545827707531236ee92a96c1865802",
+      "subset_evidence_ids": [
+        "scholarly-terms-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "subset_size": 3
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0111",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "BLOCK",
+      "full_reference_semantic_behavior": "VIOLATION",
+      "observation_id": "INT3:INT2-Q-STUDY-CLUB:m0111",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "semantic_input_sha256": "c387be12f05c62360458d9b5088af9c002bf8bfe2b2b55b3948d73475ddc8d6f",
+      "subset_evidence_ids": [
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "subset_size": 3
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1111",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "eligible_size": 4,
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "full_reference_action": "BLOCK",
+      "full_reference_semantic_behavior": "VIOLATION",
+      "observation_id": "INT3:INT2-Q-STUDY-CLUB:m1111",
+      "observed_semantic_result": {
+        "constraint_results": [
+          {
+            "constraint_id": "exclusion.recurring-membership",
+            "reason": "Product terms state that the Study Club renews monthly until cancelled, constituting a recurring membership/renewal obligation.",
+            "status": "VIOLATION"
+          }
+        ],
+        "observed_final_action": "BLOCK",
+        "observed_semantic_behavior": "VIOLATION",
+        "provider_response_id": "resp_05fba47dd0289cbb016a94297515c887d0a57573c4a42be0f6",
+        "reason": "Product terms state that the Study Club renews monthly until cancelled, constituting a recurring membership/renewal obligation.",
+        "reason_code": null,
+        "semantic_output_sha256": "b19aaa0e85c1ba369aa4f3a9712b9157d4884ac6dedfab690c68c8715a904da0",
+        "semantic_verdict": "VIOLATION"
+      },
+      "planned_new_semantic_api_call": false,
+      "prior_exact_match": true,
+      "prior_observation_id": "B:INT2-Q-STUDY-CLUB",
+      "prior_result_provenance": {
+        "exact_match_field": "semantic_input_sha256",
+        "prior_observation_id": "B:INT2-Q-STUDY-CLUB",
+        "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+        "source_commit": "3946aa50c477881b1b085e35b60c9a411b6c8d64",
+        "source_file_sha256": "311ec367c29299bbc0d90831c35c08d87e0c8ed5acd1353bcd5777cbc9bd0a75",
+        "source_path": "artifacts/engineering/int2/stage-b-live-20260830T123856Z-0e4213c/stage_b_observations.jsonl"
+      },
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "semantic_input_sha256": "caeac07142bec9baf0d1d0b117376f0f0924ab6348e84bead3f8f7baa46a1ebf",
+      "subset_evidence_ids": [
+        "scholarly-terms-v1",
+        "notebook-evidence-v1",
+        "study-club-evidence-v1",
+        "studyglow-evidence-v1"
+      ],
+      "subset_size": 4
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-MARKET-EDGE:m100",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "academy-terms-v1",
+        "market-edge-evidence-v1",
+        "tax-guide-evidence-v1"
+      ],
+      "eligible_size": 3,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "BLOCK",
+      "full_reference_semantic_behavior": "VIOLATION",
+      "observation_id": "INT3:INT2-Q-MARKET-EDGE:m100",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "semantic_input_sha256": "0cae51dedb8f415929da09b45373a4ed10f328d34a98bc9e0bdcb61037cb0a7e",
+      "subset_evidence_ids": [
+        "academy-terms-v1"
+      ],
+      "subset_size": 1
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-MARKET-EDGE:m010",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "academy-terms-v1",
+        "market-edge-evidence-v1",
+        "tax-guide-evidence-v1"
+      ],
+      "eligible_size": 3,
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "full_reference_action": "BLOCK",
+      "full_reference_semantic_behavior": "VIOLATION",
+      "observation_id": "INT3:INT2-Q-MARKET-EDGE:m010",
+      "observed_semantic_result": {
+        "constraint_results": [
+          {
+            "constraint_id": "exclusion.gambling-content",
+            "reason": "The syllabus explicitly teaches casino gambling techniques, betting systems, and wager selection.",
+            "status": "VIOLATION"
+          },
+          {
+            "constraint_id": "purpose.professional-development",
+            "reason": "The syllabus explicitly markets the course for professional development.",
+            "status": "PASS"
+          }
+        ],
+        "observed_final_action": "BLOCK",
+        "observed_semantic_behavior": "VIOLATION",
+        "provider_response_id": "resp_01248379cbf24d0b016a942987b5bc87d08bf017d1b88c6b2d",
+        "reason": "The syllabus explicitly teaches casino gambling techniques, betting systems, and wager selection.; The syllabus explicitly markets the course for professional development.",
+        "reason_code": null,
+        "semantic_output_sha256": "285fe71d3b6fea42b42344c03f946818842da8405d835cdee97e0b530b9bb537",
+        "semantic_verdict": "VIOLATION"
+      },
+      "planned_new_semantic_api_call": false,
+      "prior_exact_match": true,
+      "prior_observation_id": "F:INT2-Q-MARKET-EDGE",
+      "prior_result_provenance": {
+        "exact_match_field": "semantic_input_sha256",
+        "prior_observation_id": "F:INT2-Q-MARKET-EDGE",
+        "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+        "source_commit": "3946aa50c477881b1b085e35b60c9a411b6c8d64",
+        "source_file_sha256": "311ec367c29299bbc0d90831c35c08d87e0c8ed5acd1353bcd5777cbc9bd0a75",
+        "source_path": "artifacts/engineering/int2/stage-b-live-20260830T123856Z-0e4213c/stage_b_observations.jsonl"
+      },
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "semantic_input_sha256": "cb17187b6972a932c451809e88bc978314c2c4100f2158c20fb4db2df0ee69a6",
+      "subset_evidence_ids": [
+        "market-edge-evidence-v1"
+      ],
+      "subset_size": 1
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-MARKET-EDGE:m001",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "academy-terms-v1",
+        "market-edge-evidence-v1",
+        "tax-guide-evidence-v1"
+      ],
+      "eligible_size": 3,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "BLOCK",
+      "full_reference_semantic_behavior": "VIOLATION",
+      "observation_id": "INT3:INT2-Q-MARKET-EDGE:m001",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "semantic_input_sha256": "4ebe733ef09009fcf5b6d1e25e1bfebbea80a9a7d6486d6f256a75a0b9b11eb9",
+      "subset_evidence_ids": [
+        "tax-guide-evidence-v1"
+      ],
+      "subset_size": 1
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-MARKET-EDGE:m110",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "academy-terms-v1",
+        "market-edge-evidence-v1",
+        "tax-guide-evidence-v1"
+      ],
+      "eligible_size": 3,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "BLOCK",
+      "full_reference_semantic_behavior": "VIOLATION",
+      "observation_id": "INT3:INT2-Q-MARKET-EDGE:m110",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "semantic_input_sha256": "a0249b236a7c0f33326105201db339f4ca31e5edc04a988863918d3c08c64746",
+      "subset_evidence_ids": [
+        "academy-terms-v1",
+        "market-edge-evidence-v1"
+      ],
+      "subset_size": 2
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-MARKET-EDGE:m101",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "academy-terms-v1",
+        "market-edge-evidence-v1",
+        "tax-guide-evidence-v1"
+      ],
+      "eligible_size": 3,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "BLOCK",
+      "full_reference_semantic_behavior": "VIOLATION",
+      "observation_id": "INT3:INT2-Q-MARKET-EDGE:m101",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "semantic_input_sha256": "c406898d2b6d0d1f7dad4f4ff373fa9665a751b4743b03607e0afc492a6e0d68",
+      "subset_evidence_ids": [
+        "academy-terms-v1",
+        "tax-guide-evidence-v1"
+      ],
+      "subset_size": 2
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-MARKET-EDGE:m011",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "academy-terms-v1",
+        "market-edge-evidence-v1",
+        "tax-guide-evidence-v1"
+      ],
+      "eligible_size": 3,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "BLOCK",
+      "full_reference_semantic_behavior": "VIOLATION",
+      "observation_id": "INT3:INT2-Q-MARKET-EDGE:m011",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "semantic_input_sha256": "60bdfb937e67ba4ad0b74009e134f0f25d24ffe38e31874c22a940250435182e",
+      "subset_evidence_ids": [
+        "market-edge-evidence-v1",
+        "tax-guide-evidence-v1"
+      ],
+      "subset_size": 2
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-MARKET-EDGE:m111",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "academy-terms-v1",
+        "market-edge-evidence-v1",
+        "tax-guide-evidence-v1"
+      ],
+      "eligible_size": 3,
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "full_reference_action": "BLOCK",
+      "full_reference_semantic_behavior": "VIOLATION",
+      "observation_id": "INT3:INT2-Q-MARKET-EDGE:m111",
+      "observed_semantic_result": {
+        "constraint_results": [
+          {
+            "constraint_id": "exclusion.gambling-content",
+            "reason": "The syllabus explicitly teaches casino gambling techniques, betting systems, and wager selection.",
+            "status": "VIOLATION"
+          },
+          {
+            "constraint_id": "purpose.professional-development",
+            "reason": "The syllabus explicitly markets the course for professional development.",
+            "status": "PASS"
+          }
+        ],
+        "observed_final_action": "BLOCK",
+        "observed_semantic_behavior": "VIOLATION",
+        "provider_response_id": "resp_0f8fe2e51ad88ebf016a94297713a487d085236981f3610d9c",
+        "reason": "The syllabus explicitly teaches casino gambling techniques, betting systems, and wager selection.; The syllabus explicitly markets the course for professional development.",
+        "reason_code": null,
+        "semantic_output_sha256": "285fe71d3b6fea42b42344c03f946818842da8405d835cdee97e0b530b9bb537",
+        "semantic_verdict": "VIOLATION"
+      },
+      "planned_new_semantic_api_call": false,
+      "prior_exact_match": true,
+      "prior_observation_id": "B:INT2-Q-MARKET-EDGE",
+      "prior_result_provenance": {
+        "exact_match_field": "semantic_input_sha256",
+        "prior_observation_id": "B:INT2-Q-MARKET-EDGE",
+        "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+        "source_commit": "3946aa50c477881b1b085e35b60c9a411b6c8d64",
+        "source_file_sha256": "311ec367c29299bbc0d90831c35c08d87e0c8ed5acd1353bcd5777cbc9bd0a75",
+        "source_path": "artifacts/engineering/int2/stage-b-live-20260830T123856Z-0e4213c/stage_b_observations.jsonl"
+      },
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "semantic_input_sha256": "9b390ca5ad1cc9ecef8152a18cb7c24929a8e0144aa6a7f699318a23f175b0dd",
+      "subset_evidence_ids": [
+        "academy-terms-v1",
+        "market-edge-evidence-v1",
+        "tax-guide-evidence-v1"
+      ],
+      "subset_size": 3
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-TAX-GUIDE:m100",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "academy-terms-v1",
+        "market-edge-evidence-v1",
+        "tax-guide-evidence-v1"
+      ],
+      "eligible_size": 3,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-TAX-GUIDE:m100",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "semantic_input_sha256": "2794f6cc05eb54d5ece70f3fd7fb2bf42b48b1ca1956c6c4252ca26a7f3da8b3",
+      "subset_evidence_ids": [
+        "academy-terms-v1"
+      ],
+      "subset_size": 1
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-TAX-GUIDE:m010",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "academy-terms-v1",
+        "market-edge-evidence-v1",
+        "tax-guide-evidence-v1"
+      ],
+      "eligible_size": 3,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-TAX-GUIDE:m010",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "semantic_input_sha256": "e105e362f20c5c48f05bfc1027b037f183f03544c54e140058aa61f5b5d4529c",
+      "subset_evidence_ids": [
+        "market-edge-evidence-v1"
+      ],
+      "subset_size": 1
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-TAX-GUIDE:m001",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "academy-terms-v1",
+        "market-edge-evidence-v1",
+        "tax-guide-evidence-v1"
+      ],
+      "eligible_size": 3,
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-TAX-GUIDE:m001",
+      "observed_semantic_result": {
+        "constraint_results": [
+          {
+            "constraint_id": "exclusion.subscription-billing",
+            "reason": "Evidence states a one-time purchase with no subscription.",
+            "status": "PASS"
+          },
+          {
+            "constraint_id": "purpose.tax-planning",
+            "reason": "Evidence identifies intended use as professional development for bookkeeping and tax-planning work.",
+            "status": "PASS"
+          }
+        ],
+        "observed_final_action": "ALLOW",
+        "observed_semantic_behavior": "PASS",
+        "provider_response_id": "resp_02ccd1aeda38c996016a942989720487d0b22aeaeb6c88e883",
+        "reason": "Evidence states a one-time purchase with no subscription.; Evidence identifies intended use as professional development for bookkeeping and tax-planning work.",
+        "reason_code": null,
+        "semantic_output_sha256": "56fcb7a9eaf13aa632f9a87e618670d43da740889b7172731835d33039bf239f",
+        "semantic_verdict": "PASS"
+      },
+      "planned_new_semantic_api_call": false,
+      "prior_exact_match": true,
+      "prior_observation_id": "F:INT2-Q-TAX-GUIDE",
+      "prior_result_provenance": {
+        "exact_match_field": "semantic_input_sha256",
+        "prior_observation_id": "F:INT2-Q-TAX-GUIDE",
+        "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+        "source_commit": "3946aa50c477881b1b085e35b60c9a411b6c8d64",
+        "source_file_sha256": "311ec367c29299bbc0d90831c35c08d87e0c8ed5acd1353bcd5777cbc9bd0a75",
+        "source_path": "artifacts/engineering/int2/stage-b-live-20260830T123856Z-0e4213c/stage_b_observations.jsonl"
+      },
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "semantic_input_sha256": "0aa53bc0ab1637469b7a91ce448d4df34dd36f35ebe97127fd8358d5ed7ef397",
+      "subset_evidence_ids": [
+        "tax-guide-evidence-v1"
+      ],
+      "subset_size": 1
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-TAX-GUIDE:m110",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "academy-terms-v1",
+        "market-edge-evidence-v1",
+        "tax-guide-evidence-v1"
+      ],
+      "eligible_size": 3,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-TAX-GUIDE:m110",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "semantic_input_sha256": "71d0db3b705e2788a5d462840a8c13cb025a287a5889f8654a5779ad66b36fae",
+      "subset_evidence_ids": [
+        "academy-terms-v1",
+        "market-edge-evidence-v1"
+      ],
+      "subset_size": 2
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-TAX-GUIDE:m101",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "academy-terms-v1",
+        "market-edge-evidence-v1",
+        "tax-guide-evidence-v1"
+      ],
+      "eligible_size": 3,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-TAX-GUIDE:m101",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "semantic_input_sha256": "0242840fbe2f7f6c253c0560c336efe644ea72c9f9029c9b81a63dec5777e1bf",
+      "subset_evidence_ids": [
+        "academy-terms-v1",
+        "tax-guide-evidence-v1"
+      ],
+      "subset_size": 2
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-TAX-GUIDE:m011",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "academy-terms-v1",
+        "market-edge-evidence-v1",
+        "tax-guide-evidence-v1"
+      ],
+      "eligible_size": 3,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-TAX-GUIDE:m011",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "semantic_input_sha256": "34656af93d1736f76de09d9f40c02185957dcc1c2c70ce55b868fd63c797bf68",
+      "subset_evidence_ids": [
+        "market-edge-evidence-v1",
+        "tax-guide-evidence-v1"
+      ],
+      "subset_size": 2
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-TAX-GUIDE:m111",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "academy-terms-v1",
+        "market-edge-evidence-v1",
+        "tax-guide-evidence-v1"
+      ],
+      "eligible_size": 3,
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "full_reference_action": "ALLOW",
+      "full_reference_semantic_behavior": "PASS",
+      "observation_id": "INT3:INT2-Q-TAX-GUIDE:m111",
+      "observed_semantic_result": {
+        "constraint_results": [
+          {
+            "constraint_id": "exclusion.subscription-billing",
+            "reason": "Product evidence states a one-time purchase with no subscription.",
+            "status": "PASS"
+          },
+          {
+            "constraint_id": "purpose.tax-planning",
+            "reason": "Product evidence explicitly identifies professional development for bookkeeping and tax-planning work.",
+            "status": "PASS"
+          }
+        ],
+        "observed_final_action": "ALLOW",
+        "observed_semantic_behavior": "PASS",
+        "provider_response_id": "resp_0ce8cc308c3e6866016a942978a35087d0b5dcfc4afb91e022",
+        "reason": "Product evidence states a one-time purchase with no subscription.; Product evidence explicitly identifies professional development for bookkeeping and tax-planning work.",
+        "reason_code": null,
+        "semantic_output_sha256": "81ae0dbecd762fc6bf71da34057521bcd007637d2cbe0b6abe7467a96b5b5a9f",
+        "semantic_verdict": "PASS"
+      },
+      "planned_new_semantic_api_call": false,
+      "prior_exact_match": true,
+      "prior_observation_id": "B:INT2-Q-TAX-GUIDE",
+      "prior_result_provenance": {
+        "exact_match_field": "semantic_input_sha256",
+        "prior_observation_id": "B:INT2-Q-TAX-GUIDE",
+        "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+        "source_commit": "3946aa50c477881b1b085e35b60c9a411b6c8d64",
+        "source_file_sha256": "311ec367c29299bbc0d90831c35c08d87e0c8ed5acd1353bcd5777cbc9bd0a75",
+        "source_path": "artifacts/engineering/int2/stage-b-live-20260830T123856Z-0e4213c/stage_b_observations.jsonl"
+      },
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "semantic_input_sha256": "1efbfee23cf365790866e977487ffbcfe0d17294b0dd881a62e719fa86d2d39f",
+      "subset_evidence_ids": [
+        "academy-terms-v1",
+        "market-edge-evidence-v1",
+        "tax-guide-evidence-v1"
+      ],
+      "subset_size": 3
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-FLEXI:m10",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "nova-terms-v1",
+        "flexi-evidence-v1"
+      ],
+      "eligible_size": 2,
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "full_reference_action": "REVIEW",
+      "full_reference_semantic_behavior": "ABSTAIN",
+      "observation_id": "INT3:INT2-Q-FLEXI:m10",
+      "observed_semantic_result": null,
+      "planned_new_semantic_api_call": true,
+      "prior_exact_match": false,
+      "prior_observation_id": null,
+      "prior_result_provenance": null,
+      "prior_run_id": null,
+      "query_id": "INT2-Q-FLEXI",
+      "semantic_input_sha256": "39edf8f443d8047cbe6532a083502fe546db69b35c27f516b937dcd74cae72b9",
+      "subset_evidence_ids": [
+        "nova-terms-v1"
+      ],
+      "subset_size": 1
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-FLEXI:m01",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "nova-terms-v1",
+        "flexi-evidence-v1"
+      ],
+      "eligible_size": 2,
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "full_reference_action": "REVIEW",
+      "full_reference_semantic_behavior": "ABSTAIN",
+      "observation_id": "INT3:INT2-Q-FLEXI:m01",
+      "observed_semantic_result": {
+        "constraint_results": [
+          {
+            "constraint_id": "exclusion.longer-term-billing",
+            "reason": "Billing obligations are explicitly not documented.",
+            "status": "ABSTAIN"
+          },
+          {
+            "constraint_id": "purpose.individual-study",
+            "reason": "No evidence establishes suitability for individual study.",
+            "status": "ABSTAIN"
+          }
+        ],
+        "observed_final_action": "REVIEW",
+        "observed_semantic_behavior": "ABSTAIN",
+        "provider_response_id": "resp_004c61f9f9061aef016a94298b44e887d0b0905557bdea774f",
+        "reason": "Billing obligations are explicitly not documented.; No evidence establishes suitability for individual study.",
+        "reason_code": null,
+        "semantic_output_sha256": "4ddbe720a98d3a4d60360966e395c8fbae86b72830f8905537f2897c8e383e50",
+        "semantic_verdict": "ABSTAIN"
+      },
+      "planned_new_semantic_api_call": false,
+      "prior_exact_match": true,
+      "prior_observation_id": "F:INT2-Q-FLEXI",
+      "prior_result_provenance": {
+        "exact_match_field": "semantic_input_sha256",
+        "prior_observation_id": "F:INT2-Q-FLEXI",
+        "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+        "source_commit": "3946aa50c477881b1b085e35b60c9a411b6c8d64",
+        "source_file_sha256": "311ec367c29299bbc0d90831c35c08d87e0c8ed5acd1353bcd5777cbc9bd0a75",
+        "source_path": "artifacts/engineering/int2/stage-b-live-20260830T123856Z-0e4213c/stage_b_observations.jsonl"
+      },
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "query_id": "INT2-Q-FLEXI",
+      "semantic_input_sha256": "6a86d39646e8fb688308451b130d5e7d86225a4cbd2fa32e1994a4396f9d7826",
+      "subset_evidence_ids": [
+        "flexi-evidence-v1"
+      ],
+      "subset_size": 1
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-FLEXI:m11",
+      "decision_stable": null,
+      "eligible_evidence_ids": [
+        "nova-terms-v1",
+        "flexi-evidence-v1"
+      ],
+      "eligible_size": 2,
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "full_reference_action": "REVIEW",
+      "full_reference_semantic_behavior": "ABSTAIN",
+      "observation_id": "INT3:INT2-Q-FLEXI:m11",
+      "observed_semantic_result": {
+        "constraint_results": [
+          {
+            "constraint_id": "exclusion.longer-term-billing",
+            "reason": "Evidence explicitly states longer-term billing obligations are not documented.",
+            "status": "ABSTAIN"
+          },
+          {
+            "constraint_id": "purpose.individual-study",
+            "reason": "Evidence does not establish suitability for individual study.",
+            "status": "ABSTAIN"
+          }
+        ],
+        "observed_final_action": "REVIEW",
+        "observed_semantic_behavior": "ABSTAIN",
+        "provider_response_id": "resp_036c5e48cdc7a193016a94297a932087d0a76e7f39e438432e",
+        "reason": "Evidence explicitly states longer-term billing obligations are not documented.; Evidence does not establish suitability for individual study.",
+        "reason_code": null,
+        "semantic_output_sha256": "07eb07b544be6cfbabf583fb3a8b783508b4813444518fc32dee7c5f66421d70",
+        "semantic_verdict": "ABSTAIN"
+      },
+      "planned_new_semantic_api_call": false,
+      "prior_exact_match": true,
+      "prior_observation_id": "B:INT2-Q-FLEXI",
+      "prior_result_provenance": {
+        "exact_match_field": "semantic_input_sha256",
+        "prior_observation_id": "B:INT2-Q-FLEXI",
+        "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+        "source_commit": "3946aa50c477881b1b085e35b60c9a411b6c8d64",
+        "source_file_sha256": "311ec367c29299bbc0d90831c35c08d87e0c8ed5acd1353bcd5777cbc9bd0a75",
+        "source_path": "artifacts/engineering/int2/stage-b-live-20260830T123856Z-0e4213c/stage_b_observations.jsonl"
+      },
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "query_id": "INT2-Q-FLEXI",
+      "semantic_input_sha256": "cc424bc15a4ed584b8f8751702046bafb73e9ca14cac693e0f8251164dc3b63b",
+      "subset_evidence_ids": [
+        "nova-terms-v1",
+        "flexi-evidence-v1"
+      ],
+      "subset_size": 2
+    }
+  ],
+  "predicted_new_semantic_api_calls": 47,
+  "prior_exact_result_observation_count": 15,
+  "prior_exact_result_unique_input_count": 15,
+  "prior_result_source": {
+    "source_commit": "3946aa50c477881b1b085e35b60c9a411b6c8d64",
+    "source_file_sha256": "311ec367c29299bbc0d90831c35c08d87e0c8ed5acd1353bcd5777cbc9bd0a75",
+    "source_path": "artifacts/engineering/int2/stage-b-live-20260830T123856Z-0e4213c/stage_b_observations.jsonl"
+  },
+  "prompt_version": "1.0",
+  "schema_version": "1.0",
+  "status": "FROZEN_BEFORE_INT3_LIVE_SUBSET_EXECUTION",
+  "target": {
+    "column": "decision_stable",
+    "definition": "subset_final_action == frozen_full_evidence_final_action",
+    "terminology": "SINGLE_EXECUTION_ACTION_STABILITY"
+  },
+  "unique_inputs": [
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m1000",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDYGLOW:m1000"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "40dd8f1b558504623f1f90c7b19d3636dea8fe551a7b2b67a95fbd4f330f441f"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m0100",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDYGLOW:m0100"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "9d74f2f600518e9d40915b549e6170c29e35525fa787dbffd900fe27e5af5e09"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m0010",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDYGLOW:m0010"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "8642f65ea236d4fd8ebcad7364f535f1738cc05f76ea721285730630566e7efa"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m0001",
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDYGLOW:m0001"
+      ],
+      "planned_new_semantic_api_call": false,
+      "prior_observation_id": "F:INT2-Q-STUDYGLOW",
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "semantic_input_sha256": "2ee7142d0d4f812a4133d94ca1ddbb5711f7875e1c33265c4677c1d9a975427c"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m1100",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDYGLOW:m1100"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "fb5f44acf62fea5e0ee17a169b66447f4ef4e230a73ba2a2f5eb738e2641445c"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m1010",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDYGLOW:m1010"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "d5e369c9e4ce4e9273f7a45c831fb244325660c0a6f110336bf0986ad7b2929f"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m1001",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDYGLOW:m1001"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "621a860ecbd6993286a2b57bb1a5c0cb6e5a0d70925a71c38f5cd02769f6312b"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m0110",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDYGLOW:m0110"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "73006d21c04633fe1a80545f5187a2b169ee88ad25d07032997747fb341a9efd"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m0101",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDYGLOW:m0101"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "0337082d266cae103e542af368399460fa060ca419be688a7eb2cc31e03f7413"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m0011",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDYGLOW:m0011"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "d18fc9fabd3d87712522a3c5ab80d983be46feb3f574a8700a0a613df08d8ed3"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m1110",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDYGLOW:m1110"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "4151ab4b42aa6615429867123341d8f2112fcaf2d4e0968a14491fa7b0aea7b7"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m1101",
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDYGLOW:m1101"
+      ],
+      "planned_new_semantic_api_call": false,
+      "prior_observation_id": "C:INT2-Q-STUDYGLOW",
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "semantic_input_sha256": "445f1ddb7b19b374dafd8cc6b381d97cd812cf493d2717a0f1175f9f5f049bad"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m1011",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDYGLOW:m1011"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "56b1b4c6740965c1c1d8df86dfcffd2216ebedae68ae0e93bf7462a8ed1f7ece"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m0111",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDYGLOW:m0111"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "d801c28c1bb7cb4bea7e18462197092e619419bcd4ebf48c583cbf28c0e793f6"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDYGLOW:m1111",
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDYGLOW:m1111"
+      ],
+      "planned_new_semantic_api_call": false,
+      "prior_observation_id": "B:INT2-Q-STUDYGLOW",
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "semantic_input_sha256": "f9883afcb502f7de7b72f47779e296bc2dd5c3125b2ba3ae1d83a993e84e5c76"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m1000",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-NOTEBOOK:m1000"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "4fc26a1bacb6289649c6a744d69845a184d32252c953349ca75b07dbb6d84798"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m0100",
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "member_observation_ids": [
+        "INT3:INT2-Q-NOTEBOOK:m0100"
+      ],
+      "planned_new_semantic_api_call": false,
+      "prior_observation_id": "F:INT2-Q-NOTEBOOK",
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "semantic_input_sha256": "ce238744c991b8d12a3261b024d46f7b88b5751f3a211cddc4b5c5ed354e6ff1"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m0010",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-NOTEBOOK:m0010"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "34f76fc99cfdb52b78aa210b2c64f2b0cfeae5adae84916c8891942edeec082e"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m0001",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-NOTEBOOK:m0001"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "5088cfe410df7eee2fa7cc543656c0baa6bb61fb671657cdf5642165a97bbd62"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m1100",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-NOTEBOOK:m1100"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "32bcb37c484cc84febe25b87b80b56248126f6853bfc55daba8fe4d78e51abe9"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m1010",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-NOTEBOOK:m1010"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "919bbea9265e7434a00fca63ef1dabab5951b015f9c27e39bc7e982f9d09e265"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m1001",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-NOTEBOOK:m1001"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "94b2a4a1d9ad7418f440e2d0ea0fa0da66cd901554c252929be8abae7124f985"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m0110",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-NOTEBOOK:m0110"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "7595debded3b83cd184d4d9d25661eb09bbc7cb5d0e4cf10859b720d8ed9edca"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m0101",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-NOTEBOOK:m0101"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "1b86311da7b6afc13e325becd9bd259f6be587c77f5930b9c86ed6b2ee234ef8"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m0011",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-NOTEBOOK:m0011"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "5b81276f457a28a3c811ba66b671158e049401615d08a20bc9af2fbfb9253370"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m1110",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-NOTEBOOK:m1110"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "fa57dd349014c68bc8c0b498b6067cbd851eb95bb69e31c742fe8a386c725df9"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m1101",
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "member_observation_ids": [
+        "INT3:INT2-Q-NOTEBOOK:m1101"
+      ],
+      "planned_new_semantic_api_call": false,
+      "prior_observation_id": "C:INT2-Q-NOTEBOOK",
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "semantic_input_sha256": "1c5b0fda84bf996157a22f9ab6dd0f632c749fbc646f27fe5a45ac9242cdae0e"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m1011",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-NOTEBOOK:m1011"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "2c1ca0d62da5580f5b6bb2136f69d07f8a5bc75dd525dbb7a2ac380a75041c14"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m0111",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-NOTEBOOK:m0111"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "d912904e67ff0c8c3ab7462c854b910ef9721563faae17d44009aead956ba36a"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-NOTEBOOK:m1111",
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "member_observation_ids": [
+        "INT3:INT2-Q-NOTEBOOK:m1111"
+      ],
+      "planned_new_semantic_api_call": false,
+      "prior_observation_id": "B:INT2-Q-NOTEBOOK",
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "semantic_input_sha256": "d220660c03eae36acff0a1d984a666038ec5af7aa8d2dec440168e6bc59b784e"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1000",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDY-CLUB:m1000"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "a0bf96c8ca3bf354add9ac0a3b34104064d626fc0bbc5b0af75f7188aebf60e3"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0100",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDY-CLUB:m0100"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "f8523d35e899b10e3d30dd9aa55bbf2b01cc623e9988fe7e5f54f851ac8ffb02"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0010",
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDY-CLUB:m0010"
+      ],
+      "planned_new_semantic_api_call": false,
+      "prior_observation_id": "F:INT2-Q-STUDY-CLUB",
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "semantic_input_sha256": "463dd1f37e3a4daf6d04909e7466562a636b9aa73bb17cca3a1a761fd971bf85"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0001",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDY-CLUB:m0001"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "87d690d5cbd4491852baf540646485d3f6733712384c0795070eb498405ebc15"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1100",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDY-CLUB:m1100"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "3e0111d02c7732729393427df54a973117bf95e41e7c23b25f5c14e2e53e3b12"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1010",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDY-CLUB:m1010"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "d5653473929d6b13bab85f84d57eb0af6644dbe4906816c447d1bfd2af86f68b"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1001",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDY-CLUB:m1001"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "3333c8a4146169226349d403df41cf4ce812c7850269bc4fc15d01f3f0b228b6"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0110",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDY-CLUB:m0110"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "39cee3017f08fd277783fe28ceb84f34cbfb3a9e0f6a9452c3f54fca21538653"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0101",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDY-CLUB:m0101"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "4284abd180f3aeb291553112169479d0b8594d7fa9cf438252709db2d2e9fa69"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0011",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDY-CLUB:m0011"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "7bdd1c8ee41cad2a5eaf6bae63577ce01d9a9b6c60cbd01d79bac2525d5b73c6"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1110",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDY-CLUB:m1110"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "0a80734858d1089265d170d30b34388677f7db9ca1f0855e6088c393869fb867"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1101",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDY-CLUB:m1101"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "98db3119878a23ff833d712e335ee262b7d777437ed9d35c21466d41ee6fb47b"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1011",
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDY-CLUB:m1011"
+      ],
+      "planned_new_semantic_api_call": false,
+      "prior_observation_id": "C:INT2-Q-STUDY-CLUB",
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "semantic_input_sha256": "d3d09d90491579b2ddaac3e0a2b49bcfe7545827707531236ee92a96c1865802"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0111",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDY-CLUB:m0111"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "c387be12f05c62360458d9b5088af9c002bf8bfe2b2b55b3948d73475ddc8d6f"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1111",
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "member_observation_ids": [
+        "INT3:INT2-Q-STUDY-CLUB:m1111"
+      ],
+      "planned_new_semantic_api_call": false,
+      "prior_observation_id": "B:INT2-Q-STUDY-CLUB",
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "semantic_input_sha256": "caeac07142bec9baf0d1d0b117376f0f0924ab6348e84bead3f8f7baa46a1ebf"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-MARKET-EDGE:m100",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-MARKET-EDGE:m100"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "0cae51dedb8f415929da09b45373a4ed10f328d34a98bc9e0bdcb61037cb0a7e"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-MARKET-EDGE:m010",
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "member_observation_ids": [
+        "INT3:INT2-Q-MARKET-EDGE:m010"
+      ],
+      "planned_new_semantic_api_call": false,
+      "prior_observation_id": "F:INT2-Q-MARKET-EDGE",
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "semantic_input_sha256": "cb17187b6972a932c451809e88bc978314c2c4100f2158c20fb4db2df0ee69a6"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-MARKET-EDGE:m001",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-MARKET-EDGE:m001"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "4ebe733ef09009fcf5b6d1e25e1bfebbea80a9a7d6486d6f256a75a0b9b11eb9"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-MARKET-EDGE:m110",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-MARKET-EDGE:m110"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "a0249b236a7c0f33326105201db339f4ca31e5edc04a988863918d3c08c64746"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-MARKET-EDGE:m101",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-MARKET-EDGE:m101"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "c406898d2b6d0d1f7dad4f4ff373fa9665a751b4743b03607e0afc492a6e0d68"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-MARKET-EDGE:m011",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-MARKET-EDGE:m011"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "60bdfb937e67ba4ad0b74009e134f0f25d24ffe38e31874c22a940250435182e"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-MARKET-EDGE:m111",
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "member_observation_ids": [
+        "INT3:INT2-Q-MARKET-EDGE:m111"
+      ],
+      "planned_new_semantic_api_call": false,
+      "prior_observation_id": "B:INT2-Q-MARKET-EDGE",
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "semantic_input_sha256": "9b390ca5ad1cc9ecef8152a18cb7c24929a8e0144aa6a7f699318a23f175b0dd"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-TAX-GUIDE:m100",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-TAX-GUIDE:m100"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "2794f6cc05eb54d5ece70f3fd7fb2bf42b48b1ca1956c6c4252ca26a7f3da8b3"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-TAX-GUIDE:m010",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-TAX-GUIDE:m010"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "e105e362f20c5c48f05bfc1027b037f183f03544c54e140058aa61f5b5d4529c"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-TAX-GUIDE:m001",
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "member_observation_ids": [
+        "INT3:INT2-Q-TAX-GUIDE:m001"
+      ],
+      "planned_new_semantic_api_call": false,
+      "prior_observation_id": "F:INT2-Q-TAX-GUIDE",
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "semantic_input_sha256": "0aa53bc0ab1637469b7a91ce448d4df34dd36f35ebe97127fd8358d5ed7ef397"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-TAX-GUIDE:m110",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-TAX-GUIDE:m110"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "71d0db3b705e2788a5d462840a8c13cb025a287a5889f8654a5779ad66b36fae"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-TAX-GUIDE:m101",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-TAX-GUIDE:m101"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "0242840fbe2f7f6c253c0560c336efe644ea72c9f9029c9b81a63dec5777e1bf"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-TAX-GUIDE:m011",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-TAX-GUIDE:m011"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "34656af93d1736f76de09d9f40c02185957dcc1c2c70ce55b868fd63c797bf68"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-TAX-GUIDE:m111",
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "member_observation_ids": [
+        "INT3:INT2-Q-TAX-GUIDE:m111"
+      ],
+      "planned_new_semantic_api_call": false,
+      "prior_observation_id": "B:INT2-Q-TAX-GUIDE",
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "semantic_input_sha256": "1efbfee23cf365790866e977487ffbcfe0d17294b0dd881a62e719fa86d2d39f"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-FLEXI:m10",
+      "execution_status": "NEW_LIVE_EXECUTION_REQUIRED",
+      "member_observation_ids": [
+        "INT3:INT2-Q-FLEXI:m10"
+      ],
+      "planned_new_semantic_api_call": true,
+      "prior_observation_id": null,
+      "prior_run_id": null,
+      "semantic_input_sha256": "39edf8f443d8047cbe6532a083502fe546db69b35c27f516b937dcd74cae72b9"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-FLEXI:m01",
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "member_observation_ids": [
+        "INT3:INT2-Q-FLEXI:m01"
+      ],
+      "planned_new_semantic_api_call": false,
+      "prior_observation_id": "F:INT2-Q-FLEXI",
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "semantic_input_sha256": "6a86d39646e8fb688308451b130d5e7d86225a4cbd2fa32e1994a4396f9d7826"
+    },
+    {
+      "canonical_plan_observation_id": "INT3:INT2-Q-FLEXI:m11",
+      "execution_status": "PRIOR_EXACT_RESULT",
+      "member_observation_ids": [
+        "INT3:INT2-Q-FLEXI:m11"
+      ],
+      "planned_new_semantic_api_call": false,
+      "prior_observation_id": "B:INT2-Q-FLEXI",
+      "prior_run_id": "stage-b-live-20260830T123856Z-0e4213c",
+      "semantic_input_sha256": "cc424bc15a4ed584b8f8751702046bafb73e9ca14cac693e0f8251164dc3b63b"
+    }
+  ],
+  "unique_semantic_input_count": 62
+}

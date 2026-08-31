@@ -8,6 +8,7 @@ from mandateguard.engineering.int3.controller import (
     ControllerAction,
     ControllerCosts,
     ControllerDecision,
+    RetrievalCandidate,
     select_controller_action,
 )
 from mandateguard.engineering.int3.models import Int3ExperimentError, probability
@@ -52,16 +53,30 @@ def run_offline_demo() -> tuple[OfflineDemoScenario, ...]:
     """Return the three required synthetic outcomes without external calls."""
 
     high = select_controller_action(
-        p_sufficient=0.95,
-        costs=ControllerCosts(unstable_decision=1.0, retrieve=0.20, review=0.40),
+        p_current=0.95,
+        costs=ControllerCosts(unstable_decision=1.0, review=0.40),
     )
     valuable = select_controller_action(
-        p_sufficient=0.20,
-        costs=ControllerCosts(unstable_decision=1.0, retrieve=0.10, review=0.40),
+        p_current=0.20,
+        costs=ControllerCosts(unstable_decision=1.0, review=0.40),
+        retrieval_candidates=(
+            RetrievalCandidate(
+                evidence_id="synthetic-high-value-evidence",
+                p_after=0.80,
+                acquisition_cost=0.10,
+            ),
+        ),
     )
     expensive = select_controller_action(
-        p_sufficient=0.20,
-        costs=ControllerCosts(unstable_decision=1.0, retrieve=0.75, review=0.35),
+        p_current=0.20,
+        costs=ControllerCosts(unstable_decision=1.0, review=0.35),
+        retrieval_candidates=(
+            RetrievalCandidate(
+                evidence_id="synthetic-low-value-evidence",
+                p_after=0.25,
+                acquisition_cost=0.75,
+            ),
+        ),
     )
     if (
         high.selected_action is not ControllerAction.DECIDE
@@ -84,7 +99,8 @@ def run_offline_demo() -> tuple[OfflineDemoScenario, ...]:
             candidate_evidence_id="synthetic-high-value-evidence",
             counterfactual_p_sufficient=0.80,
             acquisition_cost=0.10,
-            voi=(0.80 - 0.20) / 0.10,
+            # min(0.8, 0.4) - (0.1 + min(0.2, 0.4)) = 0.1
+            voi=0.10,
         ),
         OfflineDemoScenario(
             scenario_id="C",
@@ -94,6 +110,7 @@ def run_offline_demo() -> tuple[OfflineDemoScenario, ...]:
             candidate_evidence_id="synthetic-low-value-evidence",
             counterfactual_p_sufficient=0.25,
             acquisition_cost=0.75,
-            voi=(0.25 - 0.20) / 0.75,
+            # min(0.8, 0.35) - (0.75 + min(0.75, 0.35)) = -0.75
+            voi=-0.75,
         ),
     )

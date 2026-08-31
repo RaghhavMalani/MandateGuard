@@ -1,0 +1,150 @@
+{
+  "base_commit": "7fe60059d857399b4a40a0d85317459d00c3f7ec",
+  "case_family_note": "Case-family diagnostics are derived only from runtime mandate semantic constraint kinds, never query/case identity; they are excluded from the compact model as redundant with the purpose/exclusion indicators.",
+  "created_at": "2026-08-31T03:52:24.870960Z",
+  "diagnostic_feature_count": 36,
+  "diagnostic_only_features": [
+    "sku_scoped_evidence_count",
+    "retrieval_scores_available",
+    "min_score",
+    "lexical_max_score",
+    "lexical_mean_score",
+    "lexical_min_score",
+    "lexical_score_margin",
+    "semantic_max_score",
+    "semantic_mean_score",
+    "semantic_min_score",
+    "semantic_score_margin",
+    "hybrid_max_score",
+    "hybrid_mean_score",
+    "hybrid_min_score",
+    "hybrid_score_margin",
+    "required_annotation_fraction",
+    "relevant_annotation_fraction",
+    "case_family_purpose_and_exclusion",
+    "case_family_exclusion_only",
+    "case_family_purpose_only",
+    "case_family_other",
+    "evidence_text_kchars_total"
+  ],
+  "manifest_sha256": "b5201911ac47dd1f17059431d88f4a2c4287875a1025821ebabcf8330a811f20",
+  "model_feature_count": 14,
+  "oracle_diagnostic_only_features": [
+    "required_annotation_fraction",
+    "relevant_annotation_fraction"
+  ],
+  "ordered_model_features": [
+    {
+      "availability": "RUNTIME_PRE_SEMANTIC_INFERENCE",
+      "derivation": "count of trusted evidence items currently held",
+      "name": "evidence_count",
+      "position": 0
+    },
+    {
+      "availability": "RUNTIME_PRE_SEMANTIC_INFERENCE",
+      "derivation": "current count divided by eligible trusted-evidence count",
+      "name": "evidence_fraction",
+      "position": 1
+    },
+    {
+      "availability": "RUNTIME_PRE_SEMANTIC_INFERENCE",
+      "derivation": "fraction surviving transaction-SKU scoping using runtime evidence metadata",
+      "name": "sku_scoped_evidence_fraction",
+      "position": 2
+    },
+    {
+      "availability": "RUNTIME_PRE_SEMANTIC_INFERENCE",
+      "derivation": "whether current evidence contains a runtime SKU-null merchant item",
+      "name": "merchant_scope_evidence_present",
+      "position": 3
+    },
+    {
+      "availability": "RUNTIME_PRE_SEMANTIC_INFERENCE",
+      "derivation": "whether current evidence contains an item matching a transaction SKU",
+      "name": "product_scope_evidence_present",
+      "position": 4
+    },
+    {
+      "availability": "RUNTIME_PRE_SEMANTIC_INFERENCE",
+      "derivation": "maximum fixed production retrieval score in current evidence",
+      "name": "max_score",
+      "position": 5
+    },
+    {
+      "availability": "RUNTIME_PRE_SEMANTIC_INFERENCE",
+      "derivation": "mean fixed production retrieval score in current evidence",
+      "name": "mean_score",
+      "position": 6
+    },
+    {
+      "availability": "RUNTIME_PRE_SEMANTIC_INFERENCE",
+      "derivation": "top minus second fixed production retrieval score",
+      "name": "score_margin",
+      "position": 7
+    },
+    {
+      "availability": "RUNTIME_PRE_SEMANTIC_INFERENCE",
+      "derivation": "distinct runtime evidence source_kind count",
+      "name": "source_kind_count",
+      "position": 8
+    },
+    {
+      "availability": "RUNTIME_PRE_SEMANTIC_INFERENCE",
+      "derivation": "source_kind count divided by evidence count",
+      "name": "source_kind_diversity",
+      "position": 9
+    },
+    {
+      "availability": "RUNTIME_PRE_SEMANTIC_INFERENCE",
+      "derivation": "count of semantic constraints in the runtime mandate",
+      "name": "constraint_count",
+      "position": 10
+    },
+    {
+      "availability": "RUNTIME_PRE_SEMANTIC_INFERENCE",
+      "derivation": "indicator derived from kind=purpose in runtime mandate constraints",
+      "name": "constraint_family_purpose",
+      "position": 11
+    },
+    {
+      "availability": "RUNTIME_PRE_SEMANTIC_INFERENCE",
+      "derivation": "indicator derived from kind=exclusion in runtime mandate constraints",
+      "name": "constraint_family_exclusion",
+      "position": 12
+    },
+    {
+      "availability": "RUNTIME_PRE_SEMANTIC_INFERENCE",
+      "derivation": "mean runtime evidence text length in kchars",
+      "name": "evidence_text_kchars_mean",
+      "position": 13
+    }
+  ],
+  "pipeline": {
+    "hyperparameter_tuning_after_labels": false,
+    "logistic_regression": {
+      "C": 1,
+      "class_weight": null,
+      "fit_intercept": true,
+      "max_iter": 2000,
+      "random_state": 0,
+      "regularization": "L2",
+      "solver": "lbfgs",
+      "tolerance_decimal": "0.0001"
+    },
+    "standard_scaler": {
+      "with_mean": true,
+      "with_std": true
+    },
+    "steps": [
+      "StandardScaler",
+      "LogisticRegression"
+    ]
+  },
+  "schema_version": "1.0",
+  "status": "FROZEN_BEFORE_INT3_SUBSET_LABELS",
+  "target": {
+    "column": "decision_stable",
+    "definition": "subset_final_action == frozen_full_evidence_final_action",
+    "terminology": "SINGLE_EXECUTION_ACTION_STABILITY"
+  }
+}
