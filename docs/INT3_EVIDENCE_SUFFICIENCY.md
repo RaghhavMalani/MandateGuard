@@ -1,5 +1,7 @@
 # INT-3 evidence sufficiency and value of information
 
+**INT-3: FROZEN — ENGINEERING RESEARCH COMPLETE**
+
 ## Scope, target, and limits
 
 INT-3 is non-benchmark engineering infrastructure. It asks whether a subset of
@@ -11,15 +13,19 @@ decision_stable = subset_final_action == frozen_full_evidence_final_action
 ```
 
 The registered name of this target is **SINGLE-EXECUTION ACTION STABILITY**.
-It is not true human intent, semantic correctness, probability of correctness,
-or causal evidence necessity. It is also not evidence that the frozen
+It is not correctness, a safety probability, user intent, ground truth, or
+causal evidence necessity. It is also not evidence that the frozen
 full-evidence action was correct. Semantic expectation labels are never reused
 as sufficiency labels.
 
+The learned layer estimates whether the current evidence appears sufficient to
+preserve frozen full-evidence behavior. It is an experimental evidence-
+acquisition signal, not a replacement for authorization judgment.
+
 No INT-3 subset semantic execution or stability label was observed before the
-methodology and artifacts in this document were frozen. The future live dataset
-uses one no-retry semantic execution for each previously unseen unique exact
-semantic input.
+methodology and artifacts in this document were frozen. The completed live
+dataset used one no-retry semantic execution for each previously unseen unique
+exact semantic input.
 
 ## Frozen sources and subset plan
 
@@ -144,17 +150,20 @@ capacity.
 
 ## Evaluation protocol and metrics
 
-Evaluation remains six-fold leave-one-query-out. Each fold holds out every
-subset from one query and trains on the other five. Random subset splits and
-generic random-split performance are not supported because they would put
-shared mandate, transaction, evidence, catalog, and query structure into both
-train and test.
+The completed evaluation used six-fold leave-one-query-out. Each fold held out
+every subset from one query and trained on the other five, with zero query
+overlap. Random subset splits and generic random-split performance are not
+supported because they would put shared mandate, transaction, evidence,
+catalog, and query structure into both train and test.
 
-Future fold reports retain Brier score, false-SUFFICIENT, and
-false-INSUFFICIENT counts/rates. ROC-AUC is reported only when both target
-classes exist. Generic accuracy is not a headline metric.
+The fold reports retain Brier score, false-SUFFICIENT, and false-INSUFFICIENT
+counts/rates. ROC-AUC is reported only when both target classes exist. Generic
+accuracy is not a headline metric.
 
 ## One-step expected-loss controller
+
+This is a frozen offline controller design. It was not evaluated in the final
+leave-one-query-out run and is not integrated into the authorization path.
 
 For current sufficiency probability `p_current`:
 
@@ -183,6 +192,8 @@ remains, `RETRIEVE_MORE` is unavailable. Equal overall losses use the explicit
 safety order `REVIEW`, `RETRIEVE_MORE`, `DECIDE`.
 
 ## Net value of information
+
+This is the frozen VoI definition. No explicit VoI evaluation was performed.
 
 The primary VoI is expected engineering-loss reduction, not probability gain
 divided by cost:
@@ -282,9 +293,81 @@ retry that request. The new run
 frozen inputs with zero retries, producing the final 62 rows from 15 INT-2 exact
 reuses, one partial-run exact reuse, and 46 new live executions.
 
-## Future research path
+## Final live subset-ablation findings
 
-After authorized live execution supplies defensible labels, follow-on work may
-study calibration, active selection of informative subsets, contextual bandits,
-or constrained sequential retrieval. None of those methods is implemented or
-justified by the current six-query engineering dataset.
+The **LIVE INT-3 SUBSET-ABLATION ENGINEERING EXPERIMENT** produced 62
+correlated evidence-subset observations across six synthetic query groups: 35
+were stable and 27 were unstable relative to their frozen full-evidence
+actions. These are not 62 independent commerce cases.
+
+| Frozen full-evidence action | Subset `ALLOW` | Subset `BLOCK` | Subset `REVIEW` |
+| --- | ---: | ---: | ---: |
+| `ALLOW` | 20 | **0** | 17 |
+| `BLOCK` | **0** | 12 | 10 |
+| `REVIEW` | 0 | 0 | 3 |
+
+The two safety-relevant observed reversal counts were **full `BLOCK` to subset
+`ALLOW`: 0** and **full `ALLOW` to subset `BLOCK`: 0**. This is a descriptive
+result from one synthetic engineering experiment and does not establish
+behavior beyond it.
+
+In this single-execution synthetic subset experiment, adding evidence never
+changed an observed stable subset into an unstable superset, while 67 nested
+pairs changed from unstable to stable. This observed monotonicity is not a
+universal guarantee.
+
+## Final non-benchmark leave-one-query-out evaluation
+
+The registered evaluation name is **INT-3 NON-BENCHMARK
+LEAVE-ONE-QUERY-OUT ENGINEERING EVALUATION**. Run
+`sufficiency-loqo-20260831T143044Z-43f94887` evaluated the 62 correlated rows as
+six held-out synthetic-query folds with zero query overlap. It used 14 frozen,
+runtime-available features in a `StandardScaler` plus L2 `LogisticRegression`
+pipeline with `C=1.0`, a `0.5` classification threshold, and no post-label
+tuning.
+
+| Approach | Pooled Brier | Macro-query Brier | False-SUFFICIENT | False-INSUFFICIENT | Predicted review | Pooled ROC-AUC |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Train prevalence | 0.247320 | 0.241847 | 27 | 0 | 0.00% | 0.444444 |
+| Evidence fraction only | 0.197671 | 0.192099 | 14 | 5 | 29.03% | 0.743386 |
+| Frozen 14-feature model | 0.020001 | 0.055076 | 0 | 1 | 45.16% | 0.984127 |
+
+The macro ROC-AUC across the five class-diverse held-out-query folds was 1.0.
+The `INT2-Q-FLEXI` fold contained only one target class, so its ROC-AUC was
+undefined.
+
+Within this six-query engineering evaluation, the frozen 14-feature model
+contained useful evidence-sufficiency signal beyond evidence fraction alone.
+The frozen model produced zero false-SUFFICIENT hard-label predictions and one
+false-INSUFFICIENT prediction across the six held-out-query folds.
+
+These results concern only the frozen target: whether a subset preserved the
+action observed once under frozen full evidence. They do not measure semantic
+correctness, a safety probability, true user intent, ground truth, or causal
+evidence necessity, and they do not validate the frozen full-evidence action.
+
+## Why this model is not part of the authorization gate
+
+The evaluation has only six synthetic query groups and 62 correlated rows. It
+has no independent real-world corpus, distribution-shift evaluation, repeated
+stochastic label runs, or calibration study beyond the preregistered Brier
+metric. MandateGuard's existing deterministic and semantic safety controller
+already handles insufficient evidence conservatively.
+
+The model therefore remains an experimental evidence-acquisition signal. It
+cannot produce `ALLOW` or `BLOCK`, is not connected to the payment gate, and
+cannot override the existing controller, verifier, capability, ledger, or
+Razorpay checks.
+
+For Razorpay and AI-judgment review: **We tested whether a learned model added
+useful signal beyond a simple evidence-quantity heuristic. It did within this
+experiment, but the dataset was not strong enough to justify giving the model
+authorization authority.**
+
+## Frozen status and future work
+
+**INT-3: FROZEN — ENGINEERING RESEARCH COMPLETE.** Future work is limited to a
+larger independent merchant corpus, repeated semantic executions, calibration,
+explicit VoI evaluation, adaptive evidence acquisition, and investigation of
+contextual bandits or constrained reinforcement learning. None of this future
+work is implemented or supported as a current INT-3 claim.
