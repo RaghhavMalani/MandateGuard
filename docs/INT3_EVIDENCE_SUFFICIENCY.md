@@ -260,8 +260,27 @@ python scripts/run_int3_offline_demo.py
 
 These commands perform local construction only. The methodology freeze and
 synthetic demo make zero semantic-provider, evidence-fetch, buyer, or Razorpay
-calls. `subset_results.jsonl` and `sufficiency_dataset.csv` remain future
-artifacts because no new INT-3 labels exist.
+calls. They do not create or modify the completed live-result artifacts.
+
+## Live execution recovery
+
+The first new semantic request, `INT3:INT2-Q-STUDYGLOW:m1000`, completed at the
+provider and its normalized response was durably cached in
+`subset-live-20260831T130829Z-48fa600c`. Local result serialization then failed
+because the authorization canonicalizer intentionally rejected the finite
+floating-point model features in the engineering artifact. The prompt, model,
+semantic input, verifier, feature manifest, and frozen execution plan were
+unchanged; this was a local infrastructure failure, not a semantic-provider
+failure.
+
+The partial run remains preserved as failure evidence. Commit
+`24bb068fc4af9d979ed57e0826fd0ed9687ae344` added a separate deterministic
+finite-float result serializer. Recovery matched the cached response by exact
+`semantic_input_sha256`, recorded it as `PRIOR_PARTIAL_RUN_RESULT`, and did not
+retry that request. The new run
+`subset-live-recovery-20260831T135210Z-737beff7` then executed the remaining 46
+frozen inputs with zero retries, producing the final 62 rows from 15 INT-2 exact
+reuses, one partial-run exact reuse, and 46 new live executions.
 
 ## Future research path
 

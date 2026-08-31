@@ -1,0 +1,536 @@
+{
+  "action_transitions": [
+    {
+      "count": 20,
+      "frozen_full_evidence_action": "ALLOW",
+      "subset_action": "ALLOW"
+    },
+    {
+      "count": 0,
+      "frozen_full_evidence_action": "ALLOW",
+      "subset_action": "BLOCK"
+    },
+    {
+      "count": 17,
+      "frozen_full_evidence_action": "ALLOW",
+      "subset_action": "REVIEW"
+    },
+    {
+      "count": 0,
+      "frozen_full_evidence_action": "BLOCK",
+      "subset_action": "ALLOW"
+    },
+    {
+      "count": 12,
+      "frozen_full_evidence_action": "BLOCK",
+      "subset_action": "BLOCK"
+    },
+    {
+      "count": 10,
+      "frozen_full_evidence_action": "BLOCK",
+      "subset_action": "REVIEW"
+    },
+    {
+      "count": 0,
+      "frozen_full_evidence_action": "REVIEW",
+      "subset_action": "ALLOW"
+    },
+    {
+      "count": 0,
+      "frozen_full_evidence_action": "REVIEW",
+      "subset_action": "BLOCK"
+    },
+    {
+      "count": 3,
+      "frozen_full_evidence_action": "REVIEW",
+      "subset_action": "REVIEW"
+    }
+  ],
+  "by_query": [
+    {
+      "query_id": "INT2-Q-STUDYGLOW",
+      "stable_count": 8,
+      "subset_count": 15,
+      "unstable_count": 7
+    },
+    {
+      "query_id": "INT2-Q-NOTEBOOK",
+      "stable_count": 8,
+      "subset_count": 15,
+      "unstable_count": 7
+    },
+    {
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "stable_count": 8,
+      "subset_count": 15,
+      "unstable_count": 7
+    },
+    {
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "stable_count": 4,
+      "subset_count": 7,
+      "unstable_count": 3
+    },
+    {
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "stable_count": 4,
+      "subset_count": 7,
+      "unstable_count": 3
+    },
+    {
+      "query_id": "INT2-Q-FLEXI",
+      "stable_count": 3,
+      "subset_count": 3,
+      "unstable_count": 0
+    }
+  ],
+  "by_subset_size": [
+    {
+      "stable_count": 7,
+      "subset_count": 20,
+      "subset_size": 1,
+      "unstable_count": 13
+    },
+    {
+      "stable_count": 14,
+      "subset_count": 25,
+      "subset_size": 2,
+      "unstable_count": 11
+    },
+    {
+      "stable_count": 11,
+      "subset_count": 14,
+      "subset_size": 3,
+      "unstable_count": 3
+    },
+    {
+      "stable_count": 3,
+      "subset_count": 3,
+      "subset_size": 4,
+      "unstable_count": 0
+    }
+  ],
+  "claim_boundary": "Descriptive single-execution subset-ablation behavior relative to frozen full-evidence reference actions; the 62 subsets are not independent commerce cases.",
+  "empirical_monotonicity": {
+    "stable_to_unstable_superset_pair_count": 0,
+    "stable_to_unstable_superset_pairs": [],
+    "unstable_to_stable_superset_pair_count": 67,
+    "unstable_to_stable_superset_pairs": [
+      {
+        "query_id": "INT2-Q-STUDYGLOW",
+        "subset_observation_id": "INT3:INT2-Q-STUDYGLOW:m1000",
+        "superset_observation_id": "INT3:INT2-Q-STUDYGLOW:m1001"
+      },
+      {
+        "query_id": "INT2-Q-STUDYGLOW",
+        "subset_observation_id": "INT3:INT2-Q-STUDYGLOW:m1000",
+        "superset_observation_id": "INT3:INT2-Q-STUDYGLOW:m1101"
+      },
+      {
+        "query_id": "INT2-Q-STUDYGLOW",
+        "subset_observation_id": "INT3:INT2-Q-STUDYGLOW:m1000",
+        "superset_observation_id": "INT3:INT2-Q-STUDYGLOW:m1011"
+      },
+      {
+        "query_id": "INT2-Q-STUDYGLOW",
+        "subset_observation_id": "INT3:INT2-Q-STUDYGLOW:m1000",
+        "superset_observation_id": "INT3:INT2-Q-STUDYGLOW:m1111"
+      },
+      {
+        "query_id": "INT2-Q-STUDYGLOW",
+        "subset_observation_id": "INT3:INT2-Q-STUDYGLOW:m0100",
+        "superset_observation_id": "INT3:INT2-Q-STUDYGLOW:m0101"
+      },
+      {
+        "query_id": "INT2-Q-STUDYGLOW",
+        "subset_observation_id": "INT3:INT2-Q-STUDYGLOW:m0100",
+        "superset_observation_id": "INT3:INT2-Q-STUDYGLOW:m1101"
+      },
+      {
+        "query_id": "INT2-Q-STUDYGLOW",
+        "subset_observation_id": "INT3:INT2-Q-STUDYGLOW:m0100",
+        "superset_observation_id": "INT3:INT2-Q-STUDYGLOW:m0111"
+      },
+      {
+        "query_id": "INT2-Q-STUDYGLOW",
+        "subset_observation_id": "INT3:INT2-Q-STUDYGLOW:m0100",
+        "superset_observation_id": "INT3:INT2-Q-STUDYGLOW:m1111"
+      },
+      {
+        "query_id": "INT2-Q-STUDYGLOW",
+        "subset_observation_id": "INT3:INT2-Q-STUDYGLOW:m0010",
+        "superset_observation_id": "INT3:INT2-Q-STUDYGLOW:m0011"
+      },
+      {
+        "query_id": "INT2-Q-STUDYGLOW",
+        "subset_observation_id": "INT3:INT2-Q-STUDYGLOW:m0010",
+        "superset_observation_id": "INT3:INT2-Q-STUDYGLOW:m1011"
+      },
+      {
+        "query_id": "INT2-Q-STUDYGLOW",
+        "subset_observation_id": "INT3:INT2-Q-STUDYGLOW:m0010",
+        "superset_observation_id": "INT3:INT2-Q-STUDYGLOW:m0111"
+      },
+      {
+        "query_id": "INT2-Q-STUDYGLOW",
+        "subset_observation_id": "INT3:INT2-Q-STUDYGLOW:m0010",
+        "superset_observation_id": "INT3:INT2-Q-STUDYGLOW:m1111"
+      },
+      {
+        "query_id": "INT2-Q-STUDYGLOW",
+        "subset_observation_id": "INT3:INT2-Q-STUDYGLOW:m1100",
+        "superset_observation_id": "INT3:INT2-Q-STUDYGLOW:m1101"
+      },
+      {
+        "query_id": "INT2-Q-STUDYGLOW",
+        "subset_observation_id": "INT3:INT2-Q-STUDYGLOW:m1100",
+        "superset_observation_id": "INT3:INT2-Q-STUDYGLOW:m1111"
+      },
+      {
+        "query_id": "INT2-Q-STUDYGLOW",
+        "subset_observation_id": "INT3:INT2-Q-STUDYGLOW:m1010",
+        "superset_observation_id": "INT3:INT2-Q-STUDYGLOW:m1011"
+      },
+      {
+        "query_id": "INT2-Q-STUDYGLOW",
+        "subset_observation_id": "INT3:INT2-Q-STUDYGLOW:m1010",
+        "superset_observation_id": "INT3:INT2-Q-STUDYGLOW:m1111"
+      },
+      {
+        "query_id": "INT2-Q-STUDYGLOW",
+        "subset_observation_id": "INT3:INT2-Q-STUDYGLOW:m0110",
+        "superset_observation_id": "INT3:INT2-Q-STUDYGLOW:m0111"
+      },
+      {
+        "query_id": "INT2-Q-STUDYGLOW",
+        "subset_observation_id": "INT3:INT2-Q-STUDYGLOW:m0110",
+        "superset_observation_id": "INT3:INT2-Q-STUDYGLOW:m1111"
+      },
+      {
+        "query_id": "INT2-Q-STUDYGLOW",
+        "subset_observation_id": "INT3:INT2-Q-STUDYGLOW:m1110",
+        "superset_observation_id": "INT3:INT2-Q-STUDYGLOW:m1111"
+      },
+      {
+        "query_id": "INT2-Q-NOTEBOOK",
+        "subset_observation_id": "INT3:INT2-Q-NOTEBOOK:m1000",
+        "superset_observation_id": "INT3:INT2-Q-NOTEBOOK:m1100"
+      },
+      {
+        "query_id": "INT2-Q-NOTEBOOK",
+        "subset_observation_id": "INT3:INT2-Q-NOTEBOOK:m1000",
+        "superset_observation_id": "INT3:INT2-Q-NOTEBOOK:m1110"
+      },
+      {
+        "query_id": "INT2-Q-NOTEBOOK",
+        "subset_observation_id": "INT3:INT2-Q-NOTEBOOK:m1000",
+        "superset_observation_id": "INT3:INT2-Q-NOTEBOOK:m1101"
+      },
+      {
+        "query_id": "INT2-Q-NOTEBOOK",
+        "subset_observation_id": "INT3:INT2-Q-NOTEBOOK:m1000",
+        "superset_observation_id": "INT3:INT2-Q-NOTEBOOK:m1111"
+      },
+      {
+        "query_id": "INT2-Q-NOTEBOOK",
+        "subset_observation_id": "INT3:INT2-Q-NOTEBOOK:m0010",
+        "superset_observation_id": "INT3:INT2-Q-NOTEBOOK:m0110"
+      },
+      {
+        "query_id": "INT2-Q-NOTEBOOK",
+        "subset_observation_id": "INT3:INT2-Q-NOTEBOOK:m0010",
+        "superset_observation_id": "INT3:INT2-Q-NOTEBOOK:m1110"
+      },
+      {
+        "query_id": "INT2-Q-NOTEBOOK",
+        "subset_observation_id": "INT3:INT2-Q-NOTEBOOK:m0010",
+        "superset_observation_id": "INT3:INT2-Q-NOTEBOOK:m0111"
+      },
+      {
+        "query_id": "INT2-Q-NOTEBOOK",
+        "subset_observation_id": "INT3:INT2-Q-NOTEBOOK:m0010",
+        "superset_observation_id": "INT3:INT2-Q-NOTEBOOK:m1111"
+      },
+      {
+        "query_id": "INT2-Q-NOTEBOOK",
+        "subset_observation_id": "INT3:INT2-Q-NOTEBOOK:m0001",
+        "superset_observation_id": "INT3:INT2-Q-NOTEBOOK:m0101"
+      },
+      {
+        "query_id": "INT2-Q-NOTEBOOK",
+        "subset_observation_id": "INT3:INT2-Q-NOTEBOOK:m0001",
+        "superset_observation_id": "INT3:INT2-Q-NOTEBOOK:m1101"
+      },
+      {
+        "query_id": "INT2-Q-NOTEBOOK",
+        "subset_observation_id": "INT3:INT2-Q-NOTEBOOK:m0001",
+        "superset_observation_id": "INT3:INT2-Q-NOTEBOOK:m0111"
+      },
+      {
+        "query_id": "INT2-Q-NOTEBOOK",
+        "subset_observation_id": "INT3:INT2-Q-NOTEBOOK:m0001",
+        "superset_observation_id": "INT3:INT2-Q-NOTEBOOK:m1111"
+      },
+      {
+        "query_id": "INT2-Q-NOTEBOOK",
+        "subset_observation_id": "INT3:INT2-Q-NOTEBOOK:m1010",
+        "superset_observation_id": "INT3:INT2-Q-NOTEBOOK:m1110"
+      },
+      {
+        "query_id": "INT2-Q-NOTEBOOK",
+        "subset_observation_id": "INT3:INT2-Q-NOTEBOOK:m1010",
+        "superset_observation_id": "INT3:INT2-Q-NOTEBOOK:m1111"
+      },
+      {
+        "query_id": "INT2-Q-NOTEBOOK",
+        "subset_observation_id": "INT3:INT2-Q-NOTEBOOK:m1001",
+        "superset_observation_id": "INT3:INT2-Q-NOTEBOOK:m1101"
+      },
+      {
+        "query_id": "INT2-Q-NOTEBOOK",
+        "subset_observation_id": "INT3:INT2-Q-NOTEBOOK:m1001",
+        "superset_observation_id": "INT3:INT2-Q-NOTEBOOK:m1111"
+      },
+      {
+        "query_id": "INT2-Q-NOTEBOOK",
+        "subset_observation_id": "INT3:INT2-Q-NOTEBOOK:m0011",
+        "superset_observation_id": "INT3:INT2-Q-NOTEBOOK:m0111"
+      },
+      {
+        "query_id": "INT2-Q-NOTEBOOK",
+        "subset_observation_id": "INT3:INT2-Q-NOTEBOOK:m0011",
+        "superset_observation_id": "INT3:INT2-Q-NOTEBOOK:m1111"
+      },
+      {
+        "query_id": "INT2-Q-NOTEBOOK",
+        "subset_observation_id": "INT3:INT2-Q-NOTEBOOK:m1011",
+        "superset_observation_id": "INT3:INT2-Q-NOTEBOOK:m1111"
+      },
+      {
+        "query_id": "INT2-Q-STUDY-CLUB",
+        "subset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1000",
+        "superset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1010"
+      },
+      {
+        "query_id": "INT2-Q-STUDY-CLUB",
+        "subset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1000",
+        "superset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1110"
+      },
+      {
+        "query_id": "INT2-Q-STUDY-CLUB",
+        "subset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1000",
+        "superset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1011"
+      },
+      {
+        "query_id": "INT2-Q-STUDY-CLUB",
+        "subset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1000",
+        "superset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1111"
+      },
+      {
+        "query_id": "INT2-Q-STUDY-CLUB",
+        "subset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0100",
+        "superset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0110"
+      },
+      {
+        "query_id": "INT2-Q-STUDY-CLUB",
+        "subset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0100",
+        "superset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1110"
+      },
+      {
+        "query_id": "INT2-Q-STUDY-CLUB",
+        "subset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0100",
+        "superset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0111"
+      },
+      {
+        "query_id": "INT2-Q-STUDY-CLUB",
+        "subset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0100",
+        "superset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1111"
+      },
+      {
+        "query_id": "INT2-Q-STUDY-CLUB",
+        "subset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0001",
+        "superset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0011"
+      },
+      {
+        "query_id": "INT2-Q-STUDY-CLUB",
+        "subset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0001",
+        "superset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1011"
+      },
+      {
+        "query_id": "INT2-Q-STUDY-CLUB",
+        "subset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0001",
+        "superset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0111"
+      },
+      {
+        "query_id": "INT2-Q-STUDY-CLUB",
+        "subset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0001",
+        "superset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1111"
+      },
+      {
+        "query_id": "INT2-Q-STUDY-CLUB",
+        "subset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1100",
+        "superset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1110"
+      },
+      {
+        "query_id": "INT2-Q-STUDY-CLUB",
+        "subset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1100",
+        "superset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1111"
+      },
+      {
+        "query_id": "INT2-Q-STUDY-CLUB",
+        "subset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1001",
+        "superset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1011"
+      },
+      {
+        "query_id": "INT2-Q-STUDY-CLUB",
+        "subset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1001",
+        "superset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1111"
+      },
+      {
+        "query_id": "INT2-Q-STUDY-CLUB",
+        "subset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0101",
+        "superset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0111"
+      },
+      {
+        "query_id": "INT2-Q-STUDY-CLUB",
+        "subset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m0101",
+        "superset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1111"
+      },
+      {
+        "query_id": "INT2-Q-STUDY-CLUB",
+        "subset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1101",
+        "superset_observation_id": "INT3:INT2-Q-STUDY-CLUB:m1111"
+      },
+      {
+        "query_id": "INT2-Q-MARKET-EDGE",
+        "subset_observation_id": "INT3:INT2-Q-MARKET-EDGE:m100",
+        "superset_observation_id": "INT3:INT2-Q-MARKET-EDGE:m110"
+      },
+      {
+        "query_id": "INT2-Q-MARKET-EDGE",
+        "subset_observation_id": "INT3:INT2-Q-MARKET-EDGE:m100",
+        "superset_observation_id": "INT3:INT2-Q-MARKET-EDGE:m111"
+      },
+      {
+        "query_id": "INT2-Q-MARKET-EDGE",
+        "subset_observation_id": "INT3:INT2-Q-MARKET-EDGE:m001",
+        "superset_observation_id": "INT3:INT2-Q-MARKET-EDGE:m011"
+      },
+      {
+        "query_id": "INT2-Q-MARKET-EDGE",
+        "subset_observation_id": "INT3:INT2-Q-MARKET-EDGE:m001",
+        "superset_observation_id": "INT3:INT2-Q-MARKET-EDGE:m111"
+      },
+      {
+        "query_id": "INT2-Q-MARKET-EDGE",
+        "subset_observation_id": "INT3:INT2-Q-MARKET-EDGE:m101",
+        "superset_observation_id": "INT3:INT2-Q-MARKET-EDGE:m111"
+      },
+      {
+        "query_id": "INT2-Q-TAX-GUIDE",
+        "subset_observation_id": "INT3:INT2-Q-TAX-GUIDE:m100",
+        "superset_observation_id": "INT3:INT2-Q-TAX-GUIDE:m101"
+      },
+      {
+        "query_id": "INT2-Q-TAX-GUIDE",
+        "subset_observation_id": "INT3:INT2-Q-TAX-GUIDE:m100",
+        "superset_observation_id": "INT3:INT2-Q-TAX-GUIDE:m111"
+      },
+      {
+        "query_id": "INT2-Q-TAX-GUIDE",
+        "subset_observation_id": "INT3:INT2-Q-TAX-GUIDE:m010",
+        "superset_observation_id": "INT3:INT2-Q-TAX-GUIDE:m011"
+      },
+      {
+        "query_id": "INT2-Q-TAX-GUIDE",
+        "subset_observation_id": "INT3:INT2-Q-TAX-GUIDE:m010",
+        "superset_observation_id": "INT3:INT2-Q-TAX-GUIDE:m111"
+      },
+      {
+        "query_id": "INT2-Q-TAX-GUIDE",
+        "subset_observation_id": "INT3:INT2-Q-TAX-GUIDE:m110",
+        "superset_observation_id": "INT3:INT2-Q-TAX-GUIDE:m111"
+      }
+    ]
+  },
+  "experiment_name": "LIVE INT-3 SUBSET-ABLATION ENGINEERING EXPERIMENT",
+  "highlighted_action_transitions": {
+    "FULL_ALLOW_TO_SUBSET_BLOCK": 0,
+    "FULL_ALLOW_TO_SUBSET_REVIEW": 17,
+    "FULL_BLOCK_TO_SUBSET_ALLOW": 0,
+    "FULL_BLOCK_TO_SUBSET_REVIEW": 10,
+    "FULL_REVIEW_TO_SUBSET_ALLOW": 0,
+    "FULL_REVIEW_TO_SUBSET_BLOCK": 0
+  },
+  "live_call_accounting": {
+    "int2_prior_exact_results_reused": 15,
+    "new_provider_requests_during_partial_recovery": 0,
+    "original_partial_run_provider_requests": 1,
+    "p50_recovery_semantic_latency_ms": 2440.759750024881,
+    "p95_recovery_semantic_latency_ms": 4442.384249938186,
+    "partial_run_latency_available": false,
+    "partial_run_token_counts_available": false,
+    "prior_partial_run_results_recovered": 1,
+    "provider_errors": 0,
+    "recovery_input_token_counts_missing": 0,
+    "recovery_output_token_counts_missing": 0,
+    "remaining_recovery_semantic_executions_attempted": 46,
+    "remaining_recovery_semantic_executions_completed": 46,
+    "retries": 0,
+    "total_new_int3_semantic_api_executions_across_runs": 47,
+    "total_recovery_input_tokens": 22393,
+    "total_recovery_output_tokens": 4223
+  },
+  "minimum_observed_stable_subsets": [
+    {
+      "minimum_observed_stable_subset_size": 1,
+      "query_id": "INT2-Q-STUDYGLOW",
+      "stable_observation_ids_at_minimum": [
+        "INT3:INT2-Q-STUDYGLOW:m0001"
+      ]
+    },
+    {
+      "minimum_observed_stable_subset_size": 1,
+      "query_id": "INT2-Q-NOTEBOOK",
+      "stable_observation_ids_at_minimum": [
+        "INT3:INT2-Q-NOTEBOOK:m0100"
+      ]
+    },
+    {
+      "minimum_observed_stable_subset_size": 1,
+      "query_id": "INT2-Q-STUDY-CLUB",
+      "stable_observation_ids_at_minimum": [
+        "INT3:INT2-Q-STUDY-CLUB:m0010"
+      ]
+    },
+    {
+      "minimum_observed_stable_subset_size": 1,
+      "query_id": "INT2-Q-MARKET-EDGE",
+      "stable_observation_ids_at_minimum": [
+        "INT3:INT2-Q-MARKET-EDGE:m010"
+      ]
+    },
+    {
+      "minimum_observed_stable_subset_size": 1,
+      "query_id": "INT2-Q-TAX-GUIDE",
+      "stable_observation_ids_at_minimum": [
+        "INT3:INT2-Q-TAX-GUIDE:m001"
+      ]
+    },
+    {
+      "minimum_observed_stable_subset_size": 1,
+      "query_id": "INT2-Q-FLEXI",
+      "stable_observation_ids_at_minimum": [
+        "INT3:INT2-Q-FLEXI:m10",
+        "INT3:INT2-Q-FLEXI:m01"
+      ]
+    }
+  ],
+  "overall": {
+    "stable_count": 35,
+    "subset_count": 62,
+    "unstable_count": 27
+  },
+  "schema_version": "1.0",
+  "target_terminology": "SINGLE-EXECUTION ACTION STABILITY"
+}
