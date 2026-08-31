@@ -7,6 +7,9 @@ name = "mandateguard"
 version = "0.1.0"
 description = "Deterministic mandate enforcement core for agentic payments"
 requires-python = ">=3.12"
+dependencies = [
+    "scikit-learn>=1.8,<2",
+]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
