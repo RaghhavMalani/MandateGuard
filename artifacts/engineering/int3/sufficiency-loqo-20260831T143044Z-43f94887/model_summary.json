@@ -1,0 +1,263 @@
+{
+  "coefficient_diagnostics": {
+    "causal_interpretation_allowed": false,
+    "full_data_diagnostic_fit_performed": false,
+    "scope": "SIX_TRAIN_ONLY_LOQO_FITS",
+    "summary": [
+      {
+        "feature_name": "evidence_count",
+        "interpretation": "DIAGNOSTIC_STANDARDIZED_COEFFICIENT_NOT_CAUSAL",
+        "median_coefficient": -0.0038363776058203828,
+        "negative_fold_count": 4,
+        "positive_fold_count": 2,
+        "sign_consistency": "MIXED_ACROSS_FOLDS",
+        "zero_fold_count": 0
+      },
+      {
+        "feature_name": "evidence_fraction",
+        "interpretation": "DIAGNOSTIC_STANDARDIZED_COEFFICIENT_NOT_CAUSAL",
+        "median_coefficient": 0.5802240619549397,
+        "negative_fold_count": 0,
+        "positive_fold_count": 6,
+        "sign_consistency": "POSITIVE_IN_ALL_6_FOLDS",
+        "zero_fold_count": 0
+      },
+      {
+        "feature_name": "sku_scoped_evidence_fraction",
+        "interpretation": "DIAGNOSTIC_STANDARDIZED_COEFFICIENT_NOT_CAUSAL",
+        "median_coefficient": 0.9836192078348822,
+        "negative_fold_count": 0,
+        "positive_fold_count": 6,
+        "sign_consistency": "POSITIVE_IN_ALL_6_FOLDS",
+        "zero_fold_count": 0
+      },
+      {
+        "feature_name": "merchant_scope_evidence_present",
+        "interpretation": "DIAGNOSTIC_STANDARDIZED_COEFFICIENT_NOT_CAUSAL",
+        "median_coefficient": -0.2312719451367777,
+        "negative_fold_count": 6,
+        "positive_fold_count": 0,
+        "sign_consistency": "NEGATIVE_IN_ALL_6_FOLDS",
+        "zero_fold_count": 0
+      },
+      {
+        "feature_name": "product_scope_evidence_present",
+        "interpretation": "DIAGNOSTIC_STANDARDIZED_COEFFICIENT_NOT_CAUSAL",
+        "median_coefficient": 1.273831808487349,
+        "negative_fold_count": 0,
+        "positive_fold_count": 6,
+        "sign_consistency": "POSITIVE_IN_ALL_6_FOLDS",
+        "zero_fold_count": 0
+      },
+      {
+        "feature_name": "max_score",
+        "interpretation": "DIAGNOSTIC_STANDARDIZED_COEFFICIENT_NOT_CAUSAL",
+        "median_coefficient": 0.8931840634404958,
+        "negative_fold_count": 0,
+        "positive_fold_count": 6,
+        "sign_consistency": "POSITIVE_IN_ALL_6_FOLDS",
+        "zero_fold_count": 0
+      },
+      {
+        "feature_name": "mean_score",
+        "interpretation": "DIAGNOSTIC_STANDARDIZED_COEFFICIENT_NOT_CAUSAL",
+        "median_coefficient": 0.7960153430675625,
+        "negative_fold_count": 0,
+        "positive_fold_count": 6,
+        "sign_consistency": "POSITIVE_IN_ALL_6_FOLDS",
+        "zero_fold_count": 0
+      },
+      {
+        "feature_name": "score_margin",
+        "interpretation": "DIAGNOSTIC_STANDARDIZED_COEFFICIENT_NOT_CAUSAL",
+        "median_coefficient": 0.3952754409598285,
+        "negative_fold_count": 0,
+        "positive_fold_count": 6,
+        "sign_consistency": "POSITIVE_IN_ALL_6_FOLDS",
+        "zero_fold_count": 0
+      },
+      {
+        "feature_name": "source_kind_count",
+        "interpretation": "DIAGNOSTIC_STANDARDIZED_COEFFICIENT_NOT_CAUSAL",
+        "median_coefficient": -0.17916908079778987,
+        "negative_fold_count": 5,
+        "positive_fold_count": 1,
+        "sign_consistency": "MIXED_ACROSS_FOLDS",
+        "zero_fold_count": 0
+      },
+      {
+        "feature_name": "source_kind_diversity",
+        "interpretation": "DIAGNOSTIC_STANDARDIZED_COEFFICIENT_NOT_CAUSAL",
+        "median_coefficient": -0.2536636952592929,
+        "negative_fold_count": 6,
+        "positive_fold_count": 0,
+        "sign_consistency": "NEGATIVE_IN_ALL_6_FOLDS",
+        "zero_fold_count": 0
+      },
+      {
+        "feature_name": "constraint_count",
+        "interpretation": "DIAGNOSTIC_STANDARDIZED_COEFFICIENT_NOT_CAUSAL",
+        "median_coefficient": 0.04696513235438484,
+        "negative_fold_count": 1,
+        "positive_fold_count": 4,
+        "sign_consistency": "MIXED_ACROSS_FOLDS",
+        "zero_fold_count": 1
+      },
+      {
+        "feature_name": "constraint_family_purpose",
+        "interpretation": "DIAGNOSTIC_STANDARDIZED_COEFFICIENT_NOT_CAUSAL",
+        "median_coefficient": 0.04696513235438482,
+        "negative_fold_count": 1,
+        "positive_fold_count": 4,
+        "sign_consistency": "MIXED_ACROSS_FOLDS",
+        "zero_fold_count": 1
+      },
+      {
+        "feature_name": "constraint_family_exclusion",
+        "interpretation": "DIAGNOSTIC_STANDARDIZED_COEFFICIENT_NOT_CAUSAL",
+        "median_coefficient": 0.0,
+        "negative_fold_count": 0,
+        "positive_fold_count": 0,
+        "sign_consistency": "ZERO_IN_ALL_6_FOLDS",
+        "zero_fold_count": 6
+      },
+      {
+        "feature_name": "evidence_text_kchars_mean",
+        "interpretation": "DIAGNOSTIC_STANDARDIZED_COEFFICIENT_NOT_CAUSAL",
+        "median_coefficient": 0.5066653962691765,
+        "negative_fold_count": 0,
+        "positive_fold_count": 6,
+        "sign_consistency": "POSITIVE_IN_ALL_6_FOLDS",
+        "zero_fold_count": 0
+      }
+    ]
+  },
+  "comparison": {
+    "EVIDENCE-FRACTION-ONLY": {
+      "false_insufficient_count": 5,
+      "false_insufficient_rate": 0.2777777777777778,
+      "false_insufficient_rate_denominator": "predicted_insufficient_count",
+      "false_sufficient_count": 14,
+      "false_sufficient_rate": 0.3181818181818182,
+      "false_sufficient_rate_denominator": "predicted_sufficient_count",
+      "macro_query_brier": 0.19209904521113874,
+      "macro_query_roc_auc_defined_folds": 0.7446428571428572,
+      "pooled_brier": 0.19767077413183703,
+      "pooled_roc_auc": 0.7433862433862434,
+      "predicted_insufficient_count": 18,
+      "predicted_review_rate": 0.2903225806451613,
+      "predicted_sufficient_count": 44,
+      "query_roc_auc_defined_fold_count": 5
+    },
+    "FROZEN-14-FEATURE": {
+      "false_insufficient_count": 1,
+      "false_insufficient_rate": 0.03571428571428571,
+      "false_insufficient_rate_denominator": "predicted_insufficient_count",
+      "false_sufficient_count": 0,
+      "false_sufficient_rate": 0.0,
+      "false_sufficient_rate_denominator": "predicted_sufficient_count",
+      "macro_query_brier": 0.05507599835175676,
+      "macro_query_roc_auc_defined_folds": 1.0,
+      "pooled_brier": 0.020000692507297996,
+      "pooled_roc_auc": 0.9841269841269841,
+      "predicted_insufficient_count": 28,
+      "predicted_review_rate": 0.45161290322580644,
+      "predicted_sufficient_count": 34,
+      "query_roc_auc_defined_fold_count": 5
+    },
+    "TRAIN-PREVALENCE": {
+      "false_insufficient_count": 0,
+      "false_insufficient_rate": 0.0,
+      "false_insufficient_rate_denominator": "predicted_insufficient_count",
+      "false_sufficient_count": 27,
+      "false_sufficient_rate": 0.43548387096774194,
+      "false_sufficient_rate_denominator": "predicted_sufficient_count",
+      "macro_query_brier": 0.24184713419455506,
+      "macro_query_roc_auc_defined_folds": 0.5,
+      "pooled_brier": 0.2473198754502111,
+      "pooled_roc_auc": 0.4444444444444444,
+      "predicted_insufficient_count": 0,
+      "predicted_review_rate": 0.0,
+      "predicted_sufficient_count": 62,
+      "query_roc_auc_defined_fold_count": 5
+    }
+  },
+  "critical_question": "Does the frozen 14-feature model provide useful evidence-sufficiency signal beyond simply knowing how much evidence has been retrieved?",
+  "dataset": {
+    "observation_count": 62,
+    "query_group_count": 6,
+    "source_commit": "fdf9b6e95904792c9256b991324d7b93362c0aa7",
+    "source_dataset_sha256": "71ca119e3b091b887175e60b48ab86083d17ab3b4edb3c75e6560275f62fd505",
+    "source_run_id": "subset-live-recovery-20260831T135210Z-737beff7",
+    "stable_count": 35,
+    "unstable_count": 27
+  },
+  "evidence_fraction_baseline_selection": "Selected after inspecting descriptive subset-ablation structure but before seeing learned-model performance; not claimed as preregistered before labels.",
+  "experiment_name": "INT-3 NON-BENCHMARK LEAVE-ONE-QUERY-OUT ENGINEERING EVALUATION",
+  "false_sufficient_primary_error": {
+    "cases": [],
+    "count": 0,
+    "definition": "predicted sufficient while frozen single-execution label is unstable",
+    "rate_denominator": "predicted_sufficient_count"
+  },
+  "frozen_model": {
+    "hyperparameter_tuning": false,
+    "ordered_features": [
+      "evidence_count",
+      "evidence_fraction",
+      "sku_scoped_evidence_fraction",
+      "merchant_scope_evidence_present",
+      "product_scope_evidence_present",
+      "max_score",
+      "mean_score",
+      "score_margin",
+      "source_kind_count",
+      "source_kind_diversity",
+      "constraint_count",
+      "constraint_family_purpose",
+      "constraint_family_exclusion",
+      "evidence_text_kchars_mean"
+    ],
+    "pipeline": {
+      "C": 1.0,
+      "class_weight": null,
+      "fit_intercept": true,
+      "max_iter": 2000,
+      "random_state": 0,
+      "regularization": "L2",
+      "solver": "lbfgs",
+      "steps": [
+        "StandardScaler",
+        "LogisticRegression"
+      ],
+      "tol": 0.0001
+    },
+    "threshold": 0.5
+  },
+  "not_performed": [
+    "threshold_tuning",
+    "hyperparameter_tuning",
+    "class_rebalancing",
+    "probability_calibration",
+    "random_train_test_split",
+    "full_data_diagnostic_fit",
+    "voi_policy_evaluation",
+    "runtime_integration",
+    "alternative_model_search",
+    "external_api_calls",
+    "buyer_calls",
+    "razorpay_calls"
+  ],
+  "observed_instability_manifestation": "Every unstable row ended in REVIEW; no instability was an ALLOW/BLOCK reversal.",
+  "sample_dependence": "62 correlated evidence subsets grouped by six synthetic queries; not 62 independent commerce cases",
+  "schema_version": "1.0",
+  "target": "decision_stable",
+  "target_definition": "subset_final_action == frozen_full_evidence_final_action",
+  "target_terminology": "SINGLE-EXECUTION ACTION STABILITY",
+  "verdict": "USEFUL ADDITIONAL SIGNAL",
+  "verdict_reasons": [
+    "The classification compares both pooled and macro-query Brier scores, not one aggregate metric alone.",
+    "It also compares both false-SUFFICIENT and false-INSUFFICIENT counts at the frozen 0.5 threshold.",
+    "The evidence-fraction-only comparison was selected after descriptive subset-ablation inspection but before learned-model performance was seen."
+  ]
+}

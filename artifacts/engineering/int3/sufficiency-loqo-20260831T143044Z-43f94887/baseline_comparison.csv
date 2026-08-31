@@ -1,0 +1,4 @@
+approach,pooled_brier,macro_query_brier,false_sufficient_count,false_sufficient_rate,false_sufficient_rate_denominator,false_insufficient_count,false_insufficient_rate,false_insufficient_rate_denominator,predicted_sufficient_count,predicted_insufficient_count,predicted_review_rate,pooled_roc_auc,macro_query_roc_auc_defined_folds,query_roc_auc_defined_fold_count
+TRAIN-PREVALENCE,0.2473198754502111,0.24184713419455506,27,0.43548387096774194,predicted_sufficient_count,0,0.0,predicted_insufficient_count,62,0,0.0,0.4444444444444444,0.5,5
+EVIDENCE-FRACTION-ONLY,0.19767077413183703,0.19209904521113874,14,0.3181818181818182,predicted_sufficient_count,5,0.2777777777777778,predicted_insufficient_count,44,18,0.2903225806451613,0.7433862433862434,0.7446428571428572,5
+FROZEN-14-FEATURE,0.020000692507297996,0.05507599835175676,0,0.0,predicted_sufficient_count,1,0.03571428571428571,predicted_insufficient_count,34,28,0.45161290322580644,0.9841269841269841,1.0,5
