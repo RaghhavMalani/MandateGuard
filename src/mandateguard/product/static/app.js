@@ -70,6 +70,17 @@ function displayScore(value) {
   return Number.isFinite(score) ? score.toFixed(3) : String(value ?? "—");
 }
 
+export function liveModeStatusNote(live) {
+  if (!live || live.available) return null;
+  const problem = (live.problems || [])[0];
+  const reason = (live.missing_configuration || []).length
+    ? "Server-side credentials are not configured on this deployment."
+    : problem
+      ? `${problem}.`
+      : "This deployment does not enable live execution.";
+  return `LIVE TEST UNAVAILABLE — ${reason} Offline demo remains fully available.`;
+}
+
 export function renderDecisionBanner(result) {
   const decision = result?.decision || "ERROR";
   const resolution = {
@@ -633,6 +644,7 @@ function init() {
   elements.run.addEventListener("click", submit);
   document.querySelectorAll('input[name="mode"]').forEach((input) => {
     input.addEventListener("change", () => {
+      if (config && !config.modes.live.available) return;
       const live = selectedMode() === "live";
       elements.modeNote.textContent = live
         ? "Uses configured OpenAI pathways and Razorpay Test Mode after explicit submission."
@@ -660,11 +672,14 @@ function init() {
       elements.system.querySelector("span:last-child").textContent = "SYSTEM READY";
       elements.research.innerHTML = renderResearch(config.research);
       elements.recovery.innerHTML = renderRecovery(config.failure_recovery);
-      if (!config.modes.live.available) {
+      const unavailableNote = liveModeStatusNote(config.modes.live);
+      if (unavailableNote) {
         const liveInput = elements.liveLabel.querySelector("input");
         liveInput.disabled = true;
         liveInput.dataset.unavailable = "true";
-        elements.liveLabel.title = "Live Test Mode is unavailable on this server.";
+        elements.liveLabel.title = unavailableNote;
+        elements.liveLabel.querySelector("span").textContent = "LIVE TEST OFF";
+        elements.modeNote.textContent = unavailableNote;
       }
       renderPresets();
     })

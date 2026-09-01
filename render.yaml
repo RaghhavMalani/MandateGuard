@@ -1,0 +1,14 @@
+# Render blueprint for the public MandateGuard Commerce Lab.
+#
+# Public deployment is OFFLINE DEMO only. No secrets are declared here: without
+# server-side credentials the product reports LIVE TEST UNAVAILABLE and refuses
+# live runs with HTTP 503, so the public URL cannot trigger paid external APIs.
+services:
+  - type: web
+    name: mandateguard-commerce-lab
+    runtime: docker
+    plan: free
+    region: singapore
+    branch: feat/judge-facing-product
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health

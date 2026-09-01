@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import OrderedDict
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -83,6 +84,7 @@ FIXTURE_ROOT = REPOSITORY_ROOT / "fixtures" / "agentic_commerce"
 _REQUEST_ID_RE = re.compile(r"^[A-Za-z0-9._-]{8,128}$")
 _NO_EXCLUSION_RE = re.compile(r"\bno\s+([^.;]+)", re.IGNORECASE)
 _TERMINAL_STATES = frozenset({"COMPLETE", "ERROR"})
+_MAX_RETAINED_RUNS = 256
 _OFFLINE_EVALUATED_AT = datetime(2026, 8, 30, 7, 41, 15, tzinfo=timezone.utc)
 
 
@@ -532,6 +534,8 @@ class _RunContext:
 class CommerceLabService:
     """Own product runs without adding any authorization decision logic."""
 
+    default_mode = "offline"
+
     def __init__(
         self,
         *,
@@ -559,7 +563,7 @@ class CommerceLabService:
             state_dir / "execution-ledger.sqlite3"
         )
         self._offline_signing_key = secrets.token_bytes(32)
-        self._runs: dict[str, CommerceRun] = {}
+        self._runs: OrderedDict[str, CommerceRun] = OrderedDict()
         self._requests: dict[str, tuple[str, str, str]] = {}
         self._lock = RLock()
 
@@ -597,7 +601,7 @@ class CommerceLabService:
         return {
             "product": "MANDATEGUARD",
             "thesis": "The agent decides. MandateGuard verifies. Razorpay executes.",
-            "default_mode": "offline",
+            "default_mode": self.default_mode,
             "modes": {
                 "offline": {
                     "available": True,
@@ -626,7 +630,7 @@ class CommerceLabService:
         return {
             "status": "ok",
             "service": "mandateguard-commerce-lab",
-            "default_mode": "offline",
+            "default_mode": self.default_mode,
             "live_mode_available": self.live_configuration()["available"],
         }
 
@@ -671,6 +675,7 @@ class CommerceLabService:
             )
             self._runs[run.run_id] = run
             self._requests[request_id] = (run.run_id, mode, normalized_intent)
+            self._evict_oldest_runs()
         Thread(target=self._execute_run, args=(run,), daemon=True).start()
         return run, False
 
@@ -694,6 +699,15 @@ class CommerceLabService:
         if not run.completion.wait(timeout_seconds):
             raise TimeoutError("commerce lab run did not finish")
         return run.snapshot()
+
+    def _evict_oldest_runs(self) -> None:
+        """Bound demo memory without touching any authorization decision."""
+
+        while len(self._runs) > _MAX_RETAINED_RUNS:
+            evicted_id, _ = self._runs.popitem(last=False)
+            for key, entry in list(self._requests.items()):
+                if entry[0] == evicted_id:
+                    del self._requests[key]
 
     def get_run(self, run_id: str) -> CommerceRun | None:
         with self._lock:

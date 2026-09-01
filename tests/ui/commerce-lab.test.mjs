@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   SubmissionLock,
   escapeHtml,
+  liveModeStatusNote,
   renderAuthorizationPanel,
   renderDecisionBanner,
   renderEvidencePanel,
@@ -147,4 +148,31 @@ test("live Test Mode label appears only for the backend live environment", () =>
   assert.match(html, /ORDER CREATED/);
   assert.doesNotMatch(html, /OFFLINE DEMO REPLAY/);
   assert.doesNotMatch(html, /preserved engineering evidence/);
+});
+
+
+test("unavailable live mode is stated in the page, not only in a tooltip", () => {
+  const note = liveModeStatusNote({ available: false, problems: [], missing_configuration: ["OPENAI_API_KEY"] });
+  assert.match(note, /LIVE TEST UNAVAILABLE/);
+  assert.match(note, /Server-side credentials are not configured on this deployment\./);
+  assert.match(note, /Offline demo remains fully available\./);
+
+  // Missing credentials is the judge-facing reason, even when a library is also absent.
+  const deployed = liveModeStatusNote({
+    available: false,
+    missing_configuration: ["OPENAI_API_KEY"],
+    problems: ["OpenAI Python package is not installed"],
+  });
+  assert.match(deployed, /Server-side credentials are not configured on this deployment\./);
+  assert.doesNotMatch(deployed, /Python package/);
+
+  const withProblem = liveModeStatusNote({
+    available: false,
+    missing_configuration: [],
+    problems: ["OpenAI Python package is not installed"],
+  });
+  assert.match(withProblem, /LIVE TEST UNAVAILABLE/);
+  assert.match(withProblem, /OpenAI Python package is not installed\./);
+
+  assert.equal(liveModeStatusNote({ available: true, problems: [] }), null);
 });

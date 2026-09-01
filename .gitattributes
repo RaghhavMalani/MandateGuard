@@ -2,3 +2,6 @@ benchmark/MANIFEST.yaml text eol=lf
 benchmark/cases/tier_ab/*.jsonl text eol=lf
 benchmark/generated/*.json text eol=lf
 artifacts/engineering/int2/stage-b-live-20260830T123856Z-0e4213c/stage_b_observations.jsonl text eol=lf
+Dockerfile text eol=lf
+.dockerignore text eol=lf
+render.yaml text eol=lf

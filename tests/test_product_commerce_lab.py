@@ -299,3 +299,71 @@ def test_http_boundary_rejects_unknown_fields(service: CommerceLabService) -> No
         assert caught.value.code == 400
         payload = json.loads(caught.value.read().decode("utf-8"))
         assert payload["error"]["code"] == "INVALID_REQUEST"
+
+
+def test_public_demo_bounds_retained_runs_without_losing_recent_runs(
+    service: CommerceLabService,
+) -> None:
+    from mandateguard.product import service as service_module
+
+    monkeypatched_cap = 4
+    original_cap = service_module._MAX_RETAINED_RUNS
+    service_module._MAX_RETAINED_RUNS = monkeypatched_cap
+    try:
+        recorded: list[str] = []
+        for index in range(monkeypatched_cap * 3):
+            run, _ = service.start_run(
+                user_intent=PRESETS["safe"]["intent"],
+                mode="offline",
+                request_id=f"retention_{index:04d}",
+            )
+            assert run.completion.wait(20.0)
+            recorded.append(run.run_id)
+
+        assert len(service._runs) == monkeypatched_cap
+        assert len(service._requests) == monkeypatched_cap
+        for run_id in recorded[-monkeypatched_cap:]:
+            assert service.get_run(run_id) is not None
+        for run_id in recorded[:-monkeypatched_cap]:
+            assert service.get_run(run_id) is None
+    finally:
+        service_module._MAX_RETAINED_RUNS = original_cap
+
+
+def test_access_log_is_bounded_and_free_of_intent_and_identifiers(
+    service: CommerceLabService,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    from mandateguard.product.http import route_template
+
+    assert route_template("/api/health") == "/api/health"
+    assert route_template("/api/runs") == "/api/runs"
+    assert route_template("/api/runs/run_" + "a" * 32) == "/api/runs/{run_id}"
+    assert route_template("/api/runs/run_" + "a" * 32 + "/replay") == (
+        "/api/runs/{run_id}/replay"
+    )
+    assert route_template("/../../etc/passwd") == "/unmatched"
+
+    secret_intent = "Buy a study lamp under 2000 for zzsecretmandatezz."
+    with running_server(service) as base_url:
+        capsys.readouterr()
+        fetch_json(f"{base_url}/api/health")
+        fetch_json(
+            f"{base_url}/api/runs",
+            payload={
+                "intent": secret_intent,
+                "mode": "offline",
+                "preset_id": None,
+                "request_id": "logsafety_0001",
+            },
+        )
+        logged = capsys.readouterr().err
+
+    assert "mandateguard.request" in logged
+    assert "route=/api/health" in logged
+    assert "route=/api/runs" in logged
+    assert "demo_mode=offline" in logged
+    assert "zzsecretmandatezz" not in logged
+    assert "logsafety_0001" not in logged
+    for forbidden in ("Authorization", "sk-", "rzp_test_", "hmac"):
+        assert forbidden not in logged

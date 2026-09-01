@@ -1,0 +1,23 @@
+# Never let credentials, history, or local state reach the build context.
+.env
+.env.*
+.git
+.gitattributes
+.gitignore
+.venv
+.pytest_cache
+.pytest_tmp
+**/__pycache__
+**/*.py[cod]
+**/*.egg-info
+
+# Not read by the running server.
+artifacts
+benchmark
+docs
+schemas
+tests
+fixtures/*
+!fixtures/agentic_commerce
+Dockerfile
+.dockerignore

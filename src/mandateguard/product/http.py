@@ -10,6 +10,8 @@ import mimetypes
 import os
 from pathlib import Path
 import re
+from secrets import token_hex
+import sys
 from threading import RLock
 from time import monotonic
 from typing import Any, Mapping
@@ -24,6 +26,21 @@ _REPLAY_PATH_RE = re.compile(r"^/api/runs/(run_[0-9a-f]{32})/replay$")
 _MAX_REQUEST_BYTES = 16_384
 _DEFAULT_PRODUCT_HOST = "0.0.0.0"
 _DEFAULT_PRODUCT_PORT = 8080
+_ROUTE_TEMPLATES = (
+    (_REPLAY_PATH_RE, "/api/runs/{run_id}/replay"),
+    (_RUN_PATH_RE, "/api/runs/{run_id}"),
+)
+_KNOWN_ROUTES = frozenset(
+    {
+        "/",
+        "/index.html",
+        "/assets/app.css",
+        "/assets/app.js",
+        "/api/health",
+        "/api/config",
+        "/api/runs",
+    }
+)
 
 
 class _DuplicateFieldError(ValueError):
@@ -49,6 +66,15 @@ def resolve_bind_address(
     if not 0 <= port <= 65535:
         raise ValueError("product server port must be between 0 and 65535")
     return host, port
+
+
+def route_template(path: str) -> str:
+    """Reduce a request path to a bounded, non-identifying label for logs."""
+
+    for pattern, template in _ROUTE_TEMPLATES:
+        if pattern.fullmatch(path):
+            return template
+    return path if path in _KNOWN_ROUTES else "/unmatched"
 
 
 def _object_without_duplicates(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
@@ -104,10 +130,34 @@ class CommerceLabHandler(BaseHTTPRequestHandler):
     server: CommerceLabHTTPServer
 
     def log_message(self, format: str, *args: object) -> None:
-        # Keep secrets and free-form user intent out of default access logs.
+        # Suppress the default access line; it echoes the raw request target.
         return
 
+    def _begin_request(self) -> None:
+        self._started_at = monotonic()
+        self._trace_id = token_hex(8)
+
+    def _log_access(self, status: HTTPStatus) -> None:
+        """Emit one bounded line. Never headers, bodies, query strings, or intent."""
+
+        started = getattr(self, "_started_at", None)
+        if started is None:
+            return
+        self._started_at = None
+        print(
+            "mandateguard.request "
+            f"id={getattr(self, '_trace_id', '-')} "
+            f"method={self.command} "
+            f"route={route_template(urlsplit(self.path).path)} "
+            f"status={status.value} "
+            f"duration_ms={(monotonic() - started) * 1000.0:.1f} "
+            f"demo_mode={self.server.service.default_mode}",
+            file=sys.stderr,
+            flush=True,
+        )
+
     def do_GET(self) -> None:
+        self._begin_request()
         path = urlsplit(self.path).path
         if path == "/api/health":
             self._send_json(HTTPStatus.OK, self.server.service.health())
@@ -135,6 +185,7 @@ class CommerceLabHandler(BaseHTTPRequestHandler):
         self._send_error(HTTPStatus.NOT_FOUND, "NOT_FOUND", "Resource not found.")
 
     def do_POST(self) -> None:
+        self._begin_request()
         path = urlsplit(self.path).path
         client_key = self.client_address[0] if self.client_address else "local"
         if not self.server.limiter.allow(client_key):
@@ -235,6 +286,7 @@ class CommerceLabHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
+        self._log_access(status)
 
     def _send_error(self, status: HTTPStatus, code: str, message: str) -> None:
         self._send_json(status, {"error": {"code": code, "message": message}})
@@ -257,6 +309,7 @@ class CommerceLabHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
+        self._log_access(HTTPStatus.OK)
 
     def _common_headers(self) -> None:
         self.send_header(
