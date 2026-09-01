@@ -65,6 +65,11 @@ function humanize(value) {
   return text ? text.replace(/^./, (character) => character.toUpperCase()) : "Not recorded";
 }
 
+function displayScore(value) {
+  const score = Number(value);
+  return Number.isFinite(score) ? score.toFixed(3) : String(value ?? "—");
+}
+
 export function renderDecisionBanner(result) {
   const decision = result?.decision || "ERROR";
   const resolution = {
@@ -154,7 +159,7 @@ export function renderEvidencePanel(evidence) {
           <dl>
             <div><dt>Source</dt><dd>${escapeHtml(card.source_kind)}</dd></div>
             <div><dt>Scope</dt><dd>${escapeHtml(card.scope)}</dd></div>
-            <div><dt>Score</dt><dd><code>${escapeHtml(card.retrieval_score)}</code></dd></div>
+            <div><dt>Score</dt><dd><code>${escapeHtml(displayScore(card.retrieval_score))}</code></dd></div>
           </dl>
         </article>`,
     )
@@ -327,11 +332,11 @@ export function renderExecutionPanel(execution) {
         <span>${resultLabel}</span><strong><i aria-hidden="true"></i>${resultStatus}</strong>
       </div>
       <dl>
-        <div><dt>Order ID</dt><dd><code title="${escapeHtml(order.order_id)}">${escapeHtml(shortId(order.order_id))}</code></dd></div>
-        <div><dt>Amount</dt><dd>${money(order.amount, order.currency)}</dd></div>
-        <div><dt>Currency</dt><dd>${escapeHtml(order.currency)}</dd></div>
-        <div><dt>Receipt</dt><dd><code title="${escapeHtml(order.receipt)}">${escapeHtml(shortId(order.receipt))}</code></dd></div>
-        <div><dt>Status</dt><dd>${escapeHtml(String(order.status || "").toUpperCase())}</dd></div>
+        <div class="order-result__order-id"><dt>Order ID</dt><dd><code title="${escapeHtml(order.order_id)}">${escapeHtml(shortId(order.order_id))}</code></dd></div>
+        <div class="order-result__amount"><dt>Amount</dt><dd>${money(order.amount, order.currency)}</dd></div>
+        <div class="order-result__currency"><dt>Currency</dt><dd>${escapeHtml(order.currency)}</dd></div>
+        <div class="order-result__receipt"><dt>Receipt</dt><dd><code title="${escapeHtml(order.receipt)}">${escapeHtml(shortId(order.receipt))}</code></dd></div>
+        <div class="order-result__status"><dt>Status</dt><dd>${escapeHtml(String(order.status || "").toUpperCase())}</dd></div>
       </dl>
     </div>
     <div class="call-accounting">
@@ -346,10 +351,10 @@ export function renderExecutionPanel(execution) {
 function renderTimeline(timeline) {
   return (timeline || [])
     .map(
-      (item) => `
+      (item, index) => `
         <li data-status="${escapeHtml(item.status)}">
           <div class="timeline__marker" aria-hidden="true"></div>
-          <span class="timeline__label">${escapeHtml(item.label)}</span>
+          <span class="timeline__label"><b>${String(index + 1).padStart(2, "0")}</b>${escapeHtml(item.label)}</span>
           ${statusBadge(item.status)}
           <small>${escapeHtml(item.detail || "Awaiting backend state")}</small>
         </li>`,
@@ -495,7 +500,7 @@ function init() {
   const setBusy = (busy) => {
     document.body.classList.toggle("is-running", busy);
     elements.run.disabled = busy;
-    elements.run.textContent = busy ? "BUYER RUNNING" : "RUN AI BUYER";
+    elements.run.textContent = busy ? "BUYER RUNNING" : "RUN AI BUYER  →";
     elements.intent.readOnly = busy;
     document
       .querySelectorAll('input[name="mode"], .preset-button')
