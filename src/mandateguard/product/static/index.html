@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="MandateGuard authorization infrastructure for autonomous commerce."
+    />
+    <title>MandateGuard Commerce Lab</title>
+    <link rel="stylesheet" href="/assets/app.css" />
+    <script type="module" src="/assets/app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#commerce-lab">Skip to commerce lab</a>
+    <header class="topbar">
+      <div class="topbar__inner">
+        <a class="brand" href="/" aria-label="MandateGuard home">
+          <span class="brand__mark" aria-hidden="true">MG</span>
+          <span class="brand__name">MANDATEGUARD</span>
+        </a>
+        <p class="architecture-line">
+          The agent decides. MandateGuard verifies. Razorpay executes.
+        </p>
+        <div class="system-state" id="system-state" aria-live="polite">
+          <span class="system-state__signal" aria-hidden="true"></span>
+          <span>CHECKING SYSTEM</span>
+        </div>
+      </div>
+    </header>
+
+    <main id="commerce-lab" class="shell">
+      <section class="lab-intro" aria-labelledby="lab-title">
+        <div class="lab-intro__copy">
+          <p class="eyebrow">Authorization infrastructure for autonomous commerce</p>
+          <h1 id="lab-title">Verify the mandate before money moves.</h1>
+          <p class="lab-intro__summary">
+            The buyer proposes a product. MandateGuard independently binds evidence,
+            policy, capability, and execution.
+          </p>
+        </div>
+        <div class="boundary-map" aria-label="Authority boundary">
+          <div>
+            <span>01</span>
+            <strong>AI BUYER</strong>
+            <small>Proposes</small>
+          </div>
+          <div>
+            <span>02</span>
+            <strong>MANDATEGUARD</strong>
+            <small>Authorizes</small>
+          </div>
+          <div>
+            <span>03</span>
+            <strong>RAZORPAY</strong>
+            <small>Executes</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="composer" aria-labelledby="purchase-question">
+        <div class="composer__main">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">COMMERCE LAB</p>
+              <h2 id="purchase-question">What should the agent buy?</h2>
+            </div>
+            <fieldset class="mode-switch" id="mode-switch">
+              <legend>Execution mode</legend>
+              <label>
+                <input type="radio" name="mode" value="offline" checked />
+                <span>OFFLINE DEMO</span>
+              </label>
+              <label id="live-mode-label">
+                <input type="radio" name="mode" value="live" />
+                <span>LIVE TEST</span>
+              </label>
+            </fieldset>
+          </div>
+
+          <div class="preset-row" id="preset-row" aria-label="Demo presets"></div>
+
+          <label class="intent-label" for="purchase-intent">Purchase mandate</label>
+          <textarea
+            id="purchase-intent"
+            name="purchase-intent"
+            rows="4"
+            maxlength="4000"
+            spellcheck="true"
+          ></textarea>
+          <div class="composer__actions">
+            <p id="mode-note" class="mode-note">
+              Deterministic local evaluation. External network calls: 0.
+            </p>
+            <button id="run-button" class="button button--primary" type="button">
+              RUN AI BUYER
+            </button>
+          </div>
+          <p class="form-error" id="form-error" role="alert" hidden></p>
+        </div>
+        <aside class="authority-note">
+          <p class="authority-note__label">HARD BOUNDARY</p>
+          <p>AI Buyer has no direct Razorpay authority.</p>
+          <dl>
+            <div><dt>Buyer tools</dt><dd>Commerce only</dd></div>
+            <div><dt>Authorization</dt><dd>MandateGuard controller</dd></div>
+            <div><dt>Execution</dt><dd>Signed capability only</dd></div>
+          </dl>
+        </aside>
+      </section>
+
+      <section class="timeline-section" aria-labelledby="timeline-title">
+        <div class="section-heading section-heading--compact">
+          <div>
+            <p class="section-kicker">EXECUTION TIMELINE</p>
+            <h2 id="timeline-title">Controller-backed state</h2>
+          </div>
+          <p id="run-state" class="run-state">WAITING FOR REQUEST</p>
+        </div>
+        <ol class="timeline" id="timeline"></ol>
+      </section>
+
+      <section id="result-region" class="result-region" aria-live="polite" hidden>
+        <div id="decision-banner"></div>
+        <div class="product-grid">
+          <div class="product-grid__primary">
+            <section class="panel" aria-labelledby="buyer-title">
+              <div class="panel__header">
+                <div>
+                  <p class="panel__index">BUYER OUTPUT</p>
+                  <h2 id="buyer-title">Buyer and product</h2>
+                </div>
+                <span class="panel__meta">NO PAYMENT AUTHORITY</span>
+              </div>
+              <div id="buyer-panel"></div>
+            </section>
+
+            <section class="panel" aria-labelledby="evidence-title">
+              <div class="panel__header">
+                <div>
+                  <p class="panel__index">TRUSTED INPUT</p>
+                  <h2 id="evidence-title">Evidence retrieval</h2>
+                </div>
+                <span class="panel__meta" id="evidence-count">0 ITEMS</span>
+              </div>
+              <div id="evidence-panel"></div>
+            </section>
+          </div>
+
+          <div class="product-grid__control">
+            <section class="panel panel--authorization" aria-labelledby="authorization-title">
+              <div class="panel__header">
+                <div>
+                  <p class="panel__index">CONTROL PLANE</p>
+                  <h2 id="authorization-title">Authorization</h2>
+                </div>
+                <span class="panel__meta">FROZEN CONTROLLER</span>
+              </div>
+              <div id="authorization-panel"></div>
+            </section>
+
+            <section class="panel" aria-labelledby="execution-title">
+              <div class="panel__header">
+                <div>
+                  <p class="panel__index">SIDE EFFECT</p>
+                  <h2 id="execution-title">Execution</h2>
+                </div>
+                <span class="panel__meta">TEST MODE ONLY</span>
+              </div>
+              <div id="execution-panel"></div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section class="assurance-grid">
+        <article class="assurance-block" aria-labelledby="research-title">
+          <p class="section-kicker">RESEARCH BOUNDARY</p>
+          <h2 id="research-title">Experimental evidence sufficiency</h2>
+          <div id="research-panel" class="assurance-block__content"></div>
+        </article>
+        <article class="assurance-block" aria-labelledby="recovery-title">
+          <p class="section-kicker">PRESERVED EVIDENCE</p>
+          <h2 id="recovery-title">Engineering failure recovery</h2>
+          <div id="recovery-panel" class="assurance-block__content"></div>
+        </article>
+      </section>
+
+      <section id="audit-section" class="audit-section" hidden>
+        <details>
+          <summary>VIEW AUDIT TRACE</summary>
+          <div id="audit-panel"></div>
+        </details>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>MandateGuard commerce lab</p>
+      <p>Test infrastructure. No real-money movement.</p>
+    </footer>
+  </body>
+</html>
