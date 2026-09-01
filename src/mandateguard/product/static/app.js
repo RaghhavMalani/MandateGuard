@@ -1,4 +1,6 @@
 const terminalStates = new Set(["COMPLETE", "ERROR"]);
+const liveRazorpayEvidenceUrl =
+  "https://github.com/RaghhavMalani/MandateGuard/blob/b104488ba92fd7b2802b4e053e48e3d398d5f65f/artifacts/engineering/agentic_commerce/int1-razorpay-exec-20260830T074115Z-507323be/RUN.md";
 
 export class SubmissionLock {
   #locked = false;
@@ -71,6 +73,10 @@ export function renderDecisionBanner(result) {
     REVIEW: "Human/evidence review required before execution.",
     ERROR: "The run stopped safely before execution.",
   }[decision] || "The controller returned a bounded result.";
+  const restraint =
+    decision === "REVIEW"
+      ? '<p class="decision-restraint">MandateGuard refused to guess. No payment was attempted.</p>'
+      : "";
   return `
     <div class="decision-banner decision-banner--${escapeHtml(decision.toLowerCase())}">
       <div class="decision-banner__state">
@@ -84,6 +90,7 @@ export function renderDecisionBanner(result) {
         <p><strong>Exact reason</strong>${escapeHtml(
           result?.decision_reason || "No controller result is available.",
         )}</p>
+        ${restraint}
       </div>
     </div>
   `;
@@ -254,6 +261,27 @@ export function renderExecutionPanel(execution) {
       </div>
     `;
   }
+  const isOfflineDemo = execution.environment === "OFFLINE_DEMO_TEST_DOUBLE";
+  const isLiveTest = execution.environment === "RAZORPAY_TEST_MODE";
+  const environmentLabel = isOfflineDemo
+    ? "OFFLINE DEMO REPLAY"
+    : isLiveTest
+      ? "RAZORPAY TEST MODE"
+      : "EXECUTION ENVIRONMENT";
+  const environmentDetail = isOfflineDemo
+    ? "NO LIVE RAZORPAY REQUEST"
+    : execution.environment;
+  const resultLabel = isOfflineDemo
+    ? "SIMULATED EXECUTION RECEIPT"
+    : "PAYMENT ORDER";
+  const resultStatus = isOfflineDemo ? "LOCAL RECEIPT CREATED" : "ORDER CREATED";
+  const liveEvidence = isOfflineDemo
+    ? `
+      <p class="live-evidence-note">
+        Live Razorpay Test Mode execution independently verified in
+        <a href="${liveRazorpayEvidenceUrl}" target="_blank" rel="noreferrer noopener">preserved engineering evidence</a>.
+      </p>`
+    : "";
   const capability = execution.capability || {};
   const order = execution.order || {};
   const bindingRows = [
@@ -284,8 +312,8 @@ export function renderExecutionPanel(execution) {
   return `
     <div class="execution-environment">
       <span class="execution-environment__signal" aria-hidden="true"></span>
-      <span>RAZORPAY TEST MODE</span>
-      <code>${escapeHtml(execution.environment)}</code>
+      <span>${environmentLabel}</span>
+      <code>${escapeHtml(environmentDetail)}</code>
     </div>
     <div class="capability-block">
       <div class="capability-block__heading">
@@ -296,7 +324,7 @@ export function renderExecutionPanel(execution) {
     </div>
     <div class="order-result">
       <div class="order-result__heading">
-        <span>PAYMENT ORDER</span><strong><i aria-hidden="true"></i>ORDER CREATED</strong>
+        <span>${resultLabel}</span><strong><i aria-hidden="true"></i>${resultStatus}</strong>
       </div>
       <dl>
         <div><dt>Order ID</dt><dd><code title="${escapeHtml(order.order_id)}">${escapeHtml(shortId(order.order_id))}</code></dd></div>
@@ -310,6 +338,7 @@ export function renderExecutionPanel(execution) {
       <span>Adapter calls <strong>${escapeHtml(execution.razorpay_calls)}</strong></span>
       <span>External calls <strong>${escapeHtml(execution.external_network_calls)}</strong></span>
     </div>
+    ${liveEvidence}
     ${replay}
   `;
 }

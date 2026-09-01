@@ -7,11 +7,12 @@ from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import mimetypes
+import os
 from pathlib import Path
 import re
 from threading import RLock
 from time import monotonic
-from typing import Any
+from typing import Any, Mapping
 from urllib.parse import urlsplit
 
 from mandateguard.product.service import CommerceLabService
@@ -21,10 +22,33 @@ STATIC_ROOT = Path(__file__).resolve().parent / "static"
 _RUN_PATH_RE = re.compile(r"^/api/runs/(run_[0-9a-f]{32})$")
 _REPLAY_PATH_RE = re.compile(r"^/api/runs/(run_[0-9a-f]{32})/replay$")
 _MAX_REQUEST_BYTES = 16_384
+_DEFAULT_PRODUCT_HOST = "0.0.0.0"
+_DEFAULT_PRODUCT_PORT = 8080
 
 
 class _DuplicateFieldError(ValueError):
     pass
+
+
+def resolve_bind_address(
+    environ: Mapping[str, str] | None = None,
+) -> tuple[str, int]:
+    """Resolve deployment-safe server defaults without exposing environment data."""
+
+    values = os.environ if environ is None else environ
+    host = values.get("MANDATEGUARD_PRODUCT_HOST") or _DEFAULT_PRODUCT_HOST
+    raw_port = (
+        values.get("PORT")
+        or values.get("MANDATEGUARD_PRODUCT_PORT")
+        or str(_DEFAULT_PRODUCT_PORT)
+    )
+    try:
+        port = int(raw_port)
+    except (TypeError, ValueError) as error:
+        raise ValueError("product server port must be an integer") from error
+    if not 0 <= port <= 65535:
+        raise ValueError("product server port must be between 0 and 65535")
+    return host, port
 
 
 def _object_without_duplicates(pairs: list[tuple[str, Any]]) -> dict[str, Any]:

@@ -11,7 +11,7 @@ python -m pip install -e .
 python scripts/run_commerce_lab.py
 ```
 
-Open `http://127.0.0.1:8080`. The host and port can be changed with `--host` and `--port`, or with `MANDATEGUARD_PRODUCT_HOST` and `MANDATEGUARD_PRODUCT_PORT`.
+Open `http://127.0.0.1:8080`. The server binds `0.0.0.0` by default so the same command works on common PaaS hosts; set `MANDATEGUARD_PRODUCT_HOST=127.0.0.1` to restrict a local run to loopback. The platform `PORT` variable takes precedence over `MANDATEGUARD_PRODUCT_PORT`, and explicit `--host` / `--port` arguments remain available.
 
 The initial page load reads only local static assets and `/api/config`. It never calls OpenAI or Razorpay. A purchase run starts only after an explicit click on `RUN AI BUYER`.
 

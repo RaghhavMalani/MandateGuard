@@ -37,6 +37,17 @@ test("ALLOW decision is visible as the final controller result", () => {
 });
 
 
+test("REVIEW is presented as deliberate restraint, not a payment attempt", () => {
+  const html = renderDecisionBanner({
+    decision: "REVIEW",
+    decision_reason: "Trusted evidence is insufficient.",
+  });
+  assert.match(html, /Human\/evidence review required before execution/);
+  assert.match(html, /MandateGuard refused to guess\. No payment was attempted\./);
+  assert.match(html, /Trusted evidence is insufficient/);
+});
+
+
 test("BLOCK and REVIEW execution panels both prove zero Razorpay calls", () => {
   for (const decision of ["BLOCK", "REVIEW"]) {
     const html = renderExecutionPanel({
@@ -110,8 +121,30 @@ test("successful execution renders verified capability and replay rejection", ()
       razorpay_additional_calls: 0,
     },
   });
-  assert.match(html, /ORDER CREATED/);
+  assert.match(html, /OFFLINE DEMO REPLAY/);
+  assert.match(html, /NO LIVE RAZORPAY REQUEST/);
+  assert.match(html, /SIMULATED EXECUTION RECEIPT/);
+  assert.match(html, /LOCAL RECEIPT CREATED/);
+  assert.match(html, /preserved engineering evidence/);
+  assert.doesNotMatch(html, />RAZORPAY TEST MODE</);
   assert.match(html, /VERIFIED/);
   assert.match(html, /REJECTED BEFORE NETWORK/);
   assert.match(html, /Razorpay additional calls: 0/);
+});
+
+
+test("live Test Mode label appears only for the backend live environment", () => {
+  const html = renderExecutionPanel({
+    status: "ORDER_CREATED",
+    environment: "RAZORPAY_TEST_MODE",
+    razorpay_calls: 1,
+    external_network_calls: 1,
+    capability: {},
+    order: {},
+  });
+  assert.match(html, />RAZORPAY TEST MODE</);
+  assert.match(html, /PAYMENT ORDER/);
+  assert.match(html, /ORDER CREATED/);
+  assert.doesNotMatch(html, /OFFLINE DEMO REPLAY/);
+  assert.doesNotMatch(html, /preserved engineering evidence/);
 });

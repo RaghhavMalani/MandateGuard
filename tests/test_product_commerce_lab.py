@@ -10,7 +10,7 @@ from urllib.request import Request, urlopen
 
 import pytest
 
-from mandateguard.product.http import CommerceLabHTTPServer
+from mandateguard.product.http import CommerceLabHTTPServer, resolve_bind_address
 from mandateguard.product.service import CommerceLabService, DEMO_PRESETS
 
 
@@ -181,6 +181,26 @@ def test_public_payloads_never_include_secret_values(
         assert value not in serialized
 
 
+def test_product_bind_address_honors_platform_port_precedence() -> None:
+    assert resolve_bind_address(
+        {
+            "PORT": "9123",
+            "MANDATEGUARD_PRODUCT_PORT": "8123",
+            "MANDATEGUARD_PRODUCT_HOST": "127.0.0.1",
+        }
+    ) == ("127.0.0.1", 9123)
+
+
+def test_product_bind_address_supports_local_and_deployment_fallbacks() -> None:
+    assert resolve_bind_address({}) == ("0.0.0.0", 8080)
+    assert resolve_bind_address(
+        {
+            "MANDATEGUARD_PRODUCT_HOST": "127.0.0.1",
+            "MANDATEGUARD_PRODUCT_PORT": "8081",
+        }
+    ) == ("127.0.0.1", 8081)
+
+
 @contextmanager
 def running_server(service: CommerceLabService) -> Iterator[str]:
     server = CommerceLabHTTPServer(("127.0.0.1", 0), service)
@@ -238,6 +258,24 @@ def test_http_boundary_serves_ui_config_and_idempotent_runs(
         assert first["run_id"] == second["run_id"]
         assert first["deduplicated"] is False
         assert second["deduplicated"] is True
+
+
+def test_http_boundary_binds_all_interfaces_and_keeps_health_reachable(
+    service: CommerceLabService,
+) -> None:
+    server = CommerceLabHTTPServer(("0.0.0.0", 0), service)
+    thread = Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        assert server.server_address[0] == "0.0.0.0"
+        port = server.server_address[1]
+        status, health, _ = fetch_json(f"http://127.0.0.1:{port}/api/health")
+        assert status == 200
+        assert health["status"] == "ok"
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=5)
 
 
 def test_http_boundary_rejects_unknown_fields(service: CommerceLabService) -> None:
