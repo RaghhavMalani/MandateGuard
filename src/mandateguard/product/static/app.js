@@ -58,15 +58,33 @@ function shortId(value) {
   return text.length > 24 ? `${text.slice(0, 12)}...${text.slice(-8)}` : text;
 }
 
+function humanize(value) {
+  const text = String(value || "").replaceAll("_", " ").toLowerCase();
+  return text ? text.replace(/^./, (character) => character.toUpperCase()) : "Not recorded";
+}
+
 export function renderDecisionBanner(result) {
   const decision = result?.decision || "ERROR";
+  const resolution = {
+    ALLOW: "Mandate verified. Execution capability issued.",
+    BLOCK: "Execution prevented before Razorpay.",
+    REVIEW: "Human/evidence review required before execution.",
+    ERROR: "The run stopped safely before execution.",
+  }[decision] || "The controller returned a bounded result.";
   return `
     <div class="decision-banner decision-banner--${escapeHtml(decision.toLowerCase())}">
-      <div>
+      <div class="decision-banner__state">
+        <span class="decision-orbit" aria-hidden="true"></span>
         <p>FINAL CONTROLLER</p>
         <strong>${escapeHtml(decision)}</strong>
       </div>
-      <p>${escapeHtml(result?.decision_reason || "No controller result is available.")}</p>
+      <div class="decision-banner__message">
+        <span>RESOLUTION</span>
+        <h3>${escapeHtml(resolution)}</h3>
+        <p><strong>Exact reason</strong>${escapeHtml(
+          result?.decision_reason || "No controller result is available.",
+        )}</p>
+      </div>
     </div>
   `;
 }
@@ -84,13 +102,16 @@ export function renderBuyerPanel(buyer) {
   return `
     <div class="buyer-layout">
       <div class="product-record">
-        <p class="record-label">SELECTED PRODUCT</p>
+        <div class="product-record__topline">
+          <p class="record-label">SELECTED PRODUCT</p>
+          <strong class="product-price">${money(buyer?.price_minor, buyer?.currency)}</strong>
+        </div>
         <h3>${escapeHtml(buyer?.product)}</h3>
-        <p>${escapeHtml(buyer?.product_description)}</p>
+        <p class="product-description">${escapeHtml(buyer?.product_description)}</p>
         <dl class="record-grid">
           <div><dt>Merchant</dt><dd><code>${escapeHtml(buyer?.merchant)}</code></dd></div>
           <div><dt>SKU</dt><dd><code>${escapeHtml(buyer?.sku)}</code></dd></div>
-          <div><dt>Price</dt><dd>${money(buyer?.price_minor, buyer?.currency)}</dd></div>
+          <div><dt>Currency</dt><dd>${escapeHtml(buyer?.currency)}</dd></div>
           <div><dt>Quantity</dt><dd>${escapeHtml(buyer?.quantity)}</dd></div>
         </dl>
       </div>
@@ -119,7 +140,7 @@ export function renderEvidencePanel(evidence) {
       (card) => `
         <article class="evidence-card">
           <div class="evidence-card__topline">
-            <span class="trusted-label">TRUSTED</span>
+            <span class="trusted-label"><i aria-hidden="true"></i>TRUSTED</span>
             <code>${escapeHtml(card.evidence_id)}</code>
           </div>
           <p>${escapeHtml(card.text)}</p>
@@ -174,32 +195,34 @@ export function renderAuthorizationPanel(authorization) {
   const semantic = authorization?.semantic || {};
   const cache = semantic.cache || {};
   return `
-    <div class="authorization-layer">
-      <div class="layer-heading">
-        <span>A</span>
-        <div><strong>DETERMINISTIC</strong><small>Tier A/B checks</small></div>
-        ${statusBadge(deterministic.action === "ALLOW" ? "PASS" : deterministic.action)}
+    <div class="authorization-matrix">
+      <div class="authorization-layer">
+        <div class="layer-heading">
+          <span>A</span>
+          <div><strong>DETERMINISTIC</strong><small>Tier A/B checks</small></div>
+          ${statusBadge(deterministic.action === "ALLOW" ? "PASS" : deterministic.action)}
+        </div>
+        <ul class="check-list">${renderCheckRows(deterministic.tier_a)}</ul>
+        <details class="secondary-checks">
+          <summary>VIEW TIER B CONSISTENCY CHECKS</summary>
+          <ul class="check-list">${renderCheckRows(deterministic.tier_b)}</ul>
+        </details>
       </div>
-      <ul class="check-list">${renderCheckRows(deterministic.tier_a)}</ul>
-      <details class="secondary-checks">
-        <summary>VIEW TIER B CONSISTENCY CHECKS</summary>
-        <ul class="check-list">${renderCheckRows(deterministic.tier_b)}</ul>
-      </details>
-    </div>
-    <div class="authorization-layer">
-      <div class="layer-heading">
-        <span>B</span>
-        <div><strong>SEMANTIC</strong><small>Purpose, exclusions, recurrence</small></div>
-        ${statusBadge(semantic.verdict)}
-      </div>
-      <ul class="check-list check-list--semantic">${
-        renderCheckRows(semantic.checks) ||
-        '<li class="not-evaluated">No semantic constraints were evaluated.</li>'
-      }</ul>
-      <div class="cache-strip">
-        <span>SEMANTIC CACHE</span>
-        <strong>${escapeHtml(cache.status || "NOT USED")}</strong>
-        <code>${escapeHtml(cache.key_prefix || "NO KEY")}</code>
+      <div class="authorization-layer">
+        <div class="layer-heading">
+          <span>B</span>
+          <div><strong>SEMANTIC</strong><small>Purpose, exclusions, recurrence</small></div>
+          ${statusBadge(semantic.verdict)}
+        </div>
+        <ul class="check-list check-list--semantic">${
+          renderCheckRows(semantic.checks) ||
+          '<li class="not-evaluated">No semantic constraints were evaluated.</li>'
+        }</ul>
+        <div class="cache-strip">
+          <span>SEMANTIC CACHE</span>
+          <strong>${escapeHtml(cache.status || "NOT USED")}</strong>
+          <code>${escapeHtml(cache.key_prefix || "NO KEY")}</code>
+        </div>
       </div>
     </div>
     <div class="final-controller final-controller--${escapeHtml(
@@ -217,9 +240,14 @@ export function renderExecutionPanel(execution) {
     const decisionClass = execution?.reason?.toLowerCase().includes("review") ? "review" : "block";
     return `
       <div class="execution-stop execution-stop--${decisionClass}">
-        <span>RAZORPAY CALLS</span>
-        <strong>${escapeHtml(execution?.razorpay_calls ?? 0)}</strong>
-        <p>${escapeHtml(execution?.reason || "Execution did not run.")}</p>
+        <div class="execution-stop__count">
+          <span>RAZORPAY CALLS</span>
+          <strong>${escapeHtml(execution?.razorpay_calls ?? 0)}</strong>
+        </div>
+        <div>
+          <h3>Execution stopped at MandateGuard.</h3>
+          <p>${escapeHtml(execution?.reason || "Execution did not run.")}</p>
+        </div>
       </div>
       <div class="network-line">
         <span>External network calls</span><strong>${escapeHtml(execution?.external_network_calls ?? 0)}</strong>
@@ -244,16 +272,32 @@ export function renderExecutionPanel(execution) {
   const replay = execution.replay
     ? `
       <div class="replay-result">
-        <strong>${escapeHtml(String(execution.replay.status).replaceAll("_", " "))}</strong>
-        <span>${escapeHtml(execution.replay.reason)}</span>
+        <span class="replay-result__mark" aria-hidden="true"></span>
+        <div>
+          <p>REPLAY SECURITY RESULT</p>
+          <strong>${escapeHtml(String(execution.replay.status).replaceAll("_", " "))}</strong>
+          <span>${escapeHtml(humanize(execution.replay.reason))}</span>
+        </div>
         <p>Razorpay additional calls: ${escapeHtml(execution.replay.razorpay_additional_calls)}</p>
       </div>`
     : `<button class="button button--secondary" id="replay-button" type="button">TEST CAPABILITY REPLAY</button>`;
   return `
-    <div class="execution-environment">${escapeHtml(execution.environment)}</div>
-    <ul class="binding-list">${bindingRows}</ul>
+    <div class="execution-environment">
+      <span class="execution-environment__signal" aria-hidden="true"></span>
+      <span>RAZORPAY TEST MODE</span>
+      <code>${escapeHtml(execution.environment)}</code>
+    </div>
+    <div class="capability-block">
+      <div class="capability-block__heading">
+        <span>SIGNED CAPABILITY</span>
+        <strong>BOUND AND VERIFIED</strong>
+      </div>
+      <ul class="binding-list">${bindingRows}</ul>
+    </div>
     <div class="order-result">
-      <div><span>RAZORPAY TEST MODE RESULT</span><strong>ORDER CREATED</strong></div>
+      <div class="order-result__heading">
+        <span>PAYMENT ORDER</span><strong><i aria-hidden="true"></i>ORDER CREATED</strong>
+      </div>
       <dl>
         <div><dt>Order ID</dt><dd><code title="${escapeHtml(order.order_id)}">${escapeHtml(shortId(order.order_id))}</code></dd></div>
         <div><dt>Amount</dt><dd>${money(order.amount, order.currency)}</dd></div>
@@ -289,9 +333,9 @@ function renderAudit(snapshot) {
     .map(
       (item) => `
         <li>
-          <span>${escapeHtml(String(item.sequence).padStart(2, "0"))}</span>
-          <strong>${escapeHtml(item.event)}</strong>
-          <small>${escapeHtml(item.recorded_at)}</small>
+          <span class="audit-list__sequence">${escapeHtml(String(item.sequence).padStart(2, "0"))}</span>
+          <span class="audit-list__marker" aria-hidden="true"></span>
+          <div><strong>${escapeHtml(humanize(item.event))}</strong><small>${escapeHtml(item.recorded_at)}</small></div>
         </li>`,
     )
     .join("");
@@ -306,14 +350,26 @@ function renderAudit(snapshot) {
 
 function renderResearch(research) {
   return `
+    <div class="research-status">
+      <span>EXPERIMENTAL</span>
+      <strong>${escapeHtml(research?.authorization_use)}</strong>
+    </div>
     <p class="research-finding">${escapeHtml(research?.finding)}</p>
-    <p>${escapeHtml(research?.scope)}</p>
-    <strong class="not-in-gate">${escapeHtml(research?.authorization_use)}</strong>
-    <code class="source-path">${escapeHtml(research?.source)}</code>
+    <details class="research-evidence">
+      <summary>VIEW RESEARCH EVIDENCE</summary>
+      <p>${escapeHtml(research?.scope)}</p>
+      <code class="source-path">${escapeHtml(research?.source)}</code>
+    </details>
   `;
 }
 
 function renderRecovery(items) {
+  const recoveryStatus = (trigger) => {
+    if (trigger === "No trusted evidence retrieved") return "REVIEW";
+    if (trigger === "INT-3 artifact serializer failure") return "RECOVERED";
+    if (trigger === "Corrupted semantic cache" || trigger === "Capability replay") return "REJECTED";
+    return "SAFE STOP";
+  };
   return `
     <div class="recovery-list">
       ${(items || [])
@@ -324,12 +380,25 @@ function renderRecovery(items) {
               : Object.hasOwn(item, "external_calls")
                 ? `External execution calls: ${escapeHtml(item.external_calls)}`
                 : "";
+            const status = recoveryStatus(item.trigger);
+            const noUnsafeEffect = item.retried_failed_request === false
+              ? "The failed stochastic request was not retried."
+              : callCount || "No unsafe execution side effect was recorded.";
             return `
-              <details>
-                <summary>${escapeHtml(item.trigger)}</summary>
-                <p>${escapeHtml(item.outcome)}</p>
-                ${callCount ? `<strong class="recovery-call-accounting">${callCount}</strong>` : ""}
-                <code>${escapeHtml(item.source)}</code>
+              <details class="recovery-item">
+                <summary>
+                  <span>${escapeHtml(item.trigger)}</span>
+                  <strong data-recovery-status="${escapeHtml(status)}">${escapeHtml(status)}</strong>
+                </summary>
+                <dl>
+                  <div><dt>WHAT FAILED</dt><dd>${escapeHtml(item.trigger)}</dd></div>
+                  <div><dt>SYSTEM RESPONSE</dt><dd>${escapeHtml(item.outcome)}</dd></div>
+                  <div><dt>WHY NO UNSAFE SIDE EFFECT OCCURRED</dt><dd>${noUnsafeEffect}</dd></div>
+                </dl>
+                <details class="recovery-source">
+                  <summary>VIEW ENGINEERING SOURCE</summary>
+                  <code>${escapeHtml(item.source)}</code>
+                </details>
               </details>`;
           },
         )
@@ -381,12 +450,23 @@ function init() {
   let selectedPreset = null;
   let currentRunId = null;
 
+  const applyPanelDisclosure = () => {
+    const mobile = window.matchMedia("(max-width: 720px)").matches;
+    const mode = mobile ? "mobile" : "desktop";
+    document.querySelectorAll(".result-panel").forEach((panel) => {
+      if (panel.dataset.disclosureMode === mode) return;
+      panel.open = !mobile || panel.id === "authorization-card" || panel.id === "execution-card";
+      panel.dataset.disclosureMode = mode;
+    });
+  };
+
   const selectedMode = () =>
     document.querySelector('input[name="mode"]:checked')?.value || "offline";
 
   const setBusy = (busy) => {
+    document.body.classList.toggle("is-running", busy);
     elements.run.disabled = busy;
-    elements.run.textContent = busy ? "RUNNING" : "RUN AI BUYER";
+    elements.run.textContent = busy ? "BUYER RUNNING" : "RUN AI BUYER";
     elements.intent.readOnly = busy;
     document
       .querySelectorAll('input[name="mode"], .preset-button')
@@ -408,6 +488,7 @@ function init() {
     if (!snapshot.result) return;
     const result = snapshot.result;
     elements.resultRegion.hidden = false;
+    elements.resultRegion.dataset.decision = result.decision;
     elements.decision.innerHTML = renderDecisionBanner(result);
     elements.buyer.innerHTML = renderBuyerPanel(result.buyer);
     elements.evidence.innerHTML = renderEvidencePanel(result.evidence);
@@ -416,6 +497,7 @@ function init() {
     elements.execution.innerHTML = renderExecutionPanel(result.execution);
     elements.auditSection.hidden = false;
     elements.audit.innerHTML = renderAudit(snapshot);
+    applyPanelDisclosure();
     const replayButton = document.querySelector("#replay-button");
     if (replayButton) replayButton.addEventListener("click", runReplay);
   };
@@ -462,6 +544,7 @@ function init() {
     }
     setBusy(true);
     elements.resultRegion.hidden = true;
+    delete elements.resultRegion.dataset.decision;
     elements.auditSection.hidden = true;
     currentRunId = null;
     try {
@@ -534,6 +617,7 @@ function init() {
     "Execution",
   ].map((label) => ({ label, status: "WAITING", detail: null }));
   elements.timeline.innerHTML = renderTimeline(waitingTimeline);
+  window.matchMedia("(max-width: 720px)").addEventListener("change", applyPanelDisclosure);
 
   fetchJson("/api/config")
     .then((payload) => {

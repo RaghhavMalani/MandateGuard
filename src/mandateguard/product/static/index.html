@@ -16,7 +16,9 @@
     <header class="topbar">
       <div class="topbar__inner">
         <a class="brand" href="/" aria-label="MandateGuard home">
-          <span class="brand__mark" aria-hidden="true">MG</span>
+          <span class="brand__mark" aria-hidden="true">
+            <span>MG</span>
+          </span>
           <span class="brand__name">MANDATEGUARD</span>
         </a>
         <p class="architecture-line">
@@ -38,22 +40,30 @@
             The buyer proposes a product. MandateGuard independently binds evidence,
             policy, capability, and execution.
           </p>
+          <div class="hero-facts" aria-label="Product facts">
+            <span><strong>Zero</strong> buyer payment authority</span>
+            <span><strong>Single-use</strong> execution capability</span>
+          </div>
         </div>
         <div class="boundary-map" aria-label="Authority boundary">
-          <div>
-            <span>01</span>
-            <strong>AI BUYER</strong>
+          <div class="boundary-map__energy" aria-hidden="true"></div>
+          <div class="boundary-stage boundary-stage--buyer">
+            <span class="boundary-stage__index">01</span>
+            <span class="boundary-stage__signal" aria-hidden="true"></span>
+            <strong>AI Buyer</strong>
             <small>Proposes</small>
           </div>
-          <div>
-            <span>02</span>
-            <strong>MANDATEGUARD</strong>
-            <small>Authorizes</small>
+          <div class="boundary-stage boundary-stage--guard">
+            <span class="boundary-stage__index">02</span>
+            <span class="boundary-stage__signal" aria-hidden="true"></span>
+            <strong>MandateGuard</strong>
+            <small>Policy verifies</small>
           </div>
-          <div>
-            <span>03</span>
-            <strong>RAZORPAY</strong>
-            <small>Executes</small>
+          <div class="boundary-stage boundary-stage--execution">
+            <span class="boundary-stage__index">03</span>
+            <span class="boundary-stage__signal" aria-hidden="true"></span>
+            <strong>Razorpay Test Mode</strong>
+            <small>Capability executes</small>
           </div>
         </div>
       </section>
@@ -62,8 +72,9 @@
         <div class="composer__main">
           <div class="section-heading">
             <div>
-              <p class="section-kicker">COMMERCE LAB</p>
+              <p class="section-kicker">Commerce Lab</p>
               <h2 id="purchase-question">What should the agent buy?</h2>
+              <p class="section-description">Describe the outcome. The control plane handles the boundary.</p>
             </div>
             <fieldset class="mode-switch" id="mode-switch">
               <legend>Execution mode</legend>
@@ -78,16 +89,22 @@
             </fieldset>
           </div>
 
-          <div class="preset-row" id="preset-row" aria-label="Demo presets"></div>
+          <div class="scenario-row">
+            <span class="scenario-row__label">Try a scenario</span>
+            <div class="preset-row" id="preset-row" aria-label="Demo presets"></div>
+          </div>
 
-          <label class="intent-label" for="purchase-intent">Purchase mandate</label>
-          <textarea
-            id="purchase-intent"
-            name="purchase-intent"
-            rows="4"
-            maxlength="4000"
-            spellcheck="true"
-          ></textarea>
+          <div class="intent-shell">
+            <label class="intent-label" for="purchase-intent">Purchase mandate</label>
+            <textarea
+              id="purchase-intent"
+              name="purchase-intent"
+              rows="4"
+              maxlength="4000"
+              spellcheck="true"
+            ></textarea>
+            <span class="intent-shell__corner" aria-hidden="true"></span>
+          </div>
           <div class="composer__actions">
             <p id="mode-note" class="mode-note">
               Deterministic local evaluation. External network calls: 0.
@@ -99,10 +116,15 @@
           <p class="form-error" id="form-error" role="alert" hidden></p>
         </div>
         <aside class="authority-note">
-          <p class="authority-note__label">HARD BOUNDARY</p>
+          <div class="boundary-visual" aria-hidden="true">
+            <span class="boundary-visual__rail"></span>
+            <span class="boundary-visual__core">MG</span>
+            <span class="boundary-visual__rail"></span>
+          </div>
+          <p class="authority-note__label">Trust boundary</p>
           <p>AI Buyer has no direct Razorpay authority.</p>
           <dl>
-            <div><dt>Buyer tools</dt><dd>Commerce only</dd></div>
+            <div><dt>Buyer</dt><dd>Commerce tools only</dd></div>
             <div><dt>Authorization</dt><dd>MandateGuard controller</dd></div>
             <div><dt>Execution</dt><dd>Signed capability only</dd></div>
           </dl>
@@ -112,7 +134,7 @@
       <section class="timeline-section" aria-labelledby="timeline-title">
         <div class="section-heading section-heading--compact">
           <div>
-            <p class="section-kicker">EXECUTION TIMELINE</p>
+            <p class="section-kicker">Execution timeline</p>
             <h2 id="timeline-title">Controller-backed state</h2>
           </div>
           <p id="run-state" class="run-state">WAITING FOR REQUEST</p>
@@ -124,63 +146,63 @@
         <div id="decision-banner"></div>
         <div class="product-grid">
           <div class="product-grid__primary">
-            <section class="panel" aria-labelledby="buyer-title">
-              <div class="panel__header">
+            <details id="buyer-card" class="panel result-panel" open>
+              <summary class="panel__header">
                 <div>
-                  <p class="panel__index">BUYER OUTPUT</p>
+                  <p class="panel__index">Buyer output</p>
                   <h2 id="buyer-title">Buyer and product</h2>
                 </div>
-                <span class="panel__meta">NO PAYMENT AUTHORITY</span>
-              </div>
+                <span class="panel__meta">No payment authority</span>
+              </summary>
               <div id="buyer-panel"></div>
-            </section>
+            </details>
 
-            <section class="panel" aria-labelledby="evidence-title">
-              <div class="panel__header">
+            <details id="evidence-card" class="panel result-panel" open>
+              <summary class="panel__header">
                 <div>
-                  <p class="panel__index">TRUSTED INPUT</p>
+                  <p class="panel__index">Trusted input</p>
                   <h2 id="evidence-title">Evidence retrieval</h2>
                 </div>
                 <span class="panel__meta" id="evidence-count">0 ITEMS</span>
-              </div>
+              </summary>
               <div id="evidence-panel"></div>
-            </section>
+            </details>
           </div>
 
           <div class="product-grid__control">
-            <section class="panel panel--authorization" aria-labelledby="authorization-title">
-              <div class="panel__header">
+            <details id="authorization-card" class="panel panel--authorization result-panel" open>
+              <summary class="panel__header">
                 <div>
-                  <p class="panel__index">CONTROL PLANE</p>
+                  <p class="panel__index">Control plane</p>
                   <h2 id="authorization-title">Authorization</h2>
                 </div>
-                <span class="panel__meta">FROZEN CONTROLLER</span>
-              </div>
+                <span class="panel__meta">Frozen controller</span>
+              </summary>
               <div id="authorization-panel"></div>
-            </section>
+            </details>
 
-            <section class="panel" aria-labelledby="execution-title">
-              <div class="panel__header">
+            <details id="execution-card" class="panel result-panel" open>
+              <summary class="panel__header">
                 <div>
-                  <p class="panel__index">SIDE EFFECT</p>
+                  <p class="panel__index">Side effect</p>
                   <h2 id="execution-title">Execution</h2>
                 </div>
-                <span class="panel__meta">TEST MODE ONLY</span>
-              </div>
+                <span class="panel__meta">Test Mode only</span>
+              </summary>
               <div id="execution-panel"></div>
-            </section>
+            </details>
           </div>
         </div>
       </section>
 
       <section class="assurance-grid">
         <article class="assurance-block" aria-labelledby="research-title">
-          <p class="section-kicker">RESEARCH BOUNDARY</p>
-          <h2 id="research-title">Experimental evidence sufficiency</h2>
+          <p class="section-kicker">Research / experimental</p>
+          <h2 id="research-title">Evidence sufficiency</h2>
           <div id="research-panel" class="assurance-block__content"></div>
         </article>
         <article class="assurance-block" aria-labelledby="recovery-title">
-          <p class="section-kicker">PRESERVED EVIDENCE</p>
+          <p class="section-kicker">Reliability history</p>
           <h2 id="recovery-title">Engineering failure recovery</h2>
           <div id="recovery-panel" class="assurance-block__content"></div>
         </article>
@@ -188,7 +210,10 @@
 
       <section id="audit-section" class="audit-section" hidden>
         <details>
-          <summary>VIEW AUDIT TRACE</summary>
+          <summary>
+            <span>View audit trace</span>
+            <small>Ordered controller and execution events</small>
+          </summary>
           <div id="audit-panel"></div>
         </details>
       </section>
