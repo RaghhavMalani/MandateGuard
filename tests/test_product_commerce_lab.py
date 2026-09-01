@@ -4,6 +4,7 @@ from contextlib import contextmanager
 import json
 from pathlib import Path
 from threading import Thread
+from time import monotonic, sleep
 from typing import Iterator
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
@@ -357,7 +358,15 @@ def test_access_log_is_bounded_and_free_of_intent_and_identifiers(
                 "request_id": "logsafety_0001",
             },
         )
-        logged = capsys.readouterr().err
+        # The access line is emitted by the handler thread after the response
+        # body is written, so the client can return before it reaches stderr.
+        logged = ""
+        deadline = monotonic() + 10.0
+        while monotonic() < deadline:
+            logged += capsys.readouterr().err
+            if "route=/api/runs" in logged and "route=/api/health" in logged:
+                break
+            sleep(0.05)
 
     assert "mandateguard.request" in logged
     assert "route=/api/health" in logged

@@ -4,13 +4,34 @@ Public deployment of the judge-facing Commerce Lab.
 
 | Item | Value |
 | --- | --- |
+| Public URL | <https://mandateguard-commerce-lab.onrender.com> |
 | Platform | Render (Docker web service, `render.yaml` blueprint) |
-| Public URL | _pending first deploy_ |
 | Region | Singapore |
-| Branch | `feat/judge-facing-product` |
-| Mode | OFFLINE DEMO only |
+| Deployed branch | `feat/judge-facing-product` |
+| Verified deployment commit | `81243f5` |
 | Startup command | `python scripts/run_commerce_lab.py` |
-| Health check | `GET /api/health` |
+| Health endpoint | `GET /api/health` |
+| Default mode | OFFLINE DEMO |
+| Live Test Mode | Intentionally disabled in public deployment |
+
+`81243f5` is the commit whose running image was verified end to end against the
+public URL. Later documentation-only commits trigger a rebuild but do not change
+any runtime file, so the served application stays byte-identical to that commit.
+
+## Verified against the public URL
+
+All four judge journeys were confirmed on the deployment, and the only host
+contacted during the whole verification was the deployment itself. Zero OpenAI
+and zero Razorpay requests were made.
+
+| Journey | Result | Razorpay calls | External network calls |
+| --- | --- | --- | --- |
+| SAFE PURCHASE | `ALLOW`, simulated offline receipt | 1 adapter call to the offline double | 0 |
+| POLICY VIOLATION | `BLOCK` before execution | 0 | 0 |
+| AMBIGUOUS EVIDENCE | `REVIEW`, refused to guess | 0 | 0 |
+| CAPABILITY REPLAY | `REJECTED_BEFORE_NETWORK`, `NONCE_ALREADY_USED` | 0 additional | 0 additional |
+
+Deployed screenshots are in [screenshots/deployed](screenshots/deployed).
 
 ## Why this platform
 
@@ -82,7 +103,7 @@ warm the URL shortly beforehand or move the service to a paid instance type.
 ## Verification
 
 ```bash
-curl -s https://<public-url>/api/health
+curl -s https://mandateguard-commerce-lab.onrender.com/api/health
 ```
 
 Then run SAFE PURCHASE, POLICY VIOLATION, AMBIGUOUS EVIDENCE, and
