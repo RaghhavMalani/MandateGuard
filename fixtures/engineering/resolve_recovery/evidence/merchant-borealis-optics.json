@@ -1,0 +1,26 @@
+{
+  "merchant_id": "merchant-borealis-optics",
+  "entries": [
+    {
+      "evidence_id": "borealis-terms-v1",
+      "merchant_id": "merchant-borealis-optics",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Borealis Optics registers one purpose statement for its catalogue and defers the component classification of each item to that item's registered product record."
+    },
+    {
+      "evidence_id": "borealis-listing-v1",
+      "merchant_id": "merchant-borealis-optics",
+      "sku": "borealis-reading-loupe",
+      "source_kind": "product_listing",
+      "text": "Borealis Reading Loupe: a hand-held magnifier with an achromatic doublet. The registered listing records neither a documented intended use nor a component classification."
+    },
+    {
+      "evidence_id": "borealis-terms-v2",
+      "merchant_id": "merchant-borealis-optics",
+      "sku": "borealis-reading-loupe",
+      "source_kind": "product_terms",
+      "text": "Registered product terms. Intended use: close reading of printed documents. Component classification: this loupe is assembled with no refurbished parts and no reconditioned optics."
+    }
+  ]
+}

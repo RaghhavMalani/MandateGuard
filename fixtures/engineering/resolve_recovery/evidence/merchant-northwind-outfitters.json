@@ -1,0 +1,26 @@
+{
+  "merchant_id": "merchant-northwind-outfitters",
+  "entries": [
+    {
+      "evidence_id": "northwind-terms-v1",
+      "merchant_id": "merchant-northwind-outfitters",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Northwind Outfitters registers one purpose statement for its catalogue and defers the billing model of each item to that item's registered product record."
+    },
+    {
+      "evidence_id": "northwind-listing-v1",
+      "merchant_id": "merchant-northwind-outfitters",
+      "sku": "atlas-desk-riser",
+      "source_kind": "product_listing",
+      "text": "Atlas Desk Riser at Northwind Outfitters: a gas-assisted riser with a keyboard shelf. The registered listing records neither a documented intended use nor an applicable billing model."
+    },
+    {
+      "evidence_id": "northwind-terms-v2",
+      "merchant_id": "merchant-northwind-outfitters",
+      "sku": "atlas-desk-riser",
+      "source_kind": "product_terms",
+      "text": "Registered product terms. Intended use: standing desk conversion at a home workstation. Billing model: a one-time purchase with no subscription and no automatic renewal."
+    }
+  ]
+}

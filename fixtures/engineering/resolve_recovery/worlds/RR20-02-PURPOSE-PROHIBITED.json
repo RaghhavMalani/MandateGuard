@@ -1,0 +1,176 @@
+{
+  "schema": "RESOLVE_EVALUATION_WORLD_V1",
+  "case_id": "RR20-02-PURPOSE-PROHIBITED",
+  "case_family": "PURPOSE",
+  "merchant_id": "merchant-quarry-press",
+  "sku": "quarry-strategy-manual",
+  "currency": "INR",
+  "amount_minor": 189900,
+  "independence_note": "This world was authored on its own: its merchant, SKU, catalogue entry, mandate, initial evidence, and source manifests are shared with no other case.",
+  "mandate": {
+    "mandate_id": "fa9b8fdd-229b-5e06-895b-9dea466252b8",
+    "nonce": "rr20_3c82992478efbbfeda621fce",
+    "issued_at": "2026-09-01T00:00:00+00:00",
+    "expires_at": "2028-01-01T00:00:00+00:00",
+    "subject_ref": "resolve-eval-subject-02",
+    "currency": "INR",
+    "hard": {
+      "max_total_minor": 250000,
+      "max_quantity": 1,
+      "recurring_allowed": false,
+      "merchant_allowlist": [
+        "merchant-quarry-press"
+      ],
+      "sku_allowlist": [
+        "quarry-strategy-manual"
+      ]
+    },
+    "semantic": [
+      {
+        "constraint_id": "purpose.1",
+        "kind": "purpose",
+        "constraint_family": "PURPOSE",
+        "text": "Declared purchase purpose: professional development. Trusted evidence must establish suitability."
+      },
+      {
+        "constraint_id": "exclusion.1",
+        "kind": "exclusion",
+        "constraint_family": "EXCLUSION",
+        "text": "Excluded product characteristic: gambling instruction."
+      }
+    ],
+    "issuer_attestation": {
+      "assurance": "DECLARED_ONLY",
+      "issuer_id": "resolve-evaluation-issuer"
+    }
+  },
+  "catalog": {
+    "snapshot_id": "RR20-02-PURPOSE-PROHIBITED-catalog",
+    "merchant_id": "merchant-quarry-press",
+    "currency": "INR",
+    "items": [
+      {
+        "sku": "quarry-strategy-manual",
+        "merchant_id": "merchant-quarry-press",
+        "effective_unit_price_minor": 189900,
+        "recurring": false
+      }
+    ]
+  },
+  "transaction": {
+    "transaction_id": "RR20-02-PURPOSE-PROHIBITED-txn",
+    "merchant_id": "merchant-quarry-press",
+    "cart_currency": "INR",
+    "order_currency": "INR",
+    "cart_recurring": false,
+    "order_recurring": false,
+    "lines": [
+      {
+        "sku": "quarry-strategy-manual",
+        "effective_unit_price_minor": 189900,
+        "quantity": 1,
+        "line_total_minor": 189900,
+        "recurring": false
+      }
+    ]
+  },
+  "evidence_fixtures": [
+    {
+      "merchant_id": "merchant-quarry-press",
+      "path": "fixtures/engineering/resolve_recovery/evidence/merchant-quarry-press.json"
+    }
+  ],
+  "initial_evidence_ids": [
+    "quarry-terms-v1",
+    "quarry-listing-v1"
+  ],
+  "initial_evidence_gap": "Neither the merchant terms nor the listing records the readership or the content classification, so both constraints are unverified.",
+  "recovery_sources": [
+    {
+      "source_id": "quarry-merchant-terms-v1",
+      "display_name": "Merchant Terms",
+      "manifest_id": "quarry-merchant-terms-v1:manifest:1",
+      "merchant_id": "merchant-quarry-press",
+      "scope_type": "MERCHANT_GLOBAL",
+      "sku": null,
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE"
+      ],
+      "manifest_version": "1",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "quarry-terms-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.professional-development",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "bd9afc13d1fd14d2a5427450f5de46ff7ee148861c40298c72888e13e8126846"
+        }
+      ]
+    },
+    {
+      "source_id": "quarry-sku-terms-v2",
+      "display_name": "Merchant SKU Terms",
+      "manifest_id": "quarry-sku-terms-v2:manifest:2",
+      "merchant_id": "merchant-quarry-press",
+      "scope_type": "SKU_SPECIFIC",
+      "sku": "quarry-strategy-manual",
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE",
+        "EXCLUSION_EVIDENCE"
+      ],
+      "manifest_version": "2",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "quarry-listing-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.professional-development",
+              "claim_value": "UNESTABLISHED"
+            },
+            {
+              "claim_id": "content.gambling-instruction",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "9a5af66424a34cb7c9691b76e67b549b2694475ed0af52cc6353ea9fe712c01f"
+        },
+        {
+          "evidence_id": "quarry-terms-v2",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.professional-development",
+              "claim_value": "SUPPORTED"
+            },
+            {
+              "claim_id": "content.gambling-instruction",
+              "claim_value": "PRESENT"
+            }
+          ],
+          "expected_entry_sha256": "ed1b4cce61c2e7890959c86c66cf76e13ccce54c78ddeb6ec90d4b8ee0b71e2f"
+        }
+      ]
+    }
+  ],
+  "foreign_merchants": [],
+  "binding_probes": [],
+  "provider_fault": null,
+  "fixture_note": null
+}

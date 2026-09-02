@@ -1,0 +1,47 @@
+{
+  "merchant_id": "merchant-meridian-fitness",
+  "entries": [
+    {
+      "evidence_id": "meridian-terms-v1",
+      "merchant_id": "merchant-meridian-fitness",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Meridian Fitness registers one purpose statement for its catalogue and defers the billing model of each item to that item's registered product record."
+    },
+    {
+      "evidence_id": "meridian-terms-part-1",
+      "merchant_id": "merchant-meridian-fitness",
+      "sku": "meridian-training-plan",
+      "source_kind": "product_terms",
+      "text": "Registered product terms, part one of five. Intended use: personal training guidance for adult clients."
+    },
+    {
+      "evidence_id": "meridian-terms-part-2",
+      "merchant_id": "merchant-meridian-fitness",
+      "sku": "meridian-training-plan",
+      "source_kind": "product_terms",
+      "text": "Registered product terms, part two of five. Session structure, progression rules, and deload weeks."
+    },
+    {
+      "evidence_id": "meridian-terms-part-3",
+      "merchant_id": "merchant-meridian-fitness",
+      "sku": "meridian-training-plan",
+      "source_kind": "product_terms",
+      "text": "Registered product terms, part three of five. Equipment requirements and substitution guidance."
+    },
+    {
+      "evidence_id": "meridian-terms-part-4",
+      "merchant_id": "merchant-meridian-fitness",
+      "sku": "meridian-training-plan",
+      "source_kind": "product_terms",
+      "text": "Registered product terms, part four of five. Support channels and response windows."
+    },
+    {
+      "evidence_id": "meridian-terms-part-5",
+      "merchant_id": "merchant-meridian-fitness",
+      "sku": "meridian-training-plan",
+      "source_kind": "product_terms",
+      "text": "Registered product terms, part five of five. Billing model: this plan enrols the buyer in a recurring monthly subscription that renews automatically."
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "merchant_id": "merchant-sable-instruments",
+  "entries": [
+    {
+      "evidence_id": "sable-terms-v1",
+      "merchant_id": "merchant-sable-instruments",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Sable Instruments registers one purpose statement for its catalogue and defers the billing model of each item to that item's registered product record."
+    },
+    {
+      "evidence_id": "sable-listing-v1",
+      "merchant_id": "merchant-sable-instruments",
+      "sku": "sable-field-recorder",
+      "source_kind": "product_listing",
+      "text": "Sable Field Recorder: a handheld two-channel recorder with locking inputs. The registered listing records neither a documented intended use nor an applicable billing model."
+    },
+    {
+      "evidence_id": "sable-terms-regional",
+      "merchant_id": "merchant-sable-instruments",
+      "sku": "sable-field-recorder",
+      "source_kind": "product_terms",
+      "text": "Regional distributor terms. Billing model: this recorder is sold as a one-time purchase with no subscription."
+    },
+    {
+      "evidence_id": "sable-terms-global",
+      "merchant_id": "merchant-sable-instruments",
+      "sku": "sable-field-recorder",
+      "source_kind": "product_terms",
+      "text": "Global distributor terms. Billing model: this recorder is sold through a recurring annual subscription."
+    }
+  ]
+}

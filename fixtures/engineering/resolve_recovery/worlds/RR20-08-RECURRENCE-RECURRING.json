@@ -1,0 +1,176 @@
+{
+  "schema": "RESOLVE_EVALUATION_WORLD_V1",
+  "case_id": "RR20-08-RECURRENCE-RECURRING",
+  "case_family": "RECURRENCE",
+  "merchant_id": "merchant-verdant-crate",
+  "sku": "verdant-seasonal-crate",
+  "currency": "INR",
+  "amount_minor": 219900,
+  "independence_note": "This world was authored on its own: its merchant, SKU, catalogue entry, mandate, initial evidence, and source manifests are shared with no other case.",
+  "mandate": {
+    "mandate_id": "03d55165-10ca-5948-8529-13dfe7ae5f54",
+    "nonce": "rr20_48283fe6e79f09d8b0d70a61",
+    "issued_at": "2026-09-01T00:00:00+00:00",
+    "expires_at": "2028-01-01T00:00:00+00:00",
+    "subject_ref": "resolve-eval-subject-08",
+    "currency": "INR",
+    "hard": {
+      "max_total_minor": 300000,
+      "max_quantity": 1,
+      "recurring_allowed": false,
+      "merchant_allowlist": [
+        "merchant-verdant-crate"
+      ],
+      "sku_allowlist": [
+        "verdant-seasonal-crate"
+      ]
+    },
+    "semantic": [
+      {
+        "constraint_id": "purpose.1",
+        "kind": "purpose",
+        "constraint_family": "PURPOSE",
+        "text": "Declared purchase purpose: single gift delivery. Trusted evidence must establish suitability."
+      },
+      {
+        "constraint_id": "exclusion.1",
+        "kind": "exclusion",
+        "constraint_family": "RECURRENCE",
+        "text": "Excluded product characteristic: subscription."
+      }
+    ],
+    "issuer_attestation": {
+      "assurance": "DECLARED_ONLY",
+      "issuer_id": "resolve-evaluation-issuer"
+    }
+  },
+  "catalog": {
+    "snapshot_id": "RR20-08-RECURRENCE-RECURRING-catalog",
+    "merchant_id": "merchant-verdant-crate",
+    "currency": "INR",
+    "items": [
+      {
+        "sku": "verdant-seasonal-crate",
+        "merchant_id": "merchant-verdant-crate",
+        "effective_unit_price_minor": 219900,
+        "recurring": false
+      }
+    ]
+  },
+  "transaction": {
+    "transaction_id": "RR20-08-RECURRENCE-RECURRING-txn",
+    "merchant_id": "merchant-verdant-crate",
+    "cart_currency": "INR",
+    "order_currency": "INR",
+    "cart_recurring": false,
+    "order_recurring": false,
+    "lines": [
+      {
+        "sku": "verdant-seasonal-crate",
+        "effective_unit_price_minor": 219900,
+        "quantity": 1,
+        "line_total_minor": 219900,
+        "recurring": false
+      }
+    ]
+  },
+  "evidence_fixtures": [
+    {
+      "merchant_id": "merchant-verdant-crate",
+      "path": "fixtures/engineering/resolve_recovery/evidence/merchant-verdant-crate.json"
+    }
+  ],
+  "initial_evidence_ids": [
+    "verdant-terms-v1",
+    "verdant-listing-v1"
+  ],
+  "initial_evidence_gap": "No registered record states the billing model, so the recurrence constraint is unverified.",
+  "recovery_sources": [
+    {
+      "source_id": "verdant-merchant-terms-v1",
+      "display_name": "Merchant Terms",
+      "manifest_id": "verdant-merchant-terms-v1:manifest:1",
+      "merchant_id": "merchant-verdant-crate",
+      "scope_type": "MERCHANT_GLOBAL",
+      "sku": null,
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE"
+      ],
+      "manifest_version": "1",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "verdant-terms-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.single-gift-delivery",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "af41522a2ccd97b6b02c05c63981c5dcc2b3f89325e4396e7364acda43116e46"
+        }
+      ]
+    },
+    {
+      "source_id": "verdant-sku-terms-v2",
+      "display_name": "Merchant SKU Terms",
+      "manifest_id": "verdant-sku-terms-v2:manifest:2",
+      "merchant_id": "merchant-verdant-crate",
+      "scope_type": "SKU_SPECIFIC",
+      "sku": "verdant-seasonal-crate",
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE",
+        "RECURRENCE_TERMS"
+      ],
+      "manifest_version": "2",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "verdant-listing-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.single-gift-delivery",
+              "claim_value": "UNESTABLISHED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "3d7919addfe1387ea003a262458cc132570a9907b1c33782e92be15a04db8126"
+        },
+        {
+          "evidence_id": "verdant-terms-v2",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.single-gift-delivery",
+              "claim_value": "SUPPORTED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "RECURRING"
+            }
+          ],
+          "expected_entry_sha256": "3ea477f1bde2cf0f7d6e0a2a10a27c019061525b8b38c73ac228c23a83158133"
+        }
+      ]
+    }
+  ],
+  "foreign_merchants": [],
+  "binding_probes": [],
+  "provider_fault": null,
+  "fixture_note": null
+}

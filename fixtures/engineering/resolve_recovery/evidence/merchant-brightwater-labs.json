@@ -1,0 +1,26 @@
+{
+  "merchant_id": "merchant-brightwater-labs",
+  "entries": [
+    {
+      "evidence_id": "brightwater-terms-v1",
+      "merchant_id": "merchant-brightwater-labs",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Brightwater Labs registers one purpose statement for its catalogue and defers the billing model of each item to that item's registered product record."
+    },
+    {
+      "evidence_id": "brightwater-listing-v1",
+      "merchant_id": "merchant-brightwater-labs",
+      "sku": "brightwater-ph-meter",
+      "source_kind": "product_listing",
+      "text": "Brightwater pH Meter: a benchtop meter with a replaceable probe. The registered listing records neither a documented intended use nor an applicable billing model."
+    },
+    {
+      "evidence_id": "brightwater-terms-v2",
+      "merchant_id": "merchant-brightwater-labs",
+      "sku": "brightwater-ph-meter",
+      "source_kind": "product_terms",
+      "text": "Registered product terms. Intended use: laboratory water testing on a fixed bench. Billing model: a one-time purchase with no subscription and no automatic renewal."
+    }
+  ]
+}

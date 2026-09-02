@@ -1,0 +1,26 @@
+{
+  "merchant_id": "merchant-harborview-books",
+  "entries": [
+    {
+      "evidence_id": "harborview-terms-v1",
+      "merchant_id": "merchant-harborview-books",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Harborview Books registers one merchant-wide purpose statement: every catalogue title is sold for individual reference reading by the buyer."
+    },
+    {
+      "evidence_id": "harborview-listing-v1",
+      "merchant_id": "merchant-harborview-books",
+      "sku": "harborview-annual-almanac",
+      "source_kind": "product_listing",
+      "text": "Harborview Annual Almanac: a bound yearly volume of tables and charts. The registered listing records neither a documented intended use nor an applicable billing model."
+    },
+    {
+      "evidence_id": "harborview-terms-v2",
+      "merchant_id": "merchant-harborview-books",
+      "sku": "harborview-annual-almanac",
+      "source_kind": "product_terms",
+      "text": "Registered product terms. Billing model: a one-time purchase with no subscription and no automatic renewal."
+    }
+  ]
+}

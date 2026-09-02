@@ -1,0 +1,26 @@
+{
+  "merchant_id": "merchant-cobalt-provisions",
+  "entries": [
+    {
+      "evidence_id": "cobalt-terms-v1",
+      "merchant_id": "merchant-cobalt-provisions",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Cobalt Provisions registers one purpose statement for its catalogue and defers the composition classification of each item to that item's registered product record."
+    },
+    {
+      "evidence_id": "cobalt-listing-v1",
+      "merchant_id": "merchant-cobalt-provisions",
+      "sku": "cobalt-trail-ration",
+      "source_kind": "product_listing",
+      "text": "Cobalt Trail Ration: a freeze-dried entree in a single-serve pouch. The registered listing records neither a documented intended use nor a composition classification."
+    },
+    {
+      "evidence_id": "cobalt-terms-v2",
+      "merchant_id": "merchant-cobalt-provisions",
+      "sku": "cobalt-trail-ration",
+      "source_kind": "product_terms",
+      "text": "Registered product terms. Intended use: backcountry trail meals on multi-day routes. Composition classification: the third-party audit for this ration has not been filed, so the registered composition classification is still pending."
+    }
+  ]
+}

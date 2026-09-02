@@ -1,0 +1,26 @@
+{
+  "merchant_id": "merchant-ashfield-labs",
+  "entries": [
+    {
+      "evidence_id": "ashfield-terms-v1",
+      "merchant_id": "merchant-ashfield-labs",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Ashfield Labs registers one purpose statement for its catalogue and defers the ingredient classification of each item to that item's registered product record."
+    },
+    {
+      "evidence_id": "ashfield-listing-v1",
+      "merchant_id": "merchant-ashfield-labs",
+      "sku": "ashfield-focus-blend",
+      "source_kind": "product_listing",
+      "text": "Ashfield Focus Blend: a powdered drink mix in a resealable tin. The registered listing records neither a documented intended use nor an ingredient classification."
+    },
+    {
+      "evidence_id": "ashfield-terms-v2",
+      "merchant_id": "merchant-ashfield-labs",
+      "sku": "ashfield-focus-blend",
+      "source_kind": "product_terms",
+      "text": "Registered product terms. Intended use: daily focus support during study sessions. Ingredient classification: each serving contains stimulant compounds including caffeine anhydrous and synephrine."
+    }
+  ]
+}

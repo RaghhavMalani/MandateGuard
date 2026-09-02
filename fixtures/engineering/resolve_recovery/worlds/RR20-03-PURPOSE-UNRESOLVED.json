@@ -1,0 +1,161 @@
+{
+  "schema": "RESOLVE_EVALUATION_WORLD_V1",
+  "case_id": "RR20-03-PURPOSE-UNRESOLVED",
+  "case_family": "PURPOSE",
+  "merchant_id": "merchant-tidewater-supply",
+  "sku": "tidewater-utility-cart",
+  "currency": "INR",
+  "amount_minor": 764500,
+  "independence_note": "This world was authored on its own: its merchant, SKU, catalogue entry, mandate, initial evidence, and source manifests are shared with no other case.",
+  "mandate": {
+    "mandate_id": "83a32d3f-4c68-59a3-a7fb-4bd3545c711b",
+    "nonce": "rr20_7b501a7b08bcb501e8fda257",
+    "issued_at": "2026-09-01T00:00:00+00:00",
+    "expires_at": "2028-01-01T00:00:00+00:00",
+    "subject_ref": "resolve-eval-subject-03",
+    "currency": "INR",
+    "hard": {
+      "max_total_minor": 800000,
+      "max_quantity": 1,
+      "recurring_allowed": false,
+      "merchant_allowlist": [
+        "merchant-tidewater-supply"
+      ],
+      "sku_allowlist": [
+        "tidewater-utility-cart"
+      ]
+    },
+    "semantic": [
+      {
+        "constraint_id": "purpose.1",
+        "kind": "purpose",
+        "constraint_family": "PURPOSE",
+        "text": "Declared purchase purpose: clinical inventory transport. Trusted evidence must establish suitability."
+      }
+    ],
+    "issuer_attestation": {
+      "assurance": "DECLARED_ONLY",
+      "issuer_id": "resolve-evaluation-issuer"
+    }
+  },
+  "catalog": {
+    "snapshot_id": "RR20-03-PURPOSE-UNRESOLVED-catalog",
+    "merchant_id": "merchant-tidewater-supply",
+    "currency": "INR",
+    "items": [
+      {
+        "sku": "tidewater-utility-cart",
+        "merchant_id": "merchant-tidewater-supply",
+        "effective_unit_price_minor": 764500,
+        "recurring": false
+      }
+    ]
+  },
+  "transaction": {
+    "transaction_id": "RR20-03-PURPOSE-UNRESOLVED-txn",
+    "merchant_id": "merchant-tidewater-supply",
+    "cart_currency": "INR",
+    "order_currency": "INR",
+    "cart_recurring": false,
+    "order_recurring": false,
+    "lines": [
+      {
+        "sku": "tidewater-utility-cart",
+        "effective_unit_price_minor": 764500,
+        "quantity": 1,
+        "line_total_minor": 764500,
+        "recurring": false
+      }
+    ]
+  },
+  "evidence_fixtures": [
+    {
+      "merchant_id": "merchant-tidewater-supply",
+      "path": "fixtures/engineering/resolve_recovery/evidence/merchant-tidewater-supply.json"
+    }
+  ],
+  "initial_evidence_ids": [
+    "tidewater-terms-v1",
+    "tidewater-listing-v1"
+  ],
+  "initial_evidence_gap": "No registered record states an intended use for this cart, so the purpose constraint is unverified.",
+  "recovery_sources": [
+    {
+      "source_id": "tidewater-merchant-terms-v1",
+      "display_name": "Merchant Terms",
+      "manifest_id": "tidewater-merchant-terms-v1:manifest:1",
+      "merchant_id": "merchant-tidewater-supply",
+      "scope_type": "MERCHANT_GLOBAL",
+      "sku": null,
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE"
+      ],
+      "manifest_version": "1",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "tidewater-terms-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.clinical-inventory-transport",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "60fca3f49d343c7b97a4c18d36767811f5178a4faa719c8250abcd0b21d0aba9"
+        }
+      ]
+    },
+    {
+      "source_id": "tidewater-sku-terms-v2",
+      "display_name": "Merchant SKU Terms",
+      "manifest_id": "tidewater-sku-terms-v2:manifest:2",
+      "merchant_id": "merchant-tidewater-supply",
+      "scope_type": "SKU_SPECIFIC",
+      "sku": "tidewater-utility-cart",
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE"
+      ],
+      "manifest_version": "2",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "tidewater-listing-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.clinical-inventory-transport",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "c133be719e8e82a9e338217e29ba3ab88cbd89f9fbf9fef927112a5c0e9cc2d1"
+        },
+        {
+          "evidence_id": "tidewater-terms-v2",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.clinical-inventory-transport",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "9a6b63721fda6ed464f4bfbecebc883e0f9c6a48b9d88ff55d34a7c1f66e1228"
+        }
+      ]
+    }
+  ],
+  "foreign_merchants": [],
+  "binding_probes": [],
+  "provider_fault": null,
+  "fixture_note": null
+}

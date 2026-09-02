@@ -1,0 +1,176 @@
+{
+  "schema": "RESOLVE_EVALUATION_WORLD_V1",
+  "case_id": "RR20-07-RECURRENCE-ONE-TIME",
+  "case_family": "RECURRENCE",
+  "merchant_id": "merchant-lanternwick-supply",
+  "sku": "lanternwick-task-light",
+  "currency": "INR",
+  "amount_minor": 254000,
+  "independence_note": "This world was authored on its own: its merchant, SKU, catalogue entry, mandate, initial evidence, and source manifests are shared with no other case.",
+  "mandate": {
+    "mandate_id": "79e331c8-9781-5c2b-8bd2-51acd996d3c2",
+    "nonce": "rr20_9e32b3642e36459ae89672e0",
+    "issued_at": "2026-09-01T00:00:00+00:00",
+    "expires_at": "2028-01-01T00:00:00+00:00",
+    "subject_ref": "resolve-eval-subject-07",
+    "currency": "INR",
+    "hard": {
+      "max_total_minor": 300000,
+      "max_quantity": 1,
+      "recurring_allowed": false,
+      "merchant_allowlist": [
+        "merchant-lanternwick-supply"
+      ],
+      "sku_allowlist": [
+        "lanternwick-task-light"
+      ]
+    },
+    "semantic": [
+      {
+        "constraint_id": "purpose.1",
+        "kind": "purpose",
+        "constraint_family": "PURPOSE",
+        "text": "Declared purchase purpose: desk task lighting. Trusted evidence must establish suitability."
+      },
+      {
+        "constraint_id": "exclusion.1",
+        "kind": "exclusion",
+        "constraint_family": "RECURRENCE",
+        "text": "Excluded product characteristic: subscription."
+      }
+    ],
+    "issuer_attestation": {
+      "assurance": "DECLARED_ONLY",
+      "issuer_id": "resolve-evaluation-issuer"
+    }
+  },
+  "catalog": {
+    "snapshot_id": "RR20-07-RECURRENCE-ONE-TIME-catalog",
+    "merchant_id": "merchant-lanternwick-supply",
+    "currency": "INR",
+    "items": [
+      {
+        "sku": "lanternwick-task-light",
+        "merchant_id": "merchant-lanternwick-supply",
+        "effective_unit_price_minor": 254000,
+        "recurring": false
+      }
+    ]
+  },
+  "transaction": {
+    "transaction_id": "RR20-07-RECURRENCE-ONE-TIME-txn",
+    "merchant_id": "merchant-lanternwick-supply",
+    "cart_currency": "INR",
+    "order_currency": "INR",
+    "cart_recurring": false,
+    "order_recurring": false,
+    "lines": [
+      {
+        "sku": "lanternwick-task-light",
+        "effective_unit_price_minor": 254000,
+        "quantity": 1,
+        "line_total_minor": 254000,
+        "recurring": false
+      }
+    ]
+  },
+  "evidence_fixtures": [
+    {
+      "merchant_id": "merchant-lanternwick-supply",
+      "path": "fixtures/engineering/resolve_recovery/evidence/merchant-lanternwick-supply.json"
+    }
+  ],
+  "initial_evidence_ids": [
+    "lanternwick-terms-v1",
+    "lanternwick-listing-v1"
+  ],
+  "initial_evidence_gap": "No registered record states the billing model, so the recurrence constraint is unverified.",
+  "recovery_sources": [
+    {
+      "source_id": "lanternwick-merchant-terms-v1",
+      "display_name": "Merchant Terms",
+      "manifest_id": "lanternwick-merchant-terms-v1:manifest:1",
+      "merchant_id": "merchant-lanternwick-supply",
+      "scope_type": "MERCHANT_GLOBAL",
+      "sku": null,
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE"
+      ],
+      "manifest_version": "1",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "lanternwick-terms-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.desk-task-lighting",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "bb34cb566dd51f943d29b0cf7417a698bf07fc755d5623f8a4fd91773273a8a5"
+        }
+      ]
+    },
+    {
+      "source_id": "lanternwick-sku-terms-v2",
+      "display_name": "Merchant SKU Terms",
+      "manifest_id": "lanternwick-sku-terms-v2:manifest:2",
+      "merchant_id": "merchant-lanternwick-supply",
+      "scope_type": "SKU_SPECIFIC",
+      "sku": "lanternwick-task-light",
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE",
+        "RECURRENCE_TERMS"
+      ],
+      "manifest_version": "2",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "lanternwick-listing-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.desk-task-lighting",
+              "claim_value": "UNESTABLISHED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "e1225356e946097af202cb59c1b3451fe676c6508288c998ade92f9b31a24257"
+        },
+        {
+          "evidence_id": "lanternwick-terms-v2",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.desk-task-lighting",
+              "claim_value": "SUPPORTED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "ONE_TIME"
+            }
+          ],
+          "expected_entry_sha256": "15ac20e3855beb7b3d3a40a37646d3e16babeb100c0033ed32075502b9d189b8"
+        }
+      ]
+    }
+  ],
+  "foreign_merchants": [],
+  "binding_probes": [],
+  "provider_fault": null,
+  "fixture_note": null
+}

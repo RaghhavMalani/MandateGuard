@@ -430,6 +430,7 @@ Not implemented — the honest next steps.
 | [docs/D6_RAZORPAY_EXECUTION.md](docs/D6_RAZORPAY_EXECUTION.md) | Capability signing, nonce ledger, Razorpay execution |
 | [docs/INT2_RETRIEVAL_EXPERIMENTS.md](docs/INT2_RETRIEVAL_EXPERIMENTS.md) | Retrieval and cache methodology and limits |
 | [docs/INT3_EVIDENCE_SUFFICIENCY.md](docs/INT3_EVIDENCE_SUFFICIENCY.md) | Evidence-sufficiency methodology and limits |
+| [docs/RESOLVE_EVALUATION_PROTOCOL.md](docs/RESOLVE_EVALUATION_PROTOCOL.md) | Preregistered 20-case Resolve recovery evaluation protocol |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Deployment configuration and verification |
 | [docs/COMMERCE_LAB_LOCAL.md](docs/COMMERCE_LAB_LOCAL.md) | Running the Commerce Lab locally |
 | [TAXONOMY.md](TAXONOMY.md) | Pre-registered Tier A/B/C check taxonomy |

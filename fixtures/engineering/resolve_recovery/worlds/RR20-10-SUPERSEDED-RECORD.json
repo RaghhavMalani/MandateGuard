@@ -1,0 +1,193 @@
+{
+  "schema": "RESOLVE_EVALUATION_WORLD_V1",
+  "case_id": "RR20-10-SUPERSEDED-RECORD",
+  "case_family": "CONFLICT_FRESHNESS",
+  "merchant_id": "merchant-ridgeline-audio",
+  "sku": "ridgeline-studio-monitor",
+  "currency": "INR",
+  "amount_minor": 184900,
+  "independence_note": "This world was authored on its own: its merchant, SKU, catalogue entry, mandate, initial evidence, and source manifests are shared with no other case.",
+  "mandate": {
+    "mandate_id": "57c520e8-c5f5-58a9-939a-31bd4109cff1",
+    "nonce": "rr20_f5aa6211acca7b373ddeac76",
+    "issued_at": "2026-09-01T00:00:00+00:00",
+    "expires_at": "2028-01-01T00:00:00+00:00",
+    "subject_ref": "resolve-eval-subject-10",
+    "currency": "INR",
+    "hard": {
+      "max_total_minor": 250000,
+      "max_quantity": 1,
+      "recurring_allowed": false,
+      "merchant_allowlist": [
+        "merchant-ridgeline-audio"
+      ],
+      "sku_allowlist": [
+        "ridgeline-studio-monitor"
+      ]
+    },
+    "semantic": [
+      {
+        "constraint_id": "purpose.1",
+        "kind": "purpose",
+        "constraint_family": "PURPOSE",
+        "text": "Declared purchase purpose: home studio monitoring. Trusted evidence must establish suitability."
+      },
+      {
+        "constraint_id": "exclusion.1",
+        "kind": "exclusion",
+        "constraint_family": "RECURRENCE",
+        "text": "Excluded product characteristic: subscription."
+      }
+    ],
+    "issuer_attestation": {
+      "assurance": "DECLARED_ONLY",
+      "issuer_id": "resolve-evaluation-issuer"
+    }
+  },
+  "catalog": {
+    "snapshot_id": "RR20-10-SUPERSEDED-RECORD-catalog",
+    "merchant_id": "merchant-ridgeline-audio",
+    "currency": "INR",
+    "items": [
+      {
+        "sku": "ridgeline-studio-monitor",
+        "merchant_id": "merchant-ridgeline-audio",
+        "effective_unit_price_minor": 184900,
+        "recurring": false
+      }
+    ]
+  },
+  "transaction": {
+    "transaction_id": "RR20-10-SUPERSEDED-RECORD-txn",
+    "merchant_id": "merchant-ridgeline-audio",
+    "cart_currency": "INR",
+    "order_currency": "INR",
+    "cart_recurring": false,
+    "order_recurring": false,
+    "lines": [
+      {
+        "sku": "ridgeline-studio-monitor",
+        "effective_unit_price_minor": 184900,
+        "quantity": 1,
+        "line_total_minor": 184900,
+        "recurring": false
+      }
+    ]
+  },
+  "evidence_fixtures": [
+    {
+      "merchant_id": "merchant-ridgeline-audio",
+      "path": "fixtures/engineering/resolve_recovery/evidence/merchant-ridgeline-audio.json"
+    }
+  ],
+  "initial_evidence_ids": [
+    "ridgeline-terms-v1",
+    "ridgeline-listing-v1"
+  ],
+  "initial_evidence_gap": "The listing states no billing model, and the merchant terms defer it to the product record.",
+  "recovery_sources": [
+    {
+      "source_id": "ridgeline-merchant-terms-v1",
+      "display_name": "Merchant Terms",
+      "manifest_id": "ridgeline-merchant-terms-v1:manifest:1",
+      "merchant_id": "merchant-ridgeline-audio",
+      "scope_type": "MERCHANT_GLOBAL",
+      "sku": null,
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE"
+      ],
+      "manifest_version": "1",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "ridgeline-terms-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.home-studio-monitoring",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "d2c2c0e9ed713cd242dc6a8ff61e8e3424c8397d757adc97e932ffcc422af6aa"
+        }
+      ]
+    },
+    {
+      "source_id": "ridgeline-sku-terms-v2",
+      "display_name": "Merchant SKU Terms",
+      "manifest_id": "ridgeline-sku-terms-v2:manifest:2",
+      "merchant_id": "merchant-ridgeline-audio",
+      "scope_type": "SKU_SPECIFIC",
+      "sku": "ridgeline-studio-monitor",
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE",
+        "RECURRENCE_TERMS"
+      ],
+      "manifest_version": "2",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "ridgeline-listing-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.home-studio-monitoring",
+              "claim_value": "UNESTABLISHED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "4173937818c7367612911f317e38e3f7a39d4e1781bd5ff80cdba76dba3d2ced"
+        },
+        {
+          "evidence_id": "ridgeline-terms-2025",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.home-studio-monitoring",
+              "claim_value": "UNESTABLISHED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "RECURRING"
+            }
+          ],
+          "expected_entry_sha256": "d13d1e0793b3a485ad703e1c35119933190c1d27727c756b329b7e28808db62d"
+        },
+        {
+          "evidence_id": "ridgeline-terms-2026",
+          "effective_at": "2026-04-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": "ridgeline-terms-2025",
+          "claims": [
+            {
+              "claim_id": "purpose.home-studio-monitoring",
+              "claim_value": "SUPPORTED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "ONE_TIME"
+            }
+          ],
+          "expected_entry_sha256": "4a18a0c008b911d277e25591748429c651860c50a1c484b24a8005bb53178f36"
+        }
+      ]
+    }
+  ],
+  "foreign_merchants": [],
+  "binding_probes": [],
+  "provider_fault": null,
+  "fixture_note": null
+}

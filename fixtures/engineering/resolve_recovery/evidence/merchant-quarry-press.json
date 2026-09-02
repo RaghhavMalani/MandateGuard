@@ -1,0 +1,26 @@
+{
+  "merchant_id": "merchant-quarry-press",
+  "entries": [
+    {
+      "evidence_id": "quarry-terms-v1",
+      "merchant_id": "merchant-quarry-press",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Quarry Press registers one purpose statement for its catalogue and defers the content classification of each item to that item's registered product record."
+    },
+    {
+      "evidence_id": "quarry-listing-v1",
+      "merchant_id": "merchant-quarry-press",
+      "sku": "quarry-strategy-manual",
+      "source_kind": "product_listing",
+      "text": "Quarry Strategy Manual: a bound volume on decision making under uncertainty. The registered listing records neither the intended readership nor the content classification."
+    },
+    {
+      "evidence_id": "quarry-terms-v2",
+      "merchant_id": "merchant-quarry-press",
+      "sku": "quarry-strategy-manual",
+      "source_kind": "product_terms",
+      "text": "Registered product terms. Intended readership: professional development for working analysts. Content classification: this volume provides gambling instruction, wagering systems, and betting bankroll management."
+    }
+  ]
+}

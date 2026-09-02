@@ -1,0 +1,175 @@
+{
+  "schema": "RESOLVE_EVALUATION_WORLD_V1",
+  "case_id": "RR20-16-GLOBAL-PLUS-SKU",
+  "case_family": "BINDING_COMPLETENESS",
+  "merchant_id": "merchant-harborview-books",
+  "sku": "harborview-annual-almanac",
+  "currency": "INR",
+  "amount_minor": 141900,
+  "independence_note": "This world was authored on its own: its merchant, SKU, catalogue entry, mandate, initial evidence, and source manifests are shared with no other case.",
+  "mandate": {
+    "mandate_id": "8da1514b-8bff-545b-a5eb-f50c885666aa",
+    "nonce": "rr20_1ff4347437741912aa70c5fd",
+    "issued_at": "2026-09-01T00:00:00+00:00",
+    "expires_at": "2028-01-01T00:00:00+00:00",
+    "subject_ref": "resolve-eval-subject-16",
+    "currency": "INR",
+    "hard": {
+      "max_total_minor": 200000,
+      "max_quantity": 1,
+      "recurring_allowed": false,
+      "merchant_allowlist": [
+        "merchant-harborview-books"
+      ],
+      "sku_allowlist": [
+        "harborview-annual-almanac"
+      ]
+    },
+    "semantic": [
+      {
+        "constraint_id": "purpose.1",
+        "kind": "purpose",
+        "constraint_family": "PURPOSE",
+        "text": "Declared purchase purpose: individual reference reading. Trusted evidence must establish suitability."
+      },
+      {
+        "constraint_id": "exclusion.1",
+        "kind": "exclusion",
+        "constraint_family": "RECURRENCE",
+        "text": "Excluded product characteristic: subscription."
+      }
+    ],
+    "issuer_attestation": {
+      "assurance": "DECLARED_ONLY",
+      "issuer_id": "resolve-evaluation-issuer"
+    }
+  },
+  "catalog": {
+    "snapshot_id": "RR20-16-GLOBAL-PLUS-SKU-catalog",
+    "merchant_id": "merchant-harborview-books",
+    "currency": "INR",
+    "items": [
+      {
+        "sku": "harborview-annual-almanac",
+        "merchant_id": "merchant-harborview-books",
+        "effective_unit_price_minor": 141900,
+        "recurring": false
+      }
+    ]
+  },
+  "transaction": {
+    "transaction_id": "RR20-16-GLOBAL-PLUS-SKU-txn",
+    "merchant_id": "merchant-harborview-books",
+    "cart_currency": "INR",
+    "order_currency": "INR",
+    "cart_recurring": false,
+    "order_recurring": false,
+    "lines": [
+      {
+        "sku": "harborview-annual-almanac",
+        "effective_unit_price_minor": 141900,
+        "quantity": 1,
+        "line_total_minor": 141900,
+        "recurring": false
+      }
+    ]
+  },
+  "evidence_fixtures": [
+    {
+      "merchant_id": "merchant-harborview-books",
+      "path": "fixtures/engineering/resolve_recovery/evidence/merchant-harborview-books.json"
+    }
+  ],
+  "initial_evidence_ids": [
+    "harborview-listing-v1"
+  ],
+  "initial_evidence_gap": "Only the product listing was retrieved initially; it establishes neither the intended use nor the billing model.",
+  "recovery_sources": [
+    {
+      "source_id": "harborview-merchant-terms-v1",
+      "display_name": "Merchant Terms",
+      "manifest_id": "harborview-merchant-terms-v1:manifest:1",
+      "merchant_id": "merchant-harborview-books",
+      "scope_type": "MERCHANT_GLOBAL",
+      "sku": null,
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE"
+      ],
+      "manifest_version": "1",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "harborview-terms-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.individual-reference-reading",
+              "claim_value": "SUPPORTED"
+            }
+          ],
+          "expected_entry_sha256": "5377b76a17b7d32195b68f9631c673e9bd30dbb9b2337f70854a00bd1f34679b"
+        }
+      ]
+    },
+    {
+      "source_id": "harborview-sku-terms-v2",
+      "display_name": "Merchant SKU Terms",
+      "manifest_id": "harborview-sku-terms-v2:manifest:2",
+      "merchant_id": "merchant-harborview-books",
+      "scope_type": "SKU_SPECIFIC",
+      "sku": "harborview-annual-almanac",
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE",
+        "RECURRENCE_TERMS"
+      ],
+      "manifest_version": "2",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "harborview-listing-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.individual-reference-reading",
+              "claim_value": "UNESTABLISHED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "3c90b2712e3452abeef0a548e99b63b8f6f141f7dbbebd7356e58b705b014e18"
+        },
+        {
+          "evidence_id": "harborview-terms-v2",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.individual-reference-reading",
+              "claim_value": "UNESTABLISHED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "ONE_TIME"
+            }
+          ],
+          "expected_entry_sha256": "2ed59384fc8e5fd745231b19b0ae6e3b6ae7e86e9cbd644b5a66d95040cba6ac"
+        }
+      ]
+    }
+  ],
+  "foreign_merchants": [],
+  "binding_probes": [],
+  "provider_fault": null,
+  "fixture_note": null
+}

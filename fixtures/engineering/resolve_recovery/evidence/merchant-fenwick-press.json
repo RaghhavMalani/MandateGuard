@@ -1,0 +1,33 @@
+{
+  "merchant_id": "merchant-fenwick-press",
+  "entries": [
+    {
+      "evidence_id": "fenwick-terms-v1",
+      "merchant_id": "merchant-fenwick-press",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Fenwick Press registers one purpose statement for its catalogue and defers the billing model of each item to that item's registered product record."
+    },
+    {
+      "evidence_id": "fenwick-listing-v1",
+      "merchant_id": "merchant-fenwick-press",
+      "sku": "fenwick-atlas-edition",
+      "source_kind": "product_listing",
+      "text": "Fenwick Atlas Edition: a case-bound volume of regional maps. The registered listing records neither a documented intended use nor an applicable billing model."
+    },
+    {
+      "evidence_id": "fenwick-terms-2025",
+      "merchant_id": "merchant-fenwick-press",
+      "sku": "fenwick-atlas-edition",
+      "source_kind": "product_terms",
+      "text": "Expired product terms. Billing model: this edition was sold through a recurring annual subscription with automatic renewal."
+    },
+    {
+      "evidence_id": "fenwick-terms-2026",
+      "merchant_id": "merchant-fenwick-press",
+      "sku": "fenwick-atlas-edition",
+      "source_kind": "product_terms",
+      "text": "Current product terms. Intended use: reference cartography study in a library setting. Billing model: a one-time purchase with no subscription and no automatic renewal."
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "merchant_id": "merchant-southgate-depot",
+  "entries": [
+    {
+      "evidence_id": "southgate-terms-v1",
+      "merchant_id": "merchant-southgate-depot",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Southgate Depot registers one purpose statement for its catalogue and defers the billing model of each item to that item's registered product record."
+    },
+    {
+      "evidence_id": "southgate-listing-v1",
+      "merchant_id": "merchant-southgate-depot",
+      "sku": "atlas-desk-riser",
+      "source_kind": "product_listing",
+      "text": "Atlas Desk Riser at Southgate Depot: a fixed-height riser shipped flat. The registered listing records neither a documented intended use nor an applicable billing model."
+    },
+    {
+      "evidence_id": "southgate-terms-v2",
+      "merchant_id": "merchant-southgate-depot",
+      "sku": "atlas-desk-riser",
+      "source_kind": "product_terms",
+      "text": "Registered product terms. Billing model: this riser ships on a recurring monthly subscription."
+    }
+  ]
+}

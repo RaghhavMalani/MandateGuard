@@ -1,0 +1,33 @@
+{
+  "merchant_id": "merchant-ridgeline-audio",
+  "entries": [
+    {
+      "evidence_id": "ridgeline-terms-v1",
+      "merchant_id": "merchant-ridgeline-audio",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Ridgeline Audio registers one purpose statement for its catalogue and defers the billing model of each item to that item's registered product record."
+    },
+    {
+      "evidence_id": "ridgeline-listing-v1",
+      "merchant_id": "merchant-ridgeline-audio",
+      "sku": "ridgeline-studio-monitor",
+      "source_kind": "product_listing",
+      "text": "Ridgeline Studio Monitor: a two-way nearfield speaker with a woven cone. The registered listing records neither a documented intended use nor an applicable billing model."
+    },
+    {
+      "evidence_id": "ridgeline-terms-2025",
+      "merchant_id": "merchant-ridgeline-audio",
+      "sku": "ridgeline-studio-monitor",
+      "source_kind": "product_terms",
+      "text": "Superseded product terms. Billing model: this speaker was previously sold through a recurring monthly subscription with automatic renewal."
+    },
+    {
+      "evidence_id": "ridgeline-terms-2026",
+      "merchant_id": "merchant-ridgeline-audio",
+      "sku": "ridgeline-studio-monitor",
+      "source_kind": "product_terms",
+      "text": "Current product terms. Intended use: home studio monitoring in a treated room. Billing model: a one-time purchase with no subscription and no automatic renewal. This record replaces the earlier terms record."
+    }
+  ]
+}

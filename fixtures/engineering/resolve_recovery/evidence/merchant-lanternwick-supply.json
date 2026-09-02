@@ -1,0 +1,26 @@
+{
+  "merchant_id": "merchant-lanternwick-supply",
+  "entries": [
+    {
+      "evidence_id": "lanternwick-terms-v1",
+      "merchant_id": "merchant-lanternwick-supply",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Lanternwick Supply registers one purpose statement for its catalogue and defers the billing model of each item to that item's registered product record."
+    },
+    {
+      "evidence_id": "lanternwick-listing-v1",
+      "merchant_id": "merchant-lanternwick-supply",
+      "sku": "lanternwick-task-light",
+      "source_kind": "product_listing",
+      "text": "Lanternwick Task Light: a clamp-mounted lamp with a dimmable head. The registered listing records neither a documented intended use nor an applicable billing model."
+    },
+    {
+      "evidence_id": "lanternwick-terms-v2",
+      "merchant_id": "merchant-lanternwick-supply",
+      "sku": "lanternwick-task-light",
+      "source_kind": "product_terms",
+      "text": "Registered product terms. Intended use: desk task lighting for evening work. Billing model: a one-time purchase with no subscription and no automatic renewal."
+    }
+  ]
+}

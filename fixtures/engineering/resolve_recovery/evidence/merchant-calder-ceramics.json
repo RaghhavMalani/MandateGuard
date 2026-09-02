@@ -1,0 +1,26 @@
+{
+  "merchant_id": "merchant-calder-ceramics",
+  "entries": [
+    {
+      "evidence_id": "calder-terms-v1",
+      "merchant_id": "merchant-calder-ceramics",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Calder Ceramics registers one purpose statement for its catalogue and defers the documented intended use of each item to that item's registered product record."
+    },
+    {
+      "evidence_id": "calder-listing-v1",
+      "merchant_id": "merchant-calder-ceramics",
+      "sku": "calder-glaze-set",
+      "source_kind": "product_listing",
+      "text": "Calder Glaze Set: six stoneware glazes in sealed jars. The registered listing records neither a documented intended use nor a material safety classification."
+    },
+    {
+      "evidence_id": "calder-terms-v2",
+      "merchant_id": "merchant-calder-ceramics",
+      "sku": "calder-glaze-set",
+      "source_kind": "product_terms",
+      "text": "Registered product terms. Intended use: studio glaze testing on test tiles before a production run."
+    }
+  ]
+}

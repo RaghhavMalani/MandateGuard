@@ -1,0 +1,176 @@
+{
+  "schema": "RESOLVE_EVALUATION_WORLD_V1",
+  "case_id": "RR20-06-EXCLUSION-AMBIGUOUS",
+  "case_family": "EXCLUSION",
+  "merchant_id": "merchant-cobalt-provisions",
+  "sku": "cobalt-trail-ration",
+  "currency": "INR",
+  "amount_minor": 87500,
+  "independence_note": "This world was authored on its own: its merchant, SKU, catalogue entry, mandate, initial evidence, and source manifests are shared with no other case.",
+  "mandate": {
+    "mandate_id": "b8bbe193-2b02-5400-aac3-339873d2de7e",
+    "nonce": "rr20_a7ff4a815b4c2a7ef7d6f0e4",
+    "issued_at": "2026-09-01T00:00:00+00:00",
+    "expires_at": "2028-01-01T00:00:00+00:00",
+    "subject_ref": "resolve-eval-subject-06",
+    "currency": "INR",
+    "hard": {
+      "max_total_minor": 150000,
+      "max_quantity": 1,
+      "recurring_allowed": false,
+      "merchant_allowlist": [
+        "merchant-cobalt-provisions"
+      ],
+      "sku_allowlist": [
+        "cobalt-trail-ration"
+      ]
+    },
+    "semantic": [
+      {
+        "constraint_id": "purpose.1",
+        "kind": "purpose",
+        "constraint_family": "PURPOSE",
+        "text": "Declared purchase purpose: backcountry trail meals. Trusted evidence must establish suitability."
+      },
+      {
+        "constraint_id": "exclusion.1",
+        "kind": "exclusion",
+        "constraint_family": "EXCLUSION",
+        "text": "Excluded product characteristic: animal derived tallow."
+      }
+    ],
+    "issuer_attestation": {
+      "assurance": "DECLARED_ONLY",
+      "issuer_id": "resolve-evaluation-issuer"
+    }
+  },
+  "catalog": {
+    "snapshot_id": "RR20-06-EXCLUSION-AMBIGUOUS-catalog",
+    "merchant_id": "merchant-cobalt-provisions",
+    "currency": "INR",
+    "items": [
+      {
+        "sku": "cobalt-trail-ration",
+        "merchant_id": "merchant-cobalt-provisions",
+        "effective_unit_price_minor": 87500,
+        "recurring": false
+      }
+    ]
+  },
+  "transaction": {
+    "transaction_id": "RR20-06-EXCLUSION-AMBIGUOUS-txn",
+    "merchant_id": "merchant-cobalt-provisions",
+    "cart_currency": "INR",
+    "order_currency": "INR",
+    "cart_recurring": false,
+    "order_recurring": false,
+    "lines": [
+      {
+        "sku": "cobalt-trail-ration",
+        "effective_unit_price_minor": 87500,
+        "quantity": 1,
+        "line_total_minor": 87500,
+        "recurring": false
+      }
+    ]
+  },
+  "evidence_fixtures": [
+    {
+      "merchant_id": "merchant-cobalt-provisions",
+      "path": "fixtures/engineering/resolve_recovery/evidence/merchant-cobalt-provisions.json"
+    }
+  ],
+  "initial_evidence_ids": [
+    "cobalt-terms-v1",
+    "cobalt-listing-v1"
+  ],
+  "initial_evidence_gap": "No registered record classifies the composition, so the excluded characteristic is unverified.",
+  "recovery_sources": [
+    {
+      "source_id": "cobalt-merchant-terms-v1",
+      "display_name": "Merchant Terms",
+      "manifest_id": "cobalt-merchant-terms-v1:manifest:1",
+      "merchant_id": "merchant-cobalt-provisions",
+      "scope_type": "MERCHANT_GLOBAL",
+      "sku": null,
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE"
+      ],
+      "manifest_version": "1",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "cobalt-terms-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.backcountry-trail-meals",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "98cf35f5183d2c68743e60191a4e4d8f9aa70c117d9bd83d3fc59bf4054a1c2b"
+        }
+      ]
+    },
+    {
+      "source_id": "cobalt-sku-terms-v2",
+      "display_name": "Merchant SKU Terms",
+      "manifest_id": "cobalt-sku-terms-v2:manifest:2",
+      "merchant_id": "merchant-cobalt-provisions",
+      "scope_type": "SKU_SPECIFIC",
+      "sku": "cobalt-trail-ration",
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE",
+        "EXCLUSION_EVIDENCE"
+      ],
+      "manifest_version": "2",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "cobalt-listing-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.backcountry-trail-meals",
+              "claim_value": "UNESTABLISHED"
+            },
+            {
+              "claim_id": "content.animal-derived-tallow",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "56dd6418ee0ed7b2186262d6a91245897d587cd94509483526bc8047a2404f82"
+        },
+        {
+          "evidence_id": "cobalt-terms-v2",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.backcountry-trail-meals",
+              "claim_value": "SUPPORTED"
+            },
+            {
+              "claim_id": "content.animal-derived-tallow",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "5483bbf294640c974a44d83c16f08d162d3d659cc74ccb19f54e93be9814fec5"
+        }
+      ]
+    }
+  ],
+  "foreign_merchants": [],
+  "binding_probes": [],
+  "provider_fault": null,
+  "fixture_note": null
+}

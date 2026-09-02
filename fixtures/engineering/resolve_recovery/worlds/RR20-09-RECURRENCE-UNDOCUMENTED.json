@@ -1,0 +1,176 @@
+{
+  "schema": "RESOLVE_EVALUATION_WORLD_V1",
+  "case_id": "RR20-09-RECURRENCE-UNDOCUMENTED",
+  "case_family": "RECURRENCE",
+  "merchant_id": "merchant-pinehold-goods",
+  "sku": "pinehold-filter-kit",
+  "currency": "INR",
+  "amount_minor": 132500,
+  "independence_note": "This world was authored on its own: its merchant, SKU, catalogue entry, mandate, initial evidence, and source manifests are shared with no other case.",
+  "mandate": {
+    "mandate_id": "17824160-c3ca-58dc-a18e-125fa967f32a",
+    "nonce": "rr20_6c6b8a927f81b51688740127",
+    "issued_at": "2026-09-01T00:00:00+00:00",
+    "expires_at": "2028-01-01T00:00:00+00:00",
+    "subject_ref": "resolve-eval-subject-09",
+    "currency": "INR",
+    "hard": {
+      "max_total_minor": 200000,
+      "max_quantity": 1,
+      "recurring_allowed": false,
+      "merchant_allowlist": [
+        "merchant-pinehold-goods"
+      ],
+      "sku_allowlist": [
+        "pinehold-filter-kit"
+      ]
+    },
+    "semantic": [
+      {
+        "constraint_id": "purpose.1",
+        "kind": "purpose",
+        "constraint_family": "PURPOSE",
+        "text": "Declared purchase purpose: household water filtration. Trusted evidence must establish suitability."
+      },
+      {
+        "constraint_id": "exclusion.1",
+        "kind": "exclusion",
+        "constraint_family": "RECURRENCE",
+        "text": "Excluded product characteristic: subscription."
+      }
+    ],
+    "issuer_attestation": {
+      "assurance": "DECLARED_ONLY",
+      "issuer_id": "resolve-evaluation-issuer"
+    }
+  },
+  "catalog": {
+    "snapshot_id": "RR20-09-RECURRENCE-UNDOCUMENTED-catalog",
+    "merchant_id": "merchant-pinehold-goods",
+    "currency": "INR",
+    "items": [
+      {
+        "sku": "pinehold-filter-kit",
+        "merchant_id": "merchant-pinehold-goods",
+        "effective_unit_price_minor": 132500,
+        "recurring": false
+      }
+    ]
+  },
+  "transaction": {
+    "transaction_id": "RR20-09-RECURRENCE-UNDOCUMENTED-txn",
+    "merchant_id": "merchant-pinehold-goods",
+    "cart_currency": "INR",
+    "order_currency": "INR",
+    "cart_recurring": false,
+    "order_recurring": false,
+    "lines": [
+      {
+        "sku": "pinehold-filter-kit",
+        "effective_unit_price_minor": 132500,
+        "quantity": 1,
+        "line_total_minor": 132500,
+        "recurring": false
+      }
+    ]
+  },
+  "evidence_fixtures": [
+    {
+      "merchant_id": "merchant-pinehold-goods",
+      "path": "fixtures/engineering/resolve_recovery/evidence/merchant-pinehold-goods.json"
+    }
+  ],
+  "initial_evidence_ids": [
+    "pinehold-terms-v1",
+    "pinehold-listing-v1"
+  ],
+  "initial_evidence_gap": "No registered record states the billing model, so the recurrence constraint is unverified.",
+  "recovery_sources": [
+    {
+      "source_id": "pinehold-merchant-terms-v1",
+      "display_name": "Merchant Terms",
+      "manifest_id": "pinehold-merchant-terms-v1:manifest:1",
+      "merchant_id": "merchant-pinehold-goods",
+      "scope_type": "MERCHANT_GLOBAL",
+      "sku": null,
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE"
+      ],
+      "manifest_version": "1",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "pinehold-terms-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.household-water-filtration",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "dce20b9e50748a751846ba83fe5039c636ed007ffda792ae4cce7fdd13e71bfa"
+        }
+      ]
+    },
+    {
+      "source_id": "pinehold-sku-terms-v2",
+      "display_name": "Merchant SKU Terms",
+      "manifest_id": "pinehold-sku-terms-v2:manifest:2",
+      "merchant_id": "merchant-pinehold-goods",
+      "scope_type": "SKU_SPECIFIC",
+      "sku": "pinehold-filter-kit",
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE",
+        "RECURRENCE_TERMS"
+      ],
+      "manifest_version": "2",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "pinehold-listing-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.household-water-filtration",
+              "claim_value": "UNESTABLISHED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "31f254b9a5e31428085279de3d6dd6f2b92b7ede8bb6ee46a69798674732bc05"
+        },
+        {
+          "evidence_id": "pinehold-terms-v2",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.household-water-filtration",
+              "claim_value": "SUPPORTED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "2722f718a2f11fc8b95c505344d7bf1f05e5407475693ae101830f02b733e804"
+        }
+      ]
+    }
+  ],
+  "foreign_merchants": [],
+  "binding_probes": [],
+  "provider_fault": null,
+  "fixture_note": null
+}

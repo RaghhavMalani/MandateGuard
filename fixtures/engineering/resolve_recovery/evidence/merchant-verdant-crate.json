@@ -1,0 +1,26 @@
+{
+  "merchant_id": "merchant-verdant-crate",
+  "entries": [
+    {
+      "evidence_id": "verdant-terms-v1",
+      "merchant_id": "merchant-verdant-crate",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Verdant Crate registers one purpose statement for its catalogue and defers the billing model of each item to that item's registered product record."
+    },
+    {
+      "evidence_id": "verdant-listing-v1",
+      "merchant_id": "merchant-verdant-crate",
+      "sku": "verdant-seasonal-crate",
+      "source_kind": "product_listing",
+      "text": "Verdant Seasonal Crate: a packed assortment of preserves and dry goods. The registered listing records neither a documented intended use nor an applicable billing model."
+    },
+    {
+      "evidence_id": "verdant-terms-v2",
+      "merchant_id": "merchant-verdant-crate",
+      "sku": "verdant-seasonal-crate",
+      "source_kind": "product_terms",
+      "text": "Registered product terms. Intended use: a single gift delivery to one address. Billing model: this crate enrols the buyer in a recurring quarterly subscription that renews automatically until cancelled."
+    }
+  ]
+}

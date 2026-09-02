@@ -1,0 +1,26 @@
+{
+  "merchant_id": "merchant-tidewater-supply",
+  "entries": [
+    {
+      "evidence_id": "tidewater-terms-v1",
+      "merchant_id": "merchant-tidewater-supply",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Tidewater Supply registers one purpose statement for its catalogue and defers the documented intended use of each item to that item's registered product record."
+    },
+    {
+      "evidence_id": "tidewater-listing-v1",
+      "merchant_id": "merchant-tidewater-supply",
+      "sku": "tidewater-utility-cart",
+      "source_kind": "product_listing",
+      "text": "Tidewater Utility Cart: a four-shelf cart with locking casters and a powder-coated frame. The registered listing does not record a documented intended use."
+    },
+    {
+      "evidence_id": "tidewater-terms-v2",
+      "merchant_id": "merchant-tidewater-supply",
+      "sku": "tidewater-utility-cart",
+      "source_kind": "product_terms",
+      "text": "Registered product terms: load rating, shelf spacing, caster specification, and warranty period. The registered terms do not record any documented intended use for this cart."
+    }
+  ]
+}

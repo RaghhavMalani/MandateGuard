@@ -1,0 +1,176 @@
+{
+  "schema": "RESOLVE_EVALUATION_WORLD_V1",
+  "case_id": "RR20-15-WRONG-SKU-BINDING",
+  "case_family": "BINDING_COMPLETENESS",
+  "merchant_id": "merchant-glasshouse-supply",
+  "sku": "glasshouse-propagation-tray",
+  "currency": "INR",
+  "amount_minor": 358000,
+  "independence_note": "This world was authored on its own: its merchant, SKU, catalogue entry, mandate, initial evidence, and source manifests are shared with no other case.",
+  "mandate": {
+    "mandate_id": "ae8fff5c-4629-576a-bbee-9324b8967053",
+    "nonce": "rr20_8a4815aff99fdc55b8f99b33",
+    "issued_at": "2026-09-01T00:00:00+00:00",
+    "expires_at": "2028-01-01T00:00:00+00:00",
+    "subject_ref": "resolve-eval-subject-15",
+    "currency": "INR",
+    "hard": {
+      "max_total_minor": 450000,
+      "max_quantity": 1,
+      "recurring_allowed": false,
+      "merchant_allowlist": [
+        "merchant-glasshouse-supply"
+      ],
+      "sku_allowlist": [
+        "glasshouse-propagation-tray"
+      ]
+    },
+    "semantic": [
+      {
+        "constraint_id": "purpose.1",
+        "kind": "purpose",
+        "constraint_family": "PURPOSE",
+        "text": "Declared purchase purpose: seedling propagation. Trusted evidence must establish suitability."
+      },
+      {
+        "constraint_id": "exclusion.1",
+        "kind": "exclusion",
+        "constraint_family": "RECURRENCE",
+        "text": "Excluded product characteristic: subscription."
+      }
+    ],
+    "issuer_attestation": {
+      "assurance": "DECLARED_ONLY",
+      "issuer_id": "resolve-evaluation-issuer"
+    }
+  },
+  "catalog": {
+    "snapshot_id": "RR20-15-WRONG-SKU-BINDING-catalog",
+    "merchant_id": "merchant-glasshouse-supply",
+    "currency": "INR",
+    "items": [
+      {
+        "sku": "glasshouse-propagation-tray",
+        "merchant_id": "merchant-glasshouse-supply",
+        "effective_unit_price_minor": 358000,
+        "recurring": false
+      }
+    ]
+  },
+  "transaction": {
+    "transaction_id": "RR20-15-WRONG-SKU-BINDING-txn",
+    "merchant_id": "merchant-glasshouse-supply",
+    "cart_currency": "INR",
+    "order_currency": "INR",
+    "cart_recurring": false,
+    "order_recurring": false,
+    "lines": [
+      {
+        "sku": "glasshouse-propagation-tray",
+        "effective_unit_price_minor": 358000,
+        "quantity": 1,
+        "line_total_minor": 358000,
+        "recurring": false
+      }
+    ]
+  },
+  "evidence_fixtures": [
+    {
+      "merchant_id": "merchant-glasshouse-supply",
+      "path": "fixtures/engineering/resolve_recovery/evidence/merchant-glasshouse-supply.json"
+    }
+  ],
+  "initial_evidence_ids": [
+    "glasshouse-terms-v1",
+    "glasshouse-listing-v1"
+  ],
+  "initial_evidence_gap": "The listing states no billing model, so the recurrence constraint is unverified.",
+  "recovery_sources": [
+    {
+      "source_id": "glasshouse-merchant-terms-v1",
+      "display_name": "Merchant Terms",
+      "manifest_id": "glasshouse-merchant-terms-v1:manifest:1",
+      "merchant_id": "merchant-glasshouse-supply",
+      "scope_type": "MERCHANT_GLOBAL",
+      "sku": null,
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE"
+      ],
+      "manifest_version": "1",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "glasshouse-terms-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.seedling-propagation",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "eeb814c34c919233c51acd1e62fdcda4ae7c896113ccd5be10f1b5bc42b8dea9"
+        }
+      ]
+    },
+    {
+      "source_id": "glasshouse-sku-terms-v2",
+      "display_name": "Merchant SKU Terms",
+      "manifest_id": "glasshouse-sku-terms-v2:manifest:2",
+      "merchant_id": "merchant-glasshouse-supply",
+      "scope_type": "SKU_SPECIFIC",
+      "sku": "glasshouse-propagation-tray",
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE",
+        "RECURRENCE_TERMS"
+      ],
+      "manifest_version": "2",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "glasshouse-listing-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.seedling-propagation",
+              "claim_value": "UNESTABLISHED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "fe891f0d917e3b307be357e47fd9417a9f3658c92ec8f04d1551a321a4ea593a"
+        },
+        {
+          "evidence_id": "glasshouse-tray-terms-v2",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.seedling-propagation",
+              "claim_value": "SUPPORTED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "ONE_TIME"
+            }
+          ],
+          "expected_entry_sha256": "b08bd2693bd4dc5211e357b20221fc29dfba30c4e92d182d8d66158388ba55d2"
+        }
+      ]
+    }
+  ],
+  "foreign_merchants": [],
+  "binding_probes": [],
+  "provider_fault": null,
+  "fixture_note": "glasshouse-tray-terms-v2 is deliberately served under glasshouse-humidity-dome while the tray manifest declares it."
+}

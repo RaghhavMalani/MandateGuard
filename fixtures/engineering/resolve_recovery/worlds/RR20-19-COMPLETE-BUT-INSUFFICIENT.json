@@ -1,0 +1,176 @@
+{
+  "schema": "RESOLVE_EVALUATION_WORLD_V1",
+  "case_id": "RR20-19-COMPLETE-BUT-INSUFFICIENT",
+  "case_family": "UNRESOLVED_FAILURE",
+  "merchant_id": "merchant-alder-instruments",
+  "sku": "alder-bench-multimeter",
+  "currency": "INR",
+  "amount_minor": 887000,
+  "independence_note": "This world was authored on its own: its merchant, SKU, catalogue entry, mandate, initial evidence, and source manifests are shared with no other case.",
+  "mandate": {
+    "mandate_id": "47a45c38-2a32-5035-8985-efdf63696011",
+    "nonce": "rr20_5e6f4ec75de2bddeb5b4455f",
+    "issued_at": "2026-09-01T00:00:00+00:00",
+    "expires_at": "2028-01-01T00:00:00+00:00",
+    "subject_ref": "resolve-eval-subject-19",
+    "currency": "INR",
+    "hard": {
+      "max_total_minor": 950000,
+      "max_quantity": 1,
+      "recurring_allowed": false,
+      "merchant_allowlist": [
+        "merchant-alder-instruments"
+      ],
+      "sku_allowlist": [
+        "alder-bench-multimeter"
+      ]
+    },
+    "semantic": [
+      {
+        "constraint_id": "purpose.1",
+        "kind": "purpose",
+        "constraint_family": "PURPOSE",
+        "text": "Declared purchase purpose: field calibration work. Trusted evidence must establish suitability."
+      },
+      {
+        "constraint_id": "exclusion.1",
+        "kind": "exclusion",
+        "constraint_family": "EXCLUSION",
+        "text": "Excluded product characteristic: conflict minerals."
+      }
+    ],
+    "issuer_attestation": {
+      "assurance": "DECLARED_ONLY",
+      "issuer_id": "resolve-evaluation-issuer"
+    }
+  },
+  "catalog": {
+    "snapshot_id": "RR20-19-COMPLETE-BUT-INSUFFICIENT-catalog",
+    "merchant_id": "merchant-alder-instruments",
+    "currency": "INR",
+    "items": [
+      {
+        "sku": "alder-bench-multimeter",
+        "merchant_id": "merchant-alder-instruments",
+        "effective_unit_price_minor": 887000,
+        "recurring": false
+      }
+    ]
+  },
+  "transaction": {
+    "transaction_id": "RR20-19-COMPLETE-BUT-INSUFFICIENT-txn",
+    "merchant_id": "merchant-alder-instruments",
+    "cart_currency": "INR",
+    "order_currency": "INR",
+    "cart_recurring": false,
+    "order_recurring": false,
+    "lines": [
+      {
+        "sku": "alder-bench-multimeter",
+        "effective_unit_price_minor": 887000,
+        "quantity": 1,
+        "line_total_minor": 887000,
+        "recurring": false
+      }
+    ]
+  },
+  "evidence_fixtures": [
+    {
+      "merchant_id": "merchant-alder-instruments",
+      "path": "fixtures/engineering/resolve_recovery/evidence/merchant-alder-instruments.json"
+    }
+  ],
+  "initial_evidence_ids": [
+    "alder-terms-v1",
+    "alder-listing-v1"
+  ],
+  "initial_evidence_gap": "The listing records no sourcing classification, so the excluded characteristic is unverified.",
+  "recovery_sources": [
+    {
+      "source_id": "alder-merchant-terms-v1",
+      "display_name": "Merchant Terms",
+      "manifest_id": "alder-merchant-terms-v1:manifest:1",
+      "merchant_id": "merchant-alder-instruments",
+      "scope_type": "MERCHANT_GLOBAL",
+      "sku": null,
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE"
+      ],
+      "manifest_version": "1",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "alder-terms-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.field-calibration-work",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "d3d9a7d71c78c900424ee1d7c9d68538367301422ce0b7ae2445a56c006536a6"
+        }
+      ]
+    },
+    {
+      "source_id": "alder-sku-terms-v2",
+      "display_name": "Merchant SKU Terms",
+      "manifest_id": "alder-sku-terms-v2:manifest:2",
+      "merchant_id": "merchant-alder-instruments",
+      "scope_type": "SKU_SPECIFIC",
+      "sku": "alder-bench-multimeter",
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE",
+        "EXCLUSION_EVIDENCE"
+      ],
+      "manifest_version": "2",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "alder-listing-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.field-calibration-work",
+              "claim_value": "UNESTABLISHED"
+            },
+            {
+              "claim_id": "content.conflict-minerals",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "abc71f64ab203216272fd5ed248b59984aefd36d84ad65c6a1ec755be10fd0da"
+        },
+        {
+          "evidence_id": "alder-terms-v2",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.field-calibration-work",
+              "claim_value": "SUPPORTED"
+            },
+            {
+              "claim_id": "content.conflict-minerals",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "2514cf2a257bb43c14355b7e0e2c3f8b4f98fc28d031784fb8dd56c0f4c19186"
+        }
+      ]
+    }
+  ],
+  "foreign_merchants": [],
+  "binding_probes": [],
+  "provider_fault": null,
+  "fixture_note": null
+}

@@ -1,0 +1,26 @@
+{
+  "merchant_id": "merchant-alder-instruments",
+  "entries": [
+    {
+      "evidence_id": "alder-terms-v1",
+      "merchant_id": "merchant-alder-instruments",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Alder Instruments registers one purpose statement for its catalogue and defers the sourcing classification of each item to that item's registered product record."
+    },
+    {
+      "evidence_id": "alder-listing-v1",
+      "merchant_id": "merchant-alder-instruments",
+      "sku": "alder-bench-multimeter",
+      "source_kind": "product_listing",
+      "text": "Alder Bench Multimeter: a four-and-a-half digit bench meter with shrouded terminals. The registered listing records neither a documented intended use nor a sourcing classification."
+    },
+    {
+      "evidence_id": "alder-terms-v2",
+      "merchant_id": "merchant-alder-instruments",
+      "sku": "alder-bench-multimeter",
+      "source_kind": "product_terms",
+      "text": "Registered product terms. Intended use: field calibration work on service benches. Sourcing classification: the responsible-sourcing audit for this meter has not been filed, so no registered classification exists for the restricted material question."
+    }
+  ]
+}

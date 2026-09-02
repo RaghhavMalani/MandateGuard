@@ -1,0 +1,26 @@
+{
+  "merchant_id": "merchant-pinehold-goods",
+  "entries": [
+    {
+      "evidence_id": "pinehold-terms-v1",
+      "merchant_id": "merchant-pinehold-goods",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Pinehold Goods registers one purpose statement for its catalogue and defers the billing model of each item to that item's registered product record."
+    },
+    {
+      "evidence_id": "pinehold-listing-v1",
+      "merchant_id": "merchant-pinehold-goods",
+      "sku": "pinehold-filter-kit",
+      "source_kind": "product_listing",
+      "text": "Pinehold Filter Kit: a replacement cartridge set for under-sink housings. The registered listing records neither a documented intended use nor an applicable billing model."
+    },
+    {
+      "evidence_id": "pinehold-terms-v2",
+      "merchant_id": "merchant-pinehold-goods",
+      "sku": "pinehold-filter-kit",
+      "source_kind": "product_terms",
+      "text": "Registered product terms. Intended use: household water filtration at the kitchen tap. Billing model: the registered terms record does not state an applicable billing model for this kit."
+    }
+  ]
+}

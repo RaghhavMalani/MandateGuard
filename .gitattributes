@@ -5,3 +5,5 @@ artifacts/engineering/int2/stage-b-live-20260830T123856Z-0e4213c/stage_b_observa
 Dockerfile text eol=lf
 .dockerignore text eol=lf
 render.yaml text eol=lf
+fixtures/engineering/resolve_recovery/**/*.json text eol=lf
+fixtures/engineering/resolve_recovery/*.json text eol=lf

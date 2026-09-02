@@ -1,0 +1,176 @@
+{
+  "schema": "RESOLVE_EVALUATION_WORLD_V1",
+  "case_id": "RR20-05-EXCLUSION-PRESENT",
+  "case_family": "EXCLUSION",
+  "merchant_id": "merchant-ashfield-labs",
+  "sku": "ashfield-focus-blend",
+  "currency": "INR",
+  "amount_minor": 149900,
+  "independence_note": "This world was authored on its own: its merchant, SKU, catalogue entry, mandate, initial evidence, and source manifests are shared with no other case.",
+  "mandate": {
+    "mandate_id": "93a1e581-46ff-5d91-a7f4-a1fd01d0fa67",
+    "nonce": "rr20_450495a80d80ef4c760cad4e",
+    "issued_at": "2026-09-01T00:00:00+00:00",
+    "expires_at": "2028-01-01T00:00:00+00:00",
+    "subject_ref": "resolve-eval-subject-05",
+    "currency": "INR",
+    "hard": {
+      "max_total_minor": 200000,
+      "max_quantity": 1,
+      "recurring_allowed": false,
+      "merchant_allowlist": [
+        "merchant-ashfield-labs"
+      ],
+      "sku_allowlist": [
+        "ashfield-focus-blend"
+      ]
+    },
+    "semantic": [
+      {
+        "constraint_id": "purpose.1",
+        "kind": "purpose",
+        "constraint_family": "PURPOSE",
+        "text": "Declared purchase purpose: daily focus support. Trusted evidence must establish suitability."
+      },
+      {
+        "constraint_id": "exclusion.1",
+        "kind": "exclusion",
+        "constraint_family": "EXCLUSION",
+        "text": "Excluded product characteristic: stimulant compounds."
+      }
+    ],
+    "issuer_attestation": {
+      "assurance": "DECLARED_ONLY",
+      "issuer_id": "resolve-evaluation-issuer"
+    }
+  },
+  "catalog": {
+    "snapshot_id": "RR20-05-EXCLUSION-PRESENT-catalog",
+    "merchant_id": "merchant-ashfield-labs",
+    "currency": "INR",
+    "items": [
+      {
+        "sku": "ashfield-focus-blend",
+        "merchant_id": "merchant-ashfield-labs",
+        "effective_unit_price_minor": 149900,
+        "recurring": false
+      }
+    ]
+  },
+  "transaction": {
+    "transaction_id": "RR20-05-EXCLUSION-PRESENT-txn",
+    "merchant_id": "merchant-ashfield-labs",
+    "cart_currency": "INR",
+    "order_currency": "INR",
+    "cart_recurring": false,
+    "order_recurring": false,
+    "lines": [
+      {
+        "sku": "ashfield-focus-blend",
+        "effective_unit_price_minor": 149900,
+        "quantity": 1,
+        "line_total_minor": 149900,
+        "recurring": false
+      }
+    ]
+  },
+  "evidence_fixtures": [
+    {
+      "merchant_id": "merchant-ashfield-labs",
+      "path": "fixtures/engineering/resolve_recovery/evidence/merchant-ashfield-labs.json"
+    }
+  ],
+  "initial_evidence_ids": [
+    "ashfield-terms-v1",
+    "ashfield-listing-v1"
+  ],
+  "initial_evidence_gap": "No registered record classifies the ingredients, so the excluded characteristic is unverified.",
+  "recovery_sources": [
+    {
+      "source_id": "ashfield-merchant-terms-v1",
+      "display_name": "Merchant Terms",
+      "manifest_id": "ashfield-merchant-terms-v1:manifest:1",
+      "merchant_id": "merchant-ashfield-labs",
+      "scope_type": "MERCHANT_GLOBAL",
+      "sku": null,
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE"
+      ],
+      "manifest_version": "1",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "ashfield-terms-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.daily-focus-support",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "1f65b57e834ee2c65ccff04ef16cb293f55641b5052f04ad410159cbacdd6bf1"
+        }
+      ]
+    },
+    {
+      "source_id": "ashfield-sku-terms-v2",
+      "display_name": "Merchant SKU Terms",
+      "manifest_id": "ashfield-sku-terms-v2:manifest:2",
+      "merchant_id": "merchant-ashfield-labs",
+      "scope_type": "SKU_SPECIFIC",
+      "sku": "ashfield-focus-blend",
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE",
+        "EXCLUSION_EVIDENCE"
+      ],
+      "manifest_version": "2",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "ashfield-listing-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.daily-focus-support",
+              "claim_value": "UNESTABLISHED"
+            },
+            {
+              "claim_id": "content.stimulant-compounds",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "ea0ceb854cd57b9c9e31fd438362d36163e340d2857361d441f52ef7afd6b10f"
+        },
+        {
+          "evidence_id": "ashfield-terms-v2",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.daily-focus-support",
+              "claim_value": "SUPPORTED"
+            },
+            {
+              "claim_id": "content.stimulant-compounds",
+              "claim_value": "PRESENT"
+            }
+          ],
+          "expected_entry_sha256": "10c131ecd49698f6af48a38a38d34a6f98ec41bd51bd065b7a44d57f120b9d35"
+        }
+      ]
+    }
+  ],
+  "foreign_merchants": [],
+  "binding_probes": [],
+  "provider_fault": null,
+  "fixture_note": null
+}

@@ -1,0 +1,245 @@
+{
+  "schema": "RESOLVE_EVALUATION_WORLD_V1",
+  "case_id": "RR20-13-EXPIRED-REPLACED",
+  "case_family": "CONFLICT_FRESHNESS",
+  "merchant_id": "merchant-fenwick-press",
+  "sku": "fenwick-atlas-edition",
+  "currency": "INR",
+  "amount_minor": 998000,
+  "independence_note": "This world was authored on its own: its merchant, SKU, catalogue entry, mandate, initial evidence, and source manifests are shared with no other case.",
+  "mandate": {
+    "mandate_id": "bd15a9f6-a145-5145-bb7f-6ed5b725f7ec",
+    "nonce": "rr20_ff816c8e433b27c3464a9746",
+    "issued_at": "2026-09-01T00:00:00+00:00",
+    "expires_at": "2028-01-01T00:00:00+00:00",
+    "subject_ref": "resolve-eval-subject-13",
+    "currency": "INR",
+    "hard": {
+      "max_total_minor": 1100000,
+      "max_quantity": 1,
+      "recurring_allowed": false,
+      "merchant_allowlist": [
+        "merchant-fenwick-press"
+      ],
+      "sku_allowlist": [
+        "fenwick-atlas-edition"
+      ]
+    },
+    "semantic": [
+      {
+        "constraint_id": "purpose.1",
+        "kind": "purpose",
+        "constraint_family": "PURPOSE",
+        "text": "Declared purchase purpose: reference cartography study. Trusted evidence must establish suitability."
+      },
+      {
+        "constraint_id": "exclusion.1",
+        "kind": "exclusion",
+        "constraint_family": "RECURRENCE",
+        "text": "Excluded product characteristic: subscription."
+      }
+    ],
+    "issuer_attestation": {
+      "assurance": "DECLARED_ONLY",
+      "issuer_id": "resolve-evaluation-issuer"
+    }
+  },
+  "catalog": {
+    "snapshot_id": "RR20-13-EXPIRED-REPLACED-catalog",
+    "merchant_id": "merchant-fenwick-press",
+    "currency": "INR",
+    "items": [
+      {
+        "sku": "fenwick-atlas-edition",
+        "merchant_id": "merchant-fenwick-press",
+        "effective_unit_price_minor": 998000,
+        "recurring": false
+      }
+    ]
+  },
+  "transaction": {
+    "transaction_id": "RR20-13-EXPIRED-REPLACED-txn",
+    "merchant_id": "merchant-fenwick-press",
+    "cart_currency": "INR",
+    "order_currency": "INR",
+    "cart_recurring": false,
+    "order_recurring": false,
+    "lines": [
+      {
+        "sku": "fenwick-atlas-edition",
+        "effective_unit_price_minor": 998000,
+        "quantity": 1,
+        "line_total_minor": 998000,
+        "recurring": false
+      }
+    ]
+  },
+  "evidence_fixtures": [
+    {
+      "merchant_id": "merchant-fenwick-press",
+      "path": "fixtures/engineering/resolve_recovery/evidence/merchant-fenwick-press.json"
+    }
+  ],
+  "initial_evidence_ids": [
+    "fenwick-terms-v1",
+    "fenwick-listing-v1"
+  ],
+  "initial_evidence_gap": "The listing states no billing model, so the recurrence constraint is unverified.",
+  "recovery_sources": [
+    {
+      "source_id": "fenwick-merchant-terms-v1",
+      "display_name": "Merchant Terms",
+      "manifest_id": "fenwick-merchant-terms-v1:manifest:1",
+      "merchant_id": "merchant-fenwick-press",
+      "scope_type": "MERCHANT_GLOBAL",
+      "sku": null,
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE"
+      ],
+      "manifest_version": "1",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "fenwick-terms-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.reference-cartography-study",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "025df110b2550fe61fcd7421ed3db3e951ab9f715de8807a8b56be693aebdf38"
+        }
+      ]
+    },
+    {
+      "source_id": "fenwick-sku-terms-v1",
+      "display_name": "Merchant SKU Terms",
+      "manifest_id": "fenwick-sku-terms-v1:manifest:1",
+      "merchant_id": "merchant-fenwick-press",
+      "scope_type": "SKU_SPECIFIC",
+      "sku": "fenwick-atlas-edition",
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE",
+        "RECURRENCE_TERMS"
+      ],
+      "manifest_version": "1",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": "2026-05-01T00:00:00+00:00",
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "fenwick-listing-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.reference-cartography-study",
+              "claim_value": "UNESTABLISHED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "12e0c6c186dd074bdec98400744bf0c794643637a263c4a4e64b144e399ecf81"
+        },
+        {
+          "evidence_id": "fenwick-terms-2025",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": "2026-05-01T00:00:00+00:00",
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.reference-cartography-study",
+              "claim_value": "UNESTABLISHED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "RECURRING"
+            }
+          ],
+          "expected_entry_sha256": "5ddd89b5c3db48824d8a0d0dcaaed9f3c3a06f80be6e4ab6a3bb6d06e1ad57ce"
+        }
+      ]
+    },
+    {
+      "source_id": "fenwick-sku-terms-v2",
+      "display_name": "Merchant SKU Terms",
+      "manifest_id": "fenwick-sku-terms-v2:manifest:2",
+      "merchant_id": "merchant-fenwick-press",
+      "scope_type": "SKU_SPECIFIC",
+      "sku": "fenwick-atlas-edition",
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE",
+        "RECURRENCE_TERMS"
+      ],
+      "manifest_version": "2",
+      "effective_at": "2026-05-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": "fenwick-sku-terms-v1:manifest:1",
+      "records": [
+        {
+          "evidence_id": "fenwick-listing-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.reference-cartography-study",
+              "claim_value": "UNESTABLISHED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "12e0c6c186dd074bdec98400744bf0c794643637a263c4a4e64b144e399ecf81"
+        },
+        {
+          "evidence_id": "fenwick-terms-2025",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": "2026-05-01T00:00:00+00:00",
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.reference-cartography-study",
+              "claim_value": "UNESTABLISHED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "RECURRING"
+            }
+          ],
+          "expected_entry_sha256": "5ddd89b5c3db48824d8a0d0dcaaed9f3c3a06f80be6e4ab6a3bb6d06e1ad57ce"
+        },
+        {
+          "evidence_id": "fenwick-terms-2026",
+          "effective_at": "2026-05-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.reference-cartography-study",
+              "claim_value": "SUPPORTED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "ONE_TIME"
+            }
+          ],
+          "expected_entry_sha256": "2c56c2d2b1e24e7af80f861895cb135b685822fb23e3e96bd9637d5ffb4d95dd"
+        }
+      ]
+    }
+  ],
+  "foreign_merchants": [],
+  "binding_probes": [],
+  "provider_fault": null,
+  "fixture_note": null
+}

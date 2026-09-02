@@ -1,0 +1,226 @@
+{
+  "schema": "RESOLVE_EVALUATION_WORLD_V1",
+  "case_id": "RR20-17-BUDGET-INSUFFICIENT",
+  "case_family": "BINDING_COMPLETENESS",
+  "merchant_id": "merchant-meridian-fitness",
+  "sku": "meridian-training-plan",
+  "currency": "INR",
+  "amount_minor": 1245000,
+  "independence_note": "This world was authored on its own: its merchant, SKU, catalogue entry, mandate, initial evidence, and source manifests are shared with no other case.",
+  "mandate": {
+    "mandate_id": "ce9a357a-f33a-53cf-ae67-27acd0418d36",
+    "nonce": "rr20_e67d346f283c3c0102b46c21",
+    "issued_at": "2026-09-01T00:00:00+00:00",
+    "expires_at": "2028-01-01T00:00:00+00:00",
+    "subject_ref": "resolve-eval-subject-17",
+    "currency": "INR",
+    "hard": {
+      "max_total_minor": 1400000,
+      "max_quantity": 1,
+      "recurring_allowed": false,
+      "merchant_allowlist": [
+        "merchant-meridian-fitness"
+      ],
+      "sku_allowlist": [
+        "meridian-training-plan"
+      ]
+    },
+    "semantic": [
+      {
+        "constraint_id": "purpose.1",
+        "kind": "purpose",
+        "constraint_family": "PURPOSE",
+        "text": "Declared purchase purpose: personal training guidance. Trusted evidence must establish suitability."
+      },
+      {
+        "constraint_id": "exclusion.1",
+        "kind": "exclusion",
+        "constraint_family": "RECURRENCE",
+        "text": "Excluded product characteristic: subscription."
+      }
+    ],
+    "issuer_attestation": {
+      "assurance": "DECLARED_ONLY",
+      "issuer_id": "resolve-evaluation-issuer"
+    }
+  },
+  "catalog": {
+    "snapshot_id": "RR20-17-BUDGET-INSUFFICIENT-catalog",
+    "merchant_id": "merchant-meridian-fitness",
+    "currency": "INR",
+    "items": [
+      {
+        "sku": "meridian-training-plan",
+        "merchant_id": "merchant-meridian-fitness",
+        "effective_unit_price_minor": 1245000,
+        "recurring": false
+      }
+    ]
+  },
+  "transaction": {
+    "transaction_id": "RR20-17-BUDGET-INSUFFICIENT-txn",
+    "merchant_id": "merchant-meridian-fitness",
+    "cart_currency": "INR",
+    "order_currency": "INR",
+    "cart_recurring": false,
+    "order_recurring": false,
+    "lines": [
+      {
+        "sku": "meridian-training-plan",
+        "effective_unit_price_minor": 1245000,
+        "quantity": 1,
+        "line_total_minor": 1245000,
+        "recurring": false
+      }
+    ]
+  },
+  "evidence_fixtures": [
+    {
+      "merchant_id": "merchant-meridian-fitness",
+      "path": "fixtures/engineering/resolve_recovery/evidence/merchant-meridian-fitness.json"
+    }
+  ],
+  "initial_evidence_ids": [
+    "meridian-terms-v1"
+  ],
+  "initial_evidence_gap": "Only the merchant terms were retrieved initially; they defer the billing model and state no intended use.",
+  "recovery_sources": [
+    {
+      "source_id": "meridian-merchant-terms-v1",
+      "display_name": "Merchant Terms",
+      "manifest_id": "meridian-merchant-terms-v1:manifest:1",
+      "merchant_id": "merchant-meridian-fitness",
+      "scope_type": "MERCHANT_GLOBAL",
+      "sku": null,
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE"
+      ],
+      "manifest_version": "1",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "meridian-terms-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.personal-training-guidance",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "fadf95666fccac04d8a4db51547f994f90918b56dc3dff2d0e0182c37555f5cc"
+        }
+      ]
+    },
+    {
+      "source_id": "meridian-sku-terms-v2",
+      "display_name": "Merchant SKU Terms",
+      "manifest_id": "meridian-sku-terms-v2:manifest:2",
+      "merchant_id": "merchant-meridian-fitness",
+      "scope_type": "SKU_SPECIFIC",
+      "sku": "meridian-training-plan",
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE",
+        "RECURRENCE_TERMS"
+      ],
+      "manifest_version": "2",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "meridian-terms-part-1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.personal-training-guidance",
+              "claim_value": "SUPPORTED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "a37f41a8250d2e213cb1c0af353ed9e8341175464fb6ea3ba0e296507b1999c7"
+        },
+        {
+          "evidence_id": "meridian-terms-part-2",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.personal-training-guidance",
+              "claim_value": "UNESTABLISHED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "32c42d319a880bea50143f2edfa62b838ce0930488641f9cbebb826242d25747"
+        },
+        {
+          "evidence_id": "meridian-terms-part-3",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.personal-training-guidance",
+              "claim_value": "UNESTABLISHED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "16b0caad5073deddd1621ccb7d0afb1877c3fabb09e502db27778c4a869b5a02"
+        },
+        {
+          "evidence_id": "meridian-terms-part-4",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.personal-training-guidance",
+              "claim_value": "UNESTABLISHED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "2d0eeda3f76b8db3eb66858dea608d88d42ecd9b431a2f797e0030d87bf7ae28"
+        },
+        {
+          "evidence_id": "meridian-terms-part-5",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.personal-training-guidance",
+              "claim_value": "UNESTABLISHED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "RECURRING"
+            }
+          ],
+          "expected_entry_sha256": "44c0a035071479434a543c4c3a60ee316b1e68aea364e3eb9d2aa9bd99c43b38"
+        }
+      ]
+    }
+  ],
+  "foreign_merchants": [],
+  "binding_probes": [],
+  "provider_fault": null,
+  "fixture_note": null
+}

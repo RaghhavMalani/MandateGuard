@@ -1,0 +1,181 @@
+{
+  "schema": "RESOLVE_EVALUATION_WORLD_V1",
+  "case_id": "RR20-20-PROVIDER-FAILURE",
+  "case_family": "UNRESOLVED_FAILURE",
+  "merchant_id": "merchant-brightwater-labs",
+  "sku": "brightwater-ph-meter",
+  "currency": "INR",
+  "amount_minor": 469500,
+  "independence_note": "This world was authored on its own: its merchant, SKU, catalogue entry, mandate, initial evidence, and source manifests are shared with no other case.",
+  "mandate": {
+    "mandate_id": "d2cf47a5-d5c1-5546-9e40-08885a57afa2",
+    "nonce": "rr20_abab21ccd33e5d8ed00cdced",
+    "issued_at": "2026-09-01T00:00:00+00:00",
+    "expires_at": "2028-01-01T00:00:00+00:00",
+    "subject_ref": "resolve-eval-subject-20",
+    "currency": "INR",
+    "hard": {
+      "max_total_minor": 550000,
+      "max_quantity": 1,
+      "recurring_allowed": false,
+      "merchant_allowlist": [
+        "merchant-brightwater-labs"
+      ],
+      "sku_allowlist": [
+        "brightwater-ph-meter"
+      ]
+    },
+    "semantic": [
+      {
+        "constraint_id": "purpose.1",
+        "kind": "purpose",
+        "constraint_family": "PURPOSE",
+        "text": "Declared purchase purpose: laboratory water testing. Trusted evidence must establish suitability."
+      },
+      {
+        "constraint_id": "exclusion.1",
+        "kind": "exclusion",
+        "constraint_family": "RECURRENCE",
+        "text": "Excluded product characteristic: subscription."
+      }
+    ],
+    "issuer_attestation": {
+      "assurance": "DECLARED_ONLY",
+      "issuer_id": "resolve-evaluation-issuer"
+    }
+  },
+  "catalog": {
+    "snapshot_id": "RR20-20-PROVIDER-FAILURE-catalog",
+    "merchant_id": "merchant-brightwater-labs",
+    "currency": "INR",
+    "items": [
+      {
+        "sku": "brightwater-ph-meter",
+        "merchant_id": "merchant-brightwater-labs",
+        "effective_unit_price_minor": 469500,
+        "recurring": false
+      }
+    ]
+  },
+  "transaction": {
+    "transaction_id": "RR20-20-PROVIDER-FAILURE-txn",
+    "merchant_id": "merchant-brightwater-labs",
+    "cart_currency": "INR",
+    "order_currency": "INR",
+    "cart_recurring": false,
+    "order_recurring": false,
+    "lines": [
+      {
+        "sku": "brightwater-ph-meter",
+        "effective_unit_price_minor": 469500,
+        "quantity": 1,
+        "line_total_minor": 469500,
+        "recurring": false
+      }
+    ]
+  },
+  "evidence_fixtures": [
+    {
+      "merchant_id": "merchant-brightwater-labs",
+      "path": "fixtures/engineering/resolve_recovery/evidence/merchant-brightwater-labs.json"
+    }
+  ],
+  "initial_evidence_ids": [
+    "brightwater-terms-v1",
+    "brightwater-listing-v1"
+  ],
+  "initial_evidence_gap": "The listing states no billing model, so the recurrence constraint is unverified.",
+  "recovery_sources": [
+    {
+      "source_id": "brightwater-merchant-terms-v1",
+      "display_name": "Merchant Terms",
+      "manifest_id": "brightwater-merchant-terms-v1:manifest:1",
+      "merchant_id": "merchant-brightwater-labs",
+      "scope_type": "MERCHANT_GLOBAL",
+      "sku": null,
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE"
+      ],
+      "manifest_version": "1",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "brightwater-terms-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.laboratory-water-testing",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "d7da74009b1240b40a2cd414251118d49f009126af49409613f7c9af6ac095a4"
+        }
+      ]
+    },
+    {
+      "source_id": "brightwater-sku-terms-v2",
+      "display_name": "Merchant SKU Terms",
+      "manifest_id": "brightwater-sku-terms-v2:manifest:2",
+      "merchant_id": "merchant-brightwater-labs",
+      "scope_type": "SKU_SPECIFIC",
+      "sku": "brightwater-ph-meter",
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE",
+        "RECURRENCE_TERMS"
+      ],
+      "manifest_version": "2",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "brightwater-listing-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.laboratory-water-testing",
+              "claim_value": "UNESTABLISHED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "60e30b5d3bb608b67e5f604c24740d89e2eccc007f0d87423ec38b5f034bfe41"
+        },
+        {
+          "evidence_id": "brightwater-terms-v2",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.laboratory-water-testing",
+              "claim_value": "SUPPORTED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "ONE_TIME"
+            }
+          ],
+          "expected_entry_sha256": "2c7e83afbc544ef74160434541d6b67f597aa7137eab90beddd74afe42fa03ac"
+        }
+      ]
+    }
+  ],
+  "foreign_merchants": [],
+  "binding_probes": [],
+  "provider_fault": {
+    "mode": "ALWAYS_UNAVAILABLE",
+    "merchant_id": "merchant-brightwater-labs",
+    "raises": "SemanticEvidenceSourceUnavailableError",
+    "rationale": "A preregistered deterministic trusted-evidence provider outage. The fixture is present and valid; the fault is injected at the provider boundary so the reserved round is still consumed."
+  },
+  "fixture_note": null
+}

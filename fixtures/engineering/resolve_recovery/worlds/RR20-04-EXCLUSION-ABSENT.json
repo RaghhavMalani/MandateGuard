@@ -1,0 +1,176 @@
+{
+  "schema": "RESOLVE_EVALUATION_WORLD_V1",
+  "case_id": "RR20-04-EXCLUSION-ABSENT",
+  "case_family": "EXCLUSION",
+  "merchant_id": "merchant-borealis-optics",
+  "sku": "borealis-reading-loupe",
+  "currency": "INR",
+  "amount_minor": 312000,
+  "independence_note": "This world was authored on its own: its merchant, SKU, catalogue entry, mandate, initial evidence, and source manifests are shared with no other case.",
+  "mandate": {
+    "mandate_id": "b36a589c-d463-56b0-946b-53e1b4e32a39",
+    "nonce": "rr20_d4b0e980503bd3ab9e9f7eac",
+    "issued_at": "2026-09-01T00:00:00+00:00",
+    "expires_at": "2028-01-01T00:00:00+00:00",
+    "subject_ref": "resolve-eval-subject-04",
+    "currency": "INR",
+    "hard": {
+      "max_total_minor": 400000,
+      "max_quantity": 1,
+      "recurring_allowed": false,
+      "merchant_allowlist": [
+        "merchant-borealis-optics"
+      ],
+      "sku_allowlist": [
+        "borealis-reading-loupe"
+      ]
+    },
+    "semantic": [
+      {
+        "constraint_id": "purpose.1",
+        "kind": "purpose",
+        "constraint_family": "PURPOSE",
+        "text": "Declared purchase purpose: close reading. Trusted evidence must establish suitability."
+      },
+      {
+        "constraint_id": "exclusion.1",
+        "kind": "exclusion",
+        "constraint_family": "EXCLUSION",
+        "text": "Excluded product characteristic: refurbished parts."
+      }
+    ],
+    "issuer_attestation": {
+      "assurance": "DECLARED_ONLY",
+      "issuer_id": "resolve-evaluation-issuer"
+    }
+  },
+  "catalog": {
+    "snapshot_id": "RR20-04-EXCLUSION-ABSENT-catalog",
+    "merchant_id": "merchant-borealis-optics",
+    "currency": "INR",
+    "items": [
+      {
+        "sku": "borealis-reading-loupe",
+        "merchant_id": "merchant-borealis-optics",
+        "effective_unit_price_minor": 312000,
+        "recurring": false
+      }
+    ]
+  },
+  "transaction": {
+    "transaction_id": "RR20-04-EXCLUSION-ABSENT-txn",
+    "merchant_id": "merchant-borealis-optics",
+    "cart_currency": "INR",
+    "order_currency": "INR",
+    "cart_recurring": false,
+    "order_recurring": false,
+    "lines": [
+      {
+        "sku": "borealis-reading-loupe",
+        "effective_unit_price_minor": 312000,
+        "quantity": 1,
+        "line_total_minor": 312000,
+        "recurring": false
+      }
+    ]
+  },
+  "evidence_fixtures": [
+    {
+      "merchant_id": "merchant-borealis-optics",
+      "path": "fixtures/engineering/resolve_recovery/evidence/merchant-borealis-optics.json"
+    }
+  ],
+  "initial_evidence_ids": [
+    "borealis-terms-v1",
+    "borealis-listing-v1"
+  ],
+  "initial_evidence_gap": "The listing records no component classification, so the excluded characteristic can be neither confirmed nor ruled out.",
+  "recovery_sources": [
+    {
+      "source_id": "borealis-merchant-terms-v1",
+      "display_name": "Merchant Terms",
+      "manifest_id": "borealis-merchant-terms-v1:manifest:1",
+      "merchant_id": "merchant-borealis-optics",
+      "scope_type": "MERCHANT_GLOBAL",
+      "sku": null,
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE"
+      ],
+      "manifest_version": "1",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "borealis-terms-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.close-reading",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "8cdab9f8f29e9eb41e6c70f8e0079a885034d622d886cb6f35c4b233e84d0a5a"
+        }
+      ]
+    },
+    {
+      "source_id": "borealis-sku-terms-v2",
+      "display_name": "Merchant SKU Terms",
+      "manifest_id": "borealis-sku-terms-v2:manifest:2",
+      "merchant_id": "merchant-borealis-optics",
+      "scope_type": "SKU_SPECIFIC",
+      "sku": "borealis-reading-loupe",
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE",
+        "EXCLUSION_EVIDENCE"
+      ],
+      "manifest_version": "2",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "borealis-listing-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.close-reading",
+              "claim_value": "UNESTABLISHED"
+            },
+            {
+              "claim_id": "content.refurbished-parts",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "f2ecfefd6755f412fb83c79fd0007d8dfcb4e9b78cf745aa7c3f9d8578808095"
+        },
+        {
+          "evidence_id": "borealis-terms-v2",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.close-reading",
+              "claim_value": "SUPPORTED"
+            },
+            {
+              "claim_id": "content.refurbished-parts",
+              "claim_value": "ABSENT"
+            }
+          ],
+          "expected_entry_sha256": "62484f01f3cb47f54644602486c7b28ce3dcc7df4eb4720a09357a146f78f10b"
+        }
+      ]
+    }
+  ],
+  "foreign_merchants": [],
+  "binding_probes": [],
+  "provider_fault": null,
+  "fixture_note": null
+}

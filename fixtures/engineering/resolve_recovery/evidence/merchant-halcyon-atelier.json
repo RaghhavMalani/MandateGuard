@@ -1,0 +1,26 @@
+{
+  "merchant_id": "merchant-halcyon-atelier",
+  "entries": [
+    {
+      "evidence_id": "halcyon-terms-v1",
+      "merchant_id": "merchant-halcyon-atelier",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Halcyon Atelier registers one purpose statement for its catalogue and defers the documented intended use of each item to that item's registered product record."
+    },
+    {
+      "evidence_id": "halcyon-listing-v1",
+      "merchant_id": "merchant-halcyon-atelier",
+      "sku": "halcyon-drafting-lamp",
+      "source_kind": "product_listing",
+      "text": "Halcyon Drafting Lamp: an articulated arm lamp with a weighted base and a warm output. The registered listing does not record a documented intended use for this lamp."
+    },
+    {
+      "evidence_id": "halcyon-terms-v2",
+      "merchant_id": "merchant-halcyon-atelier",
+      "sku": "halcyon-drafting-lamp",
+      "source_kind": "product_terms",
+      "text": "Registered product terms: the intended use of this lamp is focused drafting practice at a drawing board."
+    }
+  ]
+}

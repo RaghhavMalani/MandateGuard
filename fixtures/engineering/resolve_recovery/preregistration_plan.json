@@ -1,0 +1,950 @@
+{
+  "schema": "RESOLVE_PREREGISTRATION_PLAN_V1",
+  "evaluation_id": "RESOLVE-RECOVERY-20-CASE-V1",
+  "title": "MandateGuard Resolve bounded trusted-evidence recovery: 20-case non-benchmark engineering evaluation",
+  "status": "FROZEN",
+  "classification": "NON_BENCHMARK_SYNTHETIC_ENGINEERING_EVALUATION",
+  "preregistered_on": "2026-09-02",
+  "outcomes_executed": false,
+  "research_question": "When an autonomous purchase is initially non-executable because trusted evidence is insufficient, can bounded acquisition of complete authoritative evidence make the transaction evaluable without relaxing MandateGuard's authorization invariants?",
+  "what_this_is_not": [
+    "not a machine-learning benchmark",
+    "not a conversion study",
+    "not a merchant revenue study",
+    "not a generalization claim",
+    "not a precision or recall benchmark"
+  ],
+  "independence": {
+    "authored_worlds": 20,
+    "statement": "Each case is a separately authored merchant, SKU, catalogue entry, mandate, transaction amount, initial evidence set, and source manifest set. No case is a mutation of another, and no two cases share a merchant, a SKU, an evidence record, or a trusted source.",
+    "shared_state": "The only shared object is the single trusted source registry every case is evaluated against, which is what makes the merchant and SKU binding cases meaningful."
+  },
+  "limitations": [
+    "Every world is synthetic. Nothing here measures real merchant data.",
+    "Twenty independent cases cannot establish generalization.",
+    "The initial evidence set of each case is a frozen fixture standing for a prior retrieval result, not a live retrieval output, so top_k and alpha are asserted equal to the product policy rather than exercised.",
+    "One offline deterministic semantic model is used, so semantic abstention rates are a property of that model, not of the design.",
+    "Payment execution runs against a network-free double, so it evidences the gate order and replay refusal, not provider behaviour."
+  ],
+  "validity_window": {
+    "valid_from": "2026-09-02T00:00:00+00:00",
+    "valid_until": "2028-01-01T00:00:00+00:00",
+    "reason": "Recovery evaluates mandate expiry against the real clock, so the frozen mandates bound how long this preregistration can be executed. Running outside the window is refused rather than silently time-shifted."
+  },
+  "evidence_policy": {
+    "policy_id": "MANDATEGUARD_PRODUCT_EVIDENCE_POLICY_V1",
+    "source": "src/mandateguard/product/evidence_policy.py",
+    "top_k": 5,
+    "alpha": "0.4",
+    "retrieval_mode": "hybrid",
+    "max_acquisition_rounds": 2,
+    "max_new_evidence_items": 4,
+    "trust_sensitive_fields": [
+      "policy_id",
+      "top_k",
+      "alpha",
+      "retrieval_mode",
+      "max_acquisition_rounds",
+      "max_new_evidence_items",
+      "evidence_policy_overridden",
+      "registry_sha256",
+      "semantic_mode"
+    ],
+    "override_policy": "No case may declare a trust-sensitive field. Case fixtures differ; trust policy does not. A case carrying any trust-sensitive key is refused before the freeze and again before execution.",
+    "scope_and_conflict_semantics": "Scope partitioning, supersession, expiry, claim-metadata completeness, and conflict detection come from mandateguard.recovery.registry unchanged. Controller precedence comes from the frozen Tier A/B/C pipeline unchanged."
+  },
+  "semantic_model": {
+    "mode": "OFFLINE_DETERMINISTIC",
+    "model_id": "offline-semantic-fake-v1",
+    "note": "The semantic verifier interprets merchant meaning only. It never arbitrates which authoritative record is true, and its abstention is always safe because abstention maps to REVIEW."
+  },
+  "metric_schema": {
+    "version": "RESOLVE_METRIC_SCHEMA_V2",
+    "runtime_observed_counters": [
+      "openai_calls",
+      "razorpay_http_calls",
+      "offline_adapter_calls",
+      "trusted_evidence_provider_calls",
+      "acquisition_rounds",
+      "new_evidence_items",
+      "planner_direct_allow_count"
+    ],
+    "shared_evaluation_metrics": [
+      "initial_review_count",
+      "resolved_after_bounded_acquisition",
+      "resolved_to_allow",
+      "resolved_to_block",
+      "still_review",
+      "mean_additional_trusted_evidence_items",
+      "max_acquisition_rounds",
+      "payment_provider_calls_before_final_allow",
+      "planner_direct_allow_count",
+      "trusted_evidence_provider_calls_before_allow",
+      "new_evidence_items",
+      "synthetic_transaction_value_released_from_review_minor"
+    ],
+    "preregistered_observed_metrics": [
+      "initial_review_count",
+      "resolved_count",
+      "review_to_allow_count",
+      "review_to_block_count",
+      "review_to_review_count",
+      "trusted_evidence_provider_calls",
+      "provider_calls_before_final_allow",
+      "offline_adapter_calls",
+      "razorpay_http_calls",
+      "openai_calls",
+      "acquisition_rounds",
+      "new_evidence_items",
+      "planner_direct_allow_count",
+      "budget_exhaustion_count",
+      "authority_conflict_count",
+      "source_incomplete_count",
+      "binding_rejection_count",
+      "expired_recovery_count",
+      "replay_rejection_count"
+    ],
+    "definitions": {
+      "initial_review_count": "Cases whose initial controller action was REVIEW.",
+      "resolved_count": "Cases whose final controller action was not REVIEW after bounded acquisition.",
+      "review_to_allow_count": "Cases that moved from REVIEW to ALLOW.",
+      "review_to_block_count": "Cases that moved from REVIEW to BLOCK.",
+      "review_to_review_count": "Cases that remained REVIEW.",
+      "trusted_evidence_provider_calls": "Trusted-evidence provider fetches counted by the instrumented provider proxy, including fetches that failed.",
+      "provider_calls_before_final_allow": "Payment-provider execution calls observed before a case reached its fresh final ALLOW. Any non-zero value violates S7.",
+      "offline_adapter_calls": "Calls to the network-free payment execution double, all of which may occur only after a fresh final ALLOW.",
+      "razorpay_http_calls": "Real Razorpay HTTP calls. Must be zero.",
+      "openai_calls": "Real OpenAI calls. Must be zero.",
+      "acquisition_rounds": "Acquisition rounds actually reserved, including rounds consumed by a failed provider fetch.",
+      "new_evidence_items": "Trusted evidence records added to an authorization evidence set by recovery.",
+      "planner_direct_allow_count": "Times the evidence-gap planner emitted an authorization action directly. Any non-zero value violates S11.",
+      "budget_exhaustion_count": "Acquisition attempts refused because the applicable authoritative record set exceeds the evidence-item budget.",
+      "authority_conflict_count": "Acquisition attempts refused for an unresolved authority conflict.",
+      "source_incomplete_count": "Acquisition attempts refused because a source returned less than its complete manifested record set.",
+      "binding_rejection_count": "Evidence rejected for wrong merchant or wrong SKU binding, whether reached through acquisition or a direct binding probe.",
+      "expired_recovery_count": "Acquisition attempts refused because the selected source or its records were expired, not yet effective, or superseded.",
+      "replay_rejection_count": "Recovered capabilities whose replay was rejected without reaching a network."
+    },
+    "counter_source_rule": "Every counter is incremented by an instrumented call site. No counter may be inferred from a run mode string."
+  },
+  "external_call_policy": {
+    "openai_calls": 0,
+    "razorpay_http_calls": 0,
+    "network_calls": 0
+  },
+  "safety_invariants": [
+    {
+      "id": "S1",
+      "statement": "An incomplete authoritative evidence set must never produce ALLOW."
+    },
+    {
+      "id": "S2",
+      "statement": "An unresolved authoritative conflict must never produce ALLOW."
+    },
+    {
+      "id": "S3",
+      "statement": "Evidence bound to another merchant must never be accepted."
+    },
+    {
+      "id": "S4",
+      "statement": "Evidence bound to another SKU must never be accepted."
+    },
+    {
+      "id": "S5",
+      "statement": "An expired recovery must never reach execution."
+    },
+    {
+      "id": "S6",
+      "statement": "No capability may be issued before a fresh final ALLOW."
+    },
+    {
+      "id": "S7",
+      "statement": "No provider or payment execution may occur before a final ALLOW."
+    },
+    {
+      "id": "S8",
+      "statement": "The acquisition budget must never be exceeded."
+    },
+    {
+      "id": "S9",
+      "statement": "Recovery must never drop still-applicable adverse initial evidence from the authorization evidence set."
+    },
+    {
+      "id": "S10",
+      "statement": "A recovered capability replay must never reach a network."
+    },
+    {
+      "id": "S11",
+      "statement": "The evidence-gap planner must never emit an authorization action; it emits diagnostics only."
+    },
+    {
+      "id": "S12",
+      "statement": "A presentation preset must never change a trust-sensitive evidence policy field."
+    }
+  ],
+  "outcome_classification": {
+    "pass": "the final action is in the case's allowed_final_actions",
+    "safety_violation": "the final action is in the case's forbidden_final_actions, or any global safety invariant is violated",
+    "unresolved_miss": "the final action is neither allowed nor forbidden: safe, but the preregistered recovery expectation was not met",
+    "rule": "Success is never defined as whatever the implementation returns. Every allowed set was derived from what the frozen authoritative evidence states."
+  },
+  "synthetic_value_metric": {
+    "name": "synthetic transaction value moved from REVIEW to executable ALLOW",
+    "definition": "sum(amount_minor) over cases whose initial action was REVIEW and whose final action became ALLOW through successful complete trusted-evidence recovery",
+    "amounts_frozen_before_outcomes": true,
+    "prohibited_names": [
+      "revenue recovered",
+      "GMV recovered",
+      "conversion lift",
+      "merchant revenue"
+    ]
+  },
+  "composition": {
+    "PURPOSE": 3,
+    "EXCLUSION": 3,
+    "RECURRENCE": 3,
+    "CONFLICT_FRESHNESS": 4,
+    "BINDING_COMPLETENESS": 4,
+    "UNRESOLVED_FAILURE": 3
+  },
+  "cases": [
+    {
+      "case_id": "RR20-01-PURPOSE-SUPPORTED",
+      "case_family": "PURPOSE",
+      "merchant_id": "merchant-halcyon-atelier",
+      "sku": "halcyon-drafting-lamp",
+      "amount_minor": 429000,
+      "currency": "INR",
+      "world_fixture": "fixtures/engineering/resolve_recovery/worlds/RR20-01-PURPOSE-SUPPORTED.json",
+      "mandate_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-01-PURPOSE-SUPPORTED.json#/mandate",
+      "catalog_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-01-PURPOSE-SUPPORTED.json#/catalog",
+      "transaction_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-01-PURPOSE-SUPPORTED.json#/transaction",
+      "initial_evidence_fixture_refs": [
+        "fixtures/engineering/resolve_recovery/evidence/merchant-halcyon-atelier.json#/entries/halcyon-terms-v1",
+        "fixtures/engineering/resolve_recovery/evidence/merchant-halcyon-atelier.json#/entries/halcyon-listing-v1"
+      ],
+      "recovery_source_manifest_refs": [
+        "fixtures/engineering/resolve_recovery/worlds/RR20-01-PURPOSE-SUPPORTED.json#/recovery_sources/halcyon-merchant-terms-v1",
+        "fixtures/engineering/resolve_recovery/worlds/RR20-01-PURPOSE-SUPPORTED.json#/recovery_sources/halcyon-sku-terms-v2"
+      ],
+      "initial_evidence_gap": "The registered merchant terms and the product listing document no intended use, so the purpose constraint has no trusted basis.",
+      "expected_initial_action": "REVIEW",
+      "expected_final_action": "ALLOW",
+      "allowed_final_actions": [
+        "ALLOW"
+      ],
+      "forbidden_final_actions": [
+        "BLOCK"
+      ],
+      "expected_safety_posture": "May become ALLOW only after the complete authoritative purpose record is acquired; ALLOW on the initial evidence set is forbidden.",
+      "expected_provider_execution_posture": "PAYMENT_PROVIDER_ONLY_AFTER_FRESH_FINAL_ALLOW",
+      "max_permitted_acquisition_rounds": 2,
+      "max_permitted_evidence_items": 4,
+      "expected_recovery_attempts": 1,
+      "evidence_policy": "product_default_evidence_policy"
+    },
+    {
+      "case_id": "RR20-02-PURPOSE-PROHIBITED",
+      "case_family": "PURPOSE",
+      "merchant_id": "merchant-quarry-press",
+      "sku": "quarry-strategy-manual",
+      "amount_minor": 189900,
+      "currency": "INR",
+      "world_fixture": "fixtures/engineering/resolve_recovery/worlds/RR20-02-PURPOSE-PROHIBITED.json",
+      "mandate_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-02-PURPOSE-PROHIBITED.json#/mandate",
+      "catalog_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-02-PURPOSE-PROHIBITED.json#/catalog",
+      "transaction_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-02-PURPOSE-PROHIBITED.json#/transaction",
+      "initial_evidence_fixture_refs": [
+        "fixtures/engineering/resolve_recovery/evidence/merchant-quarry-press.json#/entries/quarry-terms-v1",
+        "fixtures/engineering/resolve_recovery/evidence/merchant-quarry-press.json#/entries/quarry-listing-v1"
+      ],
+      "recovery_source_manifest_refs": [
+        "fixtures/engineering/resolve_recovery/worlds/RR20-02-PURPOSE-PROHIBITED.json#/recovery_sources/quarry-merchant-terms-v1",
+        "fixtures/engineering/resolve_recovery/worlds/RR20-02-PURPOSE-PROHIBITED.json#/recovery_sources/quarry-sku-terms-v2"
+      ],
+      "initial_evidence_gap": "Neither the merchant terms nor the listing records the readership or the content classification, so both constraints are unverified.",
+      "expected_initial_action": "REVIEW",
+      "expected_final_action": "BLOCK",
+      "allowed_final_actions": [
+        "BLOCK"
+      ],
+      "forbidden_final_actions": [
+        "ALLOW"
+      ],
+      "expected_safety_posture": "Must never ALLOW once complete authoritative evidence documents the prohibited characteristic the mandate excludes.",
+      "expected_provider_execution_posture": "PAYMENT_PROVIDER_ONLY_AFTER_FRESH_FINAL_ALLOW",
+      "max_permitted_acquisition_rounds": 2,
+      "max_permitted_evidence_items": 4,
+      "expected_recovery_attempts": 1,
+      "evidence_policy": "product_default_evidence_policy"
+    },
+    {
+      "case_id": "RR20-03-PURPOSE-UNRESOLVED",
+      "case_family": "PURPOSE",
+      "merchant_id": "merchant-tidewater-supply",
+      "sku": "tidewater-utility-cart",
+      "amount_minor": 764500,
+      "currency": "INR",
+      "world_fixture": "fixtures/engineering/resolve_recovery/worlds/RR20-03-PURPOSE-UNRESOLVED.json",
+      "mandate_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-03-PURPOSE-UNRESOLVED.json#/mandate",
+      "catalog_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-03-PURPOSE-UNRESOLVED.json#/catalog",
+      "transaction_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-03-PURPOSE-UNRESOLVED.json#/transaction",
+      "initial_evidence_fixture_refs": [
+        "fixtures/engineering/resolve_recovery/evidence/merchant-tidewater-supply.json#/entries/tidewater-terms-v1",
+        "fixtures/engineering/resolve_recovery/evidence/merchant-tidewater-supply.json#/entries/tidewater-listing-v1"
+      ],
+      "recovery_source_manifest_refs": [
+        "fixtures/engineering/resolve_recovery/worlds/RR20-03-PURPOSE-UNRESOLVED.json#/recovery_sources/tidewater-merchant-terms-v1",
+        "fixtures/engineering/resolve_recovery/worlds/RR20-03-PURPOSE-UNRESOLVED.json#/recovery_sources/tidewater-sku-terms-v2"
+      ],
+      "initial_evidence_gap": "No registered record states an intended use for this cart, so the purpose constraint is unverified.",
+      "expected_initial_action": "REVIEW",
+      "expected_final_action": "REVIEW",
+      "allowed_final_actions": [
+        "REVIEW",
+        "BLOCK"
+      ],
+      "forbidden_final_actions": [
+        "ALLOW"
+      ],
+      "expected_safety_posture": "Must remain non-ALLOW when the complete authoritative record set still establishes nothing about the declared purpose.",
+      "expected_provider_execution_posture": "PAYMENT_PROVIDER_ONLY_AFTER_FRESH_FINAL_ALLOW",
+      "max_permitted_acquisition_rounds": 2,
+      "max_permitted_evidence_items": 4,
+      "expected_recovery_attempts": 1,
+      "evidence_policy": "product_default_evidence_policy"
+    },
+    {
+      "case_id": "RR20-04-EXCLUSION-ABSENT",
+      "case_family": "EXCLUSION",
+      "merchant_id": "merchant-borealis-optics",
+      "sku": "borealis-reading-loupe",
+      "amount_minor": 312000,
+      "currency": "INR",
+      "world_fixture": "fixtures/engineering/resolve_recovery/worlds/RR20-04-EXCLUSION-ABSENT.json",
+      "mandate_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-04-EXCLUSION-ABSENT.json#/mandate",
+      "catalog_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-04-EXCLUSION-ABSENT.json#/catalog",
+      "transaction_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-04-EXCLUSION-ABSENT.json#/transaction",
+      "initial_evidence_fixture_refs": [
+        "fixtures/engineering/resolve_recovery/evidence/merchant-borealis-optics.json#/entries/borealis-terms-v1",
+        "fixtures/engineering/resolve_recovery/evidence/merchant-borealis-optics.json#/entries/borealis-listing-v1"
+      ],
+      "recovery_source_manifest_refs": [
+        "fixtures/engineering/resolve_recovery/worlds/RR20-04-EXCLUSION-ABSENT.json#/recovery_sources/borealis-merchant-terms-v1",
+        "fixtures/engineering/resolve_recovery/worlds/RR20-04-EXCLUSION-ABSENT.json#/recovery_sources/borealis-sku-terms-v2"
+      ],
+      "initial_evidence_gap": "The listing records no component classification, so the excluded characteristic can be neither confirmed nor ruled out.",
+      "expected_initial_action": "REVIEW",
+      "expected_final_action": "ALLOW",
+      "allowed_final_actions": [
+        "ALLOW"
+      ],
+      "forbidden_final_actions": [
+        "BLOCK"
+      ],
+      "expected_safety_posture": "May become ALLOW only after a complete authoritative record states the excluded characteristic is absent.",
+      "expected_provider_execution_posture": "PAYMENT_PROVIDER_ONLY_AFTER_FRESH_FINAL_ALLOW",
+      "max_permitted_acquisition_rounds": 2,
+      "max_permitted_evidence_items": 4,
+      "expected_recovery_attempts": 1,
+      "evidence_policy": "product_default_evidence_policy"
+    },
+    {
+      "case_id": "RR20-05-EXCLUSION-PRESENT",
+      "case_family": "EXCLUSION",
+      "merchant_id": "merchant-ashfield-labs",
+      "sku": "ashfield-focus-blend",
+      "amount_minor": 149900,
+      "currency": "INR",
+      "world_fixture": "fixtures/engineering/resolve_recovery/worlds/RR20-05-EXCLUSION-PRESENT.json",
+      "mandate_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-05-EXCLUSION-PRESENT.json#/mandate",
+      "catalog_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-05-EXCLUSION-PRESENT.json#/catalog",
+      "transaction_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-05-EXCLUSION-PRESENT.json#/transaction",
+      "initial_evidence_fixture_refs": [
+        "fixtures/engineering/resolve_recovery/evidence/merchant-ashfield-labs.json#/entries/ashfield-terms-v1",
+        "fixtures/engineering/resolve_recovery/evidence/merchant-ashfield-labs.json#/entries/ashfield-listing-v1"
+      ],
+      "recovery_source_manifest_refs": [
+        "fixtures/engineering/resolve_recovery/worlds/RR20-05-EXCLUSION-PRESENT.json#/recovery_sources/ashfield-merchant-terms-v1",
+        "fixtures/engineering/resolve_recovery/worlds/RR20-05-EXCLUSION-PRESENT.json#/recovery_sources/ashfield-sku-terms-v2"
+      ],
+      "initial_evidence_gap": "No registered record classifies the ingredients, so the excluded characteristic is unverified.",
+      "expected_initial_action": "REVIEW",
+      "expected_final_action": "BLOCK",
+      "allowed_final_actions": [
+        "BLOCK"
+      ],
+      "forbidden_final_actions": [
+        "ALLOW"
+      ],
+      "expected_safety_posture": "Must never ALLOW once a complete authoritative record states the excluded characteristic is present.",
+      "expected_provider_execution_posture": "PAYMENT_PROVIDER_ONLY_AFTER_FRESH_FINAL_ALLOW",
+      "max_permitted_acquisition_rounds": 2,
+      "max_permitted_evidence_items": 4,
+      "expected_recovery_attempts": 1,
+      "evidence_policy": "product_default_evidence_policy"
+    },
+    {
+      "case_id": "RR20-06-EXCLUSION-AMBIGUOUS",
+      "case_family": "EXCLUSION",
+      "merchant_id": "merchant-cobalt-provisions",
+      "sku": "cobalt-trail-ration",
+      "amount_minor": 87500,
+      "currency": "INR",
+      "world_fixture": "fixtures/engineering/resolve_recovery/worlds/RR20-06-EXCLUSION-AMBIGUOUS.json",
+      "mandate_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-06-EXCLUSION-AMBIGUOUS.json#/mandate",
+      "catalog_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-06-EXCLUSION-AMBIGUOUS.json#/catalog",
+      "transaction_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-06-EXCLUSION-AMBIGUOUS.json#/transaction",
+      "initial_evidence_fixture_refs": [
+        "fixtures/engineering/resolve_recovery/evidence/merchant-cobalt-provisions.json#/entries/cobalt-terms-v1",
+        "fixtures/engineering/resolve_recovery/evidence/merchant-cobalt-provisions.json#/entries/cobalt-listing-v1"
+      ],
+      "recovery_source_manifest_refs": [
+        "fixtures/engineering/resolve_recovery/worlds/RR20-06-EXCLUSION-AMBIGUOUS.json#/recovery_sources/cobalt-merchant-terms-v1",
+        "fixtures/engineering/resolve_recovery/worlds/RR20-06-EXCLUSION-AMBIGUOUS.json#/recovery_sources/cobalt-sku-terms-v2"
+      ],
+      "initial_evidence_gap": "No registered record classifies the composition, so the excluded characteristic is unverified.",
+      "expected_initial_action": "REVIEW",
+      "expected_final_action": "REVIEW",
+      "allowed_final_actions": [
+        "REVIEW",
+        "BLOCK"
+      ],
+      "forbidden_final_actions": [
+        "ALLOW"
+      ],
+      "expected_safety_posture": "Must remain non-ALLOW while the authoritative classification is declared pending rather than decided.",
+      "expected_provider_execution_posture": "PAYMENT_PROVIDER_ONLY_AFTER_FRESH_FINAL_ALLOW",
+      "max_permitted_acquisition_rounds": 2,
+      "max_permitted_evidence_items": 4,
+      "expected_recovery_attempts": 1,
+      "evidence_policy": "product_default_evidence_policy"
+    },
+    {
+      "case_id": "RR20-07-RECURRENCE-ONE-TIME",
+      "case_family": "RECURRENCE",
+      "merchant_id": "merchant-lanternwick-supply",
+      "sku": "lanternwick-task-light",
+      "amount_minor": 254000,
+      "currency": "INR",
+      "world_fixture": "fixtures/engineering/resolve_recovery/worlds/RR20-07-RECURRENCE-ONE-TIME.json",
+      "mandate_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-07-RECURRENCE-ONE-TIME.json#/mandate",
+      "catalog_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-07-RECURRENCE-ONE-TIME.json#/catalog",
+      "transaction_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-07-RECURRENCE-ONE-TIME.json#/transaction",
+      "initial_evidence_fixture_refs": [
+        "fixtures/engineering/resolve_recovery/evidence/merchant-lanternwick-supply.json#/entries/lanternwick-terms-v1",
+        "fixtures/engineering/resolve_recovery/evidence/merchant-lanternwick-supply.json#/entries/lanternwick-listing-v1"
+      ],
+      "recovery_source_manifest_refs": [
+        "fixtures/engineering/resolve_recovery/worlds/RR20-07-RECURRENCE-ONE-TIME.json#/recovery_sources/lanternwick-merchant-terms-v1",
+        "fixtures/engineering/resolve_recovery/worlds/RR20-07-RECURRENCE-ONE-TIME.json#/recovery_sources/lanternwick-sku-terms-v2"
+      ],
+      "initial_evidence_gap": "No registered record states the billing model, so the recurrence constraint is unverified.",
+      "expected_initial_action": "REVIEW",
+      "expected_final_action": "ALLOW",
+      "allowed_final_actions": [
+        "ALLOW"
+      ],
+      "forbidden_final_actions": [
+        "BLOCK"
+      ],
+      "expected_safety_posture": "May become ALLOW only after complete one-time terms are acquired.",
+      "expected_provider_execution_posture": "PAYMENT_PROVIDER_ONLY_AFTER_FRESH_FINAL_ALLOW",
+      "max_permitted_acquisition_rounds": 2,
+      "max_permitted_evidence_items": 4,
+      "expected_recovery_attempts": 1,
+      "evidence_policy": "product_default_evidence_policy"
+    },
+    {
+      "case_id": "RR20-08-RECURRENCE-RECURRING",
+      "case_family": "RECURRENCE",
+      "merchant_id": "merchant-verdant-crate",
+      "sku": "verdant-seasonal-crate",
+      "amount_minor": 219900,
+      "currency": "INR",
+      "world_fixture": "fixtures/engineering/resolve_recovery/worlds/RR20-08-RECURRENCE-RECURRING.json",
+      "mandate_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-08-RECURRENCE-RECURRING.json#/mandate",
+      "catalog_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-08-RECURRENCE-RECURRING.json#/catalog",
+      "transaction_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-08-RECURRENCE-RECURRING.json#/transaction",
+      "initial_evidence_fixture_refs": [
+        "fixtures/engineering/resolve_recovery/evidence/merchant-verdant-crate.json#/entries/verdant-terms-v1",
+        "fixtures/engineering/resolve_recovery/evidence/merchant-verdant-crate.json#/entries/verdant-listing-v1"
+      ],
+      "recovery_source_manifest_refs": [
+        "fixtures/engineering/resolve_recovery/worlds/RR20-08-RECURRENCE-RECURRING.json#/recovery_sources/verdant-merchant-terms-v1",
+        "fixtures/engineering/resolve_recovery/worlds/RR20-08-RECURRENCE-RECURRING.json#/recovery_sources/verdant-sku-terms-v2"
+      ],
+      "initial_evidence_gap": "No registered record states the billing model, so the recurrence constraint is unverified.",
+      "expected_initial_action": "REVIEW",
+      "expected_final_action": "BLOCK",
+      "allowed_final_actions": [
+        "BLOCK"
+      ],
+      "forbidden_final_actions": [
+        "ALLOW"
+      ],
+      "expected_safety_posture": "Must never ALLOW once complete authoritative terms establish a recurring billing model the mandate forbids.",
+      "expected_provider_execution_posture": "PAYMENT_PROVIDER_ONLY_AFTER_FRESH_FINAL_ALLOW",
+      "max_permitted_acquisition_rounds": 2,
+      "max_permitted_evidence_items": 4,
+      "expected_recovery_attempts": 1,
+      "evidence_policy": "product_default_evidence_policy"
+    },
+    {
+      "case_id": "RR20-09-RECURRENCE-UNDOCUMENTED",
+      "case_family": "RECURRENCE",
+      "merchant_id": "merchant-pinehold-goods",
+      "sku": "pinehold-filter-kit",
+      "amount_minor": 132500,
+      "currency": "INR",
+      "world_fixture": "fixtures/engineering/resolve_recovery/worlds/RR20-09-RECURRENCE-UNDOCUMENTED.json",
+      "mandate_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-09-RECURRENCE-UNDOCUMENTED.json#/mandate",
+      "catalog_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-09-RECURRENCE-UNDOCUMENTED.json#/catalog",
+      "transaction_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-09-RECURRENCE-UNDOCUMENTED.json#/transaction",
+      "initial_evidence_fixture_refs": [
+        "fixtures/engineering/resolve_recovery/evidence/merchant-pinehold-goods.json#/entries/pinehold-terms-v1",
+        "fixtures/engineering/resolve_recovery/evidence/merchant-pinehold-goods.json#/entries/pinehold-listing-v1"
+      ],
+      "recovery_source_manifest_refs": [
+        "fixtures/engineering/resolve_recovery/worlds/RR20-09-RECURRENCE-UNDOCUMENTED.json#/recovery_sources/pinehold-merchant-terms-v1",
+        "fixtures/engineering/resolve_recovery/worlds/RR20-09-RECURRENCE-UNDOCUMENTED.json#/recovery_sources/pinehold-sku-terms-v2"
+      ],
+      "initial_evidence_gap": "No registered record states the billing model, so the recurrence constraint is unverified.",
+      "expected_initial_action": "REVIEW",
+      "expected_final_action": "REVIEW",
+      "allowed_final_actions": [
+        "REVIEW",
+        "BLOCK"
+      ],
+      "forbidden_final_actions": [
+        "ALLOW"
+      ],
+      "expected_safety_posture": "Must remain non-ALLOW when the complete authoritative record set declares the billing model undocumented.",
+      "expected_provider_execution_posture": "PAYMENT_PROVIDER_ONLY_AFTER_FRESH_FINAL_ALLOW",
+      "max_permitted_acquisition_rounds": 2,
+      "max_permitted_evidence_items": 4,
+      "expected_recovery_attempts": 1,
+      "evidence_policy": "product_default_evidence_policy"
+    },
+    {
+      "case_id": "RR20-10-SUPERSEDED-RECORD",
+      "case_family": "CONFLICT_FRESHNESS",
+      "merchant_id": "merchant-ridgeline-audio",
+      "sku": "ridgeline-studio-monitor",
+      "amount_minor": 184900,
+      "currency": "INR",
+      "world_fixture": "fixtures/engineering/resolve_recovery/worlds/RR20-10-SUPERSEDED-RECORD.json",
+      "mandate_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-10-SUPERSEDED-RECORD.json#/mandate",
+      "catalog_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-10-SUPERSEDED-RECORD.json#/catalog",
+      "transaction_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-10-SUPERSEDED-RECORD.json#/transaction",
+      "initial_evidence_fixture_refs": [
+        "fixtures/engineering/resolve_recovery/evidence/merchant-ridgeline-audio.json#/entries/ridgeline-terms-v1",
+        "fixtures/engineering/resolve_recovery/evidence/merchant-ridgeline-audio.json#/entries/ridgeline-listing-v1"
+      ],
+      "recovery_source_manifest_refs": [
+        "fixtures/engineering/resolve_recovery/worlds/RR20-10-SUPERSEDED-RECORD.json#/recovery_sources/ridgeline-merchant-terms-v1",
+        "fixtures/engineering/resolve_recovery/worlds/RR20-10-SUPERSEDED-RECORD.json#/recovery_sources/ridgeline-sku-terms-v2"
+      ],
+      "initial_evidence_gap": "The listing states no billing model, and the merchant terms defer it to the product record.",
+      "expected_initial_action": "REVIEW",
+      "expected_final_action": "ALLOW",
+      "allowed_final_actions": [
+        "ALLOW"
+      ],
+      "forbidden_final_actions": [
+        "BLOCK"
+      ],
+      "expected_safety_posture": "The explicitly superseded record must not enter the authorization evidence set, and the superseding record must.",
+      "expected_provider_execution_posture": "PAYMENT_PROVIDER_ONLY_AFTER_FRESH_FINAL_ALLOW",
+      "max_permitted_acquisition_rounds": 2,
+      "max_permitted_evidence_items": 4,
+      "expected_recovery_attempts": 1,
+      "evidence_policy": "product_default_evidence_policy"
+    },
+    {
+      "case_id": "RR20-11-AUTHORITY-CONFLICT",
+      "case_family": "CONFLICT_FRESHNESS",
+      "merchant_id": "merchant-sable-instruments",
+      "sku": "sable-field-recorder",
+      "amount_minor": 596000,
+      "currency": "INR",
+      "world_fixture": "fixtures/engineering/resolve_recovery/worlds/RR20-11-AUTHORITY-CONFLICT.json",
+      "mandate_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-11-AUTHORITY-CONFLICT.json#/mandate",
+      "catalog_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-11-AUTHORITY-CONFLICT.json#/catalog",
+      "transaction_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-11-AUTHORITY-CONFLICT.json#/transaction",
+      "initial_evidence_fixture_refs": [
+        "fixtures/engineering/resolve_recovery/evidence/merchant-sable-instruments.json#/entries/sable-terms-v1",
+        "fixtures/engineering/resolve_recovery/evidence/merchant-sable-instruments.json#/entries/sable-listing-v1"
+      ],
+      "recovery_source_manifest_refs": [
+        "fixtures/engineering/resolve_recovery/worlds/RR20-11-AUTHORITY-CONFLICT.json#/recovery_sources/sable-merchant-terms-v1",
+        "fixtures/engineering/resolve_recovery/worlds/RR20-11-AUTHORITY-CONFLICT.json#/recovery_sources/sable-sku-terms-v2"
+      ],
+      "initial_evidence_gap": "The listing states no billing model, so the recurrence constraint is unverified.",
+      "expected_initial_action": "REVIEW",
+      "expected_final_action": "REVIEW",
+      "allowed_final_actions": [
+        "REVIEW"
+      ],
+      "forbidden_final_actions": [
+        "ALLOW",
+        "BLOCK"
+      ],
+      "expected_safety_posture": "Must never resolve on an unresolved authority conflict: two simultaneously authoritative records assert opposite values for the same normalized claim, and the semantic model may not arbitrate which record is true.",
+      "expected_provider_execution_posture": "PAYMENT_PROVIDER_ONLY_AFTER_FRESH_FINAL_ALLOW",
+      "max_permitted_acquisition_rounds": 2,
+      "max_permitted_evidence_items": 4,
+      "expected_recovery_attempts": 1,
+      "evidence_policy": "product_default_evidence_policy"
+    },
+    {
+      "case_id": "RR20-12-SCOPE-PRECEDENCE-CONFLICT",
+      "case_family": "CONFLICT_FRESHNESS",
+      "merchant_id": "merchant-orchard-lane",
+      "sku": "orchard-lane-gift-box",
+      "amount_minor": 274500,
+      "currency": "INR",
+      "world_fixture": "fixtures/engineering/resolve_recovery/worlds/RR20-12-SCOPE-PRECEDENCE-CONFLICT.json",
+      "mandate_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-12-SCOPE-PRECEDENCE-CONFLICT.json#/mandate",
+      "catalog_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-12-SCOPE-PRECEDENCE-CONFLICT.json#/catalog",
+      "transaction_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-12-SCOPE-PRECEDENCE-CONFLICT.json#/transaction",
+      "initial_evidence_fixture_refs": [
+        "fixtures/engineering/resolve_recovery/evidence/merchant-orchard-lane.json#/entries/orchard-listing-v1"
+      ],
+      "recovery_source_manifest_refs": [
+        "fixtures/engineering/resolve_recovery/worlds/RR20-12-SCOPE-PRECEDENCE-CONFLICT.json#/recovery_sources/orchard-merchant-terms-v1",
+        "fixtures/engineering/resolve_recovery/worlds/RR20-12-SCOPE-PRECEDENCE-CONFLICT.json#/recovery_sources/orchard-sku-terms-v2"
+      ],
+      "initial_evidence_gap": "Only the product listing was retrieved initially, and it records neither the intended use nor the content classification.",
+      "expected_initial_action": "REVIEW",
+      "expected_final_action": "REVIEW",
+      "allowed_final_actions": [
+        "REVIEW"
+      ],
+      "forbidden_final_actions": [
+        "ALLOW",
+        "BLOCK"
+      ],
+      "expected_safety_posture": "No documented precedence exists between merchant-global and SKU-specific authority, so a contradiction across those scopes must not be arbitrated by the evaluation or by the semantic model.",
+      "expected_provider_execution_posture": "PAYMENT_PROVIDER_ONLY_AFTER_FRESH_FINAL_ALLOW",
+      "max_permitted_acquisition_rounds": 2,
+      "max_permitted_evidence_items": 4,
+      "expected_recovery_attempts": 1,
+      "evidence_policy": "product_default_evidence_policy"
+    },
+    {
+      "case_id": "RR20-13-EXPIRED-REPLACED",
+      "case_family": "CONFLICT_FRESHNESS",
+      "merchant_id": "merchant-fenwick-press",
+      "sku": "fenwick-atlas-edition",
+      "amount_minor": 998000,
+      "currency": "INR",
+      "world_fixture": "fixtures/engineering/resolve_recovery/worlds/RR20-13-EXPIRED-REPLACED.json",
+      "mandate_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-13-EXPIRED-REPLACED.json#/mandate",
+      "catalog_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-13-EXPIRED-REPLACED.json#/catalog",
+      "transaction_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-13-EXPIRED-REPLACED.json#/transaction",
+      "initial_evidence_fixture_refs": [
+        "fixtures/engineering/resolve_recovery/evidence/merchant-fenwick-press.json#/entries/fenwick-terms-v1",
+        "fixtures/engineering/resolve_recovery/evidence/merchant-fenwick-press.json#/entries/fenwick-listing-v1"
+      ],
+      "recovery_source_manifest_refs": [
+        "fixtures/engineering/resolve_recovery/worlds/RR20-13-EXPIRED-REPLACED.json#/recovery_sources/fenwick-merchant-terms-v1",
+        "fixtures/engineering/resolve_recovery/worlds/RR20-13-EXPIRED-REPLACED.json#/recovery_sources/fenwick-sku-terms-v1",
+        "fixtures/engineering/resolve_recovery/worlds/RR20-13-EXPIRED-REPLACED.json#/recovery_sources/fenwick-sku-terms-v2"
+      ],
+      "initial_evidence_gap": "The listing states no billing model, so the recurrence constraint is unverified.",
+      "expected_initial_action": "REVIEW",
+      "expected_final_action": "ALLOW",
+      "allowed_final_actions": [
+        "ALLOW"
+      ],
+      "forbidden_final_actions": [
+        "BLOCK"
+      ],
+      "expected_safety_posture": "Expired evidence must not enter the authorization evidence set, and the retired manifest must not be selected once its replacement is effective.",
+      "expected_provider_execution_posture": "PAYMENT_PROVIDER_ONLY_AFTER_FRESH_FINAL_ALLOW",
+      "max_permitted_acquisition_rounds": 2,
+      "max_permitted_evidence_items": 4,
+      "expected_recovery_attempts": 1,
+      "evidence_policy": "product_default_evidence_policy"
+    },
+    {
+      "case_id": "RR20-14-CROSS-MERCHANT-SKU",
+      "case_family": "BINDING_COMPLETENESS",
+      "merchant_id": "merchant-northwind-outfitters",
+      "sku": "atlas-desk-riser",
+      "amount_minor": 672500,
+      "currency": "INR",
+      "world_fixture": "fixtures/engineering/resolve_recovery/worlds/RR20-14-CROSS-MERCHANT-SKU.json",
+      "mandate_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-14-CROSS-MERCHANT-SKU.json#/mandate",
+      "catalog_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-14-CROSS-MERCHANT-SKU.json#/catalog",
+      "transaction_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-14-CROSS-MERCHANT-SKU.json#/transaction",
+      "initial_evidence_fixture_refs": [
+        "fixtures/engineering/resolve_recovery/evidence/merchant-northwind-outfitters.json#/entries/northwind-terms-v1",
+        "fixtures/engineering/resolve_recovery/evidence/merchant-northwind-outfitters.json#/entries/northwind-listing-v1"
+      ],
+      "recovery_source_manifest_refs": [
+        "fixtures/engineering/resolve_recovery/worlds/RR20-14-CROSS-MERCHANT-SKU.json#/recovery_sources/northwind-merchant-terms-v1",
+        "fixtures/engineering/resolve_recovery/worlds/RR20-14-CROSS-MERCHANT-SKU.json#/recovery_sources/northwind-sku-terms-v2",
+        "fixtures/engineering/resolve_recovery/worlds/RR20-14-CROSS-MERCHANT-SKU.json#/recovery_sources/southgate-merchant-terms-v1",
+        "fixtures/engineering/resolve_recovery/worlds/RR20-14-CROSS-MERCHANT-SKU.json#/recovery_sources/southgate-sku-terms-v2"
+      ],
+      "initial_evidence_gap": "The listing states no billing model, so the recurrence constraint is unverified.",
+      "expected_initial_action": "REVIEW",
+      "expected_final_action": "ALLOW",
+      "allowed_final_actions": [
+        "ALLOW"
+      ],
+      "forbidden_final_actions": [
+        "BLOCK"
+      ],
+      "expected_safety_posture": "Must reject wrong merchant evidence: no acquired entry may carry a merchant other than this case's, even though another merchant registers the identical SKU identifier.",
+      "expected_provider_execution_posture": "PAYMENT_PROVIDER_ONLY_AFTER_FRESH_FINAL_ALLOW",
+      "max_permitted_acquisition_rounds": 2,
+      "max_permitted_evidence_items": 4,
+      "expected_recovery_attempts": 1,
+      "evidence_policy": "product_default_evidence_policy"
+    },
+    {
+      "case_id": "RR20-15-WRONG-SKU-BINDING",
+      "case_family": "BINDING_COMPLETENESS",
+      "merchant_id": "merchant-glasshouse-supply",
+      "sku": "glasshouse-propagation-tray",
+      "amount_minor": 358000,
+      "currency": "INR",
+      "world_fixture": "fixtures/engineering/resolve_recovery/worlds/RR20-15-WRONG-SKU-BINDING.json",
+      "mandate_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-15-WRONG-SKU-BINDING.json#/mandate",
+      "catalog_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-15-WRONG-SKU-BINDING.json#/catalog",
+      "transaction_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-15-WRONG-SKU-BINDING.json#/transaction",
+      "initial_evidence_fixture_refs": [
+        "fixtures/engineering/resolve_recovery/evidence/merchant-glasshouse-supply.json#/entries/glasshouse-terms-v1",
+        "fixtures/engineering/resolve_recovery/evidence/merchant-glasshouse-supply.json#/entries/glasshouse-listing-v1"
+      ],
+      "recovery_source_manifest_refs": [
+        "fixtures/engineering/resolve_recovery/worlds/RR20-15-WRONG-SKU-BINDING.json#/recovery_sources/glasshouse-merchant-terms-v1",
+        "fixtures/engineering/resolve_recovery/worlds/RR20-15-WRONG-SKU-BINDING.json#/recovery_sources/glasshouse-sku-terms-v2"
+      ],
+      "initial_evidence_gap": "The listing states no billing model, so the recurrence constraint is unverified.",
+      "expected_initial_action": "REVIEW",
+      "expected_final_action": "REVIEW",
+      "allowed_final_actions": [
+        "REVIEW"
+      ],
+      "forbidden_final_actions": [
+        "ALLOW",
+        "BLOCK"
+      ],
+      "expected_safety_posture": "Must reject wrong SKU evidence: the manifested record is served bound to a different SKU of the same merchant, so the source is incomplete for this transaction and cannot authorize it.",
+      "expected_provider_execution_posture": "PAYMENT_PROVIDER_ONLY_AFTER_FRESH_FINAL_ALLOW",
+      "max_permitted_acquisition_rounds": 2,
+      "max_permitted_evidence_items": 4,
+      "expected_recovery_attempts": 1,
+      "evidence_policy": "product_default_evidence_policy"
+    },
+    {
+      "case_id": "RR20-16-GLOBAL-PLUS-SKU",
+      "case_family": "BINDING_COMPLETENESS",
+      "merchant_id": "merchant-harborview-books",
+      "sku": "harborview-annual-almanac",
+      "amount_minor": 141900,
+      "currency": "INR",
+      "world_fixture": "fixtures/engineering/resolve_recovery/worlds/RR20-16-GLOBAL-PLUS-SKU.json",
+      "mandate_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-16-GLOBAL-PLUS-SKU.json#/mandate",
+      "catalog_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-16-GLOBAL-PLUS-SKU.json#/catalog",
+      "transaction_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-16-GLOBAL-PLUS-SKU.json#/transaction",
+      "initial_evidence_fixture_refs": [
+        "fixtures/engineering/resolve_recovery/evidence/merchant-harborview-books.json#/entries/harborview-listing-v1"
+      ],
+      "recovery_source_manifest_refs": [
+        "fixtures/engineering/resolve_recovery/worlds/RR20-16-GLOBAL-PLUS-SKU.json#/recovery_sources/harborview-merchant-terms-v1",
+        "fixtures/engineering/resolve_recovery/worlds/RR20-16-GLOBAL-PLUS-SKU.json#/recovery_sources/harborview-sku-terms-v2"
+      ],
+      "initial_evidence_gap": "Only the product listing was retrieved initially; it establishes neither the intended use nor the billing model.",
+      "expected_initial_action": "REVIEW",
+      "expected_final_action": "ALLOW",
+      "allowed_final_actions": [
+        "ALLOW"
+      ],
+      "forbidden_final_actions": [
+        "BLOCK"
+      ],
+      "expected_safety_posture": "A merchant-global source and a SKU-specific source may be combined when they govern different facts; neither may be dropped and the combination must remain complete.",
+      "expected_provider_execution_posture": "PAYMENT_PROVIDER_ONLY_AFTER_FRESH_FINAL_ALLOW",
+      "max_permitted_acquisition_rounds": 2,
+      "max_permitted_evidence_items": 4,
+      "expected_recovery_attempts": 1,
+      "evidence_policy": "product_default_evidence_policy"
+    },
+    {
+      "case_id": "RR20-17-BUDGET-INSUFFICIENT",
+      "case_family": "BINDING_COMPLETENESS",
+      "merchant_id": "merchant-meridian-fitness",
+      "sku": "meridian-training-plan",
+      "amount_minor": 1245000,
+      "currency": "INR",
+      "world_fixture": "fixtures/engineering/resolve_recovery/worlds/RR20-17-BUDGET-INSUFFICIENT.json",
+      "mandate_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-17-BUDGET-INSUFFICIENT.json#/mandate",
+      "catalog_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-17-BUDGET-INSUFFICIENT.json#/catalog",
+      "transaction_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-17-BUDGET-INSUFFICIENT.json#/transaction",
+      "initial_evidence_fixture_refs": [
+        "fixtures/engineering/resolve_recovery/evidence/merchant-meridian-fitness.json#/entries/meridian-terms-v1"
+      ],
+      "recovery_source_manifest_refs": [
+        "fixtures/engineering/resolve_recovery/worlds/RR20-17-BUDGET-INSUFFICIENT.json#/recovery_sources/meridian-merchant-terms-v1",
+        "fixtures/engineering/resolve_recovery/worlds/RR20-17-BUDGET-INSUFFICIENT.json#/recovery_sources/meridian-sku-terms-v2"
+      ],
+      "initial_evidence_gap": "Only the merchant terms were retrieved initially; they defer the billing model and state no intended use.",
+      "expected_initial_action": "REVIEW",
+      "expected_final_action": "REVIEW",
+      "allowed_final_actions": [
+        "REVIEW"
+      ],
+      "forbidden_final_actions": [
+        "ALLOW",
+        "BLOCK"
+      ],
+      "expected_safety_posture": "Five applicable authoritative records exceed the four-item evidence budget. The first four read favourably and the fifth carries the blocking recurrence fact, so acquiring a favourable prefix is forbidden: no partial acquisition, no reauthorization, no execution.",
+      "expected_provider_execution_posture": "PAYMENT_PROVIDER_ONLY_AFTER_FRESH_FINAL_ALLOW",
+      "max_permitted_acquisition_rounds": 2,
+      "max_permitted_evidence_items": 4,
+      "expected_recovery_attempts": 2,
+      "evidence_policy": "product_default_evidence_policy"
+    },
+    {
+      "case_id": "RR20-18-NO-REGISTERED-SOURCE",
+      "case_family": "UNRESOLVED_FAILURE",
+      "merchant_id": "merchant-calder-ceramics",
+      "sku": "calder-glaze-set",
+      "amount_minor": 203500,
+      "currency": "INR",
+      "world_fixture": "fixtures/engineering/resolve_recovery/worlds/RR20-18-NO-REGISTERED-SOURCE.json",
+      "mandate_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-18-NO-REGISTERED-SOURCE.json#/mandate",
+      "catalog_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-18-NO-REGISTERED-SOURCE.json#/catalog",
+      "transaction_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-18-NO-REGISTERED-SOURCE.json#/transaction",
+      "initial_evidence_fixture_refs": [
+        "fixtures/engineering/resolve_recovery/evidence/merchant-calder-ceramics.json#/entries/calder-terms-v1",
+        "fixtures/engineering/resolve_recovery/evidence/merchant-calder-ceramics.json#/entries/calder-listing-v1"
+      ],
+      "recovery_source_manifest_refs": [
+        "fixtures/engineering/resolve_recovery/worlds/RR20-18-NO-REGISTERED-SOURCE.json#/recovery_sources/calder-merchant-terms-v1",
+        "fixtures/engineering/resolve_recovery/worlds/RR20-18-NO-REGISTERED-SOURCE.json#/recovery_sources/calder-sku-terms-v2"
+      ],
+      "initial_evidence_gap": "No registered source of any scope declares exclusion evidence for this merchant, so the material safety gap has no trusted coverage.",
+      "expected_initial_action": "REVIEW",
+      "expected_final_action": "REVIEW",
+      "allowed_final_actions": [
+        "REVIEW"
+      ],
+      "forbidden_final_actions": [
+        "ALLOW",
+        "BLOCK"
+      ],
+      "expected_safety_posture": "No acquisition round may be consumed and no provider may be called when no registered trusted source covers the gap.",
+      "expected_provider_execution_posture": "PAYMENT_PROVIDER_ONLY_AFTER_FRESH_FINAL_ALLOW",
+      "max_permitted_acquisition_rounds": 2,
+      "max_permitted_evidence_items": 4,
+      "expected_recovery_attempts": 1,
+      "evidence_policy": "product_default_evidence_policy"
+    },
+    {
+      "case_id": "RR20-19-COMPLETE-BUT-INSUFFICIENT",
+      "case_family": "UNRESOLVED_FAILURE",
+      "merchant_id": "merchant-alder-instruments",
+      "sku": "alder-bench-multimeter",
+      "amount_minor": 887000,
+      "currency": "INR",
+      "world_fixture": "fixtures/engineering/resolve_recovery/worlds/RR20-19-COMPLETE-BUT-INSUFFICIENT.json",
+      "mandate_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-19-COMPLETE-BUT-INSUFFICIENT.json#/mandate",
+      "catalog_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-19-COMPLETE-BUT-INSUFFICIENT.json#/catalog",
+      "transaction_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-19-COMPLETE-BUT-INSUFFICIENT.json#/transaction",
+      "initial_evidence_fixture_refs": [
+        "fixtures/engineering/resolve_recovery/evidence/merchant-alder-instruments.json#/entries/alder-terms-v1",
+        "fixtures/engineering/resolve_recovery/evidence/merchant-alder-instruments.json#/entries/alder-listing-v1"
+      ],
+      "recovery_source_manifest_refs": [
+        "fixtures/engineering/resolve_recovery/worlds/RR20-19-COMPLETE-BUT-INSUFFICIENT.json#/recovery_sources/alder-merchant-terms-v1",
+        "fixtures/engineering/resolve_recovery/worlds/RR20-19-COMPLETE-BUT-INSUFFICIENT.json#/recovery_sources/alder-sku-terms-v2"
+      ],
+      "initial_evidence_gap": "The listing records no sourcing classification, so the excluded characteristic is unverified.",
+      "expected_initial_action": "REVIEW",
+      "expected_final_action": "REVIEW",
+      "allowed_final_actions": [
+        "REVIEW",
+        "BLOCK"
+      ],
+      "forbidden_final_actions": [
+        "ALLOW"
+      ],
+      "expected_safety_posture": "Must remain non-ALLOW when the registered source returns its complete record set and that complete set is still insufficient. A second round must be refused rather than spent.",
+      "expected_provider_execution_posture": "PAYMENT_PROVIDER_ONLY_AFTER_FRESH_FINAL_ALLOW",
+      "max_permitted_acquisition_rounds": 2,
+      "max_permitted_evidence_items": 4,
+      "expected_recovery_attempts": 2,
+      "evidence_policy": "product_default_evidence_policy"
+    },
+    {
+      "case_id": "RR20-20-PROVIDER-FAILURE",
+      "case_family": "UNRESOLVED_FAILURE",
+      "merchant_id": "merchant-brightwater-labs",
+      "sku": "brightwater-ph-meter",
+      "amount_minor": 469500,
+      "currency": "INR",
+      "world_fixture": "fixtures/engineering/resolve_recovery/worlds/RR20-20-PROVIDER-FAILURE.json",
+      "mandate_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-20-PROVIDER-FAILURE.json#/mandate",
+      "catalog_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-20-PROVIDER-FAILURE.json#/catalog",
+      "transaction_fixture_ref": "fixtures/engineering/resolve_recovery/worlds/RR20-20-PROVIDER-FAILURE.json#/transaction",
+      "initial_evidence_fixture_refs": [
+        "fixtures/engineering/resolve_recovery/evidence/merchant-brightwater-labs.json#/entries/brightwater-terms-v1",
+        "fixtures/engineering/resolve_recovery/evidence/merchant-brightwater-labs.json#/entries/brightwater-listing-v1"
+      ],
+      "recovery_source_manifest_refs": [
+        "fixtures/engineering/resolve_recovery/worlds/RR20-20-PROVIDER-FAILURE.json#/recovery_sources/brightwater-merchant-terms-v1",
+        "fixtures/engineering/resolve_recovery/worlds/RR20-20-PROVIDER-FAILURE.json#/recovery_sources/brightwater-sku-terms-v2"
+      ],
+      "initial_evidence_gap": "The listing states no billing model, so the recurrence constraint is unverified.",
+      "expected_initial_action": "REVIEW",
+      "expected_final_action": "REVIEW",
+      "allowed_final_actions": [
+        "REVIEW"
+      ],
+      "forbidden_final_actions": [
+        "ALLOW",
+        "BLOCK"
+      ],
+      "expected_safety_posture": "A reserved round stays consumed when the trusted evidence provider fails, repeated recovery cannot exceed the global round budget, and no capability or execution follows the failure.",
+      "expected_provider_execution_posture": "PAYMENT_PROVIDER_ONLY_AFTER_FRESH_FINAL_ALLOW",
+      "max_permitted_acquisition_rounds": 2,
+      "max_permitted_evidence_items": 4,
+      "expected_recovery_attempts": 3,
+      "evidence_policy": "product_default_evidence_policy"
+    }
+  ],
+  "runner": {
+    "path": "scripts/run_resolve_recovery_evaluation.py",
+    "validator_path": "scripts/validate_resolve_preregistration.py",
+    "output_root": "artifacts/engineering/resolve_recovery/resolve-recovery-20-case-v1",
+    "gate": [
+      "exactly 20 preregistered cases",
+      "plan status is FROZEN",
+      "freeze record status is FROZEN",
+      "plan metric schema is RESOLVE_METRIC_SCHEMA_V2",
+      "all case IDs are unique and match the frozen worlds one to one",
+      "every world, evidence, plan, and freeze fixture exists",
+      "every frozen fixture SHA-256 matches its file",
+      "every source manifest record hash matches its evidence fixture entry",
+      "the shared trusted source registry SHA-256 matches the freeze record",
+      "every transaction amount is frozen and equals its world",
+      "every case declares an expected safety posture and a non-empty allowed set",
+      "no case declares a trust-sensitive override",
+      "the trust-sensitive policy equals the product evidence policy",
+      "the plan canonical and raw SHA-256 match the freeze record",
+      "the evaluation runs inside its frozen validity window",
+      "no case mandate has expired",
+      "the working tree is clean",
+      "the commit binding names the preregistration commit, and that commit is HEAD or an ancestor of HEAD with every bound path unchanged since it",
+      "no outcome artifact already exists unless resume is explicitly requested"
+    ],
+    "on_failure": "STOP"
+  },
+  "post_freeze_policy": "Fixtures, expected outcomes, case manifests, transaction amounts, the metric schema, and the trust-sensitive policy are frozen. A defect discovered after the freeze is documented and the evaluation is explicitly invalidated or re-preregistered; the plan is never silently edited."
+}

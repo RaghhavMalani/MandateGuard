@@ -1,0 +1,273 @@
+{
+  "schema": "RESOLVE_EVALUATION_WORLD_V1",
+  "case_id": "RR20-14-CROSS-MERCHANT-SKU",
+  "case_family": "BINDING_COMPLETENESS",
+  "merchant_id": "merchant-northwind-outfitters",
+  "sku": "atlas-desk-riser",
+  "currency": "INR",
+  "amount_minor": 672500,
+  "independence_note": "This world was authored on its own: its merchant, SKU, catalogue entry, mandate, initial evidence, and source manifests are shared with no other case.",
+  "mandate": {
+    "mandate_id": "6eb423da-edb9-5121-83f0-6fa722dadb55",
+    "nonce": "rr20_828be515929c858024ca9f03",
+    "issued_at": "2026-09-01T00:00:00+00:00",
+    "expires_at": "2028-01-01T00:00:00+00:00",
+    "subject_ref": "resolve-eval-subject-14",
+    "currency": "INR",
+    "hard": {
+      "max_total_minor": 750000,
+      "max_quantity": 1,
+      "recurring_allowed": false,
+      "merchant_allowlist": [
+        "merchant-northwind-outfitters"
+      ],
+      "sku_allowlist": [
+        "atlas-desk-riser"
+      ]
+    },
+    "semantic": [
+      {
+        "constraint_id": "purpose.1",
+        "kind": "purpose",
+        "constraint_family": "PURPOSE",
+        "text": "Declared purchase purpose: standing desk conversion. Trusted evidence must establish suitability."
+      },
+      {
+        "constraint_id": "exclusion.1",
+        "kind": "exclusion",
+        "constraint_family": "RECURRENCE",
+        "text": "Excluded product characteristic: subscription."
+      }
+    ],
+    "issuer_attestation": {
+      "assurance": "DECLARED_ONLY",
+      "issuer_id": "resolve-evaluation-issuer"
+    }
+  },
+  "catalog": {
+    "snapshot_id": "RR20-14-CROSS-MERCHANT-SKU-catalog",
+    "merchant_id": "merchant-northwind-outfitters",
+    "currency": "INR",
+    "items": [
+      {
+        "sku": "atlas-desk-riser",
+        "merchant_id": "merchant-northwind-outfitters",
+        "effective_unit_price_minor": 672500,
+        "recurring": false
+      }
+    ]
+  },
+  "transaction": {
+    "transaction_id": "RR20-14-CROSS-MERCHANT-SKU-txn",
+    "merchant_id": "merchant-northwind-outfitters",
+    "cart_currency": "INR",
+    "order_currency": "INR",
+    "cart_recurring": false,
+    "order_recurring": false,
+    "lines": [
+      {
+        "sku": "atlas-desk-riser",
+        "effective_unit_price_minor": 672500,
+        "quantity": 1,
+        "line_total_minor": 672500,
+        "recurring": false
+      }
+    ]
+  },
+  "evidence_fixtures": [
+    {
+      "merchant_id": "merchant-northwind-outfitters",
+      "path": "fixtures/engineering/resolve_recovery/evidence/merchant-northwind-outfitters.json"
+    },
+    {
+      "merchant_id": "merchant-southgate-depot",
+      "path": "fixtures/engineering/resolve_recovery/evidence/merchant-southgate-depot.json"
+    }
+  ],
+  "initial_evidence_ids": [
+    "northwind-terms-v1",
+    "northwind-listing-v1"
+  ],
+  "initial_evidence_gap": "The listing states no billing model, so the recurrence constraint is unverified.",
+  "recovery_sources": [
+    {
+      "source_id": "northwind-merchant-terms-v1",
+      "display_name": "Merchant Terms",
+      "manifest_id": "northwind-merchant-terms-v1:manifest:1",
+      "merchant_id": "merchant-northwind-outfitters",
+      "scope_type": "MERCHANT_GLOBAL",
+      "sku": null,
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE"
+      ],
+      "manifest_version": "1",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "northwind-terms-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.standing-desk-conversion",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "c62c2841da3cd1da78118a237666fe3369c0e58e9b404ac0f528019147e1ccc9"
+        }
+      ]
+    },
+    {
+      "source_id": "northwind-sku-terms-v2",
+      "display_name": "Merchant SKU Terms",
+      "manifest_id": "northwind-sku-terms-v2:manifest:2",
+      "merchant_id": "merchant-northwind-outfitters",
+      "scope_type": "SKU_SPECIFIC",
+      "sku": "atlas-desk-riser",
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE",
+        "RECURRENCE_TERMS"
+      ],
+      "manifest_version": "2",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "northwind-listing-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.standing-desk-conversion",
+              "claim_value": "UNESTABLISHED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "e0b78901cb0b4cf99a177786d7cd82f74b69d1b8be5a83925547fa64ebe59096"
+        },
+        {
+          "evidence_id": "northwind-terms-v2",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.standing-desk-conversion",
+              "claim_value": "SUPPORTED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "ONE_TIME"
+            }
+          ],
+          "expected_entry_sha256": "a06ed0f2de53135a7ba1885803fa295b7977ecbad2fbf890c627a5091b174a83"
+        }
+      ]
+    },
+    {
+      "source_id": "southgate-merchant-terms-v1",
+      "display_name": "Merchant Terms",
+      "manifest_id": "southgate-merchant-terms-v1:manifest:1",
+      "merchant_id": "merchant-southgate-depot",
+      "scope_type": "MERCHANT_GLOBAL",
+      "sku": null,
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE"
+      ],
+      "manifest_version": "1",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "southgate-terms-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.standing-desk-conversion",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "51acfe32b9a4f9e7ffa52b4e4ce8088555682c0d5197b1cf239b07d544389c8b"
+        }
+      ]
+    },
+    {
+      "source_id": "southgate-sku-terms-v2",
+      "display_name": "Merchant SKU Terms",
+      "manifest_id": "southgate-sku-terms-v2:manifest:2",
+      "merchant_id": "merchant-southgate-depot",
+      "scope_type": "SKU_SPECIFIC",
+      "sku": "atlas-desk-riser",
+      "evidence_kinds": [
+        "PURPOSE_EVIDENCE",
+        "RECURRENCE_TERMS"
+      ],
+      "manifest_version": "2",
+      "effective_at": "2026-01-01T00:00:00+00:00",
+      "expires_at": null,
+      "supersedes_manifest_id": null,
+      "records": [
+        {
+          "evidence_id": "southgate-listing-v1",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.standing-desk-conversion",
+              "claim_value": "UNESTABLISHED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "UNESTABLISHED"
+            }
+          ],
+          "expected_entry_sha256": "ee930c9ccf59e4dcf500c5c69479409844e2e51a3a1e39ab4f1bbfc3594d6b8f"
+        },
+        {
+          "evidence_id": "southgate-terms-v2",
+          "effective_at": "2026-01-01T00:00:00+00:00",
+          "expires_at": null,
+          "supersedes_evidence_id": null,
+          "claims": [
+            {
+              "claim_id": "purpose.standing-desk-conversion",
+              "claim_value": "UNESTABLISHED"
+            },
+            {
+              "claim_id": "billing.model",
+              "claim_value": "RECURRING"
+            }
+          ],
+          "expected_entry_sha256": "51a07552535992de721b03cc63eb457ad3093166aaffa372298e46b93411619a"
+        }
+      ]
+    }
+  ],
+  "foreign_merchants": [
+    {
+      "merchant_id": "merchant-southgate-depot",
+      "reason": "A different merchant selling the identical SKU identifier. Its records must never bind to this case's transaction."
+    }
+  ],
+  "binding_probes": [
+    {
+      "source_id": "southgate-sku-terms-v2",
+      "probe": "FOREIGN_MERCHANT_SOURCE",
+      "expected_status": "EVIDENCE_BINDING_REJECTED"
+    }
+  ],
+  "provider_fault": null,
+  "fixture_note": null
+}
