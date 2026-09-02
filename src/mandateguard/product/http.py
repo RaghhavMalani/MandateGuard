@@ -23,10 +23,12 @@ from mandateguard.product.service import CommerceLabService
 STATIC_ROOT = Path(__file__).resolve().parent / "static"
 _RUN_PATH_RE = re.compile(r"^/api/runs/(run_[0-9a-f]{32})$")
 _REPLAY_PATH_RE = re.compile(r"^/api/runs/(run_[0-9a-f]{32})/replay$")
+_RECOVER_PATH_RE = re.compile(r"^/api/runs/(run_[0-9a-f]{32})/recover$")
 _MAX_REQUEST_BYTES = 16_384
 _DEFAULT_PRODUCT_HOST = "0.0.0.0"
 _DEFAULT_PRODUCT_PORT = 8080
 _ROUTE_TEMPLATES = (
+    (_RECOVER_PATH_RE, "/api/runs/{run_id}/recover"),
     (_REPLAY_PATH_RE, "/api/runs/{run_id}/replay"),
     (_RUN_PATH_RE, "/api/runs/{run_id}"),
 )
@@ -242,6 +244,31 @@ class CommerceLabHandler(BaseHTTPRequestHandler):
                 return
             except RuntimeError as error:
                 self._send_error(HTTPStatus.CONFLICT, "REPLAY_UNAVAILABLE", str(error))
+                return
+            self._send_json(HTTPStatus.OK, response)
+            return
+        recover_match = _RECOVER_PATH_RE.fullmatch(path)
+        if recover_match:
+            try:
+                if self.headers.get("Content-Length") not in {None, "0"}:
+                    payload = self._read_json()
+                    if payload:
+                        raise ValueError(
+                            "recovery request body must be empty; sources are server-selected"
+                        )
+                response = self.server.service.recover(recover_match.group(1))
+            except KeyError:
+                self._send_error(HTTPStatus.NOT_FOUND, "RUN_NOT_FOUND", "Run not found.")
+                return
+            except (TypeError, ValueError) as error:
+                self._send_error(HTTPStatus.BAD_REQUEST, "INVALID_REQUEST", str(error))
+                return
+            except RuntimeError as error:
+                self._send_error(
+                    HTTPStatus.CONFLICT,
+                    "RECOVERY_UNAVAILABLE",
+                    str(error),
+                )
                 return
             self._send_json(HTTPStatus.OK, response)
             return

@@ -1,0 +1,12 @@
+{
+  "merchant_id": "merchant-scholarly",
+  "entries": [
+    {
+      "evidence_id": "studyglow-sku-terms-v2",
+      "merchant_id": "merchant-scholarly",
+      "sku": "studyglow-desk-lamp",
+      "source_kind": "product_terms",
+      "text": "Intended use: focused individual study and reading at a desk. Billing model: one-time purchase with no subscription and no renewal."
+    }
+  ]
+}

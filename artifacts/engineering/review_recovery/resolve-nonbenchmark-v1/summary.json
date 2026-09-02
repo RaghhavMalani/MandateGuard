@@ -1,0 +1,83 @@
+{
+  "architecture_verification": {
+    "authorization_source": "EXISTING_FROZEN_MANDATEGUARD_CONTROLLER",
+    "fresh_authorization_required": true,
+    "planner_can_emit_allow_or_block": false,
+    "planner_output_type": "EvidenceGapAnalysis"
+  },
+  "claims_limit": "These synthetic outcomes do not establish generalization and the released value is not revenue recovered.",
+  "classification": "NON_BENCHMARK_SYNTHETIC_ENGINEERING_EVALUATION",
+  "evaluation_id": "RESOLVE-NON-BENCHMARK-V1",
+  "external_calls": {
+    "network_calls": 0,
+    "offline_execution_double_calls_after_final_allow": 1,
+    "openai_calls": 0,
+    "razorpay_calls": 0
+  },
+  "independence_note": "The three product cases are distinct synthetic merchant/SKU scenarios. Failure injections derived from them are correlated robustness checks and are not counted as independent commerce cases.",
+  "metrics": {
+    "initial_review_count": 3,
+    "max_acquisition_rounds": 1,
+    "mean_additional_trusted_evidence_items": {
+      "decimal": "1.000",
+      "denominator": 3,
+      "numerator": 3
+    },
+    "payment_provider_calls_before_final_allow": 0,
+    "planner_direct_unsafe_allow_count": 0,
+    "resolved_after_bounded_acquisition": 2,
+    "resolved_to_allow": 1,
+    "resolved_to_block": 1,
+    "still_review": 1,
+    "synthetic_transaction_value_released_from_review_minor": 129900
+  },
+  "outcomes": [
+    {
+      "additional_trusted_evidence_items": 1,
+      "authorization_reevaluated": true,
+      "case_id": "RR-ALLOW-STUDYGLOW",
+      "evidence_provider_calls": 1,
+      "external_network_calls": 0,
+      "final_action": "ALLOW",
+      "final_evidence_sha256": "90ee2a83648e8717fd3cc73ee1f8056a71bd2a9f94f2307b24af48ce4f9ad219",
+      "initial_action": "REVIEW",
+      "initial_evidence_sha256": "f1a969888578d4d9bf1c55bff47922f21c52622a14bfe9d662ec9c97e886b07c",
+      "offline_execution_double_calls_after_allow": 1,
+      "payment_provider_calls_before_final_allow": 0,
+      "rounds_used": 1,
+      "transaction_value_minor": 129900
+    },
+    {
+      "additional_trusted_evidence_items": 1,
+      "authorization_reevaluated": true,
+      "case_id": "RR-BLOCK-MARKET-EDGE",
+      "evidence_provider_calls": 1,
+      "external_network_calls": 0,
+      "final_action": "BLOCK",
+      "final_evidence_sha256": "7ebe3c632b0c7054e2f696c4df6c1c5930a1787a3307ea833b4459421abc1fbc",
+      "initial_action": "REVIEW",
+      "initial_evidence_sha256": "48a057b9b5a324e69392d0674e1252bf8b6b4bdaa335e577b56a0faa64cae616",
+      "offline_execution_double_calls_after_allow": 0,
+      "payment_provider_calls_before_final_allow": 0,
+      "rounds_used": 1,
+      "transaction_value_minor": 249900
+    },
+    {
+      "additional_trusted_evidence_items": 1,
+      "authorization_reevaluated": true,
+      "case_id": "RR-REVIEW-FLEXI",
+      "evidence_provider_calls": 1,
+      "external_network_calls": 0,
+      "final_action": "REVIEW",
+      "final_evidence_sha256": "a490af36b35780423832f3484540290f08d461f988ecf1b9b95bc5ea09590e2c",
+      "initial_action": "REVIEW",
+      "initial_evidence_sha256": "0d7e2172f4aed43460b165d5695eddbf46ecb0d4522631f2eeead43ad614cf50",
+      "offline_execution_double_calls_after_allow": 0,
+      "payment_provider_calls_before_final_allow": 0,
+      "rounds_used": 1,
+      "transaction_value_minor": 99900
+    }
+  ],
+  "plan_file_sha256": "e80f3999e69c7ca375093fa64a22be9b721a698ffe8c8f84957f7163c5db2659",
+  "plan_path": "fixtures/engineering/review_recovery/evaluation_plan.json"
+}

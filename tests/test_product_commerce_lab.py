@@ -343,6 +343,9 @@ def test_access_log_is_bounded_and_free_of_intent_and_identifiers(
     assert route_template("/api/runs/run_" + "a" * 32 + "/replay") == (
         "/api/runs/{run_id}/replay"
     )
+    assert route_template("/api/runs/run_" + "a" * 32 + "/recover") == (
+        "/api/runs/{run_id}/recover"
+    )
     assert route_template("/../../etc/passwd") == "/unmatched"
 
     secret_intent = "Buy a study lamp under 2000 for zzsecretmandatezz."

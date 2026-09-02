@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from collections import OrderedDict
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from dataclasses import dataclass, field, replace
+from datetime import datetime, timedelta, timezone
 from hashlib import sha256
 import importlib.util
 import os
@@ -17,13 +17,19 @@ import tempfile
 from typing import Any
 from uuid import uuid4
 
-from mandateguard.core.hashing import transaction_body_sha256
+from mandateguard.core.hashing import (
+    CommittedHashes,
+    catalog_snapshot_sha256,
+    transaction_body_sha256,
+)
+from mandateguard.core.nonce_ledger import NonceLedgerState
 from mandateguard.execution import (
     HMACSHA256Signer,
     HMACSHA256Verifier,
     RazorpayTestOrdersAdapter,
     SQLiteExecutionLedger,
     TrustedExecutionConfig,
+    issue_execution_authorization,
 )
 from mandateguard.execution.executor import execute_razorpay_order
 from mandateguard.execution.models import (
@@ -70,13 +76,29 @@ from mandateguard.intelligence.store import TrustedCommerceStore
 from mandateguard.intelligence.tools import BuyerDraft, CommerceTools
 from mandateguard.models.decision import DecisionAction
 from mandateguard.models.finding import TierACheckStatus
+from mandateguard.recovery import (
+    EvidenceKind,
+    GapAnalysisStatus,
+    MAX_ACQUISITION_ROUNDS,
+    MAX_NEW_EVIDENCE_ITEMS,
+    ReviewRecoveryState,
+    create_review_recovery,
+    recover_review_once,
+)
+from mandateguard.replay.scenario import ReplayScenario
 from mandateguard.semantic import OpenAIResponsesSemanticModel, SemanticVerifier
+from mandateguard.semantic.evidence import (
+    SemanticEvidence,
+    SemanticEvidenceBundle,
+    semantic_evidence_sha256,
+)
 from mandateguard.semantic.models import ConstraintStatus
 
 from mandateguard.product.evidence import (
     FAILURE_RECOVERY_EVIDENCE,
     INT3_RESEARCH_FINDING,
 )
+from mandateguard.product.recovery_config import build_recovery_registry
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
@@ -111,6 +133,14 @@ DEMO_PRESETS: tuple[dict[str, str], ...] = (
         "intent": (
             "Buy the Flexi Desk Companion under ₹2,000 for individual study. "
             "No subscriptions. SKU: flexi-desk-companion"
+        ),
+    },
+    {
+        "id": "recoverable",
+        "label": "RECOVERABLE REVIEW",
+        "intent": (
+            "Buy me a study lamp under ₹2,000 for individual study. "
+            "No subscriptions."
         ),
     },
 )
@@ -235,6 +265,7 @@ class CommerceRun:
     error: dict[str, str] | None = None
     private_context: Any = None
     replay_in_flight: bool = False
+    recovery_in_flight: bool = False
     completion: Event = field(default_factory=Event)
     lock: RLock = field(default_factory=RLock)
 
@@ -529,6 +560,10 @@ class _RunContext:
     client: ObservedOrdersClient
     evaluated_at: datetime
     store: TrustedCommerceStore
+    semantic_verifier: SemanticVerifier
+    semantic_evidence: SemanticEvidence | None
+    recovery_state: ReviewRecoveryState | None = None
+    payment_provider_calls_before_final_allow: int | None = None
 
 
 class CommerceLabService:
@@ -558,6 +593,7 @@ class CommerceLabService:
             / "agentic_commerce"
             / "merchant_terms.json",
         )
+        self.recovery_registry = build_recovery_registry(repository_root)
         self.semantic_cache = SQLiteSemanticCache(state_dir / "semantic-cache.sqlite3")
         self.execution_ledger = SQLiteExecutionLedger(
             state_dir / "execution-ledger.sqlite3"
@@ -619,6 +655,12 @@ class CommerceLabService:
             "presets": [dict(item) for item in DEMO_PRESETS],
             "research": dict(INT3_RESEARCH_FINDING),
             "failure_recovery": [dict(item) for item in FAILURE_RECOVERY_EVIDENCE],
+            "resolve": {
+                "max_acquisition_rounds": MAX_ACQUISITION_ROUNDS,
+                "max_new_evidence_items": MAX_NEW_EVIDENCE_ITEMS,
+                "planner": "DETERMINISTIC_CONSTRAINT_FAMILY_PLANNER_V1",
+                "int3_runtime_use": "NOT_INTEGRATED",
+            },
             "safety": {
                 "external_calls_on_page_load": 0,
                 "buyer_has_razorpay_authority": False,
@@ -665,13 +707,14 @@ class CommerceLabService:
                 if existing_mode != mode or existing_intent != normalized_intent:
                     raise ValueError("request_id is already bound to another request")
                 return self._runs[run_id], True
+            effective_top_k = 2 if preset_id == "recoverable" else top_k
             run = CommerceRun(
                 run_id="run_" + uuid4().hex,
                 request_id=request_id,
                 user_intent=normalized_intent,
                 mode=mode,
                 preset_id=preset_id,
-                top_k=top_k,
+                top_k=effective_top_k,
             )
             self._runs[run.run_id] = run
             self._requests[request_id] = (run.run_id, mode, normalized_intent)
@@ -786,6 +829,104 @@ class CommerceLabService:
         finally:
             with run.lock:
                 run.replay_in_flight = False
+
+    def recover(self, run_id: str) -> dict[str, Any]:
+        """Run one user-triggered trusted acquisition round for an existing REVIEW."""
+
+        run = self.get_run(run_id)
+        if run is None:
+            raise KeyError("run was not found")
+        with run.lock:
+            if run.state != "COMPLETE" or run.private_context is None:
+                raise RuntimeError("run is not ready for evidence acquisition")
+            if run.recovery_in_flight:
+                raise RuntimeError("evidence acquisition is already in flight")
+            context: _RunContext = run.private_context
+            if context.recovery_state is None:
+                raise RuntimeError("NO_RECOVERABLE_GAP")
+            if context.recovery_state.final_action is not DecisionAction.REVIEW:
+                raise RuntimeError("review has already been resolved")
+            run.recovery_in_flight = True
+
+        recorder = RunRecorder(run)
+        previous_event_count = len(context.recovery_state.audit_events)
+        try:
+            payment_calls_before = context.client.adapter_calls
+            recovered = recover_review_once(
+                state=context.recovery_state,
+                registry=self.recovery_registry,
+                semantic_verifier=context.semantic_verifier,
+                recorded_at=context.evaluated_at,
+            )
+            capability = None
+            execution_result = None
+            if recovered.final_action is DecisionAction.ALLOW:
+                if recovered.current_evidence is None:
+                    raise RuntimeError("resolved ALLOW is missing its evidence set")
+                decision_nonce = "mg_resolve_" + sha256(
+                    f"{run.request_id}:{recovered.rounds_used}".encode("ascii")
+                ).hexdigest()[:32]
+                issued = issue_execution_authorization(
+                    authorization_result=recovered.current_authorization,
+                    authorization_scenario=recovered.scenario,
+                    semantic_evidence=recovered.current_evidence,
+                    semantic_verifier=context.semantic_verifier,
+                    issued_at=context.evaluated_at,
+                    expires_at=context.evaluated_at + timedelta(minutes=2),
+                    decision_nonce=decision_nonce,
+                    config=context.execution_runtime.config,
+                    signer=context.execution_runtime.signer,
+                )
+                if isinstance(issued, ExecutionRefusal):
+                    raise RuntimeError(
+                        f"recovered authorization capability refused: {issued.reason.value}"
+                    )
+                capability = issued
+                execution_result = execute_razorpay_order(
+                    authorization=capability,
+                    authorization_result=recovered.current_authorization,
+                    mandate=recovered.scenario.mandate,
+                    transaction=recovered.scenario.transaction,
+                    now=context.evaluated_at,
+                    config=context.execution_runtime.config,
+                    verifier=context.execution_runtime.verifier,
+                    ledger=context.execution_runtime.ledger,
+                    client=context.client,
+                )
+            context.checkout = replace(
+                context.checkout,
+                authorization_result=recovered.current_authorization,
+                execution_authorization=capability,
+                execution_result=execution_result,
+            )
+            context.semantic_evidence = recovered.current_evidence
+            context.recovery_state = recovered
+            context.payment_provider_calls_before_final_allow = payment_calls_before
+            self._complete_timeline(recorder, context.checkout)
+            self._record_recovery_events(
+                recorder,
+                recovered.audit_events,
+                start=previous_event_count,
+            )
+            if capability is not None:
+                recorder.audit(
+                    "CAPABILITY_ISSUED",
+                    decision_nonce_prefix=capability.payload.decision_nonce[:12],
+                    source="RECOVERED_FRESH_AUTHORIZATION",
+                )
+            if isinstance(execution_result, ExecutionReceipt):
+                recorder.audit(
+                    "RAZORPAY_ORDER_CREATED",
+                    order_id=execution_result.razorpay_order_id,
+                    environment=("OFFLINE_DEMO" if run.mode == "offline" else "TEST"),
+                )
+            with run.lock:
+                run.output = self._present_result(run, context)
+                run.updated_at = _utc_now_text()
+            return run.snapshot()
+        finally:
+            with run.lock:
+                run.recovery_in_flight = False
 
     def _execute_run(self, run: CommerceRun) -> None:
         recorder = RunRecorder(run)
@@ -999,12 +1140,26 @@ class CommerceLabService:
                     order_id=checkout.execution_result.razorpay_order_id,
                     environment=("OFFLINE_DEMO" if run.mode == "offline" else "TEST"),
                 )
+            semantic_evidence = self._semantic_evidence_for_checkout(checkout)
+            recovery_state = None
+            if checkout.authorization_result.final_action is DecisionAction.REVIEW:
+                recovery_state = create_review_recovery(
+                    scenario=self._replay_scenario(checkout, evaluated_at),
+                    authorization=checkout.authorization_result,
+                    semantic_evidence=semantic_evidence,
+                    registry=self.recovery_registry,
+                    created_at=evaluated_at,
+                )
+                self._record_recovery_events(recorder, recovery_state.audit_events)
             context = _RunContext(
                 checkout=checkout,
                 execution_runtime=runtime,
                 client=execution_client,
                 evaluated_at=evaluated_at,
                 store=self.store,
+                semantic_verifier=verifier,
+                semantic_evidence=semantic_evidence,
+                recovery_state=recovery_state,
             )
             output = self._present_result(run, context)
             with run.lock:
@@ -1032,6 +1187,68 @@ class CommerceLabService:
                 run.updated_at = _utc_now_text()
         finally:
             run.completion.set()
+
+    def _semantic_evidence_for_checkout(
+        self, checkout: AgenticCheckoutResult
+    ) -> SemanticEvidence | None:
+        proposal = checkout.buyer_output.proposal
+        selected_ids = tuple(
+            checkout.trace.retrieval.get("trusted_evidence_selected_ids", ())
+        )
+        if not selected_ids:
+            return None
+        entries = self.store.resolve_evidence_ids(
+            selected_ids,
+            merchant_id=proposal.merchant_id,
+            sku=proposal.sku,
+        )
+        bundle = SemanticEvidenceBundle(
+            merchant_id=proposal.merchant_id,
+            entries=entries,
+        )
+        return SemanticEvidence(
+            bundle=bundle,
+            semantic_evidence_sha256=semantic_evidence_sha256(bundle),
+        )
+
+    def _replay_scenario(
+        self, checkout: AgenticCheckoutResult, evaluated_at: datetime
+    ) -> ReplayScenario:
+        merchant_id = checkout.transaction.payload.merchant_id
+        catalog = self.store.catalog_snapshot(merchant_id=merchant_id)
+        return ReplayScenario(
+            mandate=checkout.mandate,
+            transaction=checkout.transaction,
+            catalog_snapshot=catalog,
+            server_time=evaluated_at,
+            nonce_state=NonceLedgerState(),
+            psp_committed_hashes=CommittedHashes(
+                transaction_sha256=transaction_body_sha256(checkout.transaction),
+                catalog_snapshot_sha256=catalog_snapshot_sha256(catalog),
+            ),
+            replay_seed=1001,
+            evaluated_at=evaluated_at,
+        )
+
+    @staticmethod
+    def _record_recovery_events(
+        recorder: RunRecorder,
+        events: tuple[object, ...],
+        *,
+        start: int = 0,
+    ) -> None:
+        for event in events[start:]:
+            recorder.audit(
+                event.event.value,
+                recovery_event_sha256=event.event_sha256,
+                previous_recovery_event_sha256=event.previous_event_sha256,
+                evidence_set_sha256=event.evidence_set_sha256,
+                authorization_result_sha256=event.authorization_result_sha256,
+                round=event.round_number,
+                decision=event.decision.value,
+                evidence_ids=list(event.evidence_ids),
+                outcome_codes=list(event.outcome_codes),
+            )
 
     @staticmethod
     def _execution_started(recorder: RunRecorder) -> None:
@@ -1184,13 +1401,39 @@ class CommerceLabService:
                     "scope": "PRODUCT" if entry.sku is not None else "MERCHANT",
                     "text": entry.text,
                     "retrieval_score": round(ranked.score.hybrid_score, 6),
+                    "acquisition": "INITIAL_RETRIEVAL",
                 }
             )
+        presented_ids = {item["evidence_id"] for item in evidence_cards}
+        if context.semantic_evidence is not None:
+            for entry in context.semantic_evidence.bundle.entries:
+                if entry.evidence_id in presented_ids:
+                    continue
+                evidence_cards.append(
+                    {
+                        "evidence_id": entry.evidence_id,
+                        "source_kind": entry.source_kind,
+                        "merchant_id": entry.merchant_id,
+                        "sku": entry.sku,
+                        "scope": "PRODUCT" if entry.sku is not None else "MERCHANT",
+                        "text": entry.text,
+                        "retrieval_score": None,
+                        "acquisition": "BOUNDED_TRUSTED_ACQUISITION",
+                    }
+                )
+                presented_ids.add(entry.evidence_id)
         cache_payload = dict(checkout.trace.cache)
         if cache_payload.get("status") is None:
             cache_payload["status"] = "NOT_USED"
+        if context.recovery_state is not None and context.recovery_state.rounds_used:
+            cache_payload["status"] = "REEVALUATED"
+            if authorization.semantic_decision is not None:
+                cache_payload["key_prefix"] = (
+                    authorization.semantic_decision.semantic_input_sha256[:12]
+                )
         final_reason = self._final_reason(checkout)
         execution = self._present_execution(run, context)
+        recovery = self._present_recovery(context)
         return {
             "decision": authorization.final_action.value,
             "decision_reason": final_reason,
@@ -1221,6 +1464,15 @@ class CommerceLabService:
                     "trusted": False,
                 },
                 "ranked_source_count": len(score_by_document),
+                "evidence_set_sha256": (
+                    context.recovery_state.current_evidence_sha256
+                    if context.recovery_state is not None
+                    else (
+                        context.semantic_evidence.semantic_evidence_sha256
+                        if context.semantic_evidence is not None
+                        else None
+                    )
+                ),
             },
             "authorization": {
                 "deterministic": {
@@ -1241,6 +1493,8 @@ class CommerceLabService:
                 "controller_source": "EXISTING_FROZEN_MANDATEGUARD_CONTROLLER",
             },
             "execution": execution,
+            "recovery": recovery,
+            "transactability": self._present_transactability(context),
             "models": dict(checkout.trace.models),
             "timings": dict(checkout.trace.timings),
             "raw_trace": checkout.trace.to_mapping(),
@@ -1273,6 +1527,173 @@ class CommerceLabService:
             if non_pass:
                 return non_pass[0]
         return "All applicable deterministic and semantic checks passed."
+
+    def _present_recovery(self, context: _RunContext) -> dict[str, Any] | None:
+        state = context.recovery_state
+        if state is None:
+            return None
+        preferred = next(
+            (
+                gap
+                for gap in state.gap_analysis.gaps
+                if gap.missing_evidence_kind is EvidenceKind.RECURRENCE
+            ),
+            state.gap_analysis.gaps[0] if state.gap_analysis.gaps else None,
+        )
+        source = None
+        if preferred is not None and preferred.candidate_evidence_ids:
+            source = self.recovery_registry.source(
+                preferred.candidate_evidence_ids[0]
+            )
+        if state.resolved:
+            status = "RESOLVED"
+        elif state.budget_exhausted:
+            status = "BUDGET_EXHAUSTED"
+        elif state.gap_analysis.status is GapAnalysisStatus.RECOVERABLE:
+            status = "AVAILABLE" if state.rounds_used == 0 else "STILL_REVIEW"
+        else:
+            status = "NO_RECOVERABLE_GAP"
+        action_enabled = (
+            state.final_action is DecisionAction.REVIEW
+            and not state.budget_exhausted
+            and state.gap_analysis.status is GapAnalysisStatus.RECOVERABLE
+        )
+        return {
+            "status": status,
+            "review_id": state.review_id,
+            "initial_decision": "REVIEW",
+            "current_decision": state.final_action.value,
+            "transition": (
+                f"REVIEW -> {state.final_action.value}" if state.resolved else None
+            ),
+            "gap": (
+                {
+                    "constraint_id": preferred.constraint_id,
+                    "constraint_family": preferred.constraint_family,
+                    "reason": preferred.reason,
+                    "missing_evidence_kind": preferred.missing_evidence_kind.value,
+                    "merchant_id": preferred.merchant_id,
+                    "sku": preferred.sku,
+                    "candidate_evidence_ids": list(
+                        preferred.candidate_evidence_ids
+                    ),
+                    "diagnostic_source": preferred.diagnostic_source,
+                    "created_at": preferred.created_at.isoformat(),
+                }
+                if preferred is not None
+                else None
+            ),
+            "trusted_source": (
+                {
+                    "source_id": source.source_id,
+                    "label": source.display_name,
+                }
+                if source is not None
+                else None
+            ),
+            "action": {
+                "enabled": action_enabled,
+                "label": "ACQUIRE TRUSTED EVIDENCE",
+                "accepts_source_input": False,
+                "accepts_url": False,
+                "accepts_evidence_text": False,
+            },
+            "rounds_used": state.rounds_used,
+            "max_rounds": MAX_ACQUISITION_ROUNDS,
+            "new_evidence_items": state.new_evidence_items,
+            "max_new_evidence_items": MAX_NEW_EVIDENCE_ITEMS,
+            "evidence_provider_calls": state.evidence_provider_calls,
+            "payment_provider_calls_before_final_allow": (
+                context.payment_provider_calls_before_final_allow
+            ),
+            "initial_evidence_sha256": state.initial_evidence_sha256,
+            "current_evidence_sha256": state.current_evidence_sha256,
+            "resolved_after": (
+                f"{state.rounds_used} trusted evidence acquisition"
+                if state.resolved
+                else None
+            ),
+            "audit_event_hashes": [
+                event.event_sha256 for event in state.audit_events
+            ],
+        }
+
+    def _present_transactability(self, context: _RunContext) -> dict[str, Any]:
+        authorization = context.checkout.authorization_result
+        tier_a = {
+            item.family.value: item.status is TierACheckStatus.PASS
+            for item in authorization.deterministic_decision.tier_a_results
+        }
+        semantic_status = {}
+        if authorization.semantic_decision is not None:
+            semantic_status = {
+                item.constraint_id: item.status
+                for item in authorization.semantic_decision.constraint_results
+            }
+        mandate = context.checkout.mandate
+        purpose_ids = {
+            item.constraint_id
+            for item in mandate.payload.constraints.semantic
+            if item.kind == "purpose"
+        }
+        recurrence_ids = {
+            item.constraint_id
+            for item in mandate.payload.constraints.semantic
+            if item.kind == "exclusion"
+            and any(
+                token in item.text.casefold()
+                for token in ("subscription", "recurr", "renew")
+            )
+        }
+        state = context.recovery_state
+        purpose_available = bool(
+            state
+            and any(
+                gap.missing_evidence_kind is EvidenceKind.PURPOSE
+                for gap in state.gap_analysis.gaps
+            )
+        )
+        purpose_verified = bool(purpose_ids) and all(
+            semantic_status.get(item) is ConstraintStatus.PASS for item in purpose_ids
+        )
+        recurrence_verified = bool(recurrence_ids) and all(
+            semantic_status.get(item) is ConstraintStatus.PASS
+            for item in recurrence_ids
+        )
+        readiness = (
+            {"label": "PRICE", "status": "VERIFIED" if tier_a.get("A1") else "MISSING"},
+            {"label": "SKU OWNERSHIP", "status": "VERIFIED" if tier_a.get("A2") else "MISSING"},
+            {"label": "MERCHANT BINDING", "status": "VERIFIED" if tier_a.get("A3") else "MISSING"},
+            {
+                "label": "PURPOSE EVIDENCE",
+                "status": (
+                    "VERIFIED"
+                    if purpose_verified
+                    else "AVAILABLE" if purpose_available else "MISSING"
+                ),
+            },
+            {
+                "label": "RECURRENCE TERMS",
+                "status": "VERIFIED" if recurrence_verified else "MISSING",
+            },
+        )
+        if authorization.final_action is DecisionAction.REVIEW:
+            status = "REVIEW LIKELY"
+            next_action = (
+                "Acquire registered trusted evidence for this SKU."
+                if state is not None
+                and state.gap_analysis.status is GapAnalysisStatus.RECOVERABLE
+                else "Publish trusted recurrence evidence for this SKU."
+            )
+        else:
+            status = "EVIDENCE READY" if authorization.final_action is DecisionAction.ALLOW else "POLICY BLOCKED"
+            next_action = "No evidence-readiness action is required."
+        return {
+            "readiness": list(readiness),
+            "status": status,
+            "next_action": next_action,
+            "authority_notice": "Diagnostic only. This surface cannot authorize payments.",
+        }
 
     @staticmethod
     def _present_execution(run: CommerceRun, context: _RunContext) -> dict[str, Any]:

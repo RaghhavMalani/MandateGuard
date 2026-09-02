@@ -1,0 +1,66 @@
+{
+  "evaluation_id": "RESOLVE-NON-BENCHMARK-V1",
+  "title": "MANDATEGUARD RESOLVE NON-BENCHMARK ENGINEERING EVALUATION",
+  "status": "FROZEN_BEFORE_OUTCOMES",
+  "scope": "Synthetic offline engineering evaluation of bounded trusted-evidence acquisition after an initial REVIEW.",
+  "independence_note": "The three product cases are distinct synthetic merchant/SKU scenarios. Failure injections derived from them are correlated robustness checks and are not counted as independent commerce cases.",
+  "limits": {
+    "max_acquisition_rounds": 2,
+    "max_new_evidence_items": 4
+  },
+  "cases": [
+    {
+      "case_id": "RR-ALLOW-STUDYGLOW",
+      "constraint_families": ["purpose", "recurrence"],
+      "merchant_id": "merchant-scholarly",
+      "sku": "studyglow-desk-lamp",
+      "initial_evidence_policy": "top_k_2_no_registered_merchant_evidence_selected",
+      "candidate_source_id": "studyglow-sku-terms-v2"
+    },
+    {
+      "case_id": "RR-BLOCK-MARKET-EDGE",
+      "constraint_families": ["purpose", "exclusion"],
+      "merchant_id": "merchant-academy",
+      "sku": "market-edge-course",
+      "initial_evidence_policy": "top_k_2_no_registered_merchant_evidence_selected",
+      "candidate_source_id": "market-edge-syllabus-v2"
+    },
+    {
+      "case_id": "RR-REVIEW-FLEXI",
+      "constraint_families": ["purpose", "recurrence"],
+      "merchant_id": "merchant-nova",
+      "sku": "flexi-desk-companion",
+      "initial_evidence_policy": "top_k_2_no_registered_merchant_evidence_selected",
+      "candidate_source_id": "flexi-sku-terms-v2"
+    }
+  ],
+  "failure_injections": [
+    "candidate_evidence_disappears",
+    "candidate_source_returns_no_record",
+    "wrong_merchant_binding",
+    "wrong_sku_binding",
+    "duplicate_evidence",
+    "tampered_evidence",
+    "acquisition_budget_exhausted",
+    "semantic_verifier_still_abstains",
+    "new_evidence_reveals_violation"
+  ],
+  "metrics": [
+    "initial_review_count",
+    "resolved_after_bounded_acquisition",
+    "resolved_to_allow",
+    "resolved_to_block",
+    "still_review",
+    "mean_additional_trusted_evidence_items",
+    "max_acquisition_rounds",
+    "payment_provider_calls_before_final_allow",
+    "planner_direct_unsafe_allow_count",
+    "synthetic_transaction_value_released_from_review_minor"
+  ],
+  "external_call_policy": {
+    "openai_calls": 0,
+    "razorpay_calls": 0,
+    "network_calls": 0
+  },
+  "int3_runtime_decision": "NOT_INTEGRATED. The frozen six-query INT-3 evaluation remains research-only and cannot justify runtime planning claims; deterministic gap planning is used."
+}

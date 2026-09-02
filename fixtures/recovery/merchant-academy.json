@@ -1,0 +1,12 @@
+{
+  "merchant_id": "merchant-academy",
+  "entries": [
+    {
+      "evidence_id": "market-edge-syllabus-v2",
+      "merchant_id": "merchant-academy",
+      "sku": "market-edge-course",
+      "source_kind": "course_syllabus",
+      "text": "Marketed purpose: professional development in rapid decision making. The syllabus includes gambling techniques, betting systems, and wager selection."
+    }
+  ]
+}

@@ -66,6 +66,7 @@ function humanize(value) {
 }
 
 function displayScore(value) {
+  if (value === null || value === undefined) return "—";
   const score = Number(value);
   return Number.isFinite(score) ? score.toFixed(3) : String(value ?? "—");
 }
@@ -195,6 +196,65 @@ export function renderEvidencePanel(evidence) {
       <p>${escapeHtml(evidence?.buyer_text?.text)}</p>
     </div>
   `;
+}
+
+export function renderReviewRecovery(recovery, execution) {
+  if (!recovery) return "";
+  const gap = recovery.gap;
+  const source = recovery.trusted_source;
+  const calls = recovery.payment_provider_calls_before_final_allow ?? execution?.razorpay_calls ?? 0;
+  if (recovery.status === "RESOLVED") {
+    return `
+      <div class="resolve-surface resolve-surface--resolved">
+        <p class="record-label">REVIEW RESOLVED</p>
+        <strong class="resolve-transition">${escapeHtml(recovery.transition)}</strong>
+        <p>Resolved after: <b>${escapeHtml(recovery.resolved_after)}</b></p>
+        <div class="resolve-accounting">
+          <span>New trusted items <strong>${escapeHtml(recovery.new_evidence_items)}</strong></span>
+          <span>Razorpay calls before final ALLOW <strong>${escapeHtml(calls)}</strong></span>
+        </div>
+        <p class="resolve-boundary">A fresh evidence set was canonicalized and the full controller ran again.</p>
+      </div>`;
+  }
+  const action = recovery.action?.enabled
+    ? '<button class="button button--resolve" id="acquire-evidence-button" type="button">ACQUIRE TRUSTED EVIDENCE</button>'
+    : `<p class="resolve-unavailable">${escapeHtml(humanize(recovery.status))}. The controller remains at REVIEW.</p>`;
+  return `
+    <div class="resolve-surface">
+      <div class="resolve-heading">
+        <div><p class="record-label">EVIDENCE GAP</p><h3>${escapeHtml(gap?.reason || "No registered recoverable gap was identified.")}</h3></div>
+        ${statusBadge("REVIEW")}
+      </div>
+      <div class="resolve-source">
+        <span>TRUSTED SOURCE AVAILABLE</span>
+        <strong>${escapeHtml(source?.label || "No registered source")}</strong>
+        <small>Selected by the server registry. Buyer source input is disabled.</small>
+      </div>
+      <div class="resolve-accounting">
+        <span>Razorpay calls <strong>${escapeHtml(execution?.razorpay_calls ?? 0)}</strong></span>
+        <span>Acquisition round <strong>${escapeHtml(`${recovery.rounds_used}/${recovery.max_rounds}`)}</strong></span>
+      </div>
+      ${action}
+    </div>`;
+}
+
+export function renderTransactability(transactability) {
+  if (!transactability) return "";
+  const rows = (transactability.readiness || [])
+    .map(
+      (item) => `<li><span>${escapeHtml(item.label)}</span><strong data-readiness="${escapeHtml(item.status)}">${escapeHtml(item.status)}</strong></li>`,
+    )
+    .join("");
+  return `
+    <div class="transactability-surface">
+      <div class="transactability-heading">
+        <div><p class="record-label">AGENT TRANSACTABILITY</p><h3>Evidence readiness</h3></div>
+        <strong>${escapeHtml(transactability.status)}</strong>
+      </div>
+      <ul>${rows}</ul>
+      <div class="transactability-next"><span>NEXT ACTION</span><p>${escapeHtml(transactability.next_action)}</p></div>
+      <small>${escapeHtml(transactability.authority_notice)}</small>
+    </div>`;
 }
 
 function renderCheckRows(checks) {
@@ -478,6 +538,9 @@ function init() {
     runState: document.querySelector("#run-state"),
     resultRegion: document.querySelector("#result-region"),
     decision: document.querySelector("#decision-banner"),
+    resolveRegion: document.querySelector("#resolve-region"),
+    reviewRecovery: document.querySelector("#review-recovery-panel"),
+    transactability: document.querySelector("#transactability-panel"),
     buyer: document.querySelector("#buyer-panel"),
     evidence: document.querySelector("#evidence-panel"),
     evidenceCount: document.querySelector("#evidence-count"),
@@ -491,6 +554,7 @@ function init() {
   };
   const submitLock = new SubmissionLock();
   const replayLock = new SubmissionLock();
+  const recoveryLock = new SubmissionLock();
   let config;
   let selectedPreset = null;
   let currentRunId = null;
@@ -535,6 +599,9 @@ function init() {
     elements.resultRegion.hidden = false;
     elements.resultRegion.dataset.decision = result.decision;
     elements.decision.innerHTML = renderDecisionBanner(result);
+    elements.resolveRegion.hidden = !result.recovery && !result.transactability;
+    elements.reviewRecovery.innerHTML = renderReviewRecovery(result.recovery, result.execution);
+    elements.transactability.innerHTML = renderTransactability(result.transactability);
     elements.buyer.innerHTML = renderBuyerPanel(result.buyer);
     elements.evidence.innerHTML = renderEvidencePanel(result.evidence);
     elements.evidenceCount.textContent = `${result.evidence.trusted_evidence_count} ITEMS`;
@@ -545,6 +612,8 @@ function init() {
     applyPanelDisclosure();
     const replayButton = document.querySelector("#replay-button");
     if (replayButton) replayButton.addEventListener("click", runReplay);
+    const acquireButton = document.querySelector("#acquire-evidence-button");
+    if (acquireButton) acquireButton.addEventListener("click", runRecovery);
   };
 
   const pollRun = async (initial) => {
@@ -578,6 +647,26 @@ function init() {
     }
   };
 
+  const runRecovery = async () => {
+    if (!currentRunId || !recoveryLock.acquire()) return;
+    const button = document.querySelector("#acquire-evidence-button");
+    if (button) {
+      button.disabled = true;
+      button.textContent = "ACQUIRING TRUSTED EVIDENCE";
+    }
+    try {
+      const snapshot = await fetchJson(
+        `/api/runs/${encodeURIComponent(currentRunId)}/recover`,
+        { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" },
+      );
+      renderSnapshot(snapshot);
+    } catch (error) {
+      showError(error.message);
+    } finally {
+      recoveryLock.release();
+    }
+  };
+
   const submit = async () => {
     if (!submitLock.acquire()) return;
     showError("");
@@ -589,6 +678,7 @@ function init() {
     }
     setBusy(true);
     elements.resultRegion.hidden = true;
+    elements.resolveRegion.hidden = true;
     delete elements.resultRegion.dataset.decision;
     elements.auditSection.hidden = true;
     currentRunId = null;

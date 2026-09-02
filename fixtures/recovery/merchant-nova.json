@@ -1,0 +1,12 @@
+{
+  "merchant_id": "merchant-nova",
+  "entries": [
+    {
+      "evidence_id": "flexi-sku-terms-v2",
+      "merchant_id": "merchant-nova",
+      "sku": "flexi-desk-companion",
+      "source_kind": "product_terms",
+      "text": "The registered SKU terms remain incomplete. Intended use, content classification, and longer-term billing obligations are not established."
+    }
+  ]
+}

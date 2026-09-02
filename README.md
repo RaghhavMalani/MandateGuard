@@ -14,7 +14,9 @@ MandateGuard sits between the agent and the payment provider. It independently r
 trusted merchant evidence, runs deterministic policy over the money-critical fields, uses
 a semantic model only for the constraints that cannot be reduced to a field comparison,
 and issues a signed, single-use, transaction-bound capability. Razorpay is reachable only
-with that capability. On `BLOCK` or `REVIEW`, no provider call is made at all.
+with that capability. On `BLOCK` or an unresolved `REVIEW`, no payment-provider call is
+made at all. A `REVIEW` can enter a bounded, user-triggered trusted-evidence recovery
+loop; the full controller must then produce a fresh `ALLOW` before execution is possible.
 
 ---
 
@@ -45,10 +47,11 @@ are runnable on the live demo.
 | Safe purchase | `ALLOW` | Signed single-use capability issued, execution permitted | 1 execution call — served by the offline double in the public demo |
 | Policy violation | `BLOCK` | Execution prevented before Razorpay | **0** |
 | Ambiguous / insufficient evidence | `REVIEW` | Held for human or evidence review | **0** |
+| Recoverable review | `REVIEW → ALLOW` | One registered evidence source acquired, full authorization rerun, then capability issued | **0 before final `ALLOW`**; 1 offline-double call after |
 
 In the public deployment every one of these runs offline: the `ALLOW` path creates its
 receipt through a Test Mode-compatible local double, and external network calls stay at **0**
-in all three cases.
+in all four cases.
 
 And the capability itself is not reusable:
 
@@ -75,7 +78,11 @@ flowchart TD
     end
 
     R --> D
-    C -->|BLOCK or REVIEW| X[No provider call]
+    C -->|BLOCK| X[No provider call]
+    C -->|REVIEW| G[Deterministic evidence-gap analysis]
+    G -->|registered source + explicit trigger| A[Bounded trusted acquisition]
+    G -->|no recoverable gap| X
+    A -->|new canonical evidence set| D
     C -->|ALLOW only| K[Signed single-use capability]
     K --> E[Razorpay Test Mode executor]
     K -.->|replayed nonce| J[Rejected by ledger before network]
@@ -87,7 +94,8 @@ The boundaries are the point:
   purchase, and stops. It never holds a Razorpay credential.
 - **The semantic model has no execution authority.** It returns a verdict. It cannot issue
   a capability or reach a provider.
-- **`BLOCK` and `REVIEW` make no provider call.** Not a cancelled call — no call.
+- **`BLOCK` and unresolved `REVIEW` make no payment-provider call.** Evidence acquisition
+  has no authorization authority; only a fresh controller `ALLOW` can issue a capability.
 - **The capability is narrow by construction:** transaction-bound, request-bound,
   merchant-bound, expiring, and single-use, signed with HMAC-SHA256 and consumed through a
   nonce ledger that refuses any nonce it has already seen.

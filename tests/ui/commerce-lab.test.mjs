@@ -9,6 +9,8 @@ import {
   renderDecisionBanner,
   renderEvidencePanel,
   renderExecutionPanel,
+  renderReviewRecovery,
+  renderTransactability,
 } from "../../src/mandateguard/product/static/app.js";
 
 
@@ -175,4 +177,59 @@ test("unavailable live mode is stated in the page, not only in a tooltip", () =>
   assert.match(withProblem, /OpenAI Python package is not installed\./);
 
   assert.equal(liveModeStatusNote({ available: true, problems: [] }), null);
+});
+
+
+test("recoverable REVIEW shows a server-selected acquisition action and zero calls", () => {
+  const html = renderReviewRecovery(
+    {
+      status: "AVAILABLE",
+      gap: { reason: "Recurring terms could not be verified." },
+      trusted_source: { label: "Merchant SKU Terms" },
+      action: { enabled: true },
+      rounds_used: 0,
+      max_rounds: 2,
+    },
+    { razorpay_calls: 0 },
+  );
+  assert.match(html, /EVIDENCE GAP/);
+  assert.match(html, /Recurring terms could not be verified/);
+  assert.match(html, /TRUSTED SOURCE AVAILABLE/);
+  assert.match(html, /ACQUIRE TRUSTED EVIDENCE/);
+  assert.match(html, /Razorpay calls <strong>0<\/strong>/);
+});
+
+
+test("resolved review shows the fresh controller transition", () => {
+  const html = renderReviewRecovery(
+    {
+      status: "RESOLVED",
+      transition: "REVIEW -> ALLOW",
+      resolved_after: "1 trusted evidence acquisition",
+      new_evidence_items: 1,
+      payment_provider_calls_before_final_allow: 0,
+    },
+    { razorpay_calls: 1 },
+  );
+  assert.match(html, /REVIEW -&gt; ALLOW/);
+  assert.match(html, /1 trusted evidence acquisition/);
+  assert.match(html, /Razorpay calls before final ALLOW <strong>0<\/strong>/);
+});
+
+
+test("agent transactability is explicitly diagnostic", () => {
+  const html = renderTransactability({
+    readiness: [
+      { label: "PRICE", status: "VERIFIED" },
+      { label: "RECURRENCE TERMS", status: "MISSING" },
+    ],
+    status: "REVIEW LIKELY",
+    next_action: "Publish trusted recurrence evidence for this SKU.",
+    authority_notice: "Diagnostic only. This surface cannot authorize payments.",
+  });
+  assert.match(html, /AGENT TRANSACTABILITY/);
+  assert.match(html, /REVIEW LIKELY/);
+  assert.match(html, /RECURRENCE TERMS/);
+  assert.match(html, /MISSING/);
+  assert.match(html, /cannot authorize payments/);
 });
