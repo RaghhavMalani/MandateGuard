@@ -65,9 +65,7 @@ from mandateguard.intelligence.orchestration import (
     run_agentic_checkout,
 )
 from mandateguard.intelligence.retrieval import (
-    DEFAULT_ALPHA,
     DEFAULT_EMBEDDING_MODEL,
-    DEFAULT_TOP_K,
     HashingEmbeddingProvider,
     HybridRetriever,
     OpenAIEmbeddingProvider,
@@ -81,12 +79,15 @@ from mandateguard.recovery import (
     complete_recovery_round,
     EvidenceKind,
     GapAnalysisStatus,
+    link_execution_outcome,
     MAX_ACQUISITION_ROUNDS,
     MAX_NEW_EVIDENCE_ITEMS,
+    RecoveryAuditStoreError,
     ReviewRecoveryState,
     reserve_recovery_round,
     SQLiteRecoveryAuditStore,
     create_review_recovery,
+    validate_observed_counters,
 )
 from mandateguard.replay.scenario import ReplayScenario
 from mandateguard.semantic import OpenAIResponsesSemanticModel, SemanticVerifier
@@ -101,6 +102,10 @@ from mandateguard.product.evidence import (
     FAILURE_RECOVERY_EVIDENCE,
     INT3_RESEARCH_FINDING,
 )
+from mandateguard.product.evidence_policy import (
+    EvidencePolicy,
+    PRODUCT_EVIDENCE_POLICY,
+)
 from mandateguard.product.recovery_config import build_recovery_registry
 
 
@@ -110,6 +115,7 @@ _REQUEST_ID_RE = re.compile(r"^[A-Za-z0-9._-]{8,128}$")
 _NO_EXCLUSION_RE = re.compile(r"\bno\s+([^.;]+)", re.IGNORECASE)
 _TERMINAL_STATES = frozenset({"COMPLETE", "ERROR"})
 _MAX_RETAINED_RUNS = 256
+RECOVERY_AUDIT_UNAVAILABLE = "RECOVERY_AUDIT_UNAVAILABLE"
 DEMO_PRESETS: tuple[dict[str, str], ...] = (
     {
         "id": "safe",
@@ -139,12 +145,41 @@ DEMO_PRESETS: tuple[dict[str, str], ...] = (
         "id": "recoverable",
         "label": "RECOVERABLE REVIEW",
         "intent": (
-            "Buy me a study lamp under ₹2,000 for individual study. "
-            "No subscriptions."
+            "Buy the Aurora Focus Lamp under ₹2,000 for individual study. "
+            "No subscriptions. SKU: aurora-focus-lamp"
         ),
     },
 )
 _PRESETS_BY_ID = {item["id"]: item for item in DEMO_PRESETS}
+
+
+# Resolve evaluation scenarios. Each one is an ordinary product intent run at the
+# product default evidence policy; none of them carries an evidence override.
+# `RR-BLOCK-SIGNAL-EDGE` is not a demo preset because the judge-facing
+# `POLICY VIOLATION` preset must keep reaching BLOCK on its first evaluation.
+RESOLVE_EVALUATION_SCENARIOS: tuple[dict[str, str], ...] = (
+    {
+        "case_id": "RR-ALLOW-AURORA",
+        "merchant_id": "merchant-lumen",
+        "sku": "aurora-focus-lamp",
+        "intent": _PRESETS_BY_ID["recoverable"]["intent"],
+    },
+    {
+        "case_id": "RR-BLOCK-SIGNAL-EDGE",
+        "merchant_id": "merchant-veritas",
+        "sku": "signal-edge-workshop",
+        "intent": (
+            "Buy the Signal Edge Workshop under ₹3,000 for professional "
+            "development. No gambling-related products. SKU: signal-edge-workshop"
+        ),
+    },
+    {
+        "case_id": "RR-REVIEW-FLEXI",
+        "merchant_id": "merchant-nova",
+        "sku": "flexi-desk-companion",
+        "intent": _PRESETS_BY_ID["review"]["intent"],
+    },
+)
 
 
 TIMELINE_STEPS: tuple[tuple[str, str], ...] = (
@@ -464,7 +499,11 @@ class ObservedHybridRetriever(HybridRetriever):
 class ObservedSemanticModel:
     __slots__ = ("delegate", "model_id", "on_start")
 
-    def __init__(self, delegate: object, on_start: Callable[[], None]) -> None:
+    def __init__(
+        self,
+        delegate: object,
+        on_start: Callable[[], None],
+    ) -> None:
         self.delegate = delegate
         self.model_id = delegate.model_id
         self.on_start = on_start
@@ -486,12 +525,44 @@ class ObservedSemanticModel:
         return getattr(self.delegate, "last_output_tokens", None)
 
 
-@dataclass(slots=True)
 class OperationalCounters:
-    openai_calls: int = 0
+    """Counters incremented by real call sites, never derived from ``run.mode``.
+
+    An accidental OpenAI, Razorpay, or trusted-provider call on a path that is
+    supposed to be offline increments the matching counter here, so the
+    evaluation can fail the run instead of structurally assuming zero.
+    """
+
+    __slots__ = (
+        "openai_calls",
+        "razorpay_http_calls",
+        "offline_adapter_calls",
+        "trusted_evidence_provider_calls",
+        "_lock",
+    )
+
+    def __init__(self) -> None:
+        self.openai_calls = 0
+        self.razorpay_http_calls = 0
+        self.offline_adapter_calls = 0
+        self.trusted_evidence_provider_calls = 0
+        self._lock = RLock()
 
     def record_openai_call(self) -> None:
-        self.openai_calls += 1
+        with self._lock:
+            self.openai_calls += 1
+
+    def record_razorpay_http_call(self) -> None:
+        with self._lock:
+            self.razorpay_http_calls += 1
+
+    def record_offline_adapter_call(self) -> None:
+        with self._lock:
+            self.offline_adapter_calls += 1
+
+    def record_trusted_evidence_provider_call(self) -> None:
+        with self._lock:
+            self.trusted_evidence_provider_calls += 1
 
 
 class ObservedCreateResource:
@@ -538,6 +609,7 @@ class ObservedOrdersClient:
         "external",
         "adapter_calls",
         "external_network_calls",
+        "counters",
         "on_start",
         "on_complete",
         "on_error",
@@ -548,15 +620,18 @@ class ObservedOrdersClient:
         self,
         delegate: object,
         *,
-        external: bool,
+        counters: OperationalCounters,
         on_start: Callable[[], None],
         on_complete: Callable[[], None],
         on_error: Callable[[], None],
     ) -> None:
         self.delegate = delegate
-        self.external = external
+        # Observed from the adapter actually installed, not from the run mode: a
+        # real Razorpay adapter on a supposedly offline path still counts.
+        self.external = isinstance(delegate, RazorpayTestOrdersAdapter)
         self.adapter_calls = 0
         self.external_network_calls = 0
+        self.counters = counters
         self.on_start = on_start
         self.on_complete = on_complete
         self.on_error = on_error
@@ -567,6 +642,10 @@ class ObservedOrdersClient:
             self.adapter_calls += 1
             if self.external:
                 self.external_network_calls += 1
+        if self.external:
+            self.counters.record_razorpay_http_call()
+        else:
+            self.counters.record_offline_adapter_call()
         self.on_start()
         try:
             result = self.delegate.create_order(request)
@@ -587,8 +666,11 @@ class _RunContext:
     semantic_verifier: SemanticVerifier
     semantic_evidence: SemanticEvidence | None
     operational_counters: OperationalCounters
+    recovery_registry: Any
+    trust_configuration: dict[str, Any]
     recovery_state: ReviewRecoveryState | None = None
     payment_provider_calls_before_final_allow: int | None = None
+    recovery_audit_state: str = "AVAILABLE"
 
 
 class CommerceLabService:
@@ -602,15 +684,19 @@ class CommerceLabService:
         repository_root: Path = REPOSITORY_ROOT,
         state_dir: Path | None = None,
         clock: Callable[[], datetime] | None = None,
+        evidence_policy: EvidencePolicy = PRODUCT_EVIDENCE_POLICY,
     ) -> None:
         self.repository_root = repository_root
         self._clock = clock or (lambda: datetime.now(timezone.utc))
         self._offline_evaluated_at = self._trusted_now()
+        if not isinstance(evidence_policy, EvidencePolicy):
+            raise TypeError("evidence_policy must be EvidencePolicy")
+        self.evidence_policy = evidence_policy
         _load_local_environment(repository_root / ".env")
-        if state_dir is None:
-            state_dir = Path(tempfile.mkdtemp(prefix="mandateguard-commerce-lab-"))
+        state_dir, state_persistence = self._resolve_state_dir(state_dir)
         state_dir.mkdir(parents=True, exist_ok=True)
         self.state_dir = state_dir
+        self.state_persistence = state_persistence
         self.store = TrustedCommerceStore.from_files(
             catalog_path=repository_root
             / "fixtures"
@@ -633,6 +719,35 @@ class CommerceLabService:
         self._runs: OrderedDict[str, CommerceRun] = OrderedDict()
         self._requests: dict[str, tuple[str, str, str]] = {}
         self._lock = RLock()
+
+    @staticmethod
+    def _resolve_state_dir(state_dir: Path | None) -> tuple[Path, str]:
+        """Prefer an explicit directory, then `MANDATEGUARD_STATE_DIR`, then temp.
+
+        A configured directory keeps the semantic cache, the execution ledger,
+        and the recovery audit chain across service reopens on the same
+        filesystem. Without one, the local state is temporary, which is
+        acceptable for development and the offline demo.
+        """
+
+        if state_dir is not None:
+            return Path(state_dir), "CONFIGURED_DIRECTORY"
+        configured = os.environ.get("MANDATEGUARD_STATE_DIR", "").strip()
+        if configured:
+            return Path(configured), "CONFIGURED_DIRECTORY"
+        return (
+            Path(tempfile.mkdtemp(prefix="mandateguard-commerce-lab-")),
+            "EPHEMERAL_TEMPORARY_DIRECTORY",
+        )
+
+    def trust_configuration(self, *, top_k: int | None = None) -> dict[str, Any]:
+        """Return the trust-sensitive configuration a run at `top_k` would use."""
+
+        return self.evidence_policy.describe(
+            top_k=self.evidence_policy.top_k if top_k is None else top_k,
+            registry_sha256=self.recovery_registry.registry_sha256,
+            semantic_mode="LIVE",
+        )
 
     def close(self) -> None:
         self.semantic_cache.close()
@@ -692,6 +807,8 @@ class CommerceLabService:
                 "max_new_evidence_items": MAX_NEW_EVIDENCE_ITEMS,
                 "planner": "DETERMINISTIC_CONSTRAINT_FAMILY_PLANNER_V1",
                 "int3_runtime_use": "NOT_INTEGRATED",
+                "evidence_policy_id": self.evidence_policy.policy_id,
+                "state_persistence": self.state_persistence,
             },
             "safety": {
                 "external_calls_on_page_load": 0,
@@ -706,6 +823,7 @@ class CommerceLabService:
             "service": "mandateguard-commerce-lab",
             "default_mode": self.default_mode,
             "live_mode_available": self.live_configuration()["available"],
+            "state_persistence": self.state_persistence,
         }
 
     def start_run(
@@ -715,7 +833,7 @@ class CommerceLabService:
         mode: str,
         request_id: str,
         preset_id: str | None = None,
-        top_k: int = DEFAULT_TOP_K,
+        top_k: int | None = None,
     ) -> tuple[CommerceRun, bool]:
         if not isinstance(user_intent, str) or not user_intent.strip():
             raise ValueError("user_intent must be a non-empty string")
@@ -727,6 +845,11 @@ class CommerceLabService:
             raise ValueError("request_id must be a bounded identifier")
         if preset_id is not None and preset_id not in _PRESETS_BY_ID:
             raise ValueError("preset_id is not registered")
+        # `preset_id` selects an intent and nothing else. The evidence policy is
+        # server-owned; only an explicit engineering override may replace it, and
+        # the override is recorded in the run's trust configuration.
+        if top_k is None:
+            top_k = self.evidence_policy.top_k
         if isinstance(top_k, bool) or not isinstance(top_k, int) or not 1 <= top_k <= 10:
             raise ValueError("top_k must be between 1 and 10")
         normalized_intent = user_intent.strip()
@@ -760,7 +883,7 @@ class CommerceLabService:
         mode: str = "offline",
         request_id: str | None = None,
         preset_id: str | None = None,
-        top_k: int = DEFAULT_TOP_K,
+        top_k: int | None = None,
         timeout_seconds: float = 20.0,
     ) -> dict[str, Any]:
         run, _ = self.start_run(
@@ -875,6 +998,8 @@ class CommerceLabService:
             context: _RunContext = run.private_context
             if context.recovery_state is None:
                 raise RuntimeError("NO_RECOVERABLE_GAP")
+            if context.recovery_audit_state != "AVAILABLE":
+                raise RuntimeError(RECOVERY_AUDIT_UNAVAILABLE)
             if context.recovery_state.final_action is not DecisionAction.REVIEW:
                 raise RuntimeError("review has already been resolved")
             run.recovery_in_flight = True
@@ -886,13 +1011,13 @@ class CommerceLabService:
             payment_calls_before = context.client.adapter_calls
             reserved = reserve_recovery_round(
                 state=context.recovery_state,
-                registry=self.recovery_registry,
+                registry=context.recovery_registry,
                 recovery_started_at=recovery_time,
             )
             # The durable reservation is committed before provider acquisition.
             context.recovery_state = reserved
-            self.recovery_audit_store.append(
-                reserved.audit_events[previous_event_count:]
+            self._append_recovery_audit(
+                context, reserved.audit_events[previous_event_count:]
             )
             self._record_recovery_events(
                 recorder,
@@ -905,14 +1030,15 @@ class CommerceLabService:
             )
             recovered = complete_recovery_round(
                 state=reserved,
-                registry=self.recovery_registry,
+                registry=context.recovery_registry,
                 semantic_verifier=context.semantic_verifier,
                 recovery_time=recovery_time,
                 catalog_snapshot=catalog,
                 nonce_state=reserved.scenario.nonce_state,
             )
-            self.recovery_audit_store.append(
-                recovered.audit_events[acquisition_event_count:]
+            # Provenance is durable before any capability can be issued.
+            self._append_recovery_audit(
+                context, recovered.audit_events[acquisition_event_count:]
             )
             context.recovery_state = recovered
             context.evaluated_at = recovery_time
@@ -962,6 +1088,26 @@ class CommerceLabService:
             )
             context.semantic_evidence = recovered.current_evidence
             context.payment_provider_calls_before_final_allow = payment_calls_before
+            if capability is not None:
+                linked = link_execution_outcome(
+                    state=recovered,
+                    registry=context.recovery_registry,
+                    recorded_at=recovery_time,
+                    decision_nonce=capability.payload.decision_nonce,
+                    execution_request_sha256=(
+                        capability.payload.execution_request_sha256
+                    ),
+                    execution_receipt_id=(
+                        execution_result.razorpay_order_id
+                        if isinstance(execution_result, ExecutionReceipt)
+                        else None
+                    ),
+                )
+                self._append_recovery_audit(
+                    context, linked.audit_events[len(recovered.audit_events) :]
+                )
+                context.recovery_state = linked
+                recovered = linked
             self._complete_timeline(recorder, context.checkout)
             self._record_recovery_events(
                 recorder,
@@ -988,6 +1134,25 @@ class CommerceLabService:
             with run.lock:
                 run.recovery_in_flight = False
 
+    def _append_recovery_audit(
+        self, context: _RunContext, events: tuple[Any, ...]
+    ) -> None:
+        """Persist provenance or leave the review safely non-executable.
+
+        Recovery is fail-closed on audit persistence: if the append fails, the
+        round stays consumed, no provider call or capability follows, and the
+        review is marked `AUDIT_PERSISTENCE_FAILED`. Later acquisition attempts
+        on the same review return `RECOVERY_AUDIT_UNAVAILABLE` instead of a
+        confusing reservation error. Clearing that state is a deliberate
+        operator action against the persistent store, not an automatic retry.
+        """
+
+        try:
+            self.recovery_audit_store.append(events)
+        except RecoveryAuditStoreError as error:
+            context.recovery_audit_state = "AUDIT_PERSISTENCE_FAILED"
+            raise RuntimeError(RECOVERY_AUDIT_UNAVAILABLE) from error
+
     def _trusted_now(self) -> datetime:
         now = self._clock()
         if (
@@ -1010,6 +1175,11 @@ class CommerceLabService:
 
             tools = ObservedCommerceTools(self.store, recorder.tool)
             operational_counters = OperationalCounters()
+            run_registry = self.recovery_registry.instrumented(
+                lambda _merchant_id: (
+                    operational_counters.record_trusted_evidence_provider_call()
+                )
+            )
             if run.mode == "offline":
                 buyer_delegate: CommerceBuyer = ToolDrivenOfflineBuyer(tools)
                 embedding = HashingEmbeddingProvider()
@@ -1130,7 +1300,6 @@ class CommerceLabService:
                 key_id = "commerce-lab-offline-hmac-v1"
                 account_scope = "razorpay-test-offline-demo"
                 provider = OfflineTestOrdersClient()
-                external = False
             else:
                 execution_key = os.environ["MANDATEGUARD_EXECUTION_HMAC_KEY"].encode(
                     "utf-8"
@@ -1144,11 +1313,10 @@ class CommerceLabService:
                     key_id=razorpay_key_id,
                     key_secret=os.environ["RAZORPAY_KEY_SECRET"],
                 )
-                external = True
 
             execution_client = ObservedOrdersClient(
                 provider,
-                external=external,
+                counters=operational_counters,
                 on_start=lambda: self._execution_started(recorder),
                 on_complete=lambda: recorder.step(
                     "EXECUTION", "PASS", "Order creation response validated"
@@ -1189,7 +1357,8 @@ class CommerceLabService:
                 semantic_verifier=verifier,
                 evaluated_at=evaluated_at,
                 top_k=run.top_k,
-                alpha=DEFAULT_ALPHA,
+                alpha=self.evidence_policy.alpha,
+                retrieval_mode=self.evidence_policy.retrieval_mode,
                 execute=True,
                 execution_runtime=runtime,
                 decision_nonce=decision_nonce,
@@ -1232,7 +1401,7 @@ class CommerceLabService:
                     scenario=self._replay_scenario(checkout, evaluated_at),
                     authorization=checkout.authorization_result,
                     semantic_evidence=semantic_evidence,
-                    registry=self.recovery_registry,
+                    registry=run_registry,
                     created_at=evaluated_at,
                 )
                 self.recovery_audit_store.append(recovery_state.audit_events)
@@ -1246,6 +1415,8 @@ class CommerceLabService:
                 semantic_verifier=verifier,
                 semantic_evidence=semantic_evidence,
                 operational_counters=operational_counters,
+                recovery_registry=run_registry,
+                trust_configuration=self.trust_configuration(top_k=run.top_k),
                 recovery_state=recovery_state,
             )
             output = self._present_result(run, context)
@@ -1332,6 +1503,11 @@ class CommerceLabService:
                 previous_recovery_event_sha256=event.previous_event_sha256,
                 evidence_set_sha256=event.evidence_set_sha256,
                 authorization_result_sha256=event.authorization_result_sha256,
+                mandate_payload_sha256=event.mandate_payload_sha256,
+                transaction_body_sha256=event.transaction_body_sha256,
+                decision_nonce=event.decision_nonce,
+                execution_request_sha256=event.execution_request_sha256,
+                execution_receipt_id=event.execution_receipt_id,
                 initial_evaluated_at=event.initial_evaluated_at.isoformat(),
                 recovery_started_at=(
                     event.recovery_started_at.isoformat()
@@ -1555,24 +1731,13 @@ class CommerceLabService:
                 for event in recovery_state.audit_events
             )
         )
+        counters = context.operational_counters
         observed_counters = {
-            "openai_calls": context.operational_counters.openai_calls,
-            "razorpay_calls": (
-                context.client.adapter_calls if run.mode == "live" else 0
-            ),
-            "offline_adapter_calls": (
-                context.client.adapter_calls if run.mode == "offline" else 0
-            ),
-            "planner_direct_allow_count": int(
-                recovery_state is not None
-                and recovery_state.final_action is DecisionAction.ALLOW
-                and not reauthorization_seen
-            ),
-            "provider_calls_before_allow": (
-                recovery_state.evidence_provider_calls
-                if recovery_state is not None
-                and recovery_state.final_action is DecisionAction.ALLOW
-                else 0
+            "openai_calls": counters.openai_calls,
+            "razorpay_http_calls": counters.razorpay_http_calls,
+            "offline_adapter_calls": counters.offline_adapter_calls,
+            "trusted_evidence_provider_calls": (
+                counters.trusted_evidence_provider_calls
             ),
             "acquisition_rounds": (
                 recovery_state.rounds_used if recovery_state is not None else 0
@@ -1582,7 +1747,17 @@ class CommerceLabService:
                 if recovery_state is not None
                 else 0
             ),
+            # A recovered ALLOW that never went through a fresh controller
+            # reauthorization would be a planner-issued ALLOW. It must stay 0.
+            "planner_direct_allow_count": int(
+                recovery_state is not None
+                and recovery_state.final_action is DecisionAction.ALLOW
+                and not reauthorization_seen
+            ),
         }
+        validate_observed_counters(
+            observed_counters, context="commerce lab observed counters"
+        )
         return {
             "decision": authorization.final_action.value,
             "decision_reason": final_reason,
@@ -1645,6 +1820,7 @@ class CommerceLabService:
             "recovery": recovery,
             "transactability": self._present_transactability(context),
             "observed_counters": observed_counters,
+            "trust_configuration": dict(context.trust_configuration),
             "models": dict(checkout.trace.models),
             "timings": dict(checkout.trace.timings),
             "raw_trace": checkout.trace.to_mapping(),
@@ -1695,7 +1871,10 @@ class CommerceLabService:
             source = self.recovery_registry.source(
                 preferred.candidate_evidence_ids[0]
             )
-        if state.resolved:
+        audit_available = context.recovery_audit_state == "AVAILABLE"
+        if not audit_available:
+            status = "AUDIT_UNAVAILABLE"
+        elif state.resolved:
             status = "RESOLVED"
         elif state.budget_exhausted:
             status = "BUDGET_EXHAUSTED"
@@ -1706,7 +1885,8 @@ class CommerceLabService:
         else:
             status = "NO_RECOVERABLE_GAP"
         action_enabled = (
-            state.final_action is DecisionAction.REVIEW
+            audit_available
+            and state.final_action is DecisionAction.REVIEW
             and not state.budget_exhausted
             and state.gap_analysis.status is GapAnalysisStatus.RECOVERABLE
         )
@@ -1753,6 +1933,7 @@ class CommerceLabService:
                 "accepts_url": False,
                 "accepts_evidence_text": False,
             },
+            "audit_state": context.recovery_audit_state,
             "rounds_used": state.rounds_used,
             "max_rounds": MAX_ACQUISITION_ROUNDS,
             "new_evidence_items": state.new_evidence_items,

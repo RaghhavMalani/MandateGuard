@@ -2,17 +2,24 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, replace
 from datetime import datetime
 from types import MappingProxyType
-from typing import Mapping
+from typing import Any, Mapping
 
 from mandateguard.core.hashing import sha256_canonical
 from mandateguard.recovery.models import (
+    CLAIM_VALUE_UNESTABLISHED,
+    CONFLICT_CLAIM_METADATA_INCOMPLETE,
+    CONFLICT_DUPLICATE_ID_HASH,
+    CONFLICT_SIMULTANEOUS_AUTHORITY,
     MAX_NEW_EVIDENCE_ITEMS,
+    REQUIRED_CLAIM_NAMESPACES,
     AcquisitionItemStatus,
     EvidenceKind,
     EvidenceScope,
+    TrustedEvidenceManifest,
     TrustedEvidenceRecord,
     TrustedEvidenceSource,
 )
@@ -22,6 +29,22 @@ from mandateguard.semantic.evidence import (
     SemanticEvidenceProviderRegistry,
     acquire_semantic_evidence,
 )
+
+
+class _CountingEvidenceProvider:
+    """Transparent provider proxy that reports one call per real fetch."""
+
+    __slots__ = ("_delegate", "_observe")
+
+    def __init__(self, delegate: object, observe: Callable[[str], None]) -> None:
+        if not callable(getattr(delegate, "fetch_semantic_evidence", None)):
+            raise TypeError("delegate must expose fetch_semantic_evidence")
+        self._delegate = delegate
+        self._observe = observe
+
+    def fetch_semantic_evidence(self, *, merchant_id: str) -> Any:
+        self._observe(merchant_id)
+        return self._delegate.fetch_semantic_evidence(merchant_id=merchant_id)
 
 
 @dataclass(frozen=True, slots=True)
@@ -106,7 +129,13 @@ def _source_identity(source: TrustedEvidenceSource) -> tuple[object, ...]:
         manifest.merchant_id,
         manifest.scope_type,
         manifest.sku,
-        tuple(sorted(zip(manifest.record_ids, manifest.record_hashes, strict=True))),
+        tuple(sorted(kind.value for kind in manifest.evidence_kinds)),
+        tuple(
+            sorted(
+                (record.evidence_id, sha256_canonical(record))
+                for record in manifest.records
+            )
+        ),
     )
 
 
@@ -120,39 +149,220 @@ def _scope_entries(
     return tuple(entry for entry in entries if entry.sku == manifest.sku)
 
 
-def _active_sources(
+def _retired_manifest_ids(
     sources: tuple[TrustedEvidenceSource, ...], at_time: datetime
-) -> tuple[TrustedEvidenceSource, ...]:
-    active = tuple(source for source in sources if source.manifest.active_at(at_time))
-    superseded = {
+) -> frozenset[str]:
+    """Supersession is permanent once the superseding manifest becomes effective.
+
+    A superseded manifest is retired from the moment its replacement takes
+    effect and never becomes authoritative again, including after the
+    replacement itself expires. Resurrecting a withdrawn manifest would let an
+    expiry silently reinstate evidence the merchant had already replaced.
+    """
+
+    return frozenset(
         source.manifest.supersedes_manifest_id
-        for source in active
+        for source in sources
         if source.manifest.supersedes_manifest_id is not None
-    }
+        and at_time >= source.manifest.effective_at
+    )
+
+
+def _active_sources(
+    sources: tuple[TrustedEvidenceSource, ...],
+    at_time: datetime,
+    *,
+    retirement_sources: tuple[TrustedEvidenceSource, ...] | None = None,
+) -> tuple[TrustedEvidenceSource, ...]:
+    retired = _retired_manifest_ids(retirement_sources or sources, at_time)
     return tuple(
-        source for source in active if source.manifest.manifest_id not in superseded
+        source
+        for source in sources
+        if source.manifest.active_at(at_time)
+        and source.manifest.manifest_id not in retired
     )
 
 
 def _applicable_records(
     sources: tuple[TrustedEvidenceSource, ...], at_time: datetime
 ) -> tuple[tuple[str, TrustedEvidenceRecord], ...]:
-    records = tuple(
+    declared = tuple(
         (source.source_id, record)
         for source in sources
         for record in source.manifest.records
-        if record.active_at(at_time)
     )
-    superseded_ids = {
+    # Record supersession is permanent for the same reason as manifest
+    # supersession: it applies once the replacement is effective and survives
+    # the replacement's own expiry.
+    retired_ids = {
         record.supersedes_evidence_id
-        for _, record in records
+        for _, record in declared
         if record.supersedes_evidence_id is not None
+        and at_time >= record.effective_at
     }
     return tuple(
         (source_id, record)
-        for source_id, record in records
-        if record.evidence_id not in superseded_ids
+        for source_id, record in declared
+        if record.active_at(at_time) and record.evidence_id not in retired_ids
     )
+
+
+def _claim_metadata_conflicts(
+    sources: tuple[TrustedEvidenceSource, ...],
+    applicable: tuple[tuple[str, TrustedEvidenceRecord], ...],
+) -> set[str]:
+    """Refuse to authorize when non-conflict cannot be proven from metadata.
+
+    For every conflict-capable evidence kind, compare simultaneously applicable
+    records whose merchant-global/SKU authority overlaps. If either record omits
+    normalized metadata for that kind's namespace, the server cannot prove the
+    claims agree. That is an unresolvable authority conflict, not a question for
+    the semantic model: the verifier may interpret merchant meaning, but it may
+    not decide which authoritative record is the truth. The batch therefore
+    fails closed to `REVIEW` rather than `ALLOW` or `BLOCK`.
+    """
+
+    source_by_id = {source.source_id: source for source in sources}
+    conflicts: set[str] = set()
+
+    def overlaps(left: TrustedEvidenceSource, right: TrustedEvidenceSource) -> bool:
+        if left.merchant_id != right.merchant_id:
+            return False
+        return (
+            left.manifest.scope_type is EvidenceScope.MERCHANT_GLOBAL
+            or right.manifest.scope_type is EvidenceScope.MERCHANT_GLOBAL
+            or left.sku == right.sku
+        )
+
+    # Compare authority pairwise inside the merchant/SKU scope it can govern.
+    # This deliberately lets distinct SKU-specific records disagree: each is
+    # authoritative for a different product. A merchant-global record overlaps
+    # every SKU-specific record for that merchant.
+    for index, (left_source_id, left_record) in enumerate(applicable):
+        left_source = source_by_id[left_source_id]
+        for right_source_id, right_record in applicable[index + 1 :]:
+            right_source = source_by_id[right_source_id]
+            if not overlaps(left_source, right_source):
+                continue
+            common_kinds = set(left_source.evidence_kinds).intersection(
+                right_source.evidence_kinds
+            )
+            for kind, namespace in REQUIRED_CLAIM_NAMESPACES.items():
+                if kind in common_kinds and (
+                    not left_record.declares_claim_namespace(namespace)
+                    or not right_record.declares_claim_namespace(namespace)
+                ):
+                    conflicts.add(CONFLICT_CLAIM_METADATA_INCOMPLETE)
+
+            left_claims = {
+                claim.claim_id: claim.claim_value
+                for claim in left_record.claims
+                if claim.claim_value != CLAIM_VALUE_UNESTABLISHED
+            }
+            right_claims = {
+                claim.claim_id: claim.claim_value
+                for claim in right_record.claims
+                if claim.claim_value != CLAIM_VALUE_UNESTABLISHED
+            }
+            if any(
+                left_claims[claim_id] != right_claims[claim_id]
+                for claim_id in left_claims.keys() & right_claims.keys()
+            ):
+                conflicts.add(CONFLICT_SIMULTANEOUS_AUTHORITY)
+    return conflicts
+
+
+def _windows_overlap(
+    left: TrustedEvidenceManifest, right: TrustedEvidenceManifest
+) -> bool:
+    if left.expires_at is not None and left.expires_at <= right.effective_at:
+        return False
+    if right.expires_at is not None and right.expires_at <= left.effective_at:
+        return False
+    return True
+
+
+def _validate_scope_partition(sources: tuple[TrustedEvidenceSource, ...]) -> None:
+    """Reject registries whose sources can never all be complete.
+
+    `_scope_entries` partitions a provider bundle by authoritative scope alone
+    (merchant, `MERCHANT_GLOBAL` versus `SKU_SPECIFIC`, and SKU). Evidence kinds
+    do not partition it: two sources sharing a scope both receive every entry in
+    that scope, so unless they declare identical evidence kinds and record
+    metadata each makes the other permanently `SOURCE_INCOMPLETE` or creates
+    ambiguous authority metadata. Such a configuration can never recover, so it
+    is refused at construction instead of failing silently at acquisition.
+    Sources that share a scope may coexist when they are true aliases, when
+    their effective windows do not overlap, or when one explicitly supersedes
+    the other.
+    """
+
+    grouped: dict[tuple[str, EvidenceScope, str | None], list[TrustedEvidenceSource]] = {}
+    for source in sources:
+        manifest = source.manifest
+        key = (manifest.merchant_id, manifest.scope_type, manifest.sku)
+        grouped.setdefault(key, []).append(source)
+    for key, group in grouped.items():
+        for index, left in enumerate(group):
+            for right in group[index + 1 :]:
+                if _source_identity(left) == _source_identity(right):
+                    continue
+                if not _windows_overlap(left.manifest, right.manifest):
+                    continue
+                if right.manifest.supersedes_manifest_id == left.manifest.manifest_id:
+                    continue
+                if left.manifest.supersedes_manifest_id == right.manifest.manifest_id:
+                    continue
+                merchant_id, scope_type, sku = key
+                raise ValueError(
+                    "trusted recovery sources "
+                    f"{left.source_id!r} and {right.source_id!r} claim the same "
+                    f"authoritative scope ({merchant_id}, {scope_type.value}, "
+                    f"{sku}) with different authoritative metadata and overlapping "
+                    "effective windows; this configuration is permanently "
+                    "unrecoverable"
+                )
+
+
+def _validate_manifest_supersession(
+    sources: tuple[TrustedEvidenceSource, ...],
+) -> None:
+    """Require every manifest replacement to name an older, identical scope."""
+
+    manifests = {source.manifest.manifest_id: source.manifest for source in sources}
+    supersession: dict[str, str] = {}
+    for source in sources:
+        manifest = source.manifest
+        target_id = manifest.supersedes_manifest_id
+        if target_id is None:
+            continue
+        target = manifests.get(target_id)
+        if target is None:
+            raise ValueError(
+                f"manifest {manifest.manifest_id!r} supersedes an unknown manifest"
+            )
+        if (
+            manifest.merchant_id,
+            manifest.scope_type,
+            manifest.sku,
+        ) != (
+            target.merchant_id,
+            target.scope_type,
+            target.sku,
+        ):
+            raise ValueError("manifest supersession must preserve authoritative scope")
+        if manifest.effective_at < target.effective_at:
+            raise ValueError("a superseding manifest cannot predate its target")
+        supersession[manifest.manifest_id] = target_id
+
+    for manifest_id in supersession:
+        seen: set[str] = set()
+        cursor: str | None = manifest_id
+        while cursor is not None:
+            if cursor in seen:
+                raise ValueError("manifest supersession must be acyclic")
+            seen.add(cursor)
+            cursor = supersession.get(cursor)
 
 
 class TrustedEvidenceSourceRegistry:
@@ -181,16 +391,49 @@ class TrustedEvidenceSourceRegistry:
                 raise ValueError("trusted recovery manifest IDs must be unique")
             mapped[source.source_id] = source
             manifest_ids.add(source.manifest.manifest_id)
+        _validate_manifest_supersession(sources)
+        _validate_scope_partition(sources)
         self._sources: Mapping[str, TrustedEvidenceSource] = MappingProxyType(mapped)
         self._providers = providers
         self.registry_sha256 = sha256_canonical(
-            tuple(source.manifest for source in sorted(sources, key=lambda item: item.source_id))
+            tuple(
+                source.manifest
+                for source in sorted(sources, key=lambda item: item.source_id)
+            )
         )
 
     def source(self, source_id: str) -> TrustedEvidenceSource | None:
         if not isinstance(source_id, str):
             raise TypeError("source_id must be a string")
         return self._sources.get(source_id)
+
+    @property
+    def sources(self) -> tuple[TrustedEvidenceSource, ...]:
+        return tuple(self._sources[key] for key in sorted(self._sources))
+
+    def instrumented(
+        self, observe: Callable[[str], None]
+    ) -> TrustedEvidenceSourceRegistry:
+        """Return the same registry with every provider fetch counted.
+
+        Manifests are unchanged, so `registry_sha256` is identical; only the
+        provider boundary is wrapped. Callers use this to observe real trusted
+        evidence acquisition instead of inferring it from a batch field.
+        """
+
+        if not callable(observe):
+            raise TypeError("observe must be callable")
+        providers = SemanticEvidenceProviderRegistry(
+            {
+                merchant_id: _CountingEvidenceProvider(
+                    self._providers.provider_for(merchant_id=merchant_id), observe
+                )
+                for merchant_id in self._providers.merchant_ids
+            }
+        )
+        return TrustedEvidenceSourceRegistry(
+            sources=self.sources, providers=providers
+        )
 
     def candidates(
         self,
@@ -216,7 +459,9 @@ class TrustedEvidenceSourceRegistry:
             )
             and not set(source.manifest.record_ids).issubset(excluded_evidence_ids)
         )
-        active = _active_sources(possible, at_time)
+        active = _active_sources(
+            possible, at_time, retirement_sources=self.sources
+        )
         unique: dict[tuple[object, ...], TrustedEvidenceSource] = {}
         for source in sorted(active, key=lambda item: item.source_id):
             unique.setdefault(_source_identity(source), source)
@@ -258,6 +503,7 @@ class TrustedEvidenceSourceRegistry:
             raise ValueError("acquired_at must be timezone-aware")
 
         requested = tuple(self._sources.get(source_id) for source_id in source_ids)
+        retired_manifest_ids = _retired_manifest_ids(self.sources, acquired_at)
         invalid_items: list[AcquiredEvidenceItem] = []
         valid: list[TrustedEvidenceSource] = []
         seen_identities: set[tuple[object, ...]] = set()
@@ -290,6 +536,13 @@ class TrustedEvidenceSourceRegistry:
                     )
                 )
                 continue
+            if manifest.manifest_id in retired_manifest_ids:
+                invalid_items.append(
+                    AcquiredEvidenceItem(
+                        status=AcquisitionItemStatus.SOURCE_SUPERSEDED, **common
+                    )
+                )
+                continue
             if acquired_at < manifest.effective_at:
                 invalid_items.append(
                     AcquiredEvidenceItem(
@@ -310,14 +563,16 @@ class TrustedEvidenceSourceRegistry:
             seen_identities.add(identity)
             valid.append(source)
 
-        selected = _active_sources(tuple(valid), acquired_at)
+        selected = _active_sources(
+            tuple(valid), acquired_at, retirement_sources=self.sources
+        )
         applicable = _applicable_records(selected, acquired_at)
         expected_hash_by_id: dict[str, str] = {}
         manifest_conflicts: set[str] = set()
         for _, record in applicable:
             previous = expected_hash_by_id.get(record.evidence_id)
             if previous is not None and previous != record.expected_entry_sha256:
-                manifest_conflicts.add("DUPLICATE_ID_HASH_CONFLICT")
+                manifest_conflicts.add(CONFLICT_DUPLICATE_ID_HASH)
             expected_hash_by_id[record.evidence_id] = record.expected_entry_sha256
         expected_applicable_ids = tuple(sorted(expected_hash_by_id))
 
@@ -485,14 +740,10 @@ class TrustedEvidenceSourceRegistry:
             for entry in active_entries:
                 verified_entries[entry.evidence_id] = entry
 
-        conflict_codes: set[str] = set()
-        claim_values: dict[str, str] = {}
-        for _, record in applicable:
-            for claim in record.claims:
-                previous = claim_values.get(claim.claim_id)
-                if previous is not None and previous != claim.claim_value:
-                    conflict_codes.add("SIMULTANEOUS_AUTHORITY_CONFLICT")
-                claim_values[claim.claim_id] = claim.claim_value
+        # Claim comparison runs after per-source verification so the specific
+        # acquisition failures above keep their own status codes. Both outcomes
+        # below are non-authorizing, so ordering never widens authority.
+        conflict_codes: set[str] = _claim_metadata_conflicts(selected, applicable)
         if conflict_codes:
             source_items = [
                 replace(item, status=AcquisitionItemStatus.CONFLICT, entries=())

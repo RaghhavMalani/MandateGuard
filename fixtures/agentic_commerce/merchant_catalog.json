@@ -66,6 +66,28 @@
       "recurring": false,
       "tags": ["flexi", "desk companion", "digital", "workspace"],
       "evidence_ids": ["nova-terms-v1", "flexi-evidence-v1"]
+    },
+    {
+      "merchant_id": "merchant-lumen",
+      "sku": "aurora-focus-lamp",
+      "name": "Aurora Focus Lamp",
+      "description": "A dimmable warm-white lamp with a weighted base and an incomplete registered terms record.",
+      "effective_unit_price_minor": 149900,
+      "currency": "INR",
+      "recurring": false,
+      "tags": ["aurora", "focus lamp", "lighting", "dimmable"],
+      "evidence_ids": ["lumen-terms-v1", "aurora-listing-v1"]
+    },
+    {
+      "merchant_id": "merchant-veritas",
+      "sku": "signal-edge-workshop",
+      "name": "Signal Edge Workshop",
+      "description": "A recorded workshop listed without a registered syllabus record.",
+      "effective_unit_price_minor": 179900,
+      "currency": "INR",
+      "recurring": false,
+      "tags": ["signal edge", "workshop", "recorded", "session"],
+      "evidence_ids": ["veritas-terms-v1", "signal-edge-listing-v1"]
     }
   ]
 }

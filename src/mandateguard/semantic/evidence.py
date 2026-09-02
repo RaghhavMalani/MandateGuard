@@ -294,6 +294,12 @@ class SemanticEvidenceProviderRegistry:
             configured[merchant_id] = provider
         object.__setattr__(self, "_providers", MappingProxyType(configured))
 
+    @property
+    def merchant_ids(self) -> tuple[str, ...]:
+        """Expose the configured merchant identities without exposing providers."""
+
+        return tuple(sorted(self._providers))
+
     def provider_for(
         self, *, merchant_id: str
     ) -> SemanticEvidenceProvider | None:

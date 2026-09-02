@@ -40,18 +40,20 @@ purchase, and the payment provider was never contacted:
 ## The three outcomes
 
 Every mandate resolves to exactly one of three controller actions. All four journeys below
-are runnable on the live demo.
+are runnable in the current repository build. The public URL is a separately deployed
+snapshot and may lag this branch until a later deployment task.
 
 | Scenario | Final controller | Execution | Provider calls |
 | --- | --- | --- | --- |
-| Safe purchase | `ALLOW` | Signed single-use capability issued, execution permitted | 1 execution call — served by the offline double in the public demo |
+| Safe purchase | `ALLOW` | Signed single-use capability issued, execution permitted | 1 execution call — served by the offline double in the repository demo |
 | Policy violation | `BLOCK` | Execution prevented before Razorpay | **0** |
 | Ambiguous / insufficient evidence | `REVIEW` | Held for human or evidence review | **0** |
 | Recoverable review | `REVIEW → ALLOW` | One registered evidence source acquired, full authorization rerun, then capability issued | **0 before final `ALLOW`**; 1 offline-double call after |
 
-In the public deployment every one of these runs offline: the `ALLOW` path creates its
-receipt through a Test Mode-compatible local double, and external network calls stay at **0**
-in all four cases.
+In the repository's default demo configuration every one of these runs offline: the
+`ALLOW` path creates its receipt through a Test Mode-compatible local double, and external
+network calls stay at **0** in all four cases. The public deployment remains offline-only,
+but may trail this branch until a later deployment task.
 
 And the capability itself is not reusable:
 
@@ -302,7 +304,7 @@ src/mandateguard/
 fixtures/               synthetic catalogs, merchant terms, experiment inputs
 artifacts/engineering/  immutable run records (INT-1, INT-2, INT-3)
 docs/                   methodology, deployment, screenshots
-tests/                  43 Python test modules + UI suite
+tests/                  41 Python test modules + UI suite
 scripts/                entry points, including the Commerce Lab launcher
 ```
 
@@ -322,6 +324,12 @@ Then open <http://127.0.0.1:8080>.
 The server binds `0.0.0.0` by default so the same command works on a PaaS host. Set
 `MANDATEGUARD_PRODUCT_HOST=127.0.0.1` to restrict it to loopback. Port precedence is `PORT`,
 then `MANDATEGUARD_PRODUCT_PORT`, then `8080`; `--host` and `--port` arguments also work.
+
+Set `MANDATEGUARD_STATE_DIR` to keep the semantic cache, execution ledger, and recovery
+audit in one writable directory. Reopening the service with the same directory preserves
+those SQLite stores on the same filesystem. Without it, the offline demo uses temporary
+state. The current public Render blueprint has no persistent disk, so it makes no
+restart-durability claim.
 
 Requires Python 3.12. More detail: [docs/COMMERCE_LAB_LOCAL.md](docs/COMMERCE_LAB_LOCAL.md).
 
@@ -352,8 +360,8 @@ than failing in some less obvious way.
 
 | Gate | Result |
 | --- | --- |
-| Python suite | 590 passed |
-| UI suite | 10 passed |
+| Python suite | 648 passed |
+| UI suite | 13 passed |
 | JavaScript syntax | passed |
 
 Verified against the public deployment: `SAFE` reached `ALLOW` with a simulated offline

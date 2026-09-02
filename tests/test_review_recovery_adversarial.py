@@ -11,12 +11,20 @@ from mandateguard.core.hashing import sha256_canonical, transaction_body_sha256
 from mandateguard.core.nonce_ledger import NonceLedgerState
 from mandateguard.models.decision import DecisionAction
 from mandateguard.models.transaction import Transaction, TransactionLine
-from mandateguard.product.service import CommerceLabService, DEMO_PRESETS
+from mandateguard.product.service import (
+    RECOVERY_AUDIT_UNAVAILABLE,
+    CommerceLabService,
+    DEMO_PRESETS,
+)
 from mandateguard.recovery import (
     AcquisitionItemStatus,
+    CLAIM_VALUE_UNESTABLISHED,
+    CONFLICT_CLAIM_METADATA_INCOMPLETE,
     EvidenceKind,
     EvidenceScope,
     GapAnalysisStatus,
+    OBSERVED_COUNTER_NAMES,
+    RecoveryAuditStoreError,
     SQLiteRecoveryAuditStore,
     TrustedEvidenceClaim,
     TrustedEvidenceManifest,
@@ -39,13 +47,30 @@ from mandateguard.semantic.evidence import (
 
 T0 = datetime(2026, 9, 2, 8, 0, tzinfo=timezone.utc)
 PRESETS = {item["id"]: item for item in DEMO_PRESETS}
+_UNANNOTATED_DEFAULT_CLAIMS = (
+    TrustedEvidenceClaim("billing.model", CLAIM_VALUE_UNESTABLISHED),
+    TrustedEvidenceClaim("content.class", CLAIM_VALUE_UNESTABLISHED),
+)
+
+
+def _annotated(*explicit: TrustedEvidenceClaim) -> tuple[TrustedEvidenceClaim, ...]:
+    """Complete a record's claim metadata with explicit non-assertions."""
+
+    covered = {claim.claim_id.split(".", 1)[0] for claim in explicit}
+    return explicit + tuple(
+        claim
+        for claim in _UNANNOTATED_DEFAULT_CLAIMS
+        if claim.claim_id.split(".", 1)[0] not in covered
+    )
 
 
 @dataclass
 class _Provider:
     entries: tuple[SemanticEvidenceEntry, ...]
+    calls: int = 0
 
     def fetch_semantic_evidence(self, *, merchant_id: str) -> SemanticEvidenceBundle:
+        self.calls += 1
         return SemanticEvidenceBundle(merchant_id=merchant_id, entries=self.entries)
 
 
@@ -63,6 +88,16 @@ class _FailingCache:
 
 
 @dataclass
+class _ForbiddenSemanticModel:
+    model_id: str = "must-not-evaluate-authority-conflict"
+    calls: int = 0
+
+    def evaluate(self, request: object) -> object:
+        self.calls += 1
+        raise AssertionError("semantic model must not resolve an authority conflict")
+
+
+@dataclass
 class _MutableClock:
     value: datetime
 
@@ -73,8 +108,8 @@ class _MutableClock:
 def _entry(
     evidence_id: str,
     *,
-    merchant_id: str = "merchant-scholarly",
-    sku: str | None = "studyglow-desk-lamp",
+    merchant_id: str = "merchant-lumen",
+    sku: str | None = "aurora-focus-lamp",
     text: str | None = None,
 ) -> SemanticEvidenceEntry:
     return SemanticEvidenceEntry(
@@ -91,7 +126,7 @@ def _source(
     entries: tuple[SemanticEvidenceEntry, ...],
     *,
     scope: EvidenceScope = EvidenceScope.SKU_SPECIFIC,
-    sku: str | None = "studyglow-desk-lamp",
+    sku: str | None = "aurora-focus-lamp",
     kinds: tuple[EvidenceKind, ...] = (
         EvidenceKind.PURPOSE,
         EvidenceKind.RECURRENCE,
@@ -117,7 +152,13 @@ def _source(
             ),
             effective_at=T0 - timedelta(days=1),
             supersedes_evidence_id=supersedes.get(entry.evidence_id),
-            claims=normalized_claims if index == len(entries) - 1 else (),
+            # Records of conflict-capable kinds must be annotated, so records
+            # without an explicit claim declare an explicit non-assertion.
+            claims=(
+                _annotated(*normalized_claims)
+                if index == len(entries) - 1 and normalized_claims
+                else _UNANNOTATED_DEFAULT_CLAIMS
+            ),
         )
         for index, entry in enumerate(entries)
     )
@@ -159,8 +200,8 @@ def _acquire(
     registry: TrustedEvidenceSourceRegistry,
     source_ids: tuple[str, ...],
     *,
-    merchant_id: str = "merchant-scholarly",
-    skus: tuple[str, ...] = ("studyglow-desk-lamp",),
+    merchant_id: str = "merchant-lumen",
+    skus: tuple[str, ...] = ("aurora-focus-lamp",),
     item_limit: int = 4,
 ):
     return registry.acquire(
@@ -177,7 +218,6 @@ def _initial_review(service: CommerceLabService) -> tuple[dict, object]:
     snapshot = service.run_sync(
         user_intent=PRESETS["recoverable"]["intent"],
         preset_id="recoverable",
-        top_k=2,
     )
     assert snapshot["result"]["decision"] == "REVIEW"
     return snapshot, service.get_run(snapshot["run_id"]).private_context
@@ -239,8 +279,14 @@ def test_simultaneously_authoritative_records_that_disagree_force_review(
     second = _entry("recurring-record")
     source = _source("conflicting-source", (first, second))
     records = (
-        replace(source.manifest.records[0], claims=(TrustedEvidenceClaim(*values[0]),)),
-        replace(source.manifest.records[1], claims=(TrustedEvidenceClaim(*values[1]),)),
+        replace(
+            source.manifest.records[0],
+            claims=_annotated(TrustedEvidenceClaim(*values[0])),
+        ),
+        replace(
+            source.manifest.records[1],
+            claims=_annotated(TrustedEvidenceClaim(*values[1])),
+        ),
     )
     source = replace(source, manifest=replace(source.manifest, records=records))
     batch = _acquire(_registry((source,), (first, second)), (source.source_id,))
@@ -262,6 +308,35 @@ def test_explicit_record_supersession_uses_only_the_new_record() -> None:
     assert batch.complete is True
     assert batch.expected_applicable_ids == ("terms-v2",)
     assert tuple(entry.evidence_id for entry in batch.acquired_entries) == ("terms-v2",)
+
+
+def test_expired_superseding_record_does_not_resurrect_old_record() -> None:
+    old = _entry("record-v1")
+    new = _entry("record-v2")
+    source = _source(
+        "record-supersession-source",
+        (old, new),
+        supersedes={"record-v2": "record-v1"},
+        claims=(("billing.model", "ONE_TIME"),),
+    )
+    old_record, new_record = source.manifest.records
+    source = replace(
+        source,
+        manifest=replace(
+            source.manifest,
+            records=(old_record, replace(new_record, expires_at=T0)),
+        ),
+    )
+    provider = _Provider((old, new))
+    batch = _acquire(
+        _registry((source,), (old, new), provider=provider),
+        (source.source_id,),
+    )
+    assert batch.complete is False
+    assert batch.expected_applicable_ids == ()
+    assert batch.provider_calls == 0
+    assert provider.calls == 0
+    assert batch.items[0].status is AcquisitionItemStatus.SOURCE_EXPIRED
 
 
 def test_sku_specific_source_rejects_global_record() -> None:
@@ -306,6 +381,101 @@ def test_global_and_sku_specific_records_combine_but_neither_overrides_conflict(
     assert batch.conflict_codes == ("SIMULTANEOUS_AUTHORITY_CONFLICT",)
 
 
+def test_unannotated_one_time_and_recurring_authorities_stay_review_without_execution(
+    tmp_path: Path,
+) -> None:
+    """Missing claim metadata cannot delegate authority ranking to semantics."""
+
+    service = CommerceLabService(state_dir=tmp_path / "state", clock=lambda: T0)
+    try:
+        initial, context = _initial_review(service)
+        initial_entries = context.semantic_evidence.bundle.entries
+        initial_global = next(entry for entry in initial_entries if entry.sku is None)
+        initial_sku = next(entry for entry in initial_entries if entry.sku is not None)
+        one_time = _entry(
+            "unannotated-one-time",
+            sku=None,
+            text="This product is sold as a one-time purchase.",
+        )
+        recurring = _entry(
+            "unannotated-recurring",
+            text="This product automatically renews every month.",
+        )
+        global_source = _source(
+            "unannotated-global",
+            (initial_global, one_time),
+            scope=EvidenceScope.MERCHANT_GLOBAL,
+            sku=None,
+            kinds=(EvidenceKind.PURPOSE, EvidenceKind.RECURRENCE),
+        )
+        recurring_source = _source(
+            "unannotated-sku",
+            (initial_sku, recurring),
+            kinds=(EvidenceKind.PURPOSE, EvidenceKind.RECURRENCE),
+        )
+        global_source = replace(
+            global_source,
+            manifest=replace(
+                global_source.manifest,
+                records=tuple(
+                    replace(record, claims=())
+                    for record in global_source.manifest.records
+                ),
+            ),
+        )
+        recurring_source = replace(
+            recurring_source,
+            manifest=replace(
+                recurring_source.manifest,
+                records=tuple(
+                    replace(record, claims=())
+                    for record in recurring_source.manifest.records
+                ),
+            ),
+        )
+        provider = _Provider((initial_global, one_time, initial_sku, recurring))
+        registry = _registry(
+            (global_source, recurring_source),
+            provider.entries,
+            provider=provider,
+        )
+        forbidden_model = _ForbiddenSemanticModel()
+        context.semantic_verifier = SemanticVerifier(
+            model=forbidden_model,
+            cache=context.semantic_verifier.cache,
+        )
+        context.recovery_registry = registry
+        custom_state = create_review_recovery(
+            scenario=context.recovery_state.scenario,
+            authorization=context.recovery_state.initial_authorization,
+            semantic_evidence=context.semantic_evidence,
+            registry=registry,
+            created_at=T0,
+        )
+        # Keep the already persisted initial chain, changing only the
+        # server-owned diagnostic/source plan used by this adversarial round.
+        context.recovery_state = replace(
+            context.recovery_state,
+            gap_analysis=custom_state.gap_analysis,
+        )
+
+        recovered = service.recover(initial["run_id"])
+        result = recovered["result"]
+        assert result["decision"] == "REVIEW"
+        assert CONFLICT_CLAIM_METADATA_INCOMPLETE in next(
+            event.outcome_codes
+            for event in context.recovery_state.audit_events
+            if event.event.value == "ACQUISITION_RESULT"
+        )
+        assert forbidden_model.calls == 0
+        assert provider.calls == 1
+        assert result["execution"]["capability"] is None
+        assert result["execution"]["razorpay_calls"] == 0
+        assert result["observed_counters"]["offline_adapter_calls"] == 0
+    finally:
+        service.close()
+
+
 def test_preset_id_has_no_effect_on_evidence_or_authorization_hashes(
     tmp_path: Path,
 ) -> None:
@@ -315,13 +485,11 @@ def test_preset_id_has_no_effect_on_evidence_or_authorization_hashes(
         first = service.run_sync(
             user_intent=intent,
             preset_id="safe",
-            top_k=2,
             request_id="preset_isolation_first",
         )
         second = service.run_sync(
             user_intent=intent,
             preset_id="recoverable",
-            top_k=2,
             request_id="preset_isolation_second",
         )
         first_context = service.get_run(first["run_id"]).private_context
@@ -537,11 +705,16 @@ def test_duplicate_source_aliases_do_not_starve_later_candidate() -> None:
     second = _entry("second-record")
     primary = _source("alias-a", (first,))
     alias = _source("alias-b", (first,))
-    later = _source("later-source", (second,))
+    later = _source(
+        "later-source",
+        (replace(second, sku=None),),
+        scope=EvidenceScope.MERCHANT_GLOBAL,
+        sku=None,
+    )
     registry = _registry((primary, alias, later), (first, second))
     candidates = registry.candidates(
-        merchant_id="merchant-scholarly",
-        sku="studyglow-desk-lamp",
+        merchant_id="merchant-lumen",
+        sku="aurora-focus-lamp",
         evidence_kind=EvidenceKind.PURPOSE,
         at_time=T0,
     )
@@ -560,7 +733,7 @@ def test_multiline_gap_detection_resolves_each_sku_independently(
         scenario = context.recovery_state.scenario
         original = scenario.transaction.payload.lines[0]
         second_line = TransactionLine(
-            sku="field-notebook-set",
+            sku="aurora-desk-riser",
             effective_unit_price_minor=49900,
             quantity=1,
             line_total_minor=49900,
@@ -576,10 +749,10 @@ def test_multiline_gap_detection_resolves_each_sku_independently(
             payload=payload,
             declared_transaction_hash=transaction_body_sha256(payload),
         )
-        first_entry = _entry("studyglow-complete", sku=original.sku)
-        second_entry = _entry("notebook-complete", sku=second_line.sku)
-        first_source = _source("studyglow-source", (first_entry,), sku=original.sku)
-        second_source = _source("notebook-source", (second_entry,), sku=second_line.sku)
+        first_entry = _entry("aurora-complete", sku=original.sku)
+        second_entry = _entry("riser-complete", sku=second_line.sku)
+        first_source = _source("aurora-source", (first_entry,), sku=original.sku)
+        second_source = _source("riser-source", (second_entry,), sku=second_line.sku)
         registry = _registry(
             (first_source, second_source), (first_entry, second_entry)
         )
@@ -594,12 +767,12 @@ def test_multiline_gap_detection_resolves_each_sku_independently(
         )
         assert gaps.status is GapAnalysisStatus.RECOVERABLE
         assert {gap.sku for gap in gaps.gaps} == {
-            "studyglow-desk-lamp",
-            "field-notebook-set",
+            "aurora-focus-lamp",
+            "aurora-desk-riser",
         }
         expected_source = {
-            "studyglow-desk-lamp": "studyglow-source",
-            "field-notebook-set": "notebook-source",
+            "aurora-focus-lamp": "aurora-source",
+            "aurora-desk-riser": "riser-source",
         }
         for gap in gaps.gaps:
             assert gap.candidate_evidence_ids == (expected_source[gap.sku],)
@@ -620,7 +793,7 @@ def test_multiline_gap_detection_fails_closed_when_one_sku_has_no_source(
             authorization=context.recovery_state.initial_authorization,
             mandate=scenario.mandate,
             merchant_id=scenario.transaction.payload.merchant_id,
-            skus=("studyglow-desk-lamp", "unregistered-second-line"),
+            skus=("aurora-focus-lamp", "unregistered-second-line"),
             current_entries=(),
             registry=_registry((source,), (covered,)),
             created_at=T0,
@@ -662,7 +835,9 @@ def test_duplicate_evidence_id_with_different_manifest_hash_forces_review() -> N
     first = _source("duplicate-source-a", (entry,))
     second = _source(
         "duplicate-source-b",
-        (entry,),
+        (replace(entry, sku=None),),
+        scope=EvidenceScope.MERCHANT_GLOBAL,
+        sku=None,
         expected_hashes={entry.evidence_id: "0" * 64},
     )
     batch = _acquire(
@@ -687,6 +862,140 @@ def test_expired_manifest_record_is_rejected_before_provider() -> None:
     assert batch.complete is False
     assert batch.provider_calls == 0
     assert batch.items[0].status is AcquisitionItemStatus.SOURCE_EXPIRED
+
+
+def test_source_not_effective_is_rejected_before_provider() -> None:
+    entry = _entry("future-source-record")
+    source = _source("future-source", (entry,))
+    source = replace(
+        source,
+        manifest=replace(
+            source.manifest,
+            effective_at=T0 + timedelta(days=1),
+        ),
+    )
+    provider = _Provider((entry,))
+    batch = _acquire(
+        _registry((source,), (entry,), provider=provider),
+        (source.source_id,),
+    )
+    assert batch.complete is False
+    assert batch.provider_calls == 0
+    assert provider.calls == 0
+    assert batch.items[0].status is AcquisitionItemStatus.SOURCE_NOT_EFFECTIVE
+
+
+def test_expired_manifest_is_rejected_before_provider() -> None:
+    entry = _entry("expired-manifest-record")
+    source = _source("expired-manifest-source", (entry,))
+    source = replace(
+        source,
+        manifest=replace(source.manifest, expires_at=T0),
+    )
+    provider = _Provider((entry,))
+    batch = _acquire(
+        _registry((source,), (entry,), provider=provider),
+        (source.source_id,),
+    )
+    assert batch.complete is False
+    assert batch.provider_calls == 0
+    assert provider.calls == 0
+    assert batch.items[0].status is AcquisitionItemStatus.SOURCE_EXPIRED
+
+
+def test_manifest_supersession_selects_only_the_replacement() -> None:
+    old_entry = _entry("manifest-old")
+    new_entry = _entry("manifest-new")
+    old = _source("manifest-source-v1", (old_entry,))
+    new = _source(
+        "manifest-source-v2",
+        (new_entry,),
+        supersedes_manifest_id=old.manifest.manifest_id,
+    )
+    provider = _Provider((new_entry,))
+    registry = _registry((old, new), (new_entry,), provider=provider)
+
+    candidates = registry.candidates(
+        merchant_id="merchant-lumen",
+        sku="aurora-focus-lamp",
+        evidence_kind=EvidenceKind.RECURRENCE,
+        at_time=T0,
+    )
+    assert tuple(source.source_id for source in candidates) == (new.source_id,)
+    old_batch = _acquire(registry, (old.source_id,))
+    assert old_batch.provider_calls == 0
+    assert old_batch.items[0].status is AcquisitionItemStatus.SOURCE_SUPERSEDED
+    new_batch = _acquire(registry, (new.source_id,))
+    assert new_batch.complete is True
+    assert tuple(entry.evidence_id for entry in new_batch.acquired_entries) == (
+        new_entry.evidence_id,
+    )
+
+
+def test_expired_superseding_manifest_never_resurrects_old_manifest() -> None:
+    old_entry = _entry("permanently-retired-v1")
+    new_entry = _entry("expired-replacement-v2")
+    old = _source("permanent-source-v1", (old_entry,))
+    new = _source(
+        "permanent-source-v2",
+        (new_entry,),
+        supersedes_manifest_id=old.manifest.manifest_id,
+    )
+    new = replace(new, manifest=replace(new.manifest, expires_at=T0))
+    provider = _Provider((old_entry, new_entry))
+    registry = _registry((old, new), (old_entry, new_entry), provider=provider)
+
+    assert registry.candidates(
+        merchant_id="merchant-lumen",
+        sku="aurora-focus-lamp",
+        evidence_kind=EvidenceKind.RECURRENCE,
+        at_time=T0,
+    ) == ()
+    old_batch = _acquire(registry, (old.source_id,))
+    new_batch = _acquire(registry, (new.source_id,))
+    assert old_batch.items[0].status is AcquisitionItemStatus.SOURCE_SUPERSEDED
+    assert new_batch.items[0].status is AcquisitionItemStatus.SOURCE_EXPIRED
+    assert provider.calls == 0
+
+
+def test_registry_rejects_overlapping_same_scope_sources_even_if_kinds_differ() -> None:
+    purpose_entry = _entry("same-scope-purpose")
+    recurrence_entry = _entry("same-scope-recurrence")
+    purpose = _source(
+        "same-scope-purpose-source",
+        (purpose_entry,),
+        kinds=(EvidenceKind.PURPOSE,),
+    )
+    recurrence = _source(
+        "same-scope-recurrence-source",
+        (recurrence_entry,),
+        kinds=(EvidenceKind.RECURRENCE,),
+    )
+    with pytest.raises(ValueError, match="permanently unrecoverable"):
+        _registry((purpose, recurrence), (purpose_entry, recurrence_entry))
+
+
+def test_sku_specific_manifest_requires_a_sku_at_construction() -> None:
+    entry = _entry("missing-sku-manifest")
+    with pytest.raises(ValueError, match="sku"):
+        TrustedEvidenceManifest(
+            manifest_id="missing-sku-manifest:1",
+            source_id="missing-sku-source",
+            merchant_id="merchant-lumen",
+            scope_type=EvidenceScope.SKU_SPECIFIC,
+            sku=None,
+            evidence_kinds=(EvidenceKind.PURPOSE,),
+            manifest_version="1",
+            effective_at=T0,
+            expires_at=None,
+            records=(
+                TrustedEvidenceRecord(
+                    evidence_id=entry.evidence_id,
+                    expected_entry_sha256=sha256_canonical(entry),
+                    effective_at=T0,
+                ),
+            ),
+        )
 
 
 def test_initial_evidence_omission_cannot_increase_authority(tmp_path: Path) -> None:
@@ -791,6 +1100,40 @@ def test_recovery_audit_is_persisted_with_complete_provenance(tmp_path: Path) ->
         reopened.close()
 
 
+def test_round_audit_append_failure_wedges_review_safely_before_provider(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    service = CommerceLabService(state_dir=tmp_path / "state", clock=lambda: T0)
+    try:
+        initial, context = _initial_review(service)
+        provider_calls_before = (
+            context.operational_counters.trusted_evidence_provider_calls
+        )
+
+        def fail_append(_store: object, _events: object) -> None:
+            raise RecoveryAuditStoreError("injected append failure")
+
+        monkeypatch.setattr(SQLiteRecoveryAuditStore, "append", fail_append)
+        with pytest.raises(RuntimeError, match=RECOVERY_AUDIT_UNAVAILABLE):
+            service.recover(initial["run_id"])
+
+        state = context.recovery_state
+        assert state.rounds_used == 1
+        assert state.round_in_flight == 1
+        assert context.recovery_audit_state == "AUDIT_PERSISTENCE_FAILED"
+        assert (
+            context.operational_counters.trusted_evidence_provider_calls
+            == provider_calls_before
+        )
+        assert context.client.adapter_calls == 0
+        assert context.checkout.execution_authorization is None
+        with pytest.raises(RuntimeError, match=RECOVERY_AUDIT_UNAVAILABLE):
+            service.recover(initial["run_id"])
+        assert context.client.adapter_calls == 0
+    finally:
+        service.close()
+
+
 def test_future_evaluation_metrics_are_observed_from_runtime_counters(
     tmp_path: Path,
 ) -> None:
@@ -801,12 +1144,13 @@ def test_future_evaluation_metrics_are_observed_from_runtime_counters(
         counters = recovered["result"]["observed_counters"]
         assert counters == {
             "openai_calls": 0,
-            "razorpay_calls": 0,
+            "razorpay_http_calls": 0,
             "offline_adapter_calls": 1,
-            "planner_direct_allow_count": 0,
-            "provider_calls_before_allow": 1,
+            "trusted_evidence_provider_calls": 1,
             "acquisition_rounds": 1,
             "new_evidence_items": 1,
+            "planner_direct_allow_count": 0,
         }
+        assert set(counters) == set(OBSERVED_COUNTER_NAMES)
     finally:
         service.close()

@@ -2,6 +2,20 @@
   "merchant_id": "merchant-nova",
   "entries": [
     {
+      "evidence_id": "nova-terms-v1",
+      "merchant_id": "merchant-nova",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Nova Marketplace records an introductory checkout price. Longer-term billing and product-purpose classifications are not documented in the registered terms."
+    },
+    {
+      "evidence_id": "flexi-evidence-v1",
+      "merchant_id": "merchant-nova",
+      "sku": "flexi-desk-companion",
+      "source_kind": "product_description",
+      "text": "The registered listing describes configurable digital modules. Intended use, content classification, and longer-term billing obligations are not documented."
+    },
+    {
       "evidence_id": "flexi-sku-terms-v2",
       "merchant_id": "merchant-nova",
       "sku": "flexi-desk-companion",

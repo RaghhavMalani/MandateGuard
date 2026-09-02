@@ -383,10 +383,10 @@ def test_offline_flow_performs_zero_network_calls(tmp_path, monkeypatch):
     cache.close()
 
 
-def test_synthetic_catalog_contains_six_products():
+def test_synthetic_catalog_contains_eight_distinct_products():
     store = make_store()
-    assert len(store.products) == 6
-    assert len({(item.merchant_id, item.sku) for item in store.products}) == 6
+    assert len(store.products) == 8
+    assert len({(item.merchant_id, item.sku) for item in store.products}) == 8
 
 
 def test_responses_usage_proxy_records_only_available_token_counts():

@@ -6,6 +6,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 import re
+from types import MappingProxyType
+from typing import Mapping
 
 from mandateguard.core.hashing import sha256_canonical
 from mandateguard.models.decision import DecisionAction
@@ -67,6 +69,40 @@ class EvidenceScope(str, Enum):
     SKU_SPECIFIC = "SKU_SPECIFIC"
 
 
+#: Reserved claim value meaning "this authoritative record asserts nothing here".
+#: It satisfies the claim-metadata requirement below and never conflicts with an
+#: assertion, because declared non-assertion is not a competing truth claim.
+CLAIM_VALUE_UNESTABLISHED = "UNESTABLISHED"
+
+#: Evidence kinds whose records assert a conflict-capable fact, and the claim
+#: namespace each such record must annotate. `RECURRENCE` records assert the
+#: billing model; `EXCLUSION` records assert presence or absence of a prohibited
+#: characteristic. Two simultaneously applicable records of these kinds can
+#: contradict each other, so the server must be able to compare them
+#: deterministically. `PURPOSE` is deliberately absent: purpose evidence only
+#: adds support for a declared use and never asserts the negation that would
+#: make another record's support false, so a missing purpose claim cannot hide a
+#: contradiction. Purpose records may still annotate `purpose.*` claims, and
+#: those claims are compared for conflict when present.
+REQUIRED_CLAIM_NAMESPACES: Mapping[EvidenceKind, str] = MappingProxyType(
+    {
+        EvidenceKind.RECURRENCE: "billing",
+        EvidenceKind.EXCLUSION: "content",
+    }
+)
+
+CONFLICT_SIMULTANEOUS_AUTHORITY = "SIMULTANEOUS_AUTHORITY_CONFLICT"
+CONFLICT_DUPLICATE_ID_HASH = "DUPLICATE_ID_HASH_CONFLICT"
+CONFLICT_CLAIM_METADATA_INCOMPLETE = "CLAIM_METADATA_INCOMPLETE"
+AUTHORITY_CONFLICT_UNRESOLVABLE_CODES = frozenset(
+    {
+        CONFLICT_SIMULTANEOUS_AUTHORITY,
+        CONFLICT_DUPLICATE_ID_HASH,
+        CONFLICT_CLAIM_METADATA_INCOMPLETE,
+    }
+)
+
+
 class GapAnalysisStatus(str, Enum):
     RECOVERABLE = "RECOVERABLE_GAP"
     NONE = "NO_RECOVERABLE_GAP"
@@ -83,6 +119,7 @@ class AcquisitionItemStatus(str, Enum):
     BUDGET_INSUFFICIENT = "EVIDENCE_BUDGET_INSUFFICIENT"
     SOURCE_NOT_EFFECTIVE = "SOURCE_NOT_EFFECTIVE"
     SOURCE_EXPIRED = "SOURCE_EXPIRED"
+    SOURCE_SUPERSEDED = "SOURCE_SUPERSEDED"
     SOURCE_UNAVAILABLE = "SOURCE_UNAVAILABLE"
     CONFLICT = "REVIEW_ON_CONFLICT"
     INITIAL_EVIDENCE_UNMANIFESTED = "INITIAL_EVIDENCE_UNMANIFESTED"
@@ -98,6 +135,7 @@ class RecoveryEventType(str, Enum):
     REAUTHORIZATION = "REAUTHORIZATION"
     REVIEW_RESOLVED = "REVIEW_RESOLVED"
     RECOVERY_FAILED = "RECOVERY_FAILED"
+    EXECUTION_LINKED = "EXECUTION_LINKED"
 
     # Source-compatible aliases for callers from the first Resolve prototype.
     REVIEW_CREATED = "INITIAL_REVIEW"
@@ -154,6 +192,12 @@ class TrustedEvidenceRecord:
         return self.effective_at <= at_time and (
             self.expires_at is None or at_time < self.expires_at
         )
+
+    def declares_claim_namespace(self, namespace: str) -> bool:
+        """Report whether this record carries normalized metadata for a namespace."""
+
+        prefix = f"{namespace}."
+        return any(claim.claim_id.startswith(prefix) for claim in self.claims)
 
 
 @dataclass(frozen=True, slots=True)
@@ -337,6 +381,11 @@ class RecoveryAuditEvent:
     initial_evaluated_at: datetime
     recovery_started_at: datetime | None
     recovery_authorized_at: datetime | None
+    mandate_payload_sha256: str
+    transaction_body_sha256: str
+    decision_nonce: str | None
+    execution_request_sha256: str | None
+    execution_receipt_id: str | None
     evidence_set_sha256: str
     authorization_result_sha256: str | None
     constraint_statuses: tuple[str, ...]
@@ -371,6 +420,17 @@ class RecoveryAuditEvent:
         _identifier(self.review_id, "review_id")
         if isinstance(self.round_number, bool) or not isinstance(self.round_number, int) or self.round_number < 0:
             raise ValueError("round_number must be non-negative")
+        _digest(self.mandate_payload_sha256, "mandate_payload_sha256")
+        _digest(self.transaction_body_sha256, "transaction_body_sha256")
+        _digest(
+            self.execution_request_sha256, "execution_request_sha256", nullable=True
+        )
+        for value, name in (
+            (self.decision_nonce, "decision_nonce"),
+            (self.execution_receipt_id, "execution_receipt_id"),
+        ):
+            if value is not None:
+                _identifier(value, name)
         _digest(self.evidence_set_sha256, "evidence_set_sha256")
         _digest(self.authorization_result_sha256, "authorization_result_sha256", nullable=True)
         _digest(self.registry_sha256, "registry_sha256")

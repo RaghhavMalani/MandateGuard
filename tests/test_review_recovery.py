@@ -12,10 +12,18 @@ import pytest
 
 from mandateguard.core.hashing import sha256_canonical
 from mandateguard.models.decision import DecisionAction
-from mandateguard.product.service import CommerceLabService, DEMO_PRESETS
+from mandateguard.product.evidence_policy import PRODUCT_EVIDENCE_POLICY
+from mandateguard.product.service import (
+    CommerceLabService,
+    DEMO_PRESETS,
+    RESOLVE_EVALUATION_SCENARIOS,
+)
 from mandateguard.recovery import (
+    EVALUATION_METRIC_NAMES,
     MAX_ACQUISITION_ROUNDS,
     MAX_NEW_EVIDENCE_ITEMS,
+    METRIC_SCHEMA_VERSION,
+    MetricSchemaError,
     AcquisitionItemStatus,
     EvidenceKind,
     EvidenceScope,
@@ -27,6 +35,8 @@ from mandateguard.recovery import (
     TrustedEvidenceSourceRegistry,
     create_review_recovery,
     recover_review_once,
+    validate_metric_names,
+    validate_observed_counters,
 )
 from mandateguard.semantic.evidence import (
     SemanticEvidenceBundle,
@@ -55,7 +65,9 @@ def _run(
     *,
     top_k: int | None = None,
 ) -> dict:
-    kwargs = {"top_k": 2 if top_k is None else top_k}
+    """Run a preset at the product default evidence policy unless overridden."""
+
+    kwargs = {} if top_k is None else {"top_k": top_k}
     return service.run_sync(
         user_intent=PRESETS[preset_id]["intent"],
         preset_id=preset_id,
@@ -107,7 +119,9 @@ def test_fresh_authorization_resolves_review_to_allow_and_changes_evidence_hash(
     assert result["execution"]["razorpay_calls"] == 1
     assert result["execution"]["external_network_calls"] == 0
     assert [item["evidence_id"] for item in result["evidence"]["cards"]] == [
-        "studyglow-sku-terms-v2"
+        "aurora-listing-v1",
+        "lumen-terms-v1",
+        "aurora-sku-terms-v2",
     ]
 
     events = [item["event"] for item in recovered["audit"]]
@@ -166,7 +180,7 @@ def test_new_trusted_evidence_can_resolve_review_to_block_without_execution(
 def test_semantic_verifier_can_still_abstain_after_acquisition(
     service: CommerceLabService,
 ) -> None:
-    initial = _run(service, "review", top_k=2)
+    initial = _run(service, "review")
     recovered = service.recover(initial["run_id"])
     result = recovered["result"]
 
@@ -418,7 +432,7 @@ def test_round_budget_terminates_repeated_no_record_acquisition(
         )
 
 
-def test_non_benchmark_evaluation_plan_was_frozen_and_outcomes_are_bounded() -> None:
+def test_non_benchmark_evaluation_plan_remains_unfrozen_and_schema_valid() -> None:
     root = Path(__file__).resolve().parents[1]
     plan = json.loads(
         (
@@ -429,45 +443,75 @@ def test_non_benchmark_evaluation_plan_was_frozen_and_outcomes_are_bounded() -> 
             / "evaluation_plan.json"
         ).read_text(encoding="utf-8")
     )
-    summary = json.loads(
-        (
-            root
-            / "artifacts"
-            / "engineering"
-            / "review_recovery"
-            / "resolve-nonbenchmark-v1"
-            / "summary.json"
-        ).read_text(encoding="utf-8")
-    )
 
-    assert plan["status"] == "FROZEN_BEFORE_OUTCOMES"
-    assert plan["limits"] == {
-        "max_acquisition_rounds": MAX_ACQUISITION_ROUNDS,
-        "max_new_evidence_items": MAX_NEW_EVIDENCE_ITEMS,
+    assert plan["status"] == "DRAFT_PRE_EVALUATION"
+    assert plan["execution_permitted"] is False
+    assert plan["expansion"] == {
+        "target_case_count": 20,
+        "defined_case_count": 3,
+        "status": "NOT_EXPANDED_OR_FROZEN",
     }
-    assert summary["classification"] == (
-        "NON_BENCHMARK_SYNTHETIC_ENGINEERING_EVALUATION"
-    )
-    assert summary["metrics"] == {
-        "initial_review_count": 3,
-        "resolved_after_bounded_acquisition": 2,
-        "resolved_to_allow": 1,
-        "resolved_to_block": 1,
-        "still_review": 1,
-        "mean_additional_trusted_evidence_items": {
-            "numerator": 3,
-            "denominator": 3,
-            "decimal": "1.000",
-        },
-        "max_acquisition_rounds": 1,
-        "payment_provider_calls_before_final_allow": 0,
-        "planner_direct_unsafe_allow_count": 0,
-        "synthetic_transaction_value_released_from_review_minor": 129900,
-    }
-    assert summary["architecture_verification"]["planner_can_emit_allow_or_block"] is False
-    assert summary["external_calls"] == {
+    assert plan["metric_schema_version"] == METRIC_SCHEMA_VERSION
+    assert plan["evidence_policy"]["policy_id"] == PRODUCT_EVIDENCE_POLICY.policy_id
+    assert plan["evidence_policy"]["max_acquisition_rounds"] == MAX_ACQUISITION_ROUNDS
+    assert plan["evidence_policy"]["max_new_evidence_items"] == MAX_NEW_EVIDENCE_ITEMS
+    assert plan["external_call_policy"] == {
         "openai_calls": 0,
-        "razorpay_calls": 0,
+        "razorpay_http_calls": 0,
         "network_calls": 0,
-        "offline_execution_double_calls_after_final_allow": 1,
     }
+    # Every preregistered metric and counter name exists in the versioned
+    # schema, and every schema name is preregistered. Silent drift such as
+    # planner_direct_unsafe_allow_count cannot survive this.
+    assert tuple(plan["metrics"]) == EVALUATION_METRIC_NAMES
+    validate_observed_counters(plan["observed_counters"], context="plan")
+    assert [case["case_id"] for case in plan["cases"]] == [
+        scenario["case_id"] for scenario in RESOLVE_EVALUATION_SCENARIOS
+    ]
+    for case, scenario in zip(
+        plan["cases"], RESOLVE_EVALUATION_SCENARIOS, strict=True
+    ):
+        assert case["merchant_id"] == scenario["merchant_id"]
+        assert case["sku"] == scenario["sku"]
+        assert case["initial_evidence_policy"] == "product_default_evidence_policy"
+
+    # The executable evaluator has a hard freeze gate. The draft cannot produce
+    # outcomes until a later, deliberately frozen Commit A exists.
+    from scripts.run_review_recovery_evaluation import _load_frozen_plan
+
+    with pytest.raises(RuntimeError, match="not frozen"):
+        _load_frozen_plan()
+
+
+@pytest.mark.parametrize(
+    "planned",
+    (
+        EVALUATION_METRIC_NAMES[:-1],
+        EVALUATION_METRIC_NAMES + ("planner_direct_unsafe_allow_count",),
+    ),
+)
+def test_metric_schema_refuses_missing_or_unknown_preregistered_names(
+    planned: tuple[str, ...],
+) -> None:
+    with pytest.raises(MetricSchemaError, match=METRIC_SCHEMA_VERSION):
+        validate_metric_names(
+            planned,
+            emitted=EVALUATION_METRIC_NAMES,
+            context="test plan",
+        )
+
+
+def test_superseded_evaluation_record_is_labelled_and_not_current() -> None:
+    root = Path(__file__).resolve().parents[1]
+    evaluation_root = root / "artifacts" / "engineering" / "review_recovery"
+    superseded = evaluation_root / "resolve-nonbenchmark-v1-superseded"
+
+    # The replacement run is deliberately not part of this commit, so no
+    # artifact may claim to be the current Resolve evaluation result.
+    assert not (evaluation_root / "resolve-nonbenchmark-v1").exists()
+    assert not (evaluation_root / "resolve-nonbenchmark-v2").exists()
+    notice = (superseded / "SUPERSEDED.md").read_text(encoding="utf-8")
+    assert "must not be cited as current results" in notice.replace("\n", " ")
+    stale = json.loads((superseded / "summary.json").read_text(encoding="utf-8"))
+    assert "planner_direct_unsafe_allow_count" in stale["metrics"]
+    assert set(stale["metrics"]) - set(EVALUATION_METRIC_NAMES)

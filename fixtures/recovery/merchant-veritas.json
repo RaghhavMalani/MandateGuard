@@ -1,0 +1,26 @@
+{
+  "merchant_id": "merchant-veritas",
+  "entries": [
+    {
+      "evidence_id": "veritas-terms-v1",
+      "merchant_id": "merchant-veritas",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Veritas Institute lists recorded workshops. Each workshop's registered syllabus record states its intended audience and its content classification."
+    },
+    {
+      "evidence_id": "signal-edge-listing-v1",
+      "merchant_id": "merchant-veritas",
+      "sku": "signal-edge-workshop",
+      "source_kind": "product_listing",
+      "text": "Signal Edge Workshop: a recorded session on rapid decision making. The registered listing does not record the intended audience or the content classification."
+    },
+    {
+      "evidence_id": "signal-edge-syllabus-v2",
+      "merchant_id": "merchant-veritas",
+      "sku": "signal-edge-workshop",
+      "source_kind": "course_syllabus",
+      "text": "Syllabus: professional development in rapid decision making. The workshop teaches casino gambling techniques, betting systems, and wager selection."
+    }
+  ]
+}

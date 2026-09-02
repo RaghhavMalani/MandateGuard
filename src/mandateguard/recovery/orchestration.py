@@ -8,6 +8,7 @@ from datetime import datetime
 from mandateguard.core.hashing import (
     CommittedHashes,
     catalog_snapshot_sha256,
+    mandate_payload_sha256,
     sha256_canonical,
     transaction_body_sha256,
 )
@@ -201,6 +202,9 @@ def _append_event(
     actual_hashes: tuple[str, ...] = (),
     acquisition_complete: bool | None = None,
     outcome_codes: tuple[str, ...] = (),
+    decision_nonce: str | None = None,
+    execution_request_sha256: str | None = None,
+    execution_receipt_id: str | None = None,
 ) -> tuple[RecoveryAuditEvent, ...]:
     mandate = state.scenario.mandate if state is not None else None
     if mandate is None:
@@ -215,6 +219,11 @@ def _append_event(
         initial_evaluated_at=initial_evaluated_at,
         recovery_started_at=recovery_started_at,
         recovery_authorized_at=recovery_authorized_at,
+        mandate_payload_sha256=mandate_payload_sha256(mandate),
+        transaction_body_sha256=transaction_body_sha256(state.scenario.transaction),
+        decision_nonce=decision_nonce,
+        execution_request_sha256=execution_request_sha256,
+        execution_receipt_id=execution_receipt_id,
         evidence_set_sha256=evidence_hash,
         authorization_result_sha256=sha256_canonical(authorization),
         constraint_statuses=_constraint_statuses(authorization, mandate),
@@ -843,6 +852,54 @@ def complete_recovery_round(
         recovery_authorized_at=recovery_time,
         audit_events=events,
     )
+
+
+def link_execution_outcome(
+    *,
+    state: ReviewRecoveryState,
+    registry: TrustedEvidenceSourceRegistry,
+    recorded_at: datetime,
+    decision_nonce: str,
+    execution_request_sha256: str,
+    execution_receipt_id: str | None,
+) -> ReviewRecoveryState:
+    """Close the audit chain from a resolved REVIEW to its capability and order.
+
+    The recovery audit does not duplicate the execution ledger. It records the
+    join keys a reviewer needs — mandate and transaction commitments on every
+    event, plus the decision nonce, the signed execution-request commitment, and
+    the provider receipt identifier here — so `REVIEW -> recovery -> fresh
+    authorization -> capability -> execution` can be reconstructed from durable
+    storage without any in-memory run state.
+    """
+
+    if not isinstance(state, ReviewRecoveryState):
+        raise TypeError("state must be ReviewRecoveryState")
+    if state.final_action is not DecisionAction.ALLOW:
+        raise ValueError("only a resolved ALLOW can be linked to an execution")
+    events = _append_event(
+        state.audit_events,
+        event=RecoveryEventType.EXECUTION_LINKED,
+        recorded_at=recorded_at,
+        state=state,
+        review_id=state.review_id,
+        initial_evaluated_at=state.initial_evaluated_at,
+        recovery_started_at=state.recovery_started_at,
+        recovery_authorized_at=state.recovery_authorized_at,
+        registry_sha256=registry.registry_sha256,
+        evidence_hash=state.current_evidence_sha256,
+        authorization=state.current_authorization,
+        round_number=state.rounds_used,
+        decision_nonce=decision_nonce,
+        execution_request_sha256=execution_request_sha256,
+        execution_receipt_id=execution_receipt_id,
+        outcome_codes=(
+            "CAPABILITY_ISSUED"
+            if execution_receipt_id is None
+            else "EXECUTION_RECORDED",
+        ),
+    )
+    return replace(state, audit_events=events)
 
 
 def recover_review_once(

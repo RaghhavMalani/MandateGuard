@@ -19,6 +19,21 @@ source candidates, evidence budgets, scope, or authorization policy. Recovery
 families come from the canonical mandate's structured `PURPOSE`, `EXCLUSION`,
 or `RECURRENCE` metadata; recovery never classifies buyer/model prose.
 
+The product and future evaluator import the same immutable server-owned policy,
+`MANDATEGUARD_PRODUCT_EVIDENCE_POLICY_V1`: hybrid retrieval with the product
+defaults (`top_k=5`, `alpha=0.4`), at most two acquisition rounds, and at most
+four new evidence items. The evaluator passes no trust-sensitive override and
+compares policy ID, retrieval fields, budgets, registry hash, override marker,
+and semantic mode with the product before it can score a case.
+
+The judge-facing recoverable scenario is not created by suppressing retrieval.
+It is the dedicated `merchant-lumen` / `aurora-focus-lamp` fixture. At the
+product default policy, `lumen-terms-v1` and `aurora-listing-v1` do not establish
+individual-study suitability or billing, so the controller returns `REVIEW`.
+The explicit recovery action acquires the complete registered scope, including
+`aurora-sku-terms-v2`, which establishes individual-study use and a one-time,
+non-renewing purchase. A fresh controller invocation can then return `ALLOW`.
+
 ## Manifest completeness
 
 Every registered source has an immutable manifest declaring its merchant,
@@ -34,6 +49,15 @@ evidence items. Selecting a manifest with more new applicable records than the
 remaining item budget produces `EVIDENCE_BUDGET_INSUFFICIENT` before the
 provider is called. The bundle is never truncated to fit the item budget.
 
+Registry construction rejects two different sources with overlapping active
+windows for the same merchant and authoritative scope (`MERCHANT_GLOBAL`, or
+the same `SKU_SPECIFIC` SKU), unless their evidence kinds and record metadata
+are identical aliases or one manifest explicitly supersedes the other. Merely
+using disjoint evidence-kind labels does not make such sources a safe partition:
+the provider API partitions returned records by merchant and scope/SKU, not by
+evidence kind, so both sources would otherwise see each other's records and
+remain permanently `SOURCE_INCOMPLETE`.
+
 ## Scope, freshness, and conflicts
 
 A SKU-specific source must return the exact registered SKU; `sku=None` is
@@ -44,11 +68,34 @@ coverage. Merchant-global and SKU-specific evidence are combined; neither
 silently overrides the other.
 
 Manifest and record effective/expiry times are evaluated at the recovery time.
-Explicit record and manifest supersession removes the superseded version. If
-simultaneously authoritative active records give different server-normalized
-values for the same claim, or the same evidence ID has different expected
-hashes, recovery returns `REVIEW_ON_CONFLICT`. Resolve deliberately does not
-invent an authority ranking.
+Supersession is permanent from the superseding version's effective time: expiry
+of v2 never resurrects v1. Manifest replacement must name an existing older
+manifest for the identical merchant/scope/SKU and the supersession graph must
+be acyclic.
+
+`RECURRENCE` records require normalized `billing.*` claim metadata and
+`EXCLUSION` records require normalized `content.*` claim metadata whenever two
+authorities overlap. `UNESTABLISHED` is an explicit non-assertion; an absent
+namespace is not. If overlapping active records disagree, if one or both omit
+required metadata so non-conflict cannot be proven, or if the same evidence ID
+has different expected hashes, acquisition returns `REVIEW_ON_CONFLICT` with a
+deterministic conflict code. The semantic verifier never receives that
+conflicted bundle and cannot choose which authority is true. `PURPOSE` does not
+require a normalized claim because its records add support for a declared use
+rather than assert a conflicting billing/content classification; explicit
+purpose claims are still compared when present.
+
+## Constraint-family provenance
+
+`constraint_family` originates at mandate construction, before recovery. The
+validated `InterpretedPurchaseIntent.purpose` field deterministically creates a
+`PURPOSE` constraint. Each structured exclusion creates `EXCLUSION`, except the
+closed recurrence terms `subscription`, `subscriptions`, `recurrence`, and
+`renewal`, which deterministically create `RECURRENCE`. Recovery maps only that
+enum to evidence kinds; changing the human-readable constraint text cannot
+change source selection. Legacy mandates may retain `constraint_family=None`
+in their canonical payload, but such an unclassified constraint does not gain a
+recovery source through prose inference.
 
 ## Time and round accounting
 
@@ -71,7 +118,29 @@ the initial authorization/evidence commitments and constraint statuses, gap
 diagnostic and registry commitments, selected source scopes and manifest
 hashes, expected and actual evidence IDs/hashes, completeness, semantic
 input/output hashes, final action, and distinct initial/recovery timestamps.
-This is local product persistence, not a distributed audit service.
+Every event also carries `mandate_payload_sha256` and
+`transaction_body_sha256`. After a recovered `ALLOW`, `EXECUTION_LINKED` adds
+the decision nonce, execution-request hash, and offline/Razorpay order receipt
+identifier. Those are join keys into the execution ledger; the recovery audit
+does not duplicate that ledger. A reviewer can therefore follow `REVIEW` to
+fresh authorization, capability, and execution from persistent stores without
+the in-memory CommerceRun.
+
+Set `MANDATEGUARD_STATE_DIR` (or pass `state_dir` when embedding the service) to
+place the semantic cache, execution ledger, and recovery audit in one configured
+directory. Reopening the service with the same directory and filesystem
+preserves those stores. With no configuration, the service deliberately uses a
+temporary directory suitable for local development and the offline demo. A
+public Render instance is restart-durable only if its service is configured
+with persistent filesystem/storage and `MANDATEGUARD_STATE_DIR` points there;
+the current free blueprint does neither and must be treated as ephemeral.
+
+Audit persistence is an execution prerequisite. If the round-reservation append
+fails, the in-memory round remains consumed and in flight, the review is marked
+`AUDIT_PERSISTENCE_FAILED`, and later recovery requests return
+`RECOVERY_AUDIT_UNAVAILABLE`. No trusted-evidence provider or payment adapter is
+called and no capability is issued. Reconciliation is an explicit operator
+action; the service does not silently retry or refund the round.
 
 The SQLite semantic cache is part of the trusted computing base. Its unkeyed
 SHA-256 commitments detect accidental corruption or inconsistent records; they
@@ -88,19 +157,29 @@ registry. The gap planner cannot emit `ALLOW` or `BLOCK`.
 
 ## Next engineering evaluation chronology
 
-Do not rerun the three-case evaluation as part of this safety fix. The next run
-uses two commits:
+The checked-in three-case file is a smoke scaffold with status
+`DRAFT_PRE_EVALUATION`; it is not a frozen evaluation and execution is disabled.
+It must be expanded to the planned 20 independent cases and reviewed in a later
+task. The executable runner refuses any status other than
+`FROZEN_BEFORE_OUTCOMES`, so this hardening pass cannot accidentally produce
+outcomes. A later evaluation uses two commits:
 
-1. Commit A contains the manifest, fixtures, expected safety posture, and
-   evaluator code. Record Commit A's SHA and the raw/canonical manifest hashes.
+1. Commit A contains the expanded manifest, fixtures, expected safety posture,
+   and evaluator code. Record Commit A's SHA and the raw/canonical manifest
+   hashes.
 2. Only after Commit A exists, execute the offline outcomes. Commit B contains
    results only.
 
-The runner refuses a dirty worktree and records the current HEAD as
-`preregistered_commit_sha`, plus separate `plan_canonical_sha256` and
-`plan_raw_file_sha256` fields. This gives the later results commit verifiable
-chronology instead of relying on a same-commit "frozen" assertion. Its counters
-are observed from the service: OpenAI calls, Razorpay calls, offline adapter
-calls, planner-direct ALLOW count, provider calls before ALLOW, acquisition
-rounds, and new evidence items. The run remains offline and permits zero
-OpenAI, Razorpay, or network calls.
+After the expanded manifest is deliberately frozen, the runner refuses a dirty
+worktree and records the current HEAD as `preregistered_commit_sha`, plus
+separate `plan_canonical_sha256` and `plan_raw_file_sha256` fields. This gives
+the later results commit verifiable chronology instead of relying on a
+same-commit "frozen" assertion.
+
+Counters use `RESOLVE_METRIC_SCHEMA_V2` and are observed at real
+resources/adapters: `openai_calls`, `razorpay_http_calls`,
+`offline_adapter_calls`, `trusted_evidence_provider_calls`,
+`acquisition_rounds`, `new_evidence_items`, and
+`planner_direct_allow_count`. Missing or unknown planned/emitted names refuse
+execution. The run remains offline; any observed OpenAI, Razorpay HTTP, or
+aggregate network call fails it.

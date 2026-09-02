@@ -15,10 +15,11 @@ WORKDIR /app
 # Only the files the running server actually reads.
 COPY src/ /app/src/
 COPY fixtures/agentic_commerce/ /app/fixtures/agentic_commerce/
+COPY fixtures/recovery/ /app/fixtures/recovery/
 COPY scripts/run_commerce_lab.py /app/scripts/run_commerce_lab.py
 
-# Non-root execution with a writable scratch directory for the ephemeral
-# SQLite semantic cache and execution ledger.
+# Non-root execution with a writable scratch directory for the temporary
+# SQLite semantic cache, execution ledger, and recovery audit.
 RUN useradd --create-home --uid 10001 mandateguard \
     && mkdir -p "$TMPDIR" \
     && chown -R mandateguard:mandateguard "$TMPDIR" /app

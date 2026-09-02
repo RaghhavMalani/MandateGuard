@@ -2,6 +2,20 @@
   "merchant_id": "merchant-scholarly",
   "entries": [
     {
+      "evidence_id": "scholarly-terms-v1",
+      "merchant_id": "merchant-scholarly",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Scholarly Supply sells physical study goods and separately identified memberships. Product-specific records state the applicable billing model."
+    },
+    {
+      "evidence_id": "studyglow-evidence-v1",
+      "merchant_id": "merchant-scholarly",
+      "sku": "studyglow-desk-lamp",
+      "source_kind": "product_description",
+      "text": "Intended use: focused individual study and reading at a desk. Billing model: one-time purchase with no subscription."
+    },
+    {
       "evidence_id": "studyglow-sku-terms-v2",
       "merchant_id": "merchant-scholarly",
       "sku": "studyglow-desk-lamp",

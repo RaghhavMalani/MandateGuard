@@ -5,9 +5,24 @@ from mandateguard.recovery.audit_store import (
     SQLiteRecoveryAuditStore,
 )
 
+from mandateguard.recovery.metrics import (
+    EVALUATION_METRIC_NAMES,
+    EXTERNAL_CALL_COUNTER_NAMES,
+    METRIC_SCHEMA_VERSION,
+    OBSERVED_COUNTER_NAMES,
+    MetricSchemaError,
+    validate_metric_names,
+    validate_observed_counters,
+)
 from mandateguard.recovery.models import (
+    AUTHORITY_CONFLICT_UNRESOLVABLE_CODES,
+    CLAIM_VALUE_UNESTABLISHED,
+    CONFLICT_CLAIM_METADATA_INCOMPLETE,
+    CONFLICT_DUPLICATE_ID_HASH,
+    CONFLICT_SIMULTANEOUS_AUTHORITY,
     MAX_ACQUISITION_ROUNDS,
     MAX_NEW_EVIDENCE_ITEMS,
+    REQUIRED_CLAIM_NAMESPACES,
     AcquisitionItemStatus,
     EvidenceGap,
     EvidenceGapAnalysis,
@@ -27,6 +42,7 @@ from mandateguard.recovery.orchestration import (
     complete_recovery_round,
     create_review_recovery,
     detect_evidence_gaps,
+    link_execution_outcome,
     recover_review_once,
     reserve_recovery_round,
 )
@@ -37,8 +53,19 @@ from mandateguard.recovery.registry import (
 )
 
 __all__ = [
+    "AUTHORITY_CONFLICT_UNRESOLVABLE_CODES",
+    "CLAIM_VALUE_UNESTABLISHED",
+    "CONFLICT_CLAIM_METADATA_INCOMPLETE",
+    "CONFLICT_DUPLICATE_ID_HASH",
+    "CONFLICT_SIMULTANEOUS_AUTHORITY",
+    "EVALUATION_METRIC_NAMES",
+    "EXTERNAL_CALL_COUNTER_NAMES",
     "MAX_ACQUISITION_ROUNDS",
     "MAX_NEW_EVIDENCE_ITEMS",
+    "METRIC_SCHEMA_VERSION",
+    "OBSERVED_COUNTER_NAMES",
+    "REQUIRED_CLAIM_NAMESPACES",
+    "MetricSchemaError",
     "AcquisitionBatch",
     "AcquisitionItemStatus",
     "AcquiredEvidenceItem",
@@ -61,6 +88,9 @@ __all__ = [
     "complete_recovery_round",
     "detect_evidence_gaps",
     "evidence_set_sha256",
+    "link_execution_outcome",
     "recover_review_once",
     "reserve_recovery_round",
+    "validate_metric_names",
+    "validate_observed_counters",
 ]

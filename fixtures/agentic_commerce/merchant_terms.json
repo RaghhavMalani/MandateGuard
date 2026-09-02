@@ -62,6 +62,34 @@
       "sku": "flexi-desk-companion",
       "source_kind": "product_description",
       "text": "The registered listing describes configurable digital modules. Intended use, content classification, and longer-term billing obligations are not documented."
+    },
+    {
+      "evidence_id": "lumen-terms-v1",
+      "merchant_id": "merchant-lumen",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Lumen Studio lists lighting hardware. Each listing's registered terms record states the applicable billing model and the documented intended use."
+    },
+    {
+      "evidence_id": "aurora-listing-v1",
+      "merchant_id": "merchant-lumen",
+      "sku": "aurora-focus-lamp",
+      "source_kind": "product_listing",
+      "text": "Aurora Focus Lamp: a dimmable warm-white light with a weighted base. The registered listing does not record the documented intended use or the applicable billing model."
+    },
+    {
+      "evidence_id": "veritas-terms-v1",
+      "merchant_id": "merchant-veritas",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Veritas Institute lists recorded workshops. Each workshop's registered syllabus record states its intended audience and its content classification."
+    },
+    {
+      "evidence_id": "signal-edge-listing-v1",
+      "merchant_id": "merchant-veritas",
+      "sku": "signal-edge-workshop",
+      "source_kind": "product_listing",
+      "text": "Signal Edge Workshop: a recorded session on rapid decision making. The registered listing does not record the intended audience or the content classification."
     }
   ]
 }

@@ -1,37 +1,49 @@
 {
-  "evaluation_id": "RESOLVE-NON-BENCHMARK-V1",
-  "title": "MANDATEGUARD RESOLVE NON-BENCHMARK ENGINEERING EVALUATION",
-  "status": "FROZEN_BEFORE_OUTCOMES",
-  "scope": "Synthetic offline engineering evaluation of bounded trusted-evidence acquisition after an initial REVIEW.",
+  "evaluation_id": "RESOLVE-NON-BENCHMARK-V2-DRAFT",
+  "title": "MANDATEGUARD RESOLVE PRE-EVALUATION DRAFT",
+  "status": "DRAFT_PRE_EVALUATION",
+  "execution_permitted": false,
+  "scope": "Unfrozen three-case smoke scaffold for a future 20-case synthetic offline engineering evaluation of bounded trusted-evidence acquisition after an initial REVIEW.",
+  "expansion": {
+    "target_case_count": 20,
+    "defined_case_count": 3,
+    "status": "NOT_EXPANDED_OR_FROZEN"
+  },
   "independence_note": "The three product cases are distinct synthetic merchant/SKU scenarios. Failure injections derived from them are correlated robustness checks and are not counted as independent commerce cases.",
-  "limits": {
+  "metric_schema_version": "RESOLVE_METRIC_SCHEMA_V2",
+  "evidence_policy": {
+    "policy_id": "MANDATEGUARD_PRODUCT_EVIDENCE_POLICY_V1",
+    "parity": "Every case runs the product default evidence policy. The evaluator passes no top_k, alpha, retrieval-mode, or budget override, and refuses to run if any case's trust configuration differs from the product's.",
     "max_acquisition_rounds": 2,
     "max_new_evidence_items": 4
   },
   "cases": [
     {
-      "case_id": "RR-ALLOW-STUDYGLOW",
+      "case_id": "RR-ALLOW-AURORA",
       "constraint_families": ["purpose", "recurrence"],
-      "merchant_id": "merchant-scholarly",
-      "sku": "studyglow-desk-lamp",
-      "initial_evidence_policy": "top_k_2_no_registered_merchant_evidence_selected",
-      "candidate_source_id": "studyglow-sku-terms-v2"
+      "merchant_id": "merchant-lumen",
+      "sku": "aurora-focus-lamp",
+      "initial_evidence_policy": "product_default_evidence_policy",
+      "initial_evidence_gap": "The registered merchant terms and product listing document neither the intended use nor the billing model, so the semantic verifier abstains on both constraints.",
+      "candidate_source_ids": ["lumen-merchant-terms-v1", "aurora-sku-terms-v2"]
     },
     {
-      "case_id": "RR-BLOCK-MARKET-EDGE",
+      "case_id": "RR-BLOCK-SIGNAL-EDGE",
       "constraint_families": ["purpose", "exclusion"],
-      "merchant_id": "merchant-academy",
-      "sku": "market-edge-course",
-      "initial_evidence_policy": "top_k_2_no_registered_merchant_evidence_selected",
-      "candidate_source_id": "market-edge-syllabus-v2"
+      "merchant_id": "merchant-veritas",
+      "sku": "signal-edge-workshop",
+      "initial_evidence_policy": "product_default_evidence_policy",
+      "initial_evidence_gap": "The registered listing documents neither the intended audience nor the content classification, so the semantic verifier abstains on both constraints.",
+      "candidate_source_ids": ["veritas-merchant-terms-v1", "signal-edge-syllabus-v2"]
     },
     {
       "case_id": "RR-REVIEW-FLEXI",
       "constraint_families": ["purpose", "recurrence"],
       "merchant_id": "merchant-nova",
       "sku": "flexi-desk-companion",
-      "initial_evidence_policy": "top_k_2_no_registered_merchant_evidence_selected",
-      "candidate_source_id": "flexi-sku-terms-v2"
+      "initial_evidence_policy": "product_default_evidence_policy",
+      "initial_evidence_gap": "The registered terms are incomplete, and the registered recovery source is also incomplete, so acquisition succeeds and the verifier still abstains.",
+      "candidate_source_ids": ["nova-merchant-terms-v1", "flexi-sku-terms-v2"]
     }
   ],
   "failure_injections": [
@@ -43,7 +55,9 @@
     "tampered_evidence",
     "acquisition_budget_exhausted",
     "semantic_verifier_still_abstains",
-    "new_evidence_reveals_violation"
+    "new_evidence_reveals_violation",
+    "unannotated_authority_conflict",
+    "recovery_audit_persistence_failure"
   ],
   "metrics": [
     "initial_review_count",
@@ -54,12 +68,23 @@
     "mean_additional_trusted_evidence_items",
     "max_acquisition_rounds",
     "payment_provider_calls_before_final_allow",
-    "planner_direct_unsafe_allow_count",
+    "planner_direct_allow_count",
+    "trusted_evidence_provider_calls_before_allow",
+    "new_evidence_items",
     "synthetic_transaction_value_released_from_review_minor"
+  ],
+  "observed_counters": [
+    "openai_calls",
+    "razorpay_http_calls",
+    "offline_adapter_calls",
+    "trusted_evidence_provider_calls",
+    "acquisition_rounds",
+    "new_evidence_items",
+    "planner_direct_allow_count"
   ],
   "external_call_policy": {
     "openai_calls": 0,
-    "razorpay_calls": 0,
+    "razorpay_http_calls": 0,
     "network_calls": 0
   },
   "int3_runtime_decision": "NOT_INTEGRATED. The frozen six-query INT-3 evaluation remains research-only and cannot justify runtime planning claims; deterministic gap planning is used."

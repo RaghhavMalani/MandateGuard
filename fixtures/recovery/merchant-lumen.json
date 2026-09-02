@@ -1,0 +1,26 @@
+{
+  "merchant_id": "merchant-lumen",
+  "entries": [
+    {
+      "evidence_id": "lumen-terms-v1",
+      "merchant_id": "merchant-lumen",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Lumen Studio lists lighting hardware. Each listing's registered terms record states the applicable billing model and the documented intended use."
+    },
+    {
+      "evidence_id": "aurora-listing-v1",
+      "merchant_id": "merchant-lumen",
+      "sku": "aurora-focus-lamp",
+      "source_kind": "product_listing",
+      "text": "Aurora Focus Lamp: a dimmable warm-white light with a weighted base. The registered listing does not record the documented intended use or the applicable billing model."
+    },
+    {
+      "evidence_id": "aurora-sku-terms-v2",
+      "merchant_id": "merchant-lumen",
+      "sku": "aurora-focus-lamp",
+      "source_kind": "product_terms",
+      "text": "Intended use: focused individual study and reading at a desk. Billing model: one-time purchase with no subscription and no renewal."
+    }
+  ]
+}

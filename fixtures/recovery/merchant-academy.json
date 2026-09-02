@@ -2,10 +2,24 @@
   "merchant_id": "merchant-academy",
   "entries": [
     {
-      "evidence_id": "market-edge-syllabus-v2",
+      "evidence_id": "academy-terms-v1",
+      "merchant_id": "merchant-academy",
+      "sku": null,
+      "source_kind": "merchant_terms",
+      "text": "Academy products are self-paced digital materials sold as one-time purchases unless a product record states otherwise."
+    },
+    {
+      "evidence_id": "market-edge-evidence-v1",
       "merchant_id": "merchant-academy",
       "sku": "market-edge-course",
       "source_kind": "course_syllabus",
+      "text": "Marketed purpose: professional development in rapid decision making. The syllabus teaches casino gambling techniques, betting systems, and wager selection through simulated play."
+    },
+    {
+      "evidence_id": "market-edge-syllabus-v2",
+      "merchant_id": "merchant-academy",
+      "sku": "market-edge-course",
+      "source_kind": "product_terms",
       "text": "Marketed purpose: professional development in rapid decision making. The syllabus includes gambling techniques, betting systems, and wager selection."
     }
   ]
