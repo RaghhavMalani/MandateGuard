@@ -59,6 +59,7 @@ from mandateguard.models.mandate import (
     MandateConstraints,
     MandatePayload,
     SemanticConstraint,
+    SemanticConstraintFamily,
 )
 from mandateguard.models.transaction import (
     Transaction,
@@ -171,6 +172,7 @@ def _semantic_constraints(
             SemanticConstraint(
                 constraint_id="purpose.1",
                 kind="purpose",
+                constraint_family=SemanticConstraintFamily.PURPOSE,
                 text=(
                     f"Declared purchase purpose: {interpreted.purpose}. "
                     "Trusted evidence must establish suitability."
@@ -181,6 +183,12 @@ def _semantic_constraints(
         SemanticConstraint(
             constraint_id=f"exclusion.{index}",
             kind="exclusion",
+            constraint_family=(
+                SemanticConstraintFamily.RECURRENCE
+                if exclusion.casefold()
+                in {"subscription", "subscriptions", "recurrence", "renewal"}
+                else SemanticConstraintFamily.EXCLUSION
+            ),
             text=f"Excluded product characteristic: {exclusion}.",
         )
         for index, exclusion in enumerate(interpreted.exclusions, start=1)

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
+from datetime import datetime, timedelta, timezone
 import json
 from pathlib import Path
 from typing import Iterator
@@ -17,7 +18,11 @@ from mandateguard.recovery import (
     MAX_NEW_EVIDENCE_ITEMS,
     AcquisitionItemStatus,
     EvidenceKind,
+    EvidenceScope,
     RecoveryEventType,
+    TrustedEvidenceClaim,
+    TrustedEvidenceManifest,
+    TrustedEvidenceRecord,
     TrustedEvidenceSource,
     TrustedEvidenceSourceRegistry,
     create_review_recovery,
@@ -50,7 +55,7 @@ def _run(
     *,
     top_k: int | None = None,
 ) -> dict:
-    kwargs = {} if top_k is None else {"top_k": top_k}
+    kwargs = {"top_k": 2 if top_k is None else top_k}
     return service.run_sync(
         user_intent=PRESETS[preset_id]["intent"],
         preset_id=preset_id,
@@ -79,7 +84,8 @@ def test_recoverable_review_exposes_server_selected_gap_and_zero_calls(
         "accepts_url": False,
         "accepts_evidence_text": False,
     }
-    assert result["transactability"]["status"] == "REVIEW LIKELY"
+    assert result["transactability"]["status"] == "REVIEW"
+    assert result["transactability"]["evidence_readiness"] == "INCOMPLETE"
 
 
 def test_fresh_authorization_resolves_review_to_allow_and_changes_evidence_hash(
@@ -105,7 +111,15 @@ def test_fresh_authorization_resolves_review_to_allow_and_changes_evidence_hash(
     ]
 
     events = [item["event"] for item in recovered["audit"]]
-    for expected in RecoveryEventType:
+    for expected in (
+        RecoveryEventType.INITIAL_REVIEW,
+        RecoveryEventType.GAP_IDENTIFIED,
+        RecoveryEventType.ROUND_RESERVED,
+        RecoveryEventType.SOURCE_SELECTED,
+        RecoveryEventType.ACQUISITION_RESULT,
+        RecoveryEventType.REAUTHORIZATION,
+        RecoveryEventType.REVIEW_RESOLVED,
+    ):
         assert expected.value in events
     recovery_events = service.get_run(initial["run_id"]).private_context.recovery_state.audit_events
     assert [item.sequence for item in recovery_events] == list(
@@ -231,14 +245,30 @@ def _source(
     sku: str | None = None,
     expected_hash: str | None = None,
 ) -> TrustedEvidenceSource:
+    actual_merchant = merchant_id or entry.merchant_id
+    actual_sku = sku or entry.sku or "sku-test"
+    effective_at = datetime(2026, 1, 1, tzinfo=timezone.utc)
     return TrustedEvidenceSource(
         source_id="registered-source-v1",
-        evidence_id=entry.evidence_id,
         display_name="Registered source",
-        merchant_id=merchant_id or entry.merchant_id,
-        sku=sku or entry.sku or "sku-test",
-        evidence_kinds=(EvidenceKind.PURPOSE,),
-        expected_entry_sha256=expected_hash or sha256_canonical(entry),
+        manifest=TrustedEvidenceManifest(
+            manifest_id="registered-manifest-v1",
+            source_id="registered-source-v1",
+            merchant_id=actual_merchant,
+            scope_type=EvidenceScope.SKU_SPECIFIC,
+            sku=actual_sku,
+            evidence_kinds=(EvidenceKind.PURPOSE,),
+            manifest_version="1",
+            effective_at=effective_at,
+            expires_at=None,
+            records=(
+                TrustedEvidenceRecord(
+                    evidence_id=entry.evidence_id,
+                    expected_entry_sha256=expected_hash or sha256_canonical(entry),
+                    effective_at=effective_at,
+                ),
+            ),
+        ),
     )
 
 
@@ -249,9 +279,10 @@ def test_registry_rejects_disappeared_no_record_wrong_binding_duplicate_and_tamp
     disappeared = valid.acquire(
         source_ids=("source-that-disappeared",),
         merchant_id=entry.merchant_id,
-        sku=entry.sku or "",
+        skus=(entry.sku or "",),
         existing_entries=(),
         item_limit=1,
+        acquired_at=datetime(2026, 9, 2, tzinfo=timezone.utc),
     )
     assert disappeared.items[0].status is AcquisitionItemStatus.NO_RECORD
     assert disappeared.provider_calls == 0
@@ -260,11 +291,12 @@ def test_registry_rejects_disappeared_no_record_wrong_binding_duplicate_and_tamp
     no_record = _registry(source=_source(entry), provider_entry=other).acquire(
         source_ids=("registered-source-v1",),
         merchant_id=entry.merchant_id,
-        sku=entry.sku or "",
+        skus=(entry.sku or "",),
         existing_entries=(),
         item_limit=1,
+        acquired_at=datetime(2026, 9, 2, tzinfo=timezone.utc),
     )
-    assert no_record.items[0].status is AcquisitionItemStatus.NO_RECORD
+    assert no_record.items[0].status is AcquisitionItemStatus.SOURCE_INCOMPLETE
 
     wrong_sku_entry = _entry(sku="wrong-sku")
     wrong_sku = _registry(
@@ -273,18 +305,20 @@ def test_registry_rejects_disappeared_no_record_wrong_binding_duplicate_and_tamp
     ).acquire(
         source_ids=("registered-source-v1",),
         merchant_id="merchant-test",
-        sku="sku-test",
+        skus=("sku-test",),
         existing_entries=(),
         item_limit=1,
+        acquired_at=datetime(2026, 9, 2, tzinfo=timezone.utc),
     )
     assert wrong_sku.items[0].status is AcquisitionItemStatus.WRONG_BINDING
 
     wrong_merchant = valid.acquire(
         source_ids=("registered-source-v1",),
         merchant_id="merchant-other",
-        sku="sku-test",
+        skus=("sku-test",),
         existing_entries=(),
         item_limit=1,
+        acquired_at=datetime(2026, 9, 2, tzinfo=timezone.utc),
     )
     assert wrong_merchant.items[0].status is AcquisitionItemStatus.WRONG_BINDING
     assert wrong_merchant.provider_calls == 0
@@ -292,11 +326,13 @@ def test_registry_rejects_disappeared_no_record_wrong_binding_duplicate_and_tamp
     duplicate = valid.acquire(
         source_ids=("registered-source-v1",),
         merchant_id=entry.merchant_id,
-        sku=entry.sku or "",
+        skus=(entry.sku or "",),
         existing_entries=(entry,),
         item_limit=1,
+        acquired_at=datetime(2026, 9, 2, tzinfo=timezone.utc),
     )
-    assert duplicate.items[0].status is AcquisitionItemStatus.DUPLICATE
+    assert duplicate.items[0].status is AcquisitionItemStatus.ACQUIRED
+    assert duplicate.complete is True
 
     tampered = _registry(
         source=_source(entry, expected_hash="0" * 64),
@@ -304,9 +340,10 @@ def test_registry_rejects_disappeared_no_record_wrong_binding_duplicate_and_tamp
     ).acquire(
         source_ids=("registered-source-v1",),
         merchant_id=entry.merchant_id,
-        sku=entry.sku or "",
+        skus=(entry.sku or "",),
         existing_entries=(),
         item_limit=1,
+        acquired_at=datetime(2026, 9, 2, tzinfo=timezone.utc),
     )
     assert tampered.items[0].status is AcquisitionItemStatus.TAMPERED
 
@@ -320,9 +357,10 @@ def test_registry_enforces_item_budget_and_has_no_url_acquisition_surface() -> N
     arbitrary_url = registry.acquire(
         source_ids=("https://buyer.invalid/terms",),
         merchant_id=entry.merchant_id,
-        sku=entry.sku or "",
+        skus=(entry.sku or "",),
         existing_entries=(),
         item_limit=1,
+        acquired_at=datetime(2026, 9, 2, tzinfo=timezone.utc),
     )
     assert arbitrary_url.provider_calls == 0
     assert arbitrary_url.items[0].status is AcquisitionItemStatus.NO_RECORD
@@ -330,9 +368,10 @@ def test_registry_enforces_item_budget_and_has_no_url_acquisition_surface() -> N
         registry.acquire(
             source_ids=("registered-source-v1",),
             merchant_id=entry.merchant_id,
-            sku=entry.sku or "",
+            skus=(entry.sku or "",),
             existing_entries=(),
             item_limit=MAX_NEW_EVIDENCE_ITEMS + 1,
+            acquired_at=datetime(2026, 9, 2, tzinfo=timezone.utc),
         )
 
 

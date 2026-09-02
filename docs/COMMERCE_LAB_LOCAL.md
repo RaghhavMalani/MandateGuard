@@ -20,13 +20,17 @@ The initial page load reads only local static assets and `/api/config`. It never
 - `SAFE PURCHASE` exercises the normal buyer, retrieval, deterministic, semantic, capability, ledger, and execution path. It creates one order through the offline Test Mode-compatible double and reports one adapter call, zero external calls.
 - `POLICY VIOLATION` reaches `BLOCK` through the normal frozen controller and reports zero Razorpay calls.
 - `AMBIGUOUS EVIDENCE` reaches `REVIEW` through the normal frozen controller and reports zero Razorpay calls.
-- `RECOVERABLE REVIEW` starts with genuinely insufficient trusted evidence and zero Razorpay calls. `ACQUIRE TRUSTED EVIDENCE` accepts no request fields, resolves a server-registered Merchant SKU Terms source, creates a new canonical evidence set, and reruns the full controller before the normal capability/execution path can appear.
+- `RECOVERABLE REVIEW` starts with genuinely insufficient trusted evidence and zero Razorpay calls. `ACQUIRE TRUSTED EVIDENCE` accepts no request fields, verifies the complete server-registered Merchant SKU Terms manifest, creates a new canonical evidence set, and reruns the full controller before the normal capability/execution path can appear. Additional trusted evidence may make the transaction evaluable; it does not guarantee `ALLOW`.
 
 After an `ALLOW`, use `TEST CAPABILITY REPLAY` to submit the same signed capability again. The D6 nonce ledger rejects it as `NONCE_ALREADY_USED` before another provider call.
 
 The recovery endpoint is `POST /api/runs/{run_id}/recover` with an empty JSON object. It
 does not accept a URL, evidence text, source ID, merchant, or SKU. The server registry owns
 all candidate selection and enforces two acquisition rounds and four new evidence items.
+An acquisition either verifies the complete manifest-defined source scope or remains
+`REVIEW`; the server never authorizes a truncated response. Recovery reads a fresh trusted
+time, reserves the round before provider work, and persists hash-linked provenance in
+`recovery-audit.sqlite3` under the configured state directory.
 See [MANDATEGUARD_RESOLVE.md](MANDATEGUARD_RESOLVE.md) for the security boundary and
 non-benchmark engineering evaluation.
 

@@ -19,6 +19,7 @@ from mandateguard.models.mandate import (
     MandateConstraints,
     MandatePayload,
     SemanticConstraint,
+    SemanticConstraintFamily,
 )
 from mandateguard.models.transaction import Transaction, TransactionLine, TransactionPayload
 
@@ -34,6 +35,7 @@ __all__ = [
     "MandateConstraints",
     "MandatePayload",
     "SemanticConstraint",
+    "SemanticConstraintFamily",
     "TaxonomyFamily",
     "TierACheckResult",
     "TierACheckStatus",

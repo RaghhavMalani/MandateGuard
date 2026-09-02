@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import json
+from hashlib import sha256
 from pathlib import Path
+import subprocess
 import sys
 import tempfile
 
@@ -33,7 +35,7 @@ OUTPUT_ROOT = (
 )
 
 
-def _load_frozen_plan() -> tuple[dict, str]:
+def _load_frozen_plan() -> tuple[dict, str, str]:
     raw = PLAN_PATH.read_bytes()
     plan = json.loads(raw)
     if plan.get("status") != "FROZEN_BEFORE_OUTCOMES":
@@ -44,14 +46,43 @@ def _load_frozen_plan() -> tuple[dict, str]:
         "network_calls": 0,
     }:
         raise RuntimeError("recovery evaluation must remain offline")
-    return plan, sha256_canonical(plan)
+    return plan, sha256_canonical(plan), sha256(raw).hexdigest()
+
+
+def _preregistered_commit_sha() -> str:
+    """Require Commit A to be clean and record it before outcomes are produced."""
+
+    status = subprocess.run(
+        ["git", "status", "--porcelain", "--untracked-files=all"],
+        cwd=REPOSITORY_ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    if status.stdout:
+        raise RuntimeError(
+            "evaluation requires a clean preregistration commit before outcomes"
+        )
+    revision = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=REPOSITORY_ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    if len(revision) != 40 or any(
+        character not in "0123456789abcdef" for character in revision
+    ):
+        raise RuntimeError("could not resolve the preregistration commit SHA")
+    return revision
 
 
 def main() -> int:
-    plan, plan_sha256 = _load_frozen_plan()
+    preregistered_commit_sha = _preregistered_commit_sha()
+    plan, plan_canonical_sha256, plan_raw_file_sha256 = _load_frozen_plan()
     presets = {item["id"]: item for item in DEMO_PRESETS}
     case_inputs = (
-        ("RR-ALLOW-STUDYGLOW", "recoverable", None),
+        ("RR-ALLOW-STUDYGLOW", "recoverable", 2),
         ("RR-BLOCK-MARKET-EDGE", "block", 2),
         ("RR-REVIEW-FLEXI", "review", 2),
     )
@@ -82,6 +113,7 @@ def main() -> int:
                 recovered = service.recover(initial["run_id"])
                 result = recovered["result"]
                 recovery = result["recovery"]
+                counters = result["observed_counters"]
                 if recovery["payment_provider_calls_before_final_allow"] != 0:
                     raise RuntimeError(
                         f"{case_id} called a payment provider before final ALLOW"
@@ -101,9 +133,6 @@ def main() -> int:
                         "payment_provider_calls_before_final_allow": recovery[
                             "payment_provider_calls_before_final_allow"
                         ],
-                        "offline_execution_double_calls_after_allow": result[
-                            "execution"
-                        ]["razorpay_calls"],
                         "external_network_calls": result["execution"][
                             "external_network_calls"
                         ],
@@ -114,10 +143,11 @@ def main() -> int:
                             "current_evidence_sha256"
                         ],
                         "authorization_reevaluated": any(
-                            item["event"] == "AUTHORIZATION_REEVALUATED"
+                            item["event"] == "REAUTHORIZATION"
                             for item in recovered["audit"]
                         ),
                         "transaction_value_minor": result["buyer"]["price_minor"],
+                        "observed_counters": dict(counters),
                     }
                 )
         finally:
@@ -137,7 +167,9 @@ def main() -> int:
         "evaluation_id": plan["evaluation_id"],
         "classification": "NON_BENCHMARK_SYNTHETIC_ENGINEERING_EVALUATION",
         "plan_path": str(PLAN_PATH.relative_to(REPOSITORY_ROOT)).replace("\\", "/"),
-        "plan_file_sha256": plan_sha256,
+        "preregistered_commit_sha": preregistered_commit_sha,
+        "plan_canonical_sha256": plan_canonical_sha256,
+        "plan_raw_file_sha256": plan_raw_file_sha256,
         "independence_note": plan["independence_note"],
         "metrics": {
             "initial_review_count": initial_review_count,
@@ -156,12 +188,26 @@ def main() -> int:
                 "denominator": len(outcomes),
                 "decimal": f"{item_total / len(outcomes):.3f}",
             },
-            "max_acquisition_rounds": max(item["rounds_used"] for item in outcomes),
+            "max_acquisition_rounds": max(
+                item["observed_counters"]["acquisition_rounds"]
+                for item in outcomes
+            ),
             "payment_provider_calls_before_final_allow": sum(
                 item["payment_provider_calls_before_final_allow"]
                 for item in outcomes
             ),
-            "planner_direct_unsafe_allow_count": 0,
+            "planner_direct_allow_count": sum(
+                item["observed_counters"]["planner_direct_allow_count"]
+                for item in outcomes
+            ),
+            "provider_calls_before_allow": sum(
+                item["observed_counters"]["provider_calls_before_allow"]
+                for item in outcomes
+            ),
+            "new_evidence_items": sum(
+                item["observed_counters"]["new_evidence_items"]
+                for item in outcomes
+            ),
             "synthetic_transaction_value_released_from_review_minor": allow_value,
         },
         "architecture_verification": {
@@ -173,11 +219,19 @@ def main() -> int:
             ),
         },
         "external_calls": {
-            "openai_calls": 0,
-            "razorpay_calls": 0,
-            "network_calls": sum(item["external_network_calls"] for item in outcomes),
-            "offline_execution_double_calls_after_final_allow": sum(
-                item["offline_execution_double_calls_after_allow"]
+            "openai_calls": sum(
+                item["observed_counters"]["openai_calls"] for item in outcomes
+            ),
+            "razorpay_calls": sum(
+                item["observed_counters"]["razorpay_calls"] for item in outcomes
+            ),
+            "network_calls": sum(
+                item["observed_counters"]["openai_calls"]
+                + item["observed_counters"]["razorpay_calls"]
+                for item in outcomes
+            ),
+            "offline_adapter_calls_after_final_allow": sum(
+                item["observed_counters"]["offline_adapter_calls"]
                 for item in outcomes
             ),
         },
@@ -200,7 +254,11 @@ def main() -> int:
 
 **Classification:** non-benchmark synthetic engineering evaluation
 
-**Frozen plan SHA-256:** `{plan_sha256}`
+**Preregistered Commit A:** `{preregistered_commit_sha}`
+
+**Canonical decoded-plan SHA-256:** `{plan_canonical_sha256}`
+
+**Raw plan file SHA-256:** `{plan_raw_file_sha256}`
 
 ## Results
 
@@ -214,7 +272,9 @@ def main() -> int:
 | Mean additional trusted evidence items | {metrics['mean_additional_trusted_evidence_items']['decimal']} |
 | Max acquisition rounds | {metrics['max_acquisition_rounds']} |
 | Payment-provider calls before final ALLOW | {metrics['payment_provider_calls_before_final_allow']} |
-| Planner-direct unsafe ALLOW | {metrics['planner_direct_unsafe_allow_count']} |
+| Planner-direct ALLOW | {metrics['planner_direct_allow_count']} |
+| Evidence-provider calls before ALLOW | {metrics['provider_calls_before_allow']} |
+| New evidence items | {metrics['new_evidence_items']} |
 | Synthetic transaction value released from REVIEW (minor units) | {metrics['synthetic_transaction_value_released_from_review_minor']} |
 
 The three product cases cover purpose, recurrence, and exclusion behavior. The

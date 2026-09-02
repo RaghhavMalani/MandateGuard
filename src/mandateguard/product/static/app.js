@@ -248,8 +248,8 @@ export function renderTransactability(transactability) {
   return `
     <div class="transactability-surface">
       <div class="transactability-heading">
-        <div><p class="record-label">AGENT TRANSACTABILITY</p><h3>Evidence readiness</h3></div>
-        <strong>${escapeHtml(transactability.status)}</strong>
+        <div><p class="record-label">CURRENT STATUS</p><h3>${escapeHtml(transactability.status)}</h3></div>
+        <strong>EVIDENCE READINESS ${escapeHtml(transactability.evidence_readiness || "UNKNOWN")}</strong>
       </div>
       <ul>${rows}</ul>
       <div class="transactability-next"><span>NEXT ACTION</span><p>${escapeHtml(transactability.next_action)}</p></div>

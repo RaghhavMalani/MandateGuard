@@ -1,4 +1,9 @@
-"""SQLite semantic-result cache keyed by the complete frozen semantic input hash."""
+"""SQLite semantic-result cache inside the MandateGuard trusted computing base.
+
+The unkeyed SHA-256 commitments detect accidental corruption and inconsistent
+records. They do not provide tamper resistance against a malicious process or
+operator with write access to the cache database.
+"""
 
 from __future__ import annotations
 
@@ -85,6 +90,8 @@ class SQLiteSemanticCache:
     ``semantic_input_sha256`` already commits the detector/prompt/model IDs,
     mandate payload, transaction body, catalog snapshot, trusted evidence hash,
     constraints, and selected evidence. No SKU- or prose-only lookup exists.
+    The database is therefore part of the trusted computing base; the record
+    commitment is an error-detection mechanism, not authentication of storage.
     """
 
     __slots__ = (

@@ -217,18 +217,23 @@ test("resolved review shows the fresh controller transition", () => {
 });
 
 
-test("agent transactability is explicitly diagnostic", () => {
+test("transactability shows the current REVIEW and incomplete evidence", () => {
   const html = renderTransactability({
     readiness: [
       { label: "PRICE", status: "VERIFIED" },
       { label: "RECURRENCE TERMS", status: "MISSING" },
     ],
-    status: "REVIEW LIKELY",
-    next_action: "Publish trusted recurrence evidence for this SKU.",
+    status: "REVIEW",
+    evidence_readiness: "INCOMPLETE",
+    next_action: "Additional trusted evidence may make this transaction evaluable.",
     authority_notice: "Diagnostic only. This surface cannot authorize payments.",
   });
-  assert.match(html, /AGENT TRANSACTABILITY/);
-  assert.match(html, /REVIEW LIKELY/);
+  assert.match(html, /CURRENT STATUS/);
+  assert.match(html, />REVIEW</);
+  assert.match(html, /EVIDENCE READINESS/);
+  assert.match(html, /INCOMPLETE/);
+  assert.doesNotMatch(html, /REVIEW LIKELY/);
+  assert.match(html, /may make this transaction evaluable/);
   assert.match(html, /RECURRENCE TERMS/);
   assert.match(html, /MISSING/);
   assert.match(html, /cannot authorize payments/);

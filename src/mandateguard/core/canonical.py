@@ -34,6 +34,10 @@ def _normalize(value: Any, path: str) -> Any:
         return {
             field.name: _normalize(getattr(value, field.name), f"{path}.{field.name}")
             for field in fields(value)
+            if not (
+                field.metadata.get("canonical_omit_none", False)
+                and getattr(value, field.name) is None
+            )
         }
     if isinstance(value, Mapping):
         normalized: dict[str, Any] = {}

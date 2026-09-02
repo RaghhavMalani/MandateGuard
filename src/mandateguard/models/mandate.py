@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
+from enum import Enum
 import re
 from types import MappingProxyType
 from typing import Mapping, TypeAlias
@@ -26,6 +27,14 @@ _SEMANTIC_KINDS = frozenset(
         "other",
     }
 )
+
+
+class SemanticConstraintFamily(str, Enum):
+    """Controller-owned recovery family; never inferred from constraint prose."""
+
+    PURPOSE = "PURPOSE"
+    EXCLUSION = "EXCLUSION"
+    RECURRENCE = "RECURRENCE"
 
 
 def _require_nonempty_string(value: object, name: str, maximum: int) -> None:
@@ -85,6 +94,9 @@ class SemanticConstraint:
     constraint_id: str
     kind: str
     text: str
+    constraint_family: SemanticConstraintFamily | None = field(
+        default=None, metadata={"canonical_omit_none": True}
+    )
 
     def __post_init__(self) -> None:
         if not isinstance(self.constraint_id, str) or not _CONSTRAINT_ID_RE.fullmatch(
@@ -94,6 +106,12 @@ class SemanticConstraint:
         if self.kind not in _SEMANTIC_KINDS:
             raise ValueError("kind is not registered by the mandate schema")
         _require_nonempty_string(self.text, "text", 1000)
+        if self.constraint_family is not None and not isinstance(
+            self.constraint_family, SemanticConstraintFamily
+        ):
+            raise ValueError(
+                "constraint_family must be a SemanticConstraintFamily or None"
+            )
 
 
 @dataclass(frozen=True, slots=True)
