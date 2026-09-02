@@ -25,6 +25,8 @@ from mandateguard.engineering.resolve_eval.metrics import (
     validate_preregistered_observed_metrics,
 )
 from mandateguard.engineering.resolve_eval.preregistration import (
+    COMMIT_PATH,
+    COMMIT_SCHEMA,
     FIXTURE_ROOT,
     FORBIDDEN_CASE_OVERRIDE_KEYS,
     OUTPUT_ROOT,
@@ -442,6 +444,24 @@ def test_execution_is_refused_outside_the_frozen_validity_window(
         require_execution_preconditions(
             root, now=datetime(2026, 8, 1, tzinfo=timezone.utc)
         )
+
+
+def test_commit_binding_names_the_frozen_plan_and_creates_no_outcomes(frozen) -> None:
+    binding = json.loads((REPOSITORY_ROOT / COMMIT_PATH).read_text(encoding="utf-8"))
+    assert binding["schema"] == COMMIT_SCHEMA
+    assert binding["mechanism"] == "TWO_STEP_IMMUTABLE_FREEZE"
+    assert binding["outcomes_executed"] is False
+    sha = binding["preregistration_commit_sha"]
+    assert len(sha) == 40 and all(character in "0123456789abcdef" for character in sha)
+    assert binding["plan_canonical_sha256"] == frozen.plan_canonical_sha256
+    assert binding["plan_raw_file_sha256"] == frozen.plan_raw_file_sha256
+    assert binding["freeze_raw_file_sha256"] == frozen.freeze_raw_file_sha256
+    assert binding["bound_paths"]
+    for relative in binding["bound_paths"]:
+        assert (REPOSITORY_ROOT / relative).exists()
+    # The binding record is added after the plan is frozen, so binding it to
+    # itself would make the freeze unverifiable.
+    assert str(COMMIT_PATH).replace("\\", "/") not in binding["bound_paths"]
 
 
 def test_runner_and_validator_scripts_are_preregistered(frozen) -> None:

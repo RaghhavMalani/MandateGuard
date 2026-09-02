@@ -1,0 +1,19 @@
+{
+  "schema": "RESOLVE_PREREGISTRATION_COMMIT_V1",
+  "step": "B_COMMIT_BOUND",
+  "mechanism": "TWO_STEP_IMMUTABLE_FREEZE",
+  "evaluation_id": "RESOLVE-RECOVERY-20-CASE-V1",
+  "preregistration_commit_sha": "16bcb75a9c87f337aa4e546bbdd1aa0b300a971a",
+  "preregistration_commit_message": "test: preregister resolve recovery evaluation",
+  "plan_canonical_sha256": "6df077c7467cc6be371ca798b283cd6f04cb06c82ef9b3b7a6eef711c9fda334",
+  "plan_raw_file_sha256": "c6b2aebf85eb801afd4b28b952d63a8fc862d2b8635a57eafb6c1ef2bd687688",
+  "freeze_raw_file_sha256": "9793ed9a8dfd2352f536864d972d083ee87c95e572cbcbcc128d69e6fc73b823",
+  "bound_paths": [
+    "fixtures/engineering/resolve_recovery/worlds",
+    "fixtures/engineering/resolve_recovery/evidence",
+    "fixtures/engineering/resolve_recovery/preregistration_plan.json",
+    "fixtures/engineering/resolve_recovery/preregistration_freeze.json"
+  ],
+  "note": "A plan cannot contain the SHA of the commit that introduces it. This binding record names that commit and creates no outcome data. Execution requires the named commit to be HEAD or an ancestor of HEAD with every bound path unchanged since it.",
+  "outcomes_executed": false
+}
