@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 import json
 from pathlib import Path
 import shutil
+import subprocess
 
 import pytest
 
@@ -29,8 +30,10 @@ from mandateguard.engineering.resolve_eval.preregistration import (
     COMMIT_SCHEMA,
     FIXTURE_ROOT,
     FORBIDDEN_CASE_OVERRIDE_KEYS,
+    OUTCOMES_EXIST,
     OUTPUT_ROOT,
     PLAN_PATH,
+    PREREGISTERED_NO_OUTCOMES,
     SAFETY_INVARIANT_IDS,
     PreregistrationError,
     load_frozen_preregistration,
@@ -390,12 +393,29 @@ def test_provider_failure_case_declares_a_fault_over_a_present_fixture(worlds) -
     assert all(other.provider_fault is None for other in worlds.values() if other is not world)
 
 
-def test_structural_report_declares_no_outcomes() -> None:
+def test_structural_report_declares_committed_outcomes() -> None:
     report = structural_report(REPOSITORY_ROOT)
-    assert report["outcomes_executed"] is False
+    assert report["outcome_lifecycle_state"] == OUTCOMES_EXIST
+    assert report["outcomes_executed"] is True
     assert report["case_count"] == 20
     assert report["metric_schema_version"] == METRIC_SCHEMA_VERSION
-    assert not (REPOSITORY_ROOT / OUTPUT_ROOT).exists()
+    summary_path = OUTPUT_ROOT / "summary.json"
+    assert (REPOSITORY_ROOT / summary_path).is_file()
+    tracked = subprocess.run(
+        ["git", "ls-files", "--error-unmatch", summary_path.as_posix()],
+        cwd=REPOSITORY_ROOT,
+        capture_output=True,
+        text=True,
+    )
+    assert tracked.returncode == 0
+
+
+def test_structural_report_declares_before_run_state(tmp_path: Path) -> None:
+    root = _copy_fixture_tree(tmp_path)
+    report = structural_report(root)
+    assert report["outcome_lifecycle_state"] == PREREGISTERED_NO_OUTCOMES
+    assert report["outcomes_executed"] is False
+    assert not (root / OUTPUT_ROOT).exists()
 
 
 def _copy_fixture_tree(tmp_path: Path) -> Path:
@@ -443,6 +463,35 @@ def test_execution_is_refused_outside_the_frozen_validity_window(
     with pytest.raises(PreregistrationError, match="validity window"):
         require_execution_preconditions(
             root, now=datetime(2026, 8, 1, tzinfo=timezone.utc)
+        )
+
+
+def test_duplicate_fresh_execution_is_refused(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = _copy_fixture_tree(tmp_path)
+    output_root = root / OUTPUT_ROOT
+    output_root.mkdir(parents=True)
+    (output_root / "summary.json").write_text("{}\n", encoding="utf-8")
+    binding = json.loads((root / COMMIT_PATH).read_text(encoding="utf-8"))
+    preregistration_sha = binding["preregistration_commit_sha"]
+
+    def clean_bound_git(_root: Path, *arguments: str) -> str:
+        if arguments == ("status", "--porcelain", "--untracked-files=all"):
+            return ""
+        if arguments == ("rev-parse", "HEAD"):
+            return preregistration_sha
+        if arguments[:2] == ("diff", "--name-only"):
+            return ""
+        raise AssertionError(f"unexpected git invocation: {arguments!r}")
+
+    monkeypatch.setattr(
+        "mandateguard.engineering.resolve_eval.preregistration._git",
+        clean_bound_git,
+    )
+    with pytest.raises(PreregistrationError, match="outcome artifact already exists"):
+        require_execution_preconditions(
+            root, now=datetime(2026, 9, 3, tzinfo=timezone.utc)
         )
 
 

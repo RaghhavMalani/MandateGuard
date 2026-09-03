@@ -43,6 +43,8 @@ PLAN_SCHEMA = "RESOLVE_PREREGISTRATION_PLAN_V1"
 FREEZE_SCHEMA = "RESOLVE_PREREGISTRATION_FREEZE_V1"
 COMMIT_SCHEMA = "RESOLVE_PREREGISTRATION_COMMIT_V1"
 FROZEN_STATUS = "FROZEN"
+PREREGISTERED_NO_OUTCOMES = "PREREGISTERED_NO_OUTCOMES"
+OUTCOMES_EXIST = "OUTCOMES_EXIST"
 
 PLAN_PATH = FIXTURE_ROOT / "preregistration_plan.json"
 FREEZE_PATH = FIXTURE_ROOT / "preregistration_freeze.json"
@@ -477,6 +479,7 @@ def structural_report(repository_root: Path) -> dict[str, Any]:
     frozen = load_frozen_preregistration(repository_root)
     commit_path = repository_root / COMMIT_PATH
     binding = read_strict_json(commit_path) if commit_path.is_file() else None
+    outcomes_exist = (repository_root / OUTPUT_ROOT).exists()
     return {
         "evaluation_id": frozen.plan["evaluation_id"],
         "status": frozen.plan["status"],
@@ -495,7 +498,10 @@ def structural_report(repository_root: Path) -> dict[str, Any]:
         ),
         "observed_metric_names": list(PREREGISTERED_OBSERVED_METRIC_NAMES),
         "runtime_observed_counters": list(OBSERVED_COUNTER_NAMES),
-        "outcomes_executed": False,
+        "outcome_lifecycle_state": (
+            OUTCOMES_EXIST if outcomes_exist else PREREGISTERED_NO_OUTCOMES
+        ),
+        "outcomes_executed": outcomes_exist,
     }
 
 
@@ -510,9 +516,11 @@ __all__ = [
     "FREEZE_PATH",
     "FREEZE_SCHEMA",
     "FROZEN_STATUS",
+    "OUTCOMES_EXIST",
     "OUTPUT_ROOT",
     "PLAN_PATH",
     "PLAN_SCHEMA",
+    "PREREGISTERED_NO_OUTCOMES",
     "SAFETY_INVARIANT_IDS",
     "FrozenPreregistration",
     "PreregistrationError",

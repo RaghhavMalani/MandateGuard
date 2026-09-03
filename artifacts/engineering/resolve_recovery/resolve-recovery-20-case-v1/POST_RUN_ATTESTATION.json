@@ -1,0 +1,50 @@
+{
+  "artifact_type": "DERIVED_POST_RUN_ATTESTATION",
+  "relationship_to_frozen_output": "NOT_PART_OF_FROZEN_RAW_EVALUATOR_OUTPUT",
+  "evaluation_id": "RESOLVE-RECOVERY-20-CASE-V1",
+  "preregistration_commit_sha": "16bcb75a9c87f337aa4e546bbdd1aa0b300a971a",
+  "binding_commit_sha": "4565fe4a7a5c46565439f829fd4ad485e6e2c83d",
+  "execution_head_sha": "4565fe4a7a5c46565439f829fd4ad485e6e2c83d",
+  "results_commit_sha": "4ff858b062a9f578dfd1c5a274e6cdbfc91b0aae",
+  "raw_summary_path": "artifacts/engineering/resolve_recovery/resolve-recovery-20-case-v1/summary.json",
+  "raw_summary_sha256": "c47836a8d0af42b39b3150be3de850ee883aa00d7248025d3a256cdfe714b1af",
+  "plan_canonical_sha256": "6df077c7467cc6be371ca798b283cd6f04cb06c82ef9b3b7a6eef711c9fda334",
+  "plan_raw_file_sha256": "c6b2aebf85eb801afd4b28b952d63a8fc862d2b8635a57eafb6c1ef2bd687688",
+  "registry_sha256": "5bfc8709567b8506eef6d10ef11c3949e8e7a422fac76a364c5edc6bfcfe079c",
+  "metric_schema_version": "RESOLVE_METRIC_SCHEMA_V2",
+  "evidence_policy_id": "MANDATEGUARD_PRODUCT_EVIDENCE_POLICY_V1",
+  "observed_python_runtime": {
+    "value": "3.12.13",
+    "provenance": "EXTERNALLY_OBSERVED_POST_RUN_NOT_EMITTED_BY_FROZEN_RUNNER"
+  },
+  "observed_artifact_timestamp": {
+    "value": "2026-09-03T03:46:04Z",
+    "provenance": "EXTERNALLY_OBSERVED_POST_RUN_NOT_EMITTED_BY_FROZEN_RUNNER"
+  },
+  "aggregate_external_call_counters": {
+    "openai_calls": 0,
+    "razorpay_http_calls": 0,
+    "provider_calls_before_final_allow": 0
+  },
+  "aggregate_safety_invariant_results": {
+    "S1": "PASS",
+    "S2": "PASS",
+    "S3": "PASS",
+    "S4": "PASS",
+    "S5": "PASS",
+    "S6": "PASS",
+    "S7": "PASS",
+    "S8": "PASS",
+    "S9": "PASS",
+    "S10": "PASS",
+    "S11": "PASS",
+    "S12": "PASS"
+  },
+  "case_status_counts": {
+    "PASS": 20,
+    "UNRESOLVED_MISS": 0,
+    "SAFETY_VIOLATION": 0,
+    "PRECONDITION_FAILED": 0
+  },
+  "raw_evaluator_output_unchanged": true
+}
