@@ -103,7 +103,7 @@ def _reject_constant(value: str) -> None:
 class SlidingWindowLimiter:
     """Small in-memory demo limiter for mutating endpoints."""
 
-    def __init__(self, *, limit: int = 8, window_seconds: float = 60.0) -> None:
+    def __init__(self, *, limit: int = 30, window_seconds: float = 60.0) -> None:
         self.limit = limit
         self.window_seconds = window_seconds
         self._events: dict[str, deque[float]] = defaultdict(deque)

@@ -11,7 +11,11 @@ from urllib.request import Request, urlopen
 
 import pytest
 
-from mandateguard.product.http import CommerceLabHTTPServer, resolve_bind_address
+from mandateguard.product.http import (
+    CommerceLabHTTPServer,
+    SlidingWindowLimiter,
+    resolve_bind_address,
+)
 from mandateguard.product.service import CommerceLabService, DEMO_PRESETS
 
 
@@ -218,8 +222,14 @@ def test_product_bind_address_supports_local_and_deployment_fallbacks() -> None:
 
 
 @contextmanager
-def running_server(service: CommerceLabService) -> Iterator[str]:
+def running_server(
+    service: CommerceLabService,
+    *,
+    limiter: SlidingWindowLimiter | None = None,
+) -> Iterator[str]:
     server = CommerceLabHTTPServer(("127.0.0.1", 0), service)
+    if limiter is not None:
+        server.limiter = limiter
     thread = Thread(target=server.serve_forever, daemon=True)
     thread.start()
     try:
@@ -394,3 +404,72 @@ def test_access_log_is_bounded_and_free_of_intent_and_identifiers(
     assert "logsafety_0001" not in logged
     for forbidden in ("Authorization", "sk-", "rzp_test_", "hmac"):
         assert forbidden not in logged
+
+
+def test_demo_limiter_admits_a_full_judge_walkthrough_before_refusing() -> None:
+    """The public demo budget must cover a whole sitting, not a few clicks.
+
+    A judge runs five presets, acquires evidence, revokes a mandate, attempts a
+    deferred execution, and tests capability replay. At the previous budget of
+    eight mutating requests per minute that walkthrough hit `429` partway
+    through and read as a broken deployment.
+    """
+
+    limiter = SlidingWindowLimiter()
+    assert limiter.limit == 30
+    assert limiter.window_seconds == 60.0
+
+    admitted = sum(1 for _ in range(limiter.limit) if limiter.allow("198.51.100.7"))
+    assert admitted == limiter.limit
+    # The budget stays bounded: the public demo is not an open load target.
+    assert limiter.allow("198.51.100.7") is False
+
+
+def test_demo_limiter_budget_is_per_client_and_expires_with_the_window() -> None:
+    limiter = SlidingWindowLimiter(limit=2, window_seconds=60.0)
+
+    assert limiter.allow("198.51.100.7") is True
+    assert limiter.allow("198.51.100.7") is True
+    assert limiter.allow("198.51.100.7") is False
+
+    # One client exhausting its budget must not refuse another.
+    assert limiter.allow("203.0.113.9") is True
+
+    # A window that has fully elapsed releases the budget again.
+    expired = SlidingWindowLimiter(limit=1, window_seconds=0.0)
+    assert expired.allow("198.51.100.7") is True
+    assert expired.allow("198.51.100.7") is True
+
+
+def test_demo_limiter_refuses_over_budget_posts_without_leaking_the_request(
+    service: CommerceLabService,
+) -> None:
+    # A one-request budget stands in for an exhausted window.
+    limiter = SlidingWindowLimiter(limit=1, window_seconds=60.0)
+    with running_server(service, limiter=limiter) as base_url:
+        request_payload = {
+            "intent": PRESETS["safe"]["intent"],
+            "mode": "offline",
+            "preset_id": "safe",
+            "request_id": "limiter_first_0001",
+        }
+        status, first, _ = fetch_json(base_url + "/api/runs", payload=request_payload)
+        assert status in {200, 202}
+
+        with pytest.raises(HTTPError) as refused:
+            fetch_json(
+                base_url + "/api/runs",
+                payload={**request_payload, "request_id": "limiter_second_0001"},
+            )
+        assert refused.value.code == 429
+        body = json.loads(refused.value.read().decode("utf-8"))
+        assert body["error"]["code"] == "RATE_LIMITED"
+
+        # The refusal states the limit without echoing the mandate back.
+        serialized = json.dumps(body)
+        assert "study lamp" not in serialized
+        assert "limiter_second_0001" not in serialized
+
+        # Reading a run is not a mutating request and stays available.
+        status, _, _ = fetch_json(f"{base_url}/api/runs/{first['run_id']}")
+        assert status == 200

@@ -141,7 +141,7 @@ export const EVALUATION_EVIDENCE = {
 };
 
 /** Secondary proof only. Updated when the suites change; never presented as scale. */
-export const TEST_TOTALS = { python: 709, ui: 38 };
+export const TEST_TOTALS = { python: 712, ui: 38 };
 
 export class SubmissionLock {
   #locked = false;
