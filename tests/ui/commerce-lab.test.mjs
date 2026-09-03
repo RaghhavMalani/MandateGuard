@@ -1,16 +1,33 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 
 import {
+  ATTACK_SURFACES,
+  EVALUATION_EVIDENCE,
   SubmissionLock,
   escapeHtml,
+  failedConstraint,
   liveModeStatusNote,
+  renderAttackLab,
   renderAuthorizationPanel,
+  renderBlockStory,
+  renderBoundedScale,
+  renderConsentStrip,
   renderDecisionBanner,
   renderEvidencePanel,
   renderExecutionPanel,
+  renderMeasuredEvidence,
+  renderProvenance,
+  renderResearch,
   renderReviewRecovery,
+  renderReviewStory,
+  renderRevocationStory,
+  renderSpine,
+  renderStory,
   renderTransactability,
+  spineProgress,
 } from "../../src/mandateguard/product/static/app.js";
 
 
@@ -331,4 +348,574 @@ test("consent panel never claims bank, UPI, or Razorpay mandate revocation", () 
   for (const overclaim of [/bank consent/i, /UPI mandate/i, /Razorpay mandate/i, /identity verified/i]) {
     assert.doesNotMatch(html, overclaim);
   }
+});
+
+
+// ---------------------------------------------------------------------------
+// Judge-facing transaction story
+// ---------------------------------------------------------------------------
+
+const stylesheet = readFileSync(
+  fileURLToPath(new URL("../../src/mandateguard/product/static/app.css", import.meta.url)),
+  "utf-8",
+);
+
+const SPINE_IDS = [
+  "USER_MANDATE",
+  "AI_BUYER",
+  "PRODUCT",
+  "EVIDENCE_RETRIEVAL",
+  "DETERMINISTIC_VERIFICATION",
+  "SEMANTIC_VERIFICATION",
+  "AUTHORIZATION",
+  "EXECUTION",
+];
+
+const timelineOf = (...statuses) =>
+  SPINE_IDS.map((id, index) => ({ id, status: statuses[index], detail: null }));
+
+const BLOCKED_TIMELINE = timelineOf(
+  "PASS", "PASS", "PASS", "PASS", "PASS", "BLOCK", "BLOCK", "BLOCK",
+);
+
+const BLOCK_RESULT = {
+  decision: "BLOCK",
+  decision_reason: "trusted evidence includes the prohibited characteristic",
+  buyer: { mandate: "Buy the Market Edge Decision Course. No gambling-related products." },
+  evidence: {
+    classification: "TRUSTED MERCHANT EVIDENCE",
+    cards: [
+      {
+        evidence_id: "academy-terms-v1",
+        scope: "MERCHANT",
+        text: "Academy products are sold as one-time purchases.",
+      },
+      {
+        evidence_id: "market-edge-evidence-v1",
+        scope: "PRODUCT",
+        text: "The syllabus teaches casino gambling techniques and wager selection.",
+      },
+    ],
+  },
+  authorization: {
+    final_controller: "BLOCK",
+    deterministic: { action: "ALLOW", tier_a: [], tier_b: [] },
+    semantic: {
+      verdict: "VIOLATION",
+      checks: [
+        {
+          constraint_id: "purpose.1",
+          family: "purpose",
+          constraint: "Declared purchase purpose: professional development.",
+          status: "PASS",
+          reason: "trusted evidence states the declared purpose",
+        },
+        {
+          constraint_id: "exclusion.1",
+          family: "exclusion",
+          constraint: "Excluded product characteristic: gambling-related products.",
+          status: "VIOLATION",
+          reason: "trusted evidence includes the prohibited characteristic",
+        },
+      ],
+    },
+  },
+  execution: { status: "NOT_CALLED", razorpay_calls: 0, external_network_calls: 0 },
+};
+
+
+test("the decision spine stops at the failing stage and never reaches execution", () => {
+  assert.equal(spineProgress(BLOCKED_TIMELINE), 5 / 8);
+
+  const html = renderSpine(BLOCKED_TIMELINE);
+  // Exactly one stop bar, and it sits on the stage that actually halted.
+  assert.equal(html.match(/data-halt="true"/g).length, 1);
+  assert.match(html, /data-step="SEMANTIC_VERIFICATION" data-state="block" data-halt="true"/);
+  assert.doesNotMatch(html, /data-step="EXECUTION"[^>]*data-halt="true"/);
+});
+
+
+test("the spine reaches execution only when every stage passed", () => {
+  assert.equal(spineProgress(timelineOf(...Array(8).fill("PASS"))), 1);
+  assert.equal(spineProgress(timelineOf(...Array(7).fill("PASS"), "AUTHORIZED")), 1);
+
+  // A run refused at the execution gate must not draw a line into the provider.
+  const refused = timelineOf(...Array(7).fill("PASS"), "REJECTED");
+  assert.equal(spineProgress(refused), 7 / 8);
+  assert.match(
+    renderSpine(refused),
+    /data-step="EXECUTION" data-state="stopped" data-halt="true"/,
+  );
+
+  assert.equal(spineProgress(timelineOf(...Array(8).fill("WAITING"))), 0);
+});
+
+
+test("failed constraint resolves to the semantic violation, not a passing check", () => {
+  const failed = failedConstraint(BLOCK_RESULT.authorization);
+  assert.equal(failed.layer, "SEMANTIC");
+  assert.equal(failed.family, "exclusion");
+  assert.equal(failed.constraint, "Excluded product characteristic: gambling-related products.");
+
+  // With no semantic violation the deterministic layer supplies the reason.
+  const deterministic = failedConstraint({
+    deterministic: {
+      tier_a: [
+        { family: "A1", label: "Authoritative price", status: "PASS", reason: null },
+        { family: "A2", label: "SKU ownership", status: "FAIL", reason: "SKU is not owned." },
+      ],
+      tier_b: [],
+    },
+    semantic: { checks: [] },
+  });
+  assert.equal(deterministic.layer, "DETERMINISTIC");
+  assert.equal(deterministic.family, "A2");
+});
+
+
+test("BLOCK story answers why in one screen: constraint, tier, controller", () => {
+  const html = renderBlockStory(BLOCK_RESULT);
+  assert.match(html, /Why was this transaction blocked\?/);
+
+  // The mandate and the trusted evidence are presented against each other.
+  assert.match(html, /USER MANDATE/);
+  assert.match(html, /TRUSTED MERCHANT EVIDENCE/);
+  assert.match(html, /No gambling-related products/);
+  assert.match(html, /casino gambling techniques/);
+  assert.match(html, /trusted evidence includes the prohibited characteristic/);
+
+  // The three facts a judge needs.
+  assert.match(html, /FAILED CONSTRAINT[\s\S]*?exclusion/);
+  assert.match(html, /EVIDENCE TIER[\s\S]*?TRUSTED MERCHANT EVIDENCE/);
+  assert.match(html, /CONTROLLER[\s\S]*?BLOCK/);
+});
+
+
+test("BLOCK story leads with product-scope evidence over merchant-wide terms", () => {
+  const html = renderBlockStory(BLOCK_RESULT);
+  assert.ok(
+    html.indexOf("market-edge-evidence-v1") < html.indexOf("academy-terms-v1"),
+    "the SKU-specific evidence that decided the constraint must be read first",
+  );
+});
+
+
+test("a blocked run reports zero rupees and zero provider calls", () => {
+  const html = renderDecisionBanner(BLOCK_RESULT);
+  assert.match(html, /VALUE MOVED[\s\S]*?₹0</);
+  assert.match(html, /RAZORPAY CALLS[\s\S]*?>0</);
+  assert.match(html, /EXTERNAL CALLS[\s\S]*?>0</);
+  assert.doesNotMatch(html, /₹0\.00/);
+});
+
+
+const REVIEW_RESULT = {
+  decision: "REVIEW",
+  decision_reason: "trusted evidence is insufficient for the exclusion",
+  transactability: {
+    status: "REVIEW",
+    evidence_readiness: "INCOMPLETE",
+    next_action: "Additional trusted evidence may make this transaction evaluable.",
+    readiness: [
+      { label: "PRICE", status: "VERIFIED" },
+      { label: "SKU OWNERSHIP", status: "VERIFIED" },
+      { label: "MERCHANT BINDING", status: "VERIFIED" },
+      { label: "PURPOSE EVIDENCE", status: "AVAILABLE" },
+      { label: "RECURRENCE TERMS", status: "MISSING" },
+    ],
+  },
+  authorization: {
+    final_controller: "REVIEW",
+    semantic: {
+      verdict: "ABSTAIN",
+      checks: [
+        {
+          constraint_id: "exclusion.1",
+          family: "exclusion",
+          constraint: "Excluded product characteristic: subscriptions.",
+          status: "ABSTAIN",
+          reason: "trusted evidence is insufficient for the exclusion",
+        },
+      ],
+    },
+  },
+  execution: { status: "NOT_CALLED", razorpay_calls: 0, external_network_calls: 0 },
+};
+
+
+test("REVIEW story separates what is known from what is missing", () => {
+  const html = renderReviewStory(REVIEW_RESULT);
+  assert.match(html, /WHAT WE KNOW/);
+  assert.match(html, /WHAT WE DO NOT KNOW/);
+  assert.match(html, /WHY THAT MATTERS/);
+
+  const known = html.slice(html.indexOf("WHAT WE KNOW"), html.indexOf("WHAT WE DO NOT KNOW"));
+  assert.match(known, /PRICE/);
+  assert.match(known, /SKU OWNERSHIP/);
+  assert.match(known, /MERCHANT BINDING/);
+  assert.doesNotMatch(known, /RECURRENCE TERMS/);
+
+  const missing = html.slice(html.indexOf("WHAT WE DO NOT KNOW"), html.indexOf("WHY THAT MATTERS"));
+  assert.match(missing, /RECURRENCE TERMS/);
+  assert.match(missing, /MISSING/);
+});
+
+
+test("REVIEW story states why the gap prevents a decision, and that nothing moved", () => {
+  const html = renderReviewStory(REVIEW_RESULT);
+  assert.match(html, /Excluded product characteristic: subscriptions\./);
+  assert.match(
+    html,
+    /MandateGuard cannot determine whether this transaction violates that constraint/,
+  );
+  assert.match(html, /OUTCOME[\s\S]*?REVIEW/);
+  assert.match(html, /MONEY MOVED[\s\S]*?₹0</);
+  assert.match(html, /may make this transaction evaluable/);
+});
+
+
+test("recovered REVIEW reports the transition and zero calls before the final ALLOW", () => {
+  const html = renderStory({
+    decision: "ALLOW",
+    buyer: { product: "Aurora Focus Lamp", price_minor: 149900, currency: "INR" },
+    recovery: {
+      status: "RESOLVED",
+      transition: "REVIEW -> ALLOW",
+      resolved_after: "1 trusted evidence acquisition",
+      payment_provider_calls_before_final_allow: 0,
+    },
+    execution: {
+      status: "ORDER_CREATED",
+      order: { amount: 149900, currency: "INR" },
+      consent: { status: "ACTIVE" },
+    },
+  });
+  assert.match(html, /Reached after 1 trusted evidence acquisition/);
+  assert.match(html, /a fresh run of the full controller/);
+  assert.match(html, /Payment-provider calls before the final ALLOW: <strong>0<\/strong>/);
+  assert.match(html, /₹1,499/);
+});
+
+
+// ---------------------------------------------------------------------------
+// Revocation
+// ---------------------------------------------------------------------------
+
+const ISSUED_CAPABILITY = {
+  signature_verified: true,
+  expiry_valid: true,
+  transaction_bound: true,
+  request_bound: true,
+};
+
+
+test("consent strip reports an active mandate against a verified capability", () => {
+  const html = renderConsentStrip({
+    capability: ISSUED_CAPABILITY,
+    consent: { status: "ACTIVE" },
+  });
+  assert.match(html, /data-consent-status="ACTIVE"/);
+  for (const row of ["SIGNED", "UNEXPIRED", "HASH BOUND"]) {
+    assert.match(html, new RegExp(`${row}</span>\\s*<span class="consentstrip__value">VERIFIED`));
+  }
+  assert.match(html, /CONSENT<\/span>\s*<span class="consentstrip__value">ACTIVE/);
+  assert.doesNotMatch(html, /REVOKED/);
+});
+
+
+test("revocation changes the consent row alone and stops execution before the network", () => {
+  const html = renderRevocationStory({
+    status: "REJECTED_BEFORE_NETWORK",
+    reason: "MANDATE_REVOKED",
+    razorpay_calls: 0,
+    external_network_calls: 0,
+    capability: ISSUED_CAPABILITY,
+    consent: {
+      status: "REVOKED",
+      authority: "DEMO USER REVOCATION",
+      teaching:
+        "The capability is still signed and unexpired. Current consent no longer permits execution.",
+    },
+  });
+
+  // The cryptographic rows are untouched; only consent flipped.
+  assert.match(html, /data-consent-status="REVOKED"/);
+  assert.equal(html.match(/consentstrip__value">VERIFIED/g).length, 3);
+  assert.match(html, /CONSENT<\/span>\s*<span class="consentstrip__value">REVOKED/);
+
+  assert.match(html, /REJECTED BEFORE NETWORK/);
+  assert.match(html, /still signed and unexpired\. Current consent no longer permits execution/);
+  assert.match(html, /Authority: DEMO USER REVOCATION/);
+});
+
+
+test("a refusal at the execution gate is not reported as a controller decision", () => {
+  const html = renderDecisionBanner({
+    decision: "ALLOW",
+    decision_reason: "All applicable deterministic and semantic checks passed.",
+    execution: {
+      status: "REJECTED_BEFORE_NETWORK",
+      reason: "MANDATE_REVOKED",
+      razorpay_calls: 0,
+      external_network_calls: 0,
+      consent: { status: "REVOKED" },
+    },
+  });
+  assert.match(html, /EXECUTION GATE/);
+  assert.match(html, /REJECTED BEFORE NETWORK/);
+  assert.match(html, /Mandate revoked/);
+  // The controller really did allow; the banner must not overwrite that.
+  assert.match(html, /FINAL CONTROLLER <strong>ALLOW<\/strong>/);
+  assert.match(html, /VALUE MOVED[\s\S]*?₹0</);
+});
+
+
+// ---------------------------------------------------------------------------
+// Attack lab
+// ---------------------------------------------------------------------------
+
+test("every attack surface names a control, a treatment, and its evidence", () => {
+  assert.ok(ATTACK_SURFACES.length >= 12);
+  const html = renderAttackLab();
+  for (const surface of ATTACK_SURFACES) {
+    for (const field of ["surface", "detail", "control", "treatment", "evidence"]) {
+      assert.ok(surface[field], `${surface.id} is missing ${field}`);
+    }
+    assert.ok(html.includes(escapeHtml(surface.surface)));
+    assert.ok(html.includes(escapeHtml(surface.control)));
+  }
+  for (const expected of [
+    "Price mutation after ALLOW",
+    "Capability replay",
+    "Consent revocation",
+    "Evidence omission",
+    "Cross-run consent reuse",
+  ]) {
+    assert.ok(
+      ATTACK_SURFACES.some((item) => item.surface === expected),
+      `${expected} must be covered`,
+    );
+  }
+});
+
+
+test("attack lab states defensive treatments only", () => {
+  const allowed = new Set([
+    "REJECT BEFORE NETWORK",
+    "BLOCK OR REVIEW",
+    "REVIEW",
+    "EVIDENCE REFUSED",
+  ]);
+  for (const surface of ATTACK_SURFACES) {
+    assert.ok(allowed.has(surface.treatment), `unexpected treatment: ${surface.treatment}`);
+  }
+  // The taxonomy describes surfaces and controls, never a procedure.
+  const prose = ATTACK_SURFACES.map((item) => `${item.detail} ${item.control}`).join(" ");
+  for (const forbidden of [/step 1/i, /how to bypass/i, /in order to evade/i, /payload/i]) {
+    assert.doesNotMatch(prose, forbidden);
+  }
+
+  const html = renderAttackLab();
+  assert.match(html, /REJECT BEFORE NETWORK/);
+  assert.match(html, /data-treatment="REJECT BEFORE NETWORK"/);
+});
+
+
+// ---------------------------------------------------------------------------
+// Scale and claim boundaries
+// ---------------------------------------------------------------------------
+
+test("bounded scale claims are read from the server evidence policy", () => {
+  const html = renderBoundedScale({
+    resolve: { top_k: 5, max_acquisition_rounds: 2, max_new_evidence_items: 4 },
+  });
+  assert.match(html, /Evidence retrieval<\/dt><dd>top-k 5/);
+  assert.match(html, /Recovery<\/dt><dd>max 2 rounds/);
+  assert.match(html, /New trusted evidence<\/dt><dd>max 4 items/);
+  assert.match(html, /Execution capability<\/dt><dd>single-use/);
+  assert.match(html, /External payment call<\/dt><dd>only after final ALLOW/);
+
+  // A different server policy must change the rendered claim.
+  const other = renderBoundedScale({
+    resolve: { top_k: 3, max_acquisition_rounds: 1, max_new_evidence_items: 2 },
+  });
+  assert.match(other, /top-k 3/);
+  assert.match(other, /max 1 rounds/);
+  assert.doesNotMatch(other, /top-k 5/);
+});
+
+
+test("measured evidence reports the frozen result with its caveats intact", () => {
+  const html = renderMeasuredEvidence();
+  assert.equal(EVALUATION_EVIDENCE.cases, 20);
+  assert.equal(
+    EVALUATION_EVIDENCE.allow + EVALUATION_EVIDENCE.block + EVALUATION_EVIDENCE.review,
+    EVALUATION_EVIDENCE.cases,
+  );
+  assert.equal(EVALUATION_EVIDENCE.safetyViolations, 0);
+
+  assert.match(html, /20<\/strong>\s*independent synthetic recovery/);
+  assert.match(html, /REVIEW to ALLOW<\/dt>[\s\S]*?>7</);
+  assert.match(html, /REVIEW to BLOCK<\/dt>[\s\S]*?>3</);
+  assert.match(html, /REVIEW to REVIEW<\/dt>[\s\S]*?>10</);
+  assert.match(html, /Safety violations<\/dt>[\s\S]*?>0</);
+  assert.match(html, /₹29,923 of frozen synthetic transaction value/);
+  assert.match(html, /docs\/RESOLVE_EVALUATION_RESULTS\.md/);
+});
+
+
+test("the interface never converts test counts or synthetic cases into a scale claim", () => {
+  const html = renderMeasuredEvidence();
+  assert.match(html, /Not merchant traffic, not revenue, not conversion lift/);
+  assert.match(html, /not evidence of generalization/);
+  assert.match(html, /not a production throughput claim/i);
+  assert.match(html, /Half of the initially non-executable cases stayed at REVIEW/);
+  // Tests are secondary proof, never presented as scale.
+  assert.match(html, /Secondary proof/);
+  for (const overclaim of [/TPS/, /requests per second/i, /production scale/i, /at scale/i]) {
+    assert.doesNotMatch(html, overclaim);
+  }
+
+  const research = renderResearch({
+    authorization_use: "Not used in the authorization gate.",
+    finding: "Evidence composition predicted stability better than quantity.",
+    scope: "62 correlated evidence subsets across six synthetic queries.",
+    source: "artifacts/engineering/int3/RUN.md",
+  });
+  assert.match(research, /EXPERIMENTAL/);
+  assert.match(research, /Not used in the authorization gate\./);
+});
+
+
+test("call accounting is never opted into the figure animation", () => {
+  // Interpolating a call count would paint integers the run never produced.
+  const banner = renderDecisionBanner(BLOCK_RESULT);
+  const ledger = banner.slice(banner.indexOf('class="ledger"'));
+  assert.doesNotMatch(ledger, /data-figure/);
+  assert.match(ledger, /RAZORPAY CALLS[\s\S]*?<dd class="ledger__value">0<\/dd>/);
+
+  // Aggregate evaluation figures may animate, and still render their true value.
+  const measured = renderMeasuredEvidence();
+  assert.match(measured, /data-figure="animate"/);
+  assert.match(measured, /<dd class="measured__value" data-figure="animate">7<\/dd>/);
+});
+
+
+// ---------------------------------------------------------------------------
+// Evidence provenance
+// ---------------------------------------------------------------------------
+
+test("provenance ties each constraint to the evidence set that decided it", () => {
+  const html = renderProvenance({
+    evidence: {
+      evidence_set_sha256: "5f7d75b0ad451d8f1ff9ec4270d8e3dc",
+      buyer_text: { text: "Highest lexical catalog match." },
+      cards: [
+        {
+          evidence_id: "aurora-listing-v1",
+          source_kind: "product_listing",
+          merchant_id: "merchant-lumen",
+          sku: "aurora-focus-lamp",
+          scope: "PRODUCT",
+          text: "The registered listing does not record the billing model.",
+          retrieval_score: 0.41,
+          acquisition: "INITIAL_RETRIEVAL",
+        },
+        {
+          evidence_id: "aurora-sku-terms-v2",
+          source_kind: "product_terms",
+          merchant_id: "merchant-lumen",
+          sku: "aurora-focus-lamp",
+          scope: "PRODUCT",
+          text: "Billing model: one-time purchase with no subscription.",
+          retrieval_score: null,
+          acquisition: "BOUNDED_TRUSTED_ACQUISITION",
+        },
+      ],
+    },
+    authorization: {
+      semantic: {
+        checks: [
+          {
+            constraint_id: "exclusion.1",
+            family: "exclusion",
+            constraint: "Excluded product characteristic: subscriptions.",
+            status: "PASS",
+            reason: "trusted evidence explicitly excludes the prohibited characteristic",
+          },
+        ],
+      },
+    },
+  });
+
+  assert.match(html, /EVIDENCE SET COMMITMENT/);
+  assert.match(html, /5f7d75b0ad451d8f1ff9ec4270d8e3dc/);
+  assert.match(html, /evaluated against exactly this canonical evidence set/);
+
+  // Source, trust tier, merchant, scope, effective state and claim per item.
+  assert.match(html, /TRUSTED MERCHANT EVIDENCE/);
+  assert.match(html, /product_terms/);
+  assert.match(html, /merchant-lumen/);
+  assert.match(html, /SKU aurora-focus-lamp/);
+  assert.match(html, /ACQUIRED DURING RECOVERY/);
+  assert.match(html, /RESOLVED AT RETRIEVAL/);
+  assert.match(html, /data-acquisition="BOUNDED_TRUSTED_ACQUISITION"/);
+
+  // The constraint it decided, and the buyer text that could not.
+  assert.match(html, /Excluded product characteristic: subscriptions\./);
+  assert.match(html, /data-status="PASS"/);
+  assert.match(html, /BUYER-PROVIDED TEXT<\/strong> is recorded for the audit trail and is never/);
+});
+
+
+test("the evidence view explains itself before any run has happened", () => {
+  const html = renderProvenance(null);
+  assert.match(html, /No run has been observed yet/);
+  assert.match(html, /source, trust tier, scope, and hash commitment/);
+});
+
+
+// ---------------------------------------------------------------------------
+// Presentation guarantees held in the stylesheet
+// ---------------------------------------------------------------------------
+
+test("reduced motion disables animation and never hides revealed content", () => {
+  const block = stylesheet.slice(stylesheet.indexOf("@media (prefers-reduced-motion: reduce)"));
+  assert.match(block, /animation-duration: 1ms !important/);
+  assert.match(block, /animation-iteration-count: 1 !important/);
+  assert.match(block, /transition-duration: 1ms !important/);
+  assert.match(block, /scroll-behavior: auto/);
+  assert.match(block, /\[data-reveal\] \{ opacity: 1; transform: none; \}/);
+
+  // The hidden entrance state only exists while script has armed it, so copy is
+  // readable when the transition cannot run at all.
+  assert.match(stylesheet, /\[data-reveal-armed="true"\] \[data-reveal\] \{\s*opacity: 0;/);
+});
+
+
+test("every multi-column story layout collapses to one column on small viewports", () => {
+  const collapses = (selector) =>
+    new RegExp(`\\${selector}[^{}]*\\{[^}]*grid-template-columns: 1fr`).test(stylesheet);
+  for (const selector of [
+    ".spine",
+    ".decision-banner",
+    ".verification__grid",
+    ".conflict",
+    ".knowledge",
+    ".attack",
+    ".factrow",
+    ".ledger",
+    ".measured__grid",
+    ".hero__facts",
+    ".hero",
+  ]) {
+    assert.ok(collapses(selector), `${selector} must collapse to one column`);
+  }
+
+  // The mobile tab strip must not bleed outside the padded row: a negative
+  // inline margin there gives the whole document horizontal overflow.
+  assert.doesNotMatch(stylesheet, /\.mainnav \{[^}]*margin-inline: calc\(var\(--gutter\) \* -1\)/);
+  assert.match(stylesheet, /body \{[\s\S]*?overflow-x: hidden;/);
+  // Grid tracks that hold long text must be allowed to shrink below content width.
+  assert.match(stylesheet, /grid-template-columns: auto minmax\(0, 1fr\)/);
 });

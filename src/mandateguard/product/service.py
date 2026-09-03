@@ -829,6 +829,11 @@ class CommerceLabService:
             "research": dict(INT3_RESEARCH_FINDING),
             "failure_recovery": [dict(item) for item in FAILURE_RECOVERY_EVIDENCE],
             "resolve": {
+                # Read straight off the server-owned evidence policy so the
+                # judge-facing bounded-scale claim cannot drift from the policy
+                # the controller actually applies.
+                "top_k": self.evidence_policy.top_k,
+                "alpha": float(self.evidence_policy.alpha),
                 "max_acquisition_rounds": MAX_ACQUISITION_ROUNDS,
                 "max_new_evidence_items": MAX_NEW_EVIDENCE_ITEMS,
                 "planner": "DETERMINISTIC_CONSTRAINT_FAMILY_PLANNER_V1",
