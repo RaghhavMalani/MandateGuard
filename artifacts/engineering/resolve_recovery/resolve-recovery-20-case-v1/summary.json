@@ -1,0 +1,783 @@
+{
+  "case_status_counts": {
+    "PASS": 20,
+    "PRECONDITION_FAILED": 0,
+    "SAFETY_VIOLATION": 0,
+    "UNRESOLVED_MISS": 0
+  },
+  "claims_limit": "Synthetic, non-benchmark, twenty independent cases. These outcomes do not establish generalization, and the reported synthetic transaction value is not revenue, GMV, or conversion lift.",
+  "classification": "NON_BENCHMARK_SYNTHETIC_ENGINEERING_EVALUATION",
+  "evaluation_id": "RESOLVE-RECOVERY-20-CASE-V1",
+  "evidence_policy_id": "MANDATEGUARD_PRODUCT_EVIDENCE_POLICY_V1",
+  "metric_schema_version": "RESOLVE_METRIC_SCHEMA_V2",
+  "observed_metrics": {
+    "acquisition_rounds": 21,
+    "authority_conflict_count": 2,
+    "binding_rejection_count": 2,
+    "budget_exhaustion_count": 2,
+    "expired_recovery_count": 0,
+    "initial_review_count": 20,
+    "new_evidence_items": 15,
+    "offline_adapter_calls": 7,
+    "openai_calls": 0,
+    "planner_direct_allow_count": 0,
+    "provider_calls_before_final_allow": 0,
+    "razorpay_http_calls": 0,
+    "replay_rejection_count": 7,
+    "resolved_count": 10,
+    "review_to_allow_count": 7,
+    "review_to_block_count": 3,
+    "review_to_review_count": 10,
+    "source_incomplete_count": 0,
+    "trusted_evidence_provider_calls": 19
+  },
+  "outcomes": [
+    {
+      "acquisition_outcome_codes": [
+        "ALLOW",
+        "SOURCE_COMPLETE"
+      ],
+      "allowed_final_actions": [
+        "ALLOW"
+      ],
+      "amount_minor": 429000,
+      "audit_event_count": 7,
+      "case_family": "PURPOSE",
+      "case_id": "RR20-01-PURPOSE-SUPPORTED",
+      "currency": "INR",
+      "execution": {
+        "capability_issued": true,
+        "order_created": true,
+        "replay": {
+          "additional_adapter_calls": 0,
+          "status": "REJECTED_BEFORE_NETWORK"
+        }
+      },
+      "expected_final_action": "ALLOW",
+      "final_action": "ALLOW",
+      "final_evidence_sha256": "bfcd15ef04a39f2cee66d481906805e66cdced9a1f0e44dcdf0ed2af67f3fa5c",
+      "forbidden_final_actions": [
+        "BLOCK"
+      ],
+      "initial_action": "REVIEW",
+      "initial_evidence_sha256": "df6188dd2feb88986984856dac6edd37ece9777963f0e66d19349a308ae7afd2",
+      "merchant_id": "merchant-halcyon-atelier",
+      "new_evidence_items": 1,
+      "provider_calls_before_final_allow": 0,
+      "recovery_refusals": [],
+      "rounds_used": 1,
+      "sku": "halcyon-drafting-lamp",
+      "status": "PASS",
+      "trusted_evidence_provider_calls": 1
+    },
+    {
+      "acquisition_outcome_codes": [
+        "BLOCK",
+        "SOURCE_COMPLETE"
+      ],
+      "allowed_final_actions": [
+        "BLOCK"
+      ],
+      "amount_minor": 189900,
+      "audit_event_count": 7,
+      "case_family": "PURPOSE",
+      "case_id": "RR20-02-PURPOSE-PROHIBITED",
+      "currency": "INR",
+      "execution": {
+        "capability_issued": false,
+        "order_created": false,
+        "replay": null
+      },
+      "expected_final_action": "BLOCK",
+      "final_action": "BLOCK",
+      "final_evidence_sha256": "f1a861317aa50b71d213e5e787fbee4c559ee5cb02c7e1870b6ba6d7fc550b39",
+      "forbidden_final_actions": [
+        "ALLOW"
+      ],
+      "initial_action": "REVIEW",
+      "initial_evidence_sha256": "c663a71b3db7909e86e4b0ec09ddf635794a07e8a765b9bba194038f547aa9bc",
+      "merchant_id": "merchant-quarry-press",
+      "new_evidence_items": 1,
+      "provider_calls_before_final_allow": 0,
+      "recovery_refusals": [],
+      "rounds_used": 1,
+      "sku": "quarry-strategy-manual",
+      "status": "PASS",
+      "trusted_evidence_provider_calls": 1
+    },
+    {
+      "acquisition_outcome_codes": [
+        "REVIEW",
+        "SOURCE_COMPLETE"
+      ],
+      "allowed_final_actions": [
+        "REVIEW",
+        "BLOCK"
+      ],
+      "amount_minor": 764500,
+      "audit_event_count": 6,
+      "case_family": "PURPOSE",
+      "case_id": "RR20-03-PURPOSE-UNRESOLVED",
+      "currency": "INR",
+      "execution": {
+        "capability_issued": false,
+        "order_created": false,
+        "replay": null
+      },
+      "expected_final_action": "REVIEW",
+      "final_action": "REVIEW",
+      "final_evidence_sha256": "ae0e2b92a4d33dfb1af916cef71cfa413d0701d965a4336f503eaec5476bab81",
+      "forbidden_final_actions": [
+        "ALLOW"
+      ],
+      "initial_action": "REVIEW",
+      "initial_evidence_sha256": "f0da3697b49580e30c07966daeee6184d39a4beee573b6458c98223d09df906f",
+      "merchant_id": "merchant-tidewater-supply",
+      "new_evidence_items": 1,
+      "provider_calls_before_final_allow": 0,
+      "recovery_refusals": [],
+      "rounds_used": 1,
+      "sku": "tidewater-utility-cart",
+      "status": "PASS",
+      "trusted_evidence_provider_calls": 1
+    },
+    {
+      "acquisition_outcome_codes": [
+        "ALLOW",
+        "SOURCE_COMPLETE"
+      ],
+      "allowed_final_actions": [
+        "ALLOW"
+      ],
+      "amount_minor": 312000,
+      "audit_event_count": 7,
+      "case_family": "EXCLUSION",
+      "case_id": "RR20-04-EXCLUSION-ABSENT",
+      "currency": "INR",
+      "execution": {
+        "capability_issued": true,
+        "order_created": true,
+        "replay": {
+          "additional_adapter_calls": 0,
+          "status": "REJECTED_BEFORE_NETWORK"
+        }
+      },
+      "expected_final_action": "ALLOW",
+      "final_action": "ALLOW",
+      "final_evidence_sha256": "107099675dc1d8a598e0d96e1c7803a878b16c5dc8b031263d2576cda0711053",
+      "forbidden_final_actions": [
+        "BLOCK"
+      ],
+      "initial_action": "REVIEW",
+      "initial_evidence_sha256": "1d87250120c572c2afaeb88e0cc5a2de9c541c0fa7b75219af9c8d61e1b3852b",
+      "merchant_id": "merchant-borealis-optics",
+      "new_evidence_items": 1,
+      "provider_calls_before_final_allow": 0,
+      "recovery_refusals": [],
+      "rounds_used": 1,
+      "sku": "borealis-reading-loupe",
+      "status": "PASS",
+      "trusted_evidence_provider_calls": 1
+    },
+    {
+      "acquisition_outcome_codes": [
+        "BLOCK",
+        "SOURCE_COMPLETE"
+      ],
+      "allowed_final_actions": [
+        "BLOCK"
+      ],
+      "amount_minor": 149900,
+      "audit_event_count": 7,
+      "case_family": "EXCLUSION",
+      "case_id": "RR20-05-EXCLUSION-PRESENT",
+      "currency": "INR",
+      "execution": {
+        "capability_issued": false,
+        "order_created": false,
+        "replay": null
+      },
+      "expected_final_action": "BLOCK",
+      "final_action": "BLOCK",
+      "final_evidence_sha256": "f61fe4081ef8f299eb75fa97a42bf94a1d5aa5b790acc5ea00876b21cd298eca",
+      "forbidden_final_actions": [
+        "ALLOW"
+      ],
+      "initial_action": "REVIEW",
+      "initial_evidence_sha256": "ab2d498d07bfeaad4ae543489250cefdcf9c5894f5f850d03f4b4f3b9933e6c3",
+      "merchant_id": "merchant-ashfield-labs",
+      "new_evidence_items": 1,
+      "provider_calls_before_final_allow": 0,
+      "recovery_refusals": [],
+      "rounds_used": 1,
+      "sku": "ashfield-focus-blend",
+      "status": "PASS",
+      "trusted_evidence_provider_calls": 1
+    },
+    {
+      "acquisition_outcome_codes": [
+        "REVIEW",
+        "SOURCE_COMPLETE"
+      ],
+      "allowed_final_actions": [
+        "REVIEW",
+        "BLOCK"
+      ],
+      "amount_minor": 87500,
+      "audit_event_count": 6,
+      "case_family": "EXCLUSION",
+      "case_id": "RR20-06-EXCLUSION-AMBIGUOUS",
+      "currency": "INR",
+      "execution": {
+        "capability_issued": false,
+        "order_created": false,
+        "replay": null
+      },
+      "expected_final_action": "REVIEW",
+      "final_action": "REVIEW",
+      "final_evidence_sha256": "7035f91bcb669a9b5525543a241422960e7a752566aae556c12f147ca05e2f2e",
+      "forbidden_final_actions": [
+        "ALLOW"
+      ],
+      "initial_action": "REVIEW",
+      "initial_evidence_sha256": "383c806d4b4ad5ad08f67e844cfb12775d43982a0d9e9390a54bb60c5e96ba47",
+      "merchant_id": "merchant-cobalt-provisions",
+      "new_evidence_items": 1,
+      "provider_calls_before_final_allow": 0,
+      "recovery_refusals": [],
+      "rounds_used": 1,
+      "sku": "cobalt-trail-ration",
+      "status": "PASS",
+      "trusted_evidence_provider_calls": 1
+    },
+    {
+      "acquisition_outcome_codes": [
+        "ALLOW",
+        "SOURCE_COMPLETE"
+      ],
+      "allowed_final_actions": [
+        "ALLOW"
+      ],
+      "amount_minor": 254000,
+      "audit_event_count": 7,
+      "case_family": "RECURRENCE",
+      "case_id": "RR20-07-RECURRENCE-ONE-TIME",
+      "currency": "INR",
+      "execution": {
+        "capability_issued": true,
+        "order_created": true,
+        "replay": {
+          "additional_adapter_calls": 0,
+          "status": "REJECTED_BEFORE_NETWORK"
+        }
+      },
+      "expected_final_action": "ALLOW",
+      "final_action": "ALLOW",
+      "final_evidence_sha256": "f8adbc93d51cb4ede2e599ea7305afb532a0401263f6007d75a6bc5210a5a137",
+      "forbidden_final_actions": [
+        "BLOCK"
+      ],
+      "initial_action": "REVIEW",
+      "initial_evidence_sha256": "0e5fd4f71cbb1229bf0d36ba6cabb6bf420b044387ab99f39135c457e1b5240f",
+      "merchant_id": "merchant-lanternwick-supply",
+      "new_evidence_items": 1,
+      "provider_calls_before_final_allow": 0,
+      "recovery_refusals": [],
+      "rounds_used": 1,
+      "sku": "lanternwick-task-light",
+      "status": "PASS",
+      "trusted_evidence_provider_calls": 1
+    },
+    {
+      "acquisition_outcome_codes": [
+        "BLOCK",
+        "SOURCE_COMPLETE"
+      ],
+      "allowed_final_actions": [
+        "BLOCK"
+      ],
+      "amount_minor": 219900,
+      "audit_event_count": 7,
+      "case_family": "RECURRENCE",
+      "case_id": "RR20-08-RECURRENCE-RECURRING",
+      "currency": "INR",
+      "execution": {
+        "capability_issued": false,
+        "order_created": false,
+        "replay": null
+      },
+      "expected_final_action": "BLOCK",
+      "final_action": "BLOCK",
+      "final_evidence_sha256": "ebc43c101eb9713d0418e7dcd67439bc3af22bd35bed62b7f72830289ed4d805",
+      "forbidden_final_actions": [
+        "ALLOW"
+      ],
+      "initial_action": "REVIEW",
+      "initial_evidence_sha256": "991f22f397bafff2effeae4b42add041703aca39c9af66ae540c9732d8863c22",
+      "merchant_id": "merchant-verdant-crate",
+      "new_evidence_items": 1,
+      "provider_calls_before_final_allow": 0,
+      "recovery_refusals": [],
+      "rounds_used": 1,
+      "sku": "verdant-seasonal-crate",
+      "status": "PASS",
+      "trusted_evidence_provider_calls": 1
+    },
+    {
+      "acquisition_outcome_codes": [
+        "REVIEW",
+        "SOURCE_COMPLETE"
+      ],
+      "allowed_final_actions": [
+        "REVIEW",
+        "BLOCK"
+      ],
+      "amount_minor": 132500,
+      "audit_event_count": 6,
+      "case_family": "RECURRENCE",
+      "case_id": "RR20-09-RECURRENCE-UNDOCUMENTED",
+      "currency": "INR",
+      "execution": {
+        "capability_issued": false,
+        "order_created": false,
+        "replay": null
+      },
+      "expected_final_action": "REVIEW",
+      "final_action": "REVIEW",
+      "final_evidence_sha256": "efa89a401bc6f7f3b8448bbea56c079c6ab9e699478956a23f6b8658c3dcf230",
+      "forbidden_final_actions": [
+        "ALLOW"
+      ],
+      "initial_action": "REVIEW",
+      "initial_evidence_sha256": "2d31031c9ba64abdbde32263d5980dc252aeaafb5bff35dc43caeb63b4181320",
+      "merchant_id": "merchant-pinehold-goods",
+      "new_evidence_items": 1,
+      "provider_calls_before_final_allow": 0,
+      "recovery_refusals": [],
+      "rounds_used": 1,
+      "sku": "pinehold-filter-kit",
+      "status": "PASS",
+      "trusted_evidence_provider_calls": 1
+    },
+    {
+      "acquisition_outcome_codes": [
+        "ALLOW",
+        "SOURCE_COMPLETE"
+      ],
+      "allowed_final_actions": [
+        "ALLOW"
+      ],
+      "amount_minor": 184900,
+      "audit_event_count": 7,
+      "case_family": "CONFLICT_FRESHNESS",
+      "case_id": "RR20-10-SUPERSEDED-RECORD",
+      "currency": "INR",
+      "execution": {
+        "capability_issued": true,
+        "order_created": true,
+        "replay": {
+          "additional_adapter_calls": 0,
+          "status": "REJECTED_BEFORE_NETWORK"
+        }
+      },
+      "expected_final_action": "ALLOW",
+      "final_action": "ALLOW",
+      "final_evidence_sha256": "436e9abdf6e4b2169ca505646d390a7cb1c00000980087e631e101cff33df1cc",
+      "forbidden_final_actions": [
+        "BLOCK"
+      ],
+      "initial_action": "REVIEW",
+      "initial_evidence_sha256": "f6e0ed152b4cfe008b2367a70473f0e2f43bcdfae31ac7cc2a17f167b9dcad1d",
+      "merchant_id": "merchant-ridgeline-audio",
+      "new_evidence_items": 1,
+      "provider_calls_before_final_allow": 0,
+      "recovery_refusals": [],
+      "rounds_used": 1,
+      "sku": "ridgeline-studio-monitor",
+      "status": "PASS",
+      "trusted_evidence_provider_calls": 1
+    },
+    {
+      "acquisition_outcome_codes": [
+        "REVIEW_ON_CONFLICT",
+        "SIMULTANEOUS_AUTHORITY_CONFLICT"
+      ],
+      "allowed_final_actions": [
+        "REVIEW"
+      ],
+      "amount_minor": 596000,
+      "audit_event_count": 5,
+      "case_family": "CONFLICT_FRESHNESS",
+      "case_id": "RR20-11-AUTHORITY-CONFLICT",
+      "currency": "INR",
+      "execution": {
+        "capability_issued": false,
+        "order_created": false,
+        "replay": null
+      },
+      "expected_final_action": "REVIEW",
+      "final_action": "REVIEW",
+      "final_evidence_sha256": "bd3c0e948da6c6bac7ef23a92bd5445a4ca96087dbe8450ab31837e77a36ae87",
+      "forbidden_final_actions": [
+        "ALLOW",
+        "BLOCK"
+      ],
+      "initial_action": "REVIEW",
+      "initial_evidence_sha256": "bd3c0e948da6c6bac7ef23a92bd5445a4ca96087dbe8450ab31837e77a36ae87",
+      "merchant_id": "merchant-sable-instruments",
+      "new_evidence_items": 0,
+      "provider_calls_before_final_allow": 0,
+      "recovery_refusals": [],
+      "rounds_used": 1,
+      "sku": "sable-field-recorder",
+      "status": "PASS",
+      "trusted_evidence_provider_calls": 1
+    },
+    {
+      "acquisition_outcome_codes": [
+        "REVIEW_ON_CONFLICT",
+        "SIMULTANEOUS_AUTHORITY_CONFLICT"
+      ],
+      "allowed_final_actions": [
+        "REVIEW"
+      ],
+      "amount_minor": 274500,
+      "audit_event_count": 5,
+      "case_family": "CONFLICT_FRESHNESS",
+      "case_id": "RR20-12-SCOPE-PRECEDENCE-CONFLICT",
+      "currency": "INR",
+      "execution": {
+        "capability_issued": false,
+        "order_created": false,
+        "replay": null
+      },
+      "expected_final_action": "REVIEW",
+      "final_action": "REVIEW",
+      "final_evidence_sha256": "45cc5fb3138098f8ea9a6c790507ba794d0136afd6e5a50a98371a9da6ad8db2",
+      "forbidden_final_actions": [
+        "ALLOW",
+        "BLOCK"
+      ],
+      "initial_action": "REVIEW",
+      "initial_evidence_sha256": "45cc5fb3138098f8ea9a6c790507ba794d0136afd6e5a50a98371a9da6ad8db2",
+      "merchant_id": "merchant-orchard-lane",
+      "new_evidence_items": 0,
+      "provider_calls_before_final_allow": 0,
+      "recovery_refusals": [],
+      "rounds_used": 1,
+      "sku": "orchard-lane-gift-box",
+      "status": "PASS",
+      "trusted_evidence_provider_calls": 1
+    },
+    {
+      "acquisition_outcome_codes": [
+        "ALLOW",
+        "SOURCE_COMPLETE"
+      ],
+      "allowed_final_actions": [
+        "ALLOW"
+      ],
+      "amount_minor": 998000,
+      "audit_event_count": 7,
+      "case_family": "CONFLICT_FRESHNESS",
+      "case_id": "RR20-13-EXPIRED-REPLACED",
+      "currency": "INR",
+      "execution": {
+        "capability_issued": true,
+        "order_created": true,
+        "replay": {
+          "additional_adapter_calls": 0,
+          "status": "REJECTED_BEFORE_NETWORK"
+        }
+      },
+      "expected_final_action": "ALLOW",
+      "final_action": "ALLOW",
+      "final_evidence_sha256": "0369e461dca2f7a9b428666d60e72d15bf1e506e2459324a82817610be79718f",
+      "forbidden_final_actions": [
+        "BLOCK"
+      ],
+      "initial_action": "REVIEW",
+      "initial_evidence_sha256": "ce675702a5daa112b6eaed53b2ef46563a9397ffe6ef845c6a7150f637f45312",
+      "merchant_id": "merchant-fenwick-press",
+      "new_evidence_items": 1,
+      "provider_calls_before_final_allow": 0,
+      "recovery_refusals": [],
+      "rounds_used": 1,
+      "sku": "fenwick-atlas-edition",
+      "status": "PASS",
+      "trusted_evidence_provider_calls": 1
+    },
+    {
+      "acquisition_outcome_codes": [
+        "ALLOW",
+        "SOURCE_COMPLETE"
+      ],
+      "allowed_final_actions": [
+        "ALLOW"
+      ],
+      "amount_minor": 672500,
+      "audit_event_count": 7,
+      "case_family": "BINDING_COMPLETENESS",
+      "case_id": "RR20-14-CROSS-MERCHANT-SKU",
+      "currency": "INR",
+      "execution": {
+        "capability_issued": true,
+        "order_created": true,
+        "replay": {
+          "additional_adapter_calls": 0,
+          "status": "REJECTED_BEFORE_NETWORK"
+        }
+      },
+      "expected_final_action": "ALLOW",
+      "final_action": "ALLOW",
+      "final_evidence_sha256": "00a07e3b4e12afd33ba4cdb6fb9b362055cccbb0ae429e69bc180872195aee7e",
+      "forbidden_final_actions": [
+        "BLOCK"
+      ],
+      "initial_action": "REVIEW",
+      "initial_evidence_sha256": "29ae48746580772a5529ff5e3cd17a1ca6785d0f8f38ca99fe5760c3c7345422",
+      "merchant_id": "merchant-northwind-outfitters",
+      "new_evidence_items": 1,
+      "provider_calls_before_final_allow": 0,
+      "recovery_refusals": [],
+      "rounds_used": 1,
+      "sku": "atlas-desk-riser",
+      "status": "PASS",
+      "trusted_evidence_provider_calls": 1
+    },
+    {
+      "acquisition_outcome_codes": [
+        "EVIDENCE_BINDING_REJECTED",
+        "SOURCE_COMPLETE"
+      ],
+      "allowed_final_actions": [
+        "REVIEW"
+      ],
+      "amount_minor": 358000,
+      "audit_event_count": 5,
+      "case_family": "BINDING_COMPLETENESS",
+      "case_id": "RR20-15-WRONG-SKU-BINDING",
+      "currency": "INR",
+      "execution": {
+        "capability_issued": false,
+        "order_created": false,
+        "replay": null
+      },
+      "expected_final_action": "REVIEW",
+      "final_action": "REVIEW",
+      "final_evidence_sha256": "85123e3c7d661bfd45ba0fd3cdc520c4cac7845d8787d37d491723f46ccdd470",
+      "forbidden_final_actions": [
+        "ALLOW",
+        "BLOCK"
+      ],
+      "initial_action": "REVIEW",
+      "initial_evidence_sha256": "85123e3c7d661bfd45ba0fd3cdc520c4cac7845d8787d37d491723f46ccdd470",
+      "merchant_id": "merchant-glasshouse-supply",
+      "new_evidence_items": 0,
+      "provider_calls_before_final_allow": 0,
+      "recovery_refusals": [],
+      "rounds_used": 1,
+      "sku": "glasshouse-propagation-tray",
+      "status": "PASS",
+      "trusted_evidence_provider_calls": 1
+    },
+    {
+      "acquisition_outcome_codes": [
+        "ALLOW",
+        "SOURCE_COMPLETE"
+      ],
+      "allowed_final_actions": [
+        "ALLOW"
+      ],
+      "amount_minor": 141900,
+      "audit_event_count": 7,
+      "case_family": "BINDING_COMPLETENESS",
+      "case_id": "RR20-16-GLOBAL-PLUS-SKU",
+      "currency": "INR",
+      "execution": {
+        "capability_issued": true,
+        "order_created": true,
+        "replay": {
+          "additional_adapter_calls": 0,
+          "status": "REJECTED_BEFORE_NETWORK"
+        }
+      },
+      "expected_final_action": "ALLOW",
+      "final_action": "ALLOW",
+      "final_evidence_sha256": "0379863bcbe6df0b468d27c4b2cc2b8bc6751719185130a9cd0702dbbe0c25f2",
+      "forbidden_final_actions": [
+        "BLOCK"
+      ],
+      "initial_action": "REVIEW",
+      "initial_evidence_sha256": "b55a3150408b855fd3edb6f6fe8a0024f5d51b7f0925320f3e9e4d7b13832683",
+      "merchant_id": "merchant-harborview-books",
+      "new_evidence_items": 2,
+      "provider_calls_before_final_allow": 0,
+      "recovery_refusals": [],
+      "rounds_used": 1,
+      "sku": "harborview-annual-almanac",
+      "status": "PASS",
+      "trusted_evidence_provider_calls": 1
+    },
+    {
+      "acquisition_outcome_codes": [
+        "EVIDENCE_BUDGET_INSUFFICIENT"
+      ],
+      "allowed_final_actions": [
+        "REVIEW"
+      ],
+      "amount_minor": 1245000,
+      "audit_event_count": 8,
+      "case_family": "BINDING_COMPLETENESS",
+      "case_id": "RR20-17-BUDGET-INSUFFICIENT",
+      "currency": "INR",
+      "execution": {
+        "capability_issued": false,
+        "order_created": false,
+        "replay": null
+      },
+      "expected_final_action": "REVIEW",
+      "final_action": "REVIEW",
+      "final_evidence_sha256": "b21ab36fd169876b5aa6bc3b83241e36d429871a0783f2195153bbb9acae6f54",
+      "forbidden_final_actions": [
+        "ALLOW",
+        "BLOCK"
+      ],
+      "initial_action": "REVIEW",
+      "initial_evidence_sha256": "b21ab36fd169876b5aa6bc3b83241e36d429871a0783f2195153bbb9acae6f54",
+      "merchant_id": "merchant-meridian-fitness",
+      "new_evidence_items": 0,
+      "provider_calls_before_final_allow": 0,
+      "recovery_refusals": [],
+      "rounds_used": 2,
+      "sku": "meridian-training-plan",
+      "status": "PASS",
+      "trusted_evidence_provider_calls": 0
+    },
+    {
+      "acquisition_outcome_codes": [],
+      "allowed_final_actions": [
+        "REVIEW"
+      ],
+      "amount_minor": 203500,
+      "audit_event_count": 2,
+      "case_family": "UNRESOLVED_FAILURE",
+      "case_id": "RR20-18-NO-REGISTERED-SOURCE",
+      "currency": "INR",
+      "execution": {
+        "capability_issued": false,
+        "order_created": false,
+        "replay": null
+      },
+      "expected_final_action": "REVIEW",
+      "final_action": "REVIEW",
+      "final_evidence_sha256": "c98a3cb35bcd92b5af83ee6b07f0af05c18f79aa9e0ebf1d739c440b6bbc31f2",
+      "forbidden_final_actions": [
+        "ALLOW",
+        "BLOCK"
+      ],
+      "initial_action": "REVIEW",
+      "initial_evidence_sha256": "c98a3cb35bcd92b5af83ee6b07f0af05c18f79aa9e0ebf1d739c440b6bbc31f2",
+      "merchant_id": "merchant-calder-ceramics",
+      "new_evidence_items": 0,
+      "provider_calls_before_final_allow": 0,
+      "recovery_refusals": [
+        "INCOMPLETE_SOURCE_COVERAGE"
+      ],
+      "rounds_used": 0,
+      "sku": "calder-glaze-set",
+      "status": "PASS",
+      "trusted_evidence_provider_calls": 0
+    },
+    {
+      "acquisition_outcome_codes": [
+        "REVIEW",
+        "SOURCE_COMPLETE"
+      ],
+      "allowed_final_actions": [
+        "REVIEW",
+        "BLOCK"
+      ],
+      "amount_minor": 887000,
+      "audit_event_count": 6,
+      "case_family": "UNRESOLVED_FAILURE",
+      "case_id": "RR20-19-COMPLETE-BUT-INSUFFICIENT",
+      "currency": "INR",
+      "execution": {
+        "capability_issued": false,
+        "order_created": false,
+        "replay": null
+      },
+      "expected_final_action": "REVIEW",
+      "final_action": "REVIEW",
+      "final_evidence_sha256": "da82432f8933a9a75b6a74b8617d74663b42e21385c68fe196daca50449320e2",
+      "forbidden_final_actions": [
+        "ALLOW"
+      ],
+      "initial_action": "REVIEW",
+      "initial_evidence_sha256": "693203159aba57e0e24fb977f474d3f262cbc064b2daefab52bf919bf5d2ba5c",
+      "merchant_id": "merchant-alder-instruments",
+      "new_evidence_items": 1,
+      "provider_calls_before_final_allow": 0,
+      "recovery_refusals": [
+        "NO_RECOVERABLE_GAP"
+      ],
+      "rounds_used": 1,
+      "sku": "alder-bench-multimeter",
+      "status": "PASS",
+      "trusted_evidence_provider_calls": 1
+    },
+    {
+      "acquisition_outcome_codes": [
+        "SOURCE_UNAVAILABLE"
+      ],
+      "allowed_final_actions": [
+        "REVIEW"
+      ],
+      "amount_minor": 469500,
+      "audit_event_count": 8,
+      "case_family": "UNRESOLVED_FAILURE",
+      "case_id": "RR20-20-PROVIDER-FAILURE",
+      "currency": "INR",
+      "execution": {
+        "capability_issued": false,
+        "order_created": false,
+        "replay": null
+      },
+      "expected_final_action": "REVIEW",
+      "final_action": "REVIEW",
+      "final_evidence_sha256": "780cf6a86d1bf1b08bc2922cf92a7eeaa8d45b3e4a1fc89f8cbaac2a254f3da3",
+      "forbidden_final_actions": [
+        "ALLOW",
+        "BLOCK"
+      ],
+      "initial_action": "REVIEW",
+      "initial_evidence_sha256": "780cf6a86d1bf1b08bc2922cf92a7eeaa8d45b3e4a1fc89f8cbaac2a254f3da3",
+      "merchant_id": "merchant-brightwater-labs",
+      "new_evidence_items": 0,
+      "provider_calls_before_final_allow": 0,
+      "recovery_refusals": [
+        "acquisition round budget exhausted"
+      ],
+      "rounds_used": 2,
+      "sku": "brightwater-ph-meter",
+      "status": "PASS",
+      "trusted_evidence_provider_calls": 2
+    }
+  ],
+  "plan_canonical_sha256": "6df077c7467cc6be371ca798b283cd6f04cb06c82ef9b3b7a6eef711c9fda334",
+  "plan_raw_file_sha256": "c6b2aebf85eb801afd4b28b952d63a8fc862d2b8635a57eafb6c1ef2bd687688",
+  "preregistration_commit_sha": "16bcb75a9c87f337aa4e546bbdd1aa0b300a971a",
+  "registry_sha256": "5bfc8709567b8506eef6d10ef11c3949e8e7a422fac76a364c5edc6bfcfe079c",
+  "runtime_observed_counters": [
+    "openai_calls",
+    "razorpay_http_calls",
+    "offline_adapter_calls",
+    "trusted_evidence_provider_calls",
+    "acquisition_rounds",
+    "new_evidence_items",
+    "planner_direct_allow_count"
+  ],
+  "safety_violations": [],
+  "synthetic_transaction_value_moved_from_review_to_executable_allow_minor": 2992300
+}
