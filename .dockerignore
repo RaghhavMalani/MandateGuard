@@ -17,7 +17,13 @@ benchmark
 docs
 schemas
 tests
+
+# Runtime fixtures only.
 fixtures/*
-!fixtures/agentic_commerce
+!fixtures/agentic_commerce/
+!fixtures/agentic_commerce/**
+!fixtures/recovery/
+!fixtures/recovery/**
+
 Dockerfile
 .dockerignore
