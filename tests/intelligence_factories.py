@@ -104,6 +104,9 @@ def make_execution_runtime(
     return runtime, ledger
 
 
+CHECKOUT_IDENTITY_SEED = "offline-checkout-fixture-run"
+
+
 def run_offline(
     tmp_path: Path,
     intent: str,
@@ -112,6 +115,7 @@ def run_offline(
     semantic_model: DeterministicSemanticModel | None = None,
     execute: bool = False,
     execution_runtime: ExecutionRuntime | None = None,
+    mandate_identity_seed: str = CHECKOUT_IDENTITY_SEED,
 ) -> tuple[AgenticCheckoutResult, SQLiteSemanticCache, DeterministicSemanticModel]:
     store = make_store()
     model = semantic_model or DeterministicSemanticModel()
@@ -127,5 +131,6 @@ def run_offline(
         execute=execute,
         execution_runtime=execution_runtime,
         decision_nonce="agentic_decision_nonce_12345" if execute else None,
+        mandate_identity_seed=mandate_identity_seed,
     )
     return result, cache, model

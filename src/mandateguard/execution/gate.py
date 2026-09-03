@@ -7,7 +7,11 @@ from datetime import datetime
 from mandateguard.core.hashing import mandate_payload_sha256, transaction_body_sha256
 from mandateguard.execution.authorization import authorization_result_sha256
 from mandateguard.execution.ledger import ExecutionLedger
-from mandateguard.execution.mandate_state import MandateStateRegistry, MandateStatus
+from mandateguard.execution.mandate_state import (
+    MandateStateCorruptionError,
+    MandateStateRegistry,
+    MandateStatus,
+)
 from mandateguard.execution.models import (
     MAX_ISSUED_AT_FUTURE_SKEW,
     ExecutionRefusal,
@@ -121,8 +125,18 @@ def validate_and_reserve_execution(
     if payload.mandate_id != mandate.payload.mandate_id:
         mandate_state_reason = ExecutionRefusalReason.MANDATE_ID_MISMATCH
     else:
-        current_state = mandate_state_registry.get_current(payload.mandate_id)
-        if current_state is None:
+        try:
+            current_state = mandate_state_registry.get_current(payload.mandate_id)
+        except MandateStateCorruptionError:
+            # Trusted storage holds a configuration no transition can produce.
+            # Refuse rather than trust any row it would still return.
+            current_state = None
+            corrupt = True
+        else:
+            corrupt = False
+        if corrupt:
+            mandate_state_reason = ExecutionRefusalReason.MANDATE_STATE_CORRUPT
+        elif current_state is None:
             mandate_state_reason = ExecutionRefusalReason.MANDATE_STATE_MISSING
         elif current_state.version != payload.mandate_version:
             bound_state = mandate_state_registry.get_version(

@@ -30,6 +30,7 @@ from mandateguard.models.decision import DecisionAction
 from mandateguard.semantic.cache import InMemorySemanticCache
 from mandateguard.semantic.verifier import SemanticVerifier
 from tests.intelligence_factories import (
+    CHECKOUT_IDENTITY_SEED,
     ALLOW_INTENT,
     BLOCK_INTENT,
     NOW,
@@ -136,6 +137,7 @@ def test_no_trusted_evidence_retrieved_returns_bounded_review(
             semantic_verifier=verifier,
             evaluated_at=NOW,
             alpha=alpha,
+            mandate_identity_seed=CHECKOUT_IDENTITY_SEED,
         )
         assert earlier.trace.decision == "ALLOW"
         assert len(model.calls) == 1
@@ -168,6 +170,7 @@ def test_no_trusted_evidence_retrieved_returns_bounded_review(
             alpha=alpha,
             execute=True,
             execution_runtime=runtime,
+            mandate_identity_seed=CHECKOUT_IDENTITY_SEED,
             decision_nonce="insufficient_evidence_nonce_12345",
         )
     finally:
@@ -325,6 +328,7 @@ def test_buyer_reason_never_becomes_trusted_semantic_evidence(tmp_path):
             model=TimedSemanticModel(model), cache=cache
         ),
         evaluated_at=NOW,
+        mandate_identity_seed=CHECKOUT_IDENTITY_SEED,
     )
     assert result.trace.buyer["reason"] == injected_reason
     assert len(model.calls) == 1

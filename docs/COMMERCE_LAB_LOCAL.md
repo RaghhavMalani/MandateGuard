@@ -35,7 +35,8 @@ See [MANDATEGUARD_RESOLVE.md](MANDATEGUARD_RESOLVE.md) for the security boundary
 non-benchmark engineering evaluation.
 
 Set `MANDATEGUARD_STATE_DIR` to a directory the process can write when the
-semantic cache, execution ledger, and recovery audit should survive service
+semantic cache, execution ledger, mandate state, and recovery audit should
+survive service
 reopen. Reusing the same directory on the same durable filesystem preserves all
 three SQLite stores. If it is absent, the service uses a new temporary directory
 and reports `EPHEMERAL_TEMPORARY_DIRECTORY` through config/health.

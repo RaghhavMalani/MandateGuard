@@ -253,6 +253,10 @@ def test_configured_state_dir_persists_cache_ledger_and_audit_across_reopen(
         decision_nonce = linked["decision_nonce"]
         execution_request_sha256 = linked["execution_request_sha256"]
         assert recovered["result"]["execution"]["status"] == "ORDER_CREATED"
+        cached_records_before_close = first.semantic_cache._connection.execute(
+            "SELECT COUNT(*) FROM semantic_decision_cache"
+        ).fetchone()[0]
+        assert cached_records_before_close > 0
     finally:
         first.close()
 
@@ -262,10 +266,20 @@ def test_configured_state_dir_persists_cache_ledger_and_audit_across_reopen(
         ledger_record = reopened.execution_ledger.get(decision_nonce)
         assert ledger_record is not None
         assert ledger_record.execution_request_sha256 == execution_request_sha256
+        # Consent identity is per run, so a fresh run after reopen is a fresh
+        # authorization context and must MISS. Cache *persistence* is therefore
+        # asserted on the stored records themselves, not on a cross-run hit.
+        stored_after_reopen = reopened.semantic_cache._connection.execute(
+            "SELECT COUNT(*) FROM semantic_decision_cache"
+        ).fetchone()[0]
+        assert stored_after_reopen == cached_records_before_close
         repeated = _run(reopened, "recoverable", 2)
         assert repeated["result"]["authorization"]["semantic"]["cache"][
             "status"
-        ] == "HIT"
+        ] == "MISS"
+        assert reopened.semantic_cache._connection.execute(
+            "SELECT COUNT(*) FROM semantic_decision_cache"
+        ).fetchone()[0] > stored_after_reopen
         assert reopened.health()["state_persistence"] == "CONFIGURED_DIRECTORY"
     finally:
         reopened.close()

@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from hashlib import sha256
 import json
 import os
+import secrets
 from pathlib import Path
 import sys
 import tempfile
@@ -217,6 +218,9 @@ def main(argv: list[str] | None = None) -> int:
             alpha=args.alpha,
             execute=args.execute,
             execution_runtime=runtime,
+            # One CLI invocation is one consent instance. A fresh server-issued
+            # seed keeps repeat runs of the same intent independently revocable.
+            mandate_identity_seed="cli_" + secrets.token_hex(16),
         )
         trace = result.trace.to_mapping()
         if args.trace_json is not None:

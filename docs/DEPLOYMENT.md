@@ -80,8 +80,9 @@ then `8080`. Render supplies `PORT`, so no port configuration is required.
 
 ## Filesystem
 
-The semantic cache, execution ledger, and recovery audit are SQLite files. Set
-`MANDATEGUARD_STATE_DIR` to a writable directory to keep all three together;
+The semantic cache, execution ledger, mandate state
+(`mandate-state.sqlite3`), and recovery audit are SQLite files. Set
+`MANDATEGUARD_STATE_DIR` to a writable directory to keep all four together;
 reopening the service with the same directory preserves them on the same
 filesystem. If the variable is absent, the service creates a temporary state
 directory under `TMPDIR` (`/var/tmp/mandateguard` in the image).
@@ -91,7 +92,7 @@ disk or set `MANDATEGUARD_STATE_DIR`, so its state is intentionally ephemeral
 and no restart-durability claim is made. A future Render configuration may claim
 restart persistence only if it attaches suitable persistent storage and points
 `MANDATEGUARD_STATE_DIR` at that mounted path. Losing current demo state clears
-cache, nonce-ledger, and audit history; it does not widen the authorization
+cache, nonce-ledger, mandate-state, and audit history; it does not widen the authorization
 controller, but old in-memory run IDs and their recovery history are unavailable.
 
 ## Deploy

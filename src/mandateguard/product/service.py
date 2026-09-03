@@ -26,6 +26,8 @@ from mandateguard.core.nonce_ledger import NonceLedgerState
 from mandateguard.execution import (
     HMACSHA256Signer,
     HMACSHA256Verifier,
+    MandateStateBusyError,
+    MandateStateCorruptionError,
     MandateStatus,
     RazorpayTestOrdersAdapter,
     SQLiteExecutionLedger,
@@ -703,7 +705,6 @@ class CommerceLabService:
     ) -> None:
         self.repository_root = repository_root
         self._clock = clock or (lambda: datetime.now(timezone.utc))
-        self._offline_evaluated_at = self._trusted_now()
         if not isinstance(evidence_policy, EvidencePolicy):
             raise TypeError("evidence_policy must be EvidencePolicy")
         self.evidence_policy = evidence_policy
@@ -1043,7 +1044,18 @@ class CommerceLabService:
                 run.replay_in_flight = False
 
     def revoke_mandate(self, run_id: str) -> dict[str, Any]:
-        """Apply the server-owned DEMO USER REVOCATION transition."""
+        """Apply the server-owned DEMO USER REVOCATION transition.
+
+        Revocation only ever touches the mandate identity of *this* run. The
+        identity is derived from the server-issued ``run_id``, so knowing one
+        run cannot revoke another run's consent.
+
+        If an execution for this mandate already holds the consent-state guard,
+        the revocation queues behind it and commits once the guarded provider
+        section returns. If that wait exceeds the registry's budget, this raises
+        ``MandateStateBusyError``: the revocation is *not* committed, and the
+        in-flight provider operation is neither cancelled nor retried.
+        """
 
         run = self.get_run(run_id)
         if run is None:
@@ -1414,7 +1426,7 @@ class CommerceLabService:
                 buyer_delegate: CommerceBuyer = ToolDrivenOfflineBuyer(tools)
                 embedding = HashingEmbeddingProvider()
                 semantic_delegate = TimedSemanticModel(DeterministicSemanticModel())
-                evaluated_at = self._offline_evaluated_at
+                evaluated_at = self._trusted_now()
             else:
                 from openai import OpenAI
 
@@ -1594,6 +1606,10 @@ class CommerceLabService:
                 defer_execution=run.defer_execution,
                 execution_runtime=runtime,
                 decision_nonce=decision_nonce,
+                # Consent identity is scoped to this server-issued run, so two
+                # visitors who type the same sentence get two mandates and one
+                # visitor's revocation cannot reach the other's capability.
+                mandate_identity_seed=run.run_id,
             )
             self._complete_timeline(recorder, checkout)
             recorder.audit(

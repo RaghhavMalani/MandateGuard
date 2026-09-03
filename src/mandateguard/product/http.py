@@ -17,6 +17,10 @@ from time import monotonic
 from typing import Any, Mapping
 from urllib.parse import urlsplit
 
+from mandateguard.execution import (
+    MandateStateBusyError,
+    MandateStateCorruptionError,
+)
 from mandateguard.product.service import CommerceLabService
 
 
@@ -287,6 +291,24 @@ class CommerceLabHandler(BaseHTTPRequestHandler):
             except KeyError:
                 self._send_error(HTTPStatus.NOT_FOUND, "RUN_NOT_FOUND", "Run not found.")
                 return
+            except MandateStateBusyError:
+                # Precise, not a 500: the transition was not committed, and the
+                # guarded provider operation was neither cancelled nor retried.
+                self._send_error(
+                    HTTPStatus.CONFLICT,
+                    "MANDATE_STATE_BUSY",
+                    "Execution had already entered its guarded provider section. "
+                    "Revocation could not be committed before that operation "
+                    "completed.",
+                )
+                return
+            except MandateStateCorruptionError:
+                self._send_error(
+                    HTTPStatus.CONFLICT,
+                    "MANDATE_STATE_CORRUPT",
+                    "Trusted mandate state is inconsistent; refusing to act on it.",
+                )
+                return
             except (TypeError, ValueError) as error:
                 self._send_error(HTTPStatus.BAD_REQUEST, "INVALID_REQUEST", str(error))
                 return
@@ -311,6 +333,21 @@ class CommerceLabHandler(BaseHTTPRequestHandler):
                 )
             except KeyError:
                 self._send_error(HTTPStatus.NOT_FOUND, "RUN_NOT_FOUND", "Run not found.")
+                return
+            except MandateStateBusyError:
+                self._send_error(
+                    HTTPStatus.CONFLICT,
+                    "MANDATE_STATE_BUSY",
+                    "Consent state is guarded by another in-flight operation; "
+                    "no provider call was made.",
+                )
+                return
+            except MandateStateCorruptionError:
+                self._send_error(
+                    HTTPStatus.CONFLICT,
+                    "MANDATE_STATE_CORRUPT",
+                    "Trusted mandate state is inconsistent; refusing to act on it.",
+                )
                 return
             except (TypeError, ValueError) as error:
                 self._send_error(HTTPStatus.BAD_REQUEST, "INVALID_REQUEST", str(error))

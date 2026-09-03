@@ -476,6 +476,20 @@ def test_unannotated_one_time_and_recurring_authorities_stay_review_without_exec
         service.close()
 
 
+_NORMALISED_MANDATE_ID = "00000000-0000-4000-8000-000000000000"
+_NORMALISED_MANDATE_NONCE = "mg_intent_normalised_for_comparison"
+
+
+def _without_consent_identity(payload):
+    """Strip per-run consent identity so mandate *content* can be compared."""
+
+    return replace(
+        payload,
+        mandate_id=_NORMALISED_MANDATE_ID,
+        nonce=_NORMALISED_MANDATE_NONCE,
+    )
+
+
 def test_preset_id_has_no_effect_on_evidence_or_authorization_hashes(
     tmp_path: Path,
 ) -> None:
@@ -502,8 +516,24 @@ def test_preset_id_has_no_effect_on_evidence_or_authorization_hashes(
         assert first_context.recovery_state.current_evidence_sha256 == (
             second_context.recovery_state.current_evidence_sha256
         )
-        assert sha256_canonical(first_context.checkout.authorization_result) == (
-            sha256_canonical(second_context.checkout.authorization_result)
+        # Consent identity is per-run by design, so the two mandates are not the
+        # same object. What `preset_id` must not touch is everything else: the
+        # constraints the mandate expresses and the decision reached on them.
+        first_payload = first_context.checkout.mandate.payload
+        second_payload = second_context.checkout.mandate.payload
+        assert first_payload.mandate_id != second_payload.mandate_id
+        assert first_payload.nonce != second_payload.nonce
+        assert sha256_canonical(_without_consent_identity(first_payload)) == (
+            sha256_canonical(_without_consent_identity(second_payload))
+        )
+        first_authorization = first_context.checkout.authorization_result
+        second_authorization = second_context.checkout.authorization_result
+        assert sha256_canonical(first_authorization.deterministic_decision) == (
+            sha256_canonical(second_authorization.deterministic_decision)
+        )
+        assert first_authorization.final_action is second_authorization.final_action
+        assert first_authorization.semantic_constraints_present == (
+            second_authorization.semantic_constraints_present
         )
     finally:
         service.close()

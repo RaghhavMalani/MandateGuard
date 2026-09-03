@@ -38,6 +38,25 @@ class MandateStateTransitionError(RuntimeError):
     """A trusted mandate-state transition would weaken lifecycle semantics."""
 
 
+class MandateStateBusyError(RuntimeError):
+    """The consent-state write lock was held past the caller's wait budget.
+
+    Raised instead of a bare ``sqlite3.OperationalError`` so that callers can
+    report a precise outcome. It means the transition was *not* committed and
+    nothing about any in-flight guarded operation was changed or cancelled.
+    """
+
+
+class MandateStateCorruptionError(RuntimeError):
+    """Trusted storage holds a mandate-state configuration no API can produce.
+
+    Raised on read so that execution fails closed. This registry never repairs
+    corruption: an impossible configuration means the state directory is no
+    longer trustworthy, and guessing which row was "meant" to be current is
+    exactly the behaviour a rollback attacker would want.
+    """
+
+
 def _validate_mandate_id(value: object) -> str:
     if not isinstance(value, str):
         raise ValueError("mandate_id must be a UUID string")
@@ -197,10 +216,15 @@ class InMemoryMandateStateRegistry:
         with self._lock:
             return self._states.get((mandate_id, version))
 
+    def _observed_status(self, mandate_id: str) -> MandateStatus | None:
+        current = self.get_current(mandate_id)
+        return None if current is None else current.status
+
     def _append(
         self,
         *,
-        state: MandateState,
+        mandate_id: str,
+        version: int,
         event: MandateAuditEventType,
         previous_status: MandateStatus | None,
         current_status: MandateStatus | None,
@@ -210,11 +234,11 @@ class InMemoryMandateStateRegistry:
         execution_request_sha256: str | None = None,
         authorization_result_sha256: str | None = None,
     ) -> None:
-        events = self._audit.setdefault(state.mandate_id, [])
+        events = self._audit.setdefault(mandate_id, [])
         previous_hash = events[-1]["event_sha256"] if events else None
         body = _state_event_body(
-            mandate_id=state.mandate_id,
-            version=state.version,
+            mandate_id=mandate_id,
+            version=version,
             event=event,
             previous_status=previous_status,
             current_status=current_status,
@@ -258,7 +282,8 @@ class InMemoryMandateStateRegistry:
             self._states[(mandate_id, version)] = state
             self._current[mandate_id] = version
             self._append(
-                state=state,
+                mandate_id=state.mandate_id,
+                version=state.version,
                 event=MandateAuditEventType.MANDATE_REGISTERED_ACTIVE,
                 previous_status=current.status if current else None,
                 current_status=MandateStatus.ACTIVE,
@@ -291,7 +316,8 @@ class InMemoryMandateStateRegistry:
             )
             self._states[(mandate_id, version)] = state
             self._append(
-                state=state,
+                mandate_id=state.mandate_id,
+                version=state.version,
                 event=MandateAuditEventType.MANDATE_REVOKED,
                 previous_status=MandateStatus.ACTIVE,
                 current_status=MandateStatus.REVOKED,
@@ -336,7 +362,8 @@ class InMemoryMandateStateRegistry:
             self._states[(mandate_id, superseded_by_version)] = new
             self._current[mandate_id] = superseded_by_version
             self._append(
-                state=old,
+                mandate_id=old.mandate_id,
+                version=old.version,
                 event=MandateAuditEventType.MANDATE_SUPERSEDED,
                 previous_status=MandateStatus.ACTIVE,
                 current_status=MandateStatus.SUPERSEDED,
@@ -344,7 +371,8 @@ class InMemoryMandateStateRegistry:
                 reason=f"SUPERSEDED_BY_VERSION_{superseded_by_version}",
             )
             self._append(
-                state=new,
+                mandate_id=new.mandate_id,
+                version=new.version,
                 event=MandateAuditEventType.MANDATE_REGISTERED_ACTIVE,
                 previous_status=MandateStatus.SUPERSEDED,
                 current_status=MandateStatus.ACTIVE,
@@ -367,18 +395,16 @@ class InMemoryMandateStateRegistry:
         _validate_digest(execution_request_sha256, "execution_request_sha256")
         _validate_digest(authorization_result_sha256, "authorization_result_sha256")
         with self._lock:
-            state = self.get_version(mandate_id, version) or MandateState(
-                mandate_id=mandate_id,
-                version=version,
-                status=MandateStatus.ACTIVE,
-                updated_at=occurred_at,
-            )
-            current = self.get_current(mandate_id)
+            # Record the requested identity and the observed state. A version
+            # that never existed is recorded as observed-missing; no state
+            # object is fabricated to carry the identity into the log.
+            observed_state = self._observed_status(mandate_id)
             self._append(
-                state=state,
+                mandate_id=_validate_mandate_id(mandate_id),
+                version=_validate_version(version),
                 event=MandateAuditEventType.EXECUTION_REFUSED_MANDATE_STATE,
-                previous_status=current.status if current else None,
-                current_status=current.status if current else None,
+                previous_status=observed_state,
+                current_status=observed_state,
                 recorded_at=occurred_at,
                 reason=reason,
                 decision_nonce=decision_nonce,
@@ -398,17 +424,49 @@ class InMemoryMandateStateRegistry:
 
 
 class SQLiteMandateStateRegistry:
-    """Persistent mandate state and append-only transition audit in SQLite."""
+    """Persistent mandate state and append-only transition audit in SQLite.
 
-    def __init__(self, path: str | Path) -> None:
+    Lock-timeout policy. ``execution_guard`` holds the SQLite write reservation
+    across provider I/O, so any concurrent transition waits for the guarded
+    section to finish. The wait budget must therefore exceed the longest
+    guarded provider interval, or an ordinary in-flight payment would make
+    revocation fail rather than queue behind it. ``DEFAULT_LOCK_WAIT_SECONDS``
+    is set above the Razorpay adapter's default 10s request timeout for that
+    reason. When the budget is exhausted the transition raises
+    ``MandateStateBusyError`` and commits nothing; it never proceeds without
+    the lock, so lock failure cannot fail open.
+    """
+
+    #: Above the 10s default provider request timeout in `execution.razorpay`,
+    #: so a revocation queues behind a normal in-flight call instead of failing.
+    DEFAULT_LOCK_WAIT_SECONDS = 15.0
+
+    def __init__(
+        self,
+        path: str | Path,
+        *,
+        lock_wait_seconds: float = DEFAULT_LOCK_WAIT_SECONDS,
+    ) -> None:
         if not isinstance(path, (str, Path)):
             raise TypeError("path must be a string or Path")
+        if (
+            isinstance(lock_wait_seconds, bool)
+            or not isinstance(lock_wait_seconds, (int, float))
+            or lock_wait_seconds <= 0
+        ):
+            raise ValueError("lock_wait_seconds must be a positive number")
+        self._lock_wait_seconds = float(lock_wait_seconds)
         self._connection = sqlite3.connect(
-            str(path), timeout=5.0, isolation_level=None, check_same_thread=False
+            str(path),
+            timeout=self._lock_wait_seconds,
+            isolation_level=None,
+            check_same_thread=False,
         )
         self._lock = RLock()
         with self._lock:
-            self._connection.execute("PRAGMA busy_timeout = 5000")
+            self._connection.execute(
+                f"PRAGMA busy_timeout = {int(self._lock_wait_seconds * 1000)}"
+            )
             self._connection.execute(
                 """
                 CREATE TABLE IF NOT EXISTS mandate_states (
@@ -445,9 +503,29 @@ class SQLiteMandateStateRegistry:
             )
 
     @contextmanager
-    def _transaction(self) -> Iterator[None]:
-        with self._lock:
-            self._connection.execute("BEGIN IMMEDIATE")
+    def _transaction(self, *, wait_seconds: float | None = None) -> Iterator[None]:
+        """Serialize on the in-process lock, then on the SQLite write lock.
+
+        Both waits are bounded by the same budget and both exhaust into
+        ``MandateStateBusyError``, so a caller can distinguish "the consent
+        state is guarded right now" from a genuine storage fault. Nothing is
+        written on either failure path.
+        """
+
+        budget = self._lock_wait_seconds if wait_seconds is None else wait_seconds
+        if not self._lock.acquire(timeout=budget):
+            raise MandateStateBusyError(
+                "mandate state is guarded by an in-flight execution"
+            )
+        try:
+            try:
+                self._connection.execute("BEGIN IMMEDIATE")
+            except sqlite3.OperationalError as error:
+                if "lock" not in str(error).lower():
+                    raise
+                raise MandateStateBusyError(
+                    "mandate state is guarded by an in-flight execution"
+                ) from None
             try:
                 yield
             except BaseException:
@@ -455,6 +533,8 @@ class SQLiteMandateStateRegistry:
                 raise
             else:
                 self._connection.execute("COMMIT")
+        finally:
+            self._lock.release()
 
     @staticmethod
     def _decode_state(row: tuple[object, ...] | None) -> MandateState | None:
@@ -480,7 +560,51 @@ class SQLiteMandateStateRegistry:
         ).fetchone()
         return self._decode_state(row)
 
+    def _assert_consistent_unlocked(self, mandate_id: str) -> int | None:
+        """Reject trusted-storage states that no API transition can produce.
+
+        The API can only ever leave one row ACTIVE per mandate, with the current
+        pointer on it and no ACTIVE row newer than the pointer. Anything else
+        means the state directory was edited outside these transitions, so the
+        registry refuses to serve a current state at all rather than pick the
+        row that happens to look usable.
+        """
+
+        pointer = self._connection.execute(
+            "SELECT version FROM mandate_current WHERE mandate_id = ?",
+            (mandate_id,),
+        ).fetchone()
+        if pointer is None:
+            return None
+        pointer_version = int(pointer[0])
+        rows = self._connection.execute(
+            "SELECT version, status FROM mandate_states WHERE mandate_id = ?",
+            (mandate_id,),
+        ).fetchall()
+        versions = {int(row[0]): str(row[1]) for row in rows}
+        if pointer_version not in versions:
+            raise MandateStateCorruptionError(
+                "mandate current pointer references a missing state row"
+            )
+        active = sorted(v for v, status in versions.items() if status == "ACTIVE")
+        if len(active) > 1:
+            raise MandateStateCorruptionError(
+                "mandate has more than one ACTIVE version"
+            )
+        if active and active[0] != pointer_version:
+            raise MandateStateCorruptionError(
+                "mandate current pointer does not identify the ACTIVE version"
+            )
+        newer = [v for v in versions if v > pointer_version]
+        if newer:
+            raise MandateStateCorruptionError(
+                "mandate has a version newer than the current pointer"
+            )
+        return pointer_version
+
     def _get_current_unlocked(self, mandate_id: str) -> MandateState | None:
+        if self._assert_consistent_unlocked(mandate_id) is None:
+            return None
         row = self._connection.execute(
             """
             SELECT s.mandate_id, s.version, s.status, s.updated_at, s.revoked_at,
@@ -493,6 +617,16 @@ class SQLiteMandateStateRegistry:
             (mandate_id,),
         ).fetchone()
         return self._decode_state(row)
+
+    def _current_status_unlocked(self, mandate_id: str) -> MandateStatus | None:
+        # Audit annotation only. Unreadable (corrupt) storage is recorded the
+        # same way as absent storage: no observed status. The refusal reason
+        # carried alongside is what distinguishes the two cases.
+        try:
+            current = self._get_current_unlocked(mandate_id)
+        except MandateStateCorruptionError:
+            return None
+        return None if current is None else current.status
 
     def get_current(self, mandate_id: str) -> MandateState | None:
         _validate_mandate_id(mandate_id)
@@ -540,7 +674,8 @@ class SQLiteMandateStateRegistry:
     def _append_unlocked(
         self,
         *,
-        state: MandateState,
+        mandate_id: str,
+        version: int,
         event: MandateAuditEventType,
         previous_status: MandateStatus | None,
         current_status: MandateStatus | None,
@@ -555,13 +690,13 @@ class SQLiteMandateStateRegistry:
             SELECT sequence, event_sha256 FROM mandate_state_audit
             WHERE mandate_id = ? ORDER BY sequence DESC LIMIT 1
             """,
-            (state.mandate_id,),
+            (mandate_id,),
         ).fetchone()
         sequence = 1 if previous is None else int(previous[0]) + 1
         previous_hash = None if previous is None else str(previous[1])
         body = _state_event_body(
-            mandate_id=state.mandate_id,
-            version=state.version,
+            mandate_id=mandate_id,
+            version=version,
             event=event,
             previous_status=previous_status,
             current_status=current_status,
@@ -582,7 +717,7 @@ class SQLiteMandateStateRegistry:
             ) VALUES (?, ?, ?, ?, ?, ?)
             """,
             (
-                state.mandate_id,
+                mandate_id,
                 sequence,
                 event.value,
                 event_hash,
@@ -621,7 +756,8 @@ class SQLiteMandateStateRegistry:
             self._store_state_unlocked(state)
             self._set_current_unlocked(mandate_id, version)
             self._append_unlocked(
-                state=state,
+                mandate_id=state.mandate_id,
+                version=state.version,
                 event=MandateAuditEventType.MANDATE_REGISTERED_ACTIVE,
                 previous_status=current.status if current else None,
                 current_status=MandateStatus.ACTIVE,
@@ -654,7 +790,8 @@ class SQLiteMandateStateRegistry:
             )
             self._store_state_unlocked(state)
             self._append_unlocked(
-                state=state,
+                mandate_id=state.mandate_id,
+                version=state.version,
                 event=MandateAuditEventType.MANDATE_REVOKED,
                 previous_status=MandateStatus.ACTIVE,
                 current_status=MandateStatus.REVOKED,
@@ -699,7 +836,8 @@ class SQLiteMandateStateRegistry:
             self._store_state_unlocked(new)
             self._set_current_unlocked(mandate_id, superseded_by_version)
             self._append_unlocked(
-                state=old,
+                mandate_id=old.mandate_id,
+                version=old.version,
                 event=MandateAuditEventType.MANDATE_SUPERSEDED,
                 previous_status=MandateStatus.ACTIVE,
                 current_status=MandateStatus.SUPERSEDED,
@@ -707,7 +845,8 @@ class SQLiteMandateStateRegistry:
                 reason=f"SUPERSEDED_BY_VERSION_{superseded_by_version}",
             )
             self._append_unlocked(
-                state=new,
+                mandate_id=new.mandate_id,
+                version=new.version,
                 event=MandateAuditEventType.MANDATE_REGISTERED_ACTIVE,
                 previous_status=MandateStatus.SUPERSEDED,
                 current_status=MandateStatus.ACTIVE,
@@ -731,18 +870,16 @@ class SQLiteMandateStateRegistry:
         _validate_digest(authorization_result_sha256, "authorization_result_sha256")
 
         def append() -> None:
-            state = self._get_version_unlocked(mandate_id, version) or MandateState(
-                mandate_id=mandate_id,
-                version=version,
-                status=MandateStatus.ACTIVE,
-                updated_at=occurred_at,
-            )
-            current = self._get_current_unlocked(mandate_id)
+            # Requested identity plus observed state. A version that never
+            # existed is recorded as observed-missing; no state object is
+            # fabricated to carry the identity into the log.
+            current = self._current_status_unlocked(mandate_id)
             self._append_unlocked(
-                state=state,
+                mandate_id=_validate_mandate_id(mandate_id),
+                version=_validate_version(version),
                 event=MandateAuditEventType.EXECUTION_REFUSED_MANDATE_STATE,
-                previous_status=current.status if current else None,
-                current_status=current.status if current else None,
+                previous_status=current,
+                current_status=current,
                 recorded_at=occurred_at,
                 reason=reason,
                 decision_nonce=decision_nonce,
@@ -805,6 +942,8 @@ __all__ = [
     "InMemoryMandateStateRegistry",
     "MandateAuditEventType",
     "MandateState",
+    "MandateStateBusyError",
+    "MandateStateCorruptionError",
     "MandateStateRegistry",
     "MandateStateTransitionError",
     "MandateStatus",

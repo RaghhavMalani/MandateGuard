@@ -95,9 +95,18 @@ def test_no_trusted_evidence_routes_to_review_without_semantic_cache(
     assert result["execution"]["razorpay_calls"] == 0
 
 
-def test_identical_semantic_input_moves_from_cache_miss_to_hit(
+def test_separate_runs_are_separate_semantic_inputs_and_each_writes_the_cache(
     service: CommerceLabService,
 ) -> None:
+    """Two runs of one intent are two consent instances, not one cached input.
+
+    The semantic cache key commits the whole mandate payload, and consent
+    identity is per run so that one visitor's revocation cannot reach another
+    visitor's capability. Distinct consent therefore means distinct cache keys.
+    The cache is not being bypassed: each run is a genuinely different
+    authorization context, and each writes its own record.
+    """
+
     first = run_preset(service, "safe", request_id="cache_first_request")
     second = run_preset(service, "safe", request_id="cache_second_request")
 
@@ -105,9 +114,12 @@ def test_identical_semantic_input_moves_from_cache_miss_to_hit(
     second_cache = second["result"]["authorization"]["semantic"]["cache"]
     assert first_cache["status"] == "MISS"
     assert first_cache["write_performed"] is True
-    assert second_cache["status"] == "HIT"
-    assert second_cache["write_performed"] is False
-    assert second_cache["key_prefix"] == first_cache["key_prefix"]
+    assert second_cache["status"] == "MISS"
+    assert second_cache["write_performed"] is True
+    assert second_cache["key_prefix"] != first_cache["key_prefix"]
+    # Cache hits on a genuinely repeated authorization context are covered by
+    # test_agentic_checkout.test_exact_repeat_hits_semantic_cache_and_skips_model,
+    # where the identity seed is held fixed.
 
 
 def test_capability_replay_is_rejected_before_an_additional_provider_call(

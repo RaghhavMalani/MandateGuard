@@ -18,6 +18,7 @@ import argparse
 from dataclasses import dataclass, field
 from datetime import timedelta
 from hashlib import sha256
+import inspect
 import json
 from pathlib import Path
 import sys
@@ -50,6 +51,7 @@ from mandateguard.engineering.resolve_eval.worlds import (  # noqa: E402
 from mandateguard.execution import (  # noqa: E402
     HMACSHA256Signer,
     HMACSHA256Verifier,
+    InMemoryMandateStateRegistry,
     SQLiteExecutionLedger,
     TrustedExecutionConfig,
     issue_execution_authorization,
@@ -164,6 +166,70 @@ class ObservedCounters:
     violations: list[str] = field(default_factory=list)
 
 
+def verify_execution_wiring() -> None:
+    """Fail fast if this runner no longer satisfies the execution API.
+
+    The runner calls into signed-capability issuance and the execution gate.
+    When either grows a required dependency, a stale runner would previously
+    only discover it deep inside a case, after semantic work had already been
+    spent. This checks the call construction against the live signatures with
+    no model, provider, network, or filesystem access, so a wiring regression
+    is caught by an ordinary test and by the first second of a real run.
+
+    Raises ``TypeError`` naming the missing arguments.
+    """
+
+    expectations = (
+        (
+            issue_execution_authorization,
+            {
+                "authorization_result",
+                "authorization_scenario",
+                "semantic_evidence",
+                "semantic_verifier",
+                "issued_at",
+                "expires_at",
+                "decision_nonce",
+                "config",
+                "signer",
+                "mandate_state_registry",
+            },
+        ),
+        (
+            execute_razorpay_order,
+            {
+                "authorization",
+                "authorization_result",
+                "mandate",
+                "transaction",
+                "now",
+                "config",
+                "verifier",
+                "ledger",
+                "client",
+                "mandate_state_registry",
+            },
+        ),
+    )
+    for function, supplied in expectations:
+        required = {
+            name
+            for name, parameter in inspect.signature(function).parameters.items()
+            if parameter.default is inspect.Parameter.empty
+            and parameter.kind
+            in (
+                inspect.Parameter.KEYWORD_ONLY,
+                inspect.Parameter.POSITIONAL_OR_KEYWORD,
+            )
+        }
+        missing = sorted(required - supplied)
+        if missing:
+            raise TypeError(
+                f"{function.__name__} requires unsupplied argument(s): "
+                + ", ".join(missing)
+            )
+
+
 def _replay_seed(case_id: str) -> int:
     return int(sha256(case_id.encode("ascii")).hexdigest()[:8], 16)
 
@@ -227,6 +293,7 @@ def _run_case(
     worlds: tuple[ResolveCaseWorld, ...],
     verifier: SemanticVerifier,
     ledger: SQLiteExecutionLedger,
+    mandate_state_registry: InMemoryMandateStateRegistry,
     signing_key: bytes,
     counters: ObservedCounters,
 ) -> dict[str, Any]:
@@ -395,6 +462,12 @@ def _run_case(
             merchant_id=world.merchant_id,
             account_scope="razorpay-test-resolve-evaluation",
         )
+        # Each evaluation case is its own consent instance. The registry is
+        # in-memory and per-invocation, so this records current consent without
+        # touching any persisted product state.
+        mandate_state_registry.register_active(
+            state.scenario.mandate.payload.mandate_id, 1, updated_at=issued_at
+        )
         capability = issue_execution_authorization(
             authorization_result=state.current_authorization,
             authorization_scenario=state.scenario,
@@ -409,6 +482,7 @@ def _run_case(
             + sha256(world.case_id.encode("ascii")).hexdigest()[:24],
             config=config,
             signer=HMACSHA256Signer(key_id="resolve-eval", key=signing_key),
+            mandate_state_registry=mandate_state_registry,
         )
         if isinstance(capability, ExecutionRefusal):
             counters.violations.append(
@@ -427,6 +501,7 @@ def _run_case(
                 verifier=verifier_impl,
                 ledger=ledger,
                 client=client,
+                mandate_state_registry=mandate_state_registry,
             )
             execution["order_created"] = not isinstance(result, ExecutionRefusal)
             counters.offline_adapter_calls += client.adapter_calls
@@ -442,6 +517,7 @@ def _run_case(
                 verifier=verifier_impl,
                 ledger=ledger,
                 client=client,
+                mandate_state_registry=mandate_state_registry,
             )
             rejected = (
                 isinstance(replay, ExecutionRefusal)
@@ -503,6 +579,16 @@ def main() -> int:
     )
     arguments = parser.parse_args()
 
+    # Configuration preflight runs before any preregistration check, semantic
+    # work, or provider work, so a wiring regression costs nothing but an exit
+    # code. It must never be the case that a missing dependency is discovered
+    # only after the run has already spent model calls.
+    try:
+        verify_execution_wiring()
+    except TypeError as error:
+        print(f"EVALUATION REFUSED: runner wiring is incomplete: {error}", file=sys.stderr)
+        return 1
+
     try:
         frozen, commit_sha = require_execution_preconditions(
             REPOSITORY_ROOT, now=utc_now(), allow_resume=arguments.resume
@@ -523,6 +609,9 @@ def main() -> int:
         model = DeterministicSemanticModel()
         verifier = SemanticVerifier(model=model, cache=cache)
         signing_key = b"resolve-evaluation-offline-signing-key-32bytes"[:32]
+        # Consent state for the evaluation is in-memory and per-invocation: the
+        # evaluation must never read or write persisted product mandate state.
+        mandate_state_registry = InMemoryMandateStateRegistry()
         try:
             for world in frozen.worlds:
                 outcomes.append(
@@ -533,6 +622,7 @@ def main() -> int:
                         worlds=frozen.worlds,
                         verifier=verifier,
                         ledger=ledger,
+                        mandate_state_registry=mandate_state_registry,
                         signing_key=signing_key,
                         counters=counters,
                     )

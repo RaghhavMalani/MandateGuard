@@ -55,6 +55,66 @@ Out of scope, and deliberately not claimed:
 The correct framing is narrow and literal: **MandateGuard revalidates its own
 trusted declared mandate state immediately before execution.**
 
+## Mandate identity
+
+Consent identity and mandate content are two different things, and the design
+keeps both:
+
+- `mandate_id` / `mandate_version` — the **consent-state identity**. This is the
+  key the revocation registry is keyed by and the thing a capability is bound
+  to for lifecycle purposes.
+- `mandate_payload_sha256` — the **exact mandate-content binding**. A capability
+  still cannot be moved onto a different mandate body.
+
+`mandate_id` is derived by `build_mandate_from_intent` as a domain-separated
+digest over a **server-issued identity seed** and the intent text:
+
+```
+mandate_id = UUID(sha256("mandateguard/mandate-identity/v1" || seed || intent))
+```
+
+`mandate_identity_seed` is a required argument with no default. The Commerce
+Lab passes the run's server-generated `run_id`, so two visitors who type the
+same sentence receive two different mandates and one visitor's revocation
+cannot reach the other's capability. The seed is never buyer-supplied: the
+intent text contributes content, not identity.
+
+An earlier revision derived `mandate_id` from the intent alone. That made the
+registry row shared across every principal who typed the same intent, which is
+why the seed is now mandatory rather than optional.
+
+### Why both bindings are required
+
+A content hash alone cannot be looked up in a lifecycle registry; an identity
+alone cannot detect payload tampering. The capability payload binds
+`mandate_id` and `mandate_version` **in addition to** `mandate_payload_sha256`,
+and the existing hash binding is not replaced. The gate also checks that the
+capability's `mandate_id` equals the presented mandate's own id, refusing
+`MANDATE_ID_MISMATCH` if a validly signed capability is paired with a different
+mandate.
+
+### Consequence for the semantic cache
+
+`semantic_input_sha256` commits the whole mandate payload, so per-run consent
+identity means two runs of the same intent are two different cache keys and
+each performs its own semantic evaluation. This is not the cache being
+bypassed: they are genuinely different authorization contexts. Live mode
+already behaved this way, because its per-run `evaluated_at` also lands in the
+mandate payload. The cache still elides the model whenever one authorization
+context genuinely repeats, which is what
+`test_exact_repeat_hits_semantic_cache_and_skips_model` covers.
+
+### One clock per run
+
+A run has a single trusted clock. The mandate's own validity window, the
+deterministic decision, mandate-state transitions, and capability lifetime are
+all stamped from the same instant. These are deliberately not separable: a
+capability may not outlive the mandate it was issued under, and a registration
+may not appear to move backwards against a revocation. An earlier revision froze
+the offline demo's clock at service construction while revocation used the wall
+clock, which made a revoked mandate reject every later run of the same intent
+with `mandate state time moved backwards`.
+
 ## State model
 
 `MandateState` (`src/mandateguard/execution/mandate_state.py`) is a frozen
@@ -83,23 +143,6 @@ reactivated. Renewed consent must arrive as a **new version** (via
 `supersede`), which produces a new current version and therefore requires a
 freshly issued capability. Lifecycle direction is monotonic.
 
-## Mandate identity vs. payload hash
-
-The capability payload now binds `mandate_id` and `mandate_version` **in
-addition to** the existing `mandate_payload_sha256`. The existing hash binding
-is not replaced. The two answer different questions:
-
-- `mandate_payload_sha256` — exact content binding. *Is this the same mandate
-  document?*
-- `mandate_id` / `mandate_version` — consent-state lookup key. *Is this
-  mandate still authorized right now?*
-
-Both are required. A content hash alone cannot be looked up in a lifecycle
-registry; an identity alone cannot detect payload tampering. The gate also
-checks that the capability's `mandate_id` equals the presented mandate's own
-id, refusing `MANDATE_ID_MISMATCH` if a validly signed capability is paired
-with a different mandate.
-
 ## Registry
 
 `MandateStateRegistry` is a Protocol with `get_current`, `get_version`,
@@ -119,6 +162,19 @@ only write paths are the service's own transition methods.
 State lives in three tables: `mandate_states` (per-version rows),
 `mandate_current` (the single current version per mandate), and
 `mandate_state_audit` (an append-only hash-chained transition log).
+
+### Storage-consistency check
+
+Every `get_current` on the SQLite registry first asserts that storage holds a
+configuration the API could actually have produced: the pointer resolves to a
+real row, at most one version is `ACTIVE`, the pointer identifies that `ACTIVE`
+version when one exists, and no version is newer than the pointer. A violation
+raises `MandateStateCorruptionError` and the gate refuses with
+`MANDATE_STATE_CORRUPT` before any provider call.
+
+The registry never repairs corruption. An impossible configuration means the
+state directory was written outside these transitions, and choosing whichever
+row still looks usable is precisely the behaviour an attacker would want.
 
 ## Execution-time lookup
 
@@ -152,7 +208,8 @@ the execution gate re-queries independently.
 ### Refusal reasons
 
 `MANDATE_REVOKED`, `MANDATE_SUPERSEDED`, `MANDATE_STATE_MISSING`,
-`MANDATE_VERSION_MISMATCH`, `MANDATE_ID_MISMATCH`. Every one is returned
+`MANDATE_VERSION_MISMATCH`, `MANDATE_ID_MISMATCH`, `MANDATE_STATE_CORRUPT`.
+Every one is returned
 before any provider or network call. The product layer additionally asserts
 that adapter and external-call counters did not move across a mandate-state
 refusal, and raises rather than reporting a refusal that came after provider
@@ -233,6 +290,23 @@ not persist across restarts, so a revocation performed on the public demo is
 durable only for the life of that instance. This is a deployment property, not
 a design claim.
 
+## Demo authority boundary
+
+The revoke and execute endpoints are labelled `DEMO USER REVOCATION` because
+that is exactly what they are. The Commerce Lab implements **no production
+authentication or authorization**: there is no account, no session, and no
+credential behind these routes.
+
+What the design does provide is ownership *scoping*. Mandate identity is derived
+from the server-issued `run_id`, so a caller can only affect the consent state
+of a run whose `run_id` they already hold; knowing one run does not let you
+reach another run's mandate through an identity collision. `run_id` is a 122-bit
+random value and is not enumerable, so it serves as the demo's ownership handle.
+
+That is a scoping property, not authentication. A caller who obtains someone
+else's `run_id` can act on that run, and nothing here verifies who they are.
+Do not read these endpoints as evidence of verified user identity.
+
 ## TOCTOU limitation
 
 The honest statement of the ordering guarantee, and its boundary.
@@ -242,12 +316,59 @@ call in `mandate_state_registry.execution_guard()`. For the SQLite registry
 that guard is a `BEGIN IMMEDIATE` transaction, so the write lock is held from
 current-state validation through provider return.
 
-Within this single-SQLite-file trust boundary, a concurrent revocation
-therefore orders strictly *before* the validation (and refuses the execution)
-or strictly *after* the provider call returns. It cannot interleave between
-the state read and the provider call. A test proves this empirically: a
-revocation attempted from a second connection while a provider call is blocked
-in flight does not complete until that call returns.
+This is a **single SQLite state-file ordering guarantee across cooperating
+processes using the same database and locking protocol.** It is not limited to
+one process: `BEGIN IMMEDIATE` takes the file's write reservation, so a second
+process opening the same database blocks on it exactly as a second thread does.
+
+Within that boundary a concurrent revocation orders strictly *before* the
+validation (and refuses the execution) or strictly *after* the provider call
+returns. It cannot interleave between the state read and the provider call. A
+test proves this empirically: a revocation attempted from a second connection
+while a provider call is blocked in flight does not complete until that call
+returns.
+
+It is explicitly **not** distributed consensus, not cross-host
+linearizability, and not provider-side cancellation.
+
+### Lock-timeout policy
+
+The guard holds the write reservation across provider I/O, so a concurrent
+transition has to wait for the guarded section. The wait budget is therefore
+set *above* the longest guarded provider interval rather than below it:
+`SQLiteMandateStateRegistry.DEFAULT_LOCK_WAIT_SECONDS` is 15s against the
+Razorpay adapter's 10s default request timeout. A shorter budget would make an
+ordinary in-flight payment fail an unrelated revocation.
+
+When the budget is genuinely exhausted the transition raises
+`MandateStateBusyError` and the HTTP layer answers `409 MANDATE_STATE_BUSY`:
+
+> Execution had already entered its guarded provider section. Revocation could
+> not be committed before that operation completed.
+
+Nothing is committed, the in-flight provider operation is neither cancelled nor
+retried, and no claim is made that the payment was stopped. The same typed
+error covers the execution side, where failing to acquire the guard means no
+provider call happens at all. **Lock failure never fails open.**
+
+### Rollback resistance: not provided
+
+The local SQLite registry is **not rollback-resistant** against an attacker who
+can restore an older filesystem snapshot of the state directory. Restoring a
+snapshot taken before a revocation returns the mandate to `ACTIVE`, and the
+per-mandate hash chain does not detect it: the chain detects mutation of
+*visible* history, but a truncated tail simply looks like a shorter valid
+history, because there is no external checkpoint to compare it against.
+
+The current threat model trusts the state directory against rollback-capable
+filesystem attackers. This is a stated limitation, not a hidden guarantee, and
+no remote consensus, monotonic counter, transparency log, or distributed
+database is used or planned here to close it.
+
+One backstop does survive rollback of mandate state alone: a capability that
+was already refused has had its nonce permanently consumed in the separate
+execution ledger, so resurrecting `ACTIVE` state yields `NONCE_ALREADY_USED`
+with zero provider calls. That is defence in depth, not rollback resistance.
 
 What remains true, and is not claimed away:
 

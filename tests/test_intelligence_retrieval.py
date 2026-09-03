@@ -160,6 +160,7 @@ def test_query_construction_is_stable_and_binds_candidate_context():
         user_intent=ALLOW_INTENT,
         interpreted=interpreted,
         evaluated_at=NOW,
+        mandate_identity_seed="retrieval-query-test-run",
     )
     product = store.get_product(
         merchant_id="merchant-scholarly", sku="studyglow-desk-lamp"

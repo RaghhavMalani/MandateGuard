@@ -520,3 +520,73 @@ def test_runner_and_validator_scripts_are_preregistered(frozen) -> None:
     assert runner["on_failure"] == "STOP"
     assert len(runner["gate"]) >= 15
     assert runner["output_root"] == str(OUTPUT_ROOT).replace("\\", "/")
+
+
+def _load_runner_module():
+    """Import the evaluation runner without executing an evaluation.
+
+    Importing is safe: ``main`` is only invoked under ``__main__``, so this
+    exercises the module's call construction and nothing else. No model,
+    provider, network, or outcome artifact is touched.
+    """
+
+    import importlib.util
+    import sys
+
+    path = REPOSITORY_ROOT / "scripts" / "run_resolve_recovery_evaluation.py"
+    spec = importlib.util.spec_from_file_location(
+        "resolve_recovery_evaluation_runner", path
+    )
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    try:
+        spec.loader.exec_module(module)
+    finally:
+        sys.modules.pop(spec.name, None)
+    return module
+
+
+def test_resolve_runner_still_satisfies_the_execution_api() -> None:
+    """The runner must stay callable against the live execution signatures.
+
+    The frozen 20-case outcomes are historical and are never regenerated here.
+    This asserts only that the repository remains internally executable, so a
+    required-argument change to issuance or the execution gate is caught by the
+    suite rather than by a real run that has already spent model calls.
+    """
+
+    module = _load_runner_module()
+    module.verify_execution_wiring()
+
+
+def test_resolve_runner_preflight_names_a_missing_required_argument() -> None:
+    """The preflight is a real check, not a no-op that always passes."""
+
+    module = _load_runner_module()
+    original = module.execute_razorpay_order
+
+    def _with_extra_requirement(*, sentinel_dependency, **kwargs):  # pragma: no cover
+        raise AssertionError("never called")
+
+    _with_extra_requirement.__name__ = "execute_razorpay_order"
+    module.execute_razorpay_order = _with_extra_requirement
+    try:
+        with pytest.raises(TypeError, match="sentinel_dependency"):
+            module.verify_execution_wiring()
+    finally:
+        module.execute_razorpay_order = original
+
+
+def test_resolve_runner_case_execution_is_wired_to_trusted_mandate_state() -> None:
+    """Each evaluation case must carry its own in-memory consent registry."""
+
+    import inspect
+
+    module = _load_runner_module()
+    parameters = inspect.signature(module._run_case).parameters
+    assert "mandate_state_registry" in parameters
+    source = inspect.getsource(module._run_case)
+    # Issuance registers current consent for the case before a capability exists.
+    assert "mandate_state_registry.register_active(" in source
+    assert source.count("mandate_state_registry=mandate_state_registry") == 3

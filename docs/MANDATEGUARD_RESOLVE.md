@@ -127,7 +127,8 @@ fresh authorization, capability, and execution from persistent stores without
 the in-memory CommerceRun.
 
 Set `MANDATEGUARD_STATE_DIR` (or pass `state_dir` when embedding the service) to
-place the semantic cache, execution ledger, and recovery audit in one configured
+place the semantic cache, execution ledger, mandate state, and recovery audit
+in one configured
 directory. Reopening the service with the same directory and filesystem
 preserves those stores. With no configuration, the service deliberately uses a
 temporary directory suitable for local development and the offline demo. A

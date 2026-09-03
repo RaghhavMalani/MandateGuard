@@ -325,8 +325,8 @@ The server binds `0.0.0.0` by default so the same command works on a PaaS host. 
 `MANDATEGUARD_PRODUCT_HOST=127.0.0.1` to restrict it to loopback. Port precedence is `PORT`,
 then `MANDATEGUARD_PRODUCT_PORT`, then `8080`; `--host` and `--port` arguments also work.
 
-Set `MANDATEGUARD_STATE_DIR` to keep the semantic cache, execution ledger, and recovery
-audit in one writable directory. Reopening the service with the same directory preserves
+Set `MANDATEGUARD_STATE_DIR` to keep the semantic cache, execution ledger, mandate
+state, and recovery audit in one writable directory. Reopening the service with the same directory preserves
 those SQLite stores on the same filesystem. Without it, the offline demo uses temporary
 state. The current public Render blueprint has no persistent disk, so it makes no
 restart-durability claim.

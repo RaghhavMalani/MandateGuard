@@ -204,14 +204,38 @@ def _semantic_constraints(
     return tuple(constraints)
 
 
+MANDATE_IDENTITY_DOMAIN = b"mandateguard/mandate-identity/v1"
+_MAX_IDENTITY_SEED_LENGTH = 256
+
+
+def _validate_identity_seed(value: object) -> str:
+    """Require a bounded, non-empty, server-issued mandate identity seed."""
+
+    if not isinstance(value, str):
+        raise TypeError("mandate_identity_seed must be a server-issued string")
+    seed = value.strip()
+    if not seed or len(seed) > _MAX_IDENTITY_SEED_LENGTH:
+        raise ValueError("mandate_identity_seed must be a bounded identifier")
+    return seed
+
+
 def build_mandate_from_intent(
     *,
     user_intent: str,
     interpreted: InterpretedPurchaseIntent,
     evaluated_at: datetime,
+    mandate_identity_seed: str,
     subject_ref: str = "agentic-commerce-user",
 ) -> Mandate:
-    """Construct a bounded V1 mandate from one validated intent interpretation."""
+    """Construct a bounded V1 mandate from one validated intent interpretation.
+
+    ``mandate_identity_seed`` must be a server-issued identifier for the run
+    that is asking for consent — never buyer-supplied text. Mandate identity is
+    the consent-state key the revocation registry is keyed by, so deriving it
+    from the intent alone would make two principals who happen to type the same
+    sentence share one revocable mandate. The seed is a required argument
+    precisely so that sharing has to be a deliberate act.
+    """
 
     if not isinstance(interpreted, InterpretedPurchaseIntent):
         raise TypeError("interpreted must be InterpretedPurchaseIntent")
@@ -221,7 +245,14 @@ def build_mandate_from_intent(
         or evaluated_at.utcoffset() is None
     ):
         raise ValueError("evaluated_at must be timezone-aware")
-    digest = sha256(user_intent.strip().encode("utf-8")).digest()
+    seed = _validate_identity_seed(mandate_identity_seed)
+    digest = sha256(
+        MANDATE_IDENTITY_DOMAIN
+        + b"\x00"
+        + seed.encode("utf-8")
+        + b"\x00"
+        + user_intent.strip().encode("utf-8")
+    ).digest()
     mandate_id = str(UUID(bytes=digest[:16], version=4))
     nonce = "mg_intent_" + digest.hex()[:32]
     return Mandate(
@@ -450,11 +481,22 @@ def run_agentic_checkout(
     execution_runtime: ExecutionRuntime | None = None,
     decision_nonce: str | None = None,
     mandate_version: int | None = None,
+    mandate_identity_seed: str,
 ) -> AgenticCheckoutResult:
-    """Run one vertical slice. Payment I/O is opt-in and ALLOW-capability gated."""
+    """Run one vertical slice. Payment I/O is opt-in and ALLOW-capability gated.
+
+    ``evaluated_at`` is the single clock for the whole slice: the mandate's own
+    validity window, the deterministic decision, mandate-state transitions, and
+    capability lifetime are all stamped from it. They are deliberately not
+    separable. A capability may not outlive the mandate it was issued under, and
+    a mandate-state transition may not appear to move backwards against a
+    revocation, so a caller that froze one of these clocks and not the others
+    would produce exactly those contradictions.
+    """
 
     if not isinstance(user_intent, str) or not user_intent.strip() or len(user_intent) > 8000:
         raise ValueError("user_intent must be a bounded non-empty string")
+    _validate_identity_seed(mandate_identity_seed)
     if not isinstance(buyer, CommerceBuyer):
         raise TypeError("buyer must implement CommerceBuyer")
     if not isinstance(store, TrustedCommerceStore):
@@ -476,7 +518,6 @@ def run_agentic_checkout(
     now = evaluated_at or datetime.now(timezone.utc)
     if now.tzinfo is None or now.utcoffset() is None:
         raise ValueError("evaluated_at must be timezone-aware")
-
     total_started = perf_counter()
     buyer_started = perf_counter()
     buyer_output = buyer.purchase(user_intent.strip())
@@ -496,6 +537,7 @@ def run_agentic_checkout(
         user_intent=user_intent,
         interpreted=buyer_output.interpreted_intent,
         evaluated_at=now,
+        mandate_identity_seed=mandate_identity_seed,
     )
     transaction = _transaction_for_proposal(proposal=proposal, store=store)
     catalog = store.catalog_snapshot(merchant_id=proposal.merchant_id)
