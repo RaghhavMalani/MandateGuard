@@ -20,6 +20,7 @@ from mandateguard.execution import (
     ExecutionRefusal,
     HMACSHA256Signer,
     HMACSHA256Verifier,
+    InMemoryMandateStateRegistry,
     RazorpayTestOrdersAdapter,
     SQLiteExecutionLedger,
     SignedExecutionAuthorization,
@@ -157,6 +158,10 @@ def main() -> int:
         account_scope=account_scope,
     )
     signer = HMACSHA256Signer(key_id="manual-smoke-hmac-v1", key=hmac_key)
+    mandate_registry = InMemoryMandateStateRegistry()
+    mandate_registry.register_active(
+        mandate.payload.mandate_id, 1, updated_at=now
+    )
     capability = issue_execution_authorization(
         authorization_result=result,
         authorization_scenario=scenario,
@@ -167,6 +172,7 @@ def main() -> int:
         decision_nonce=decision_nonce,
         config=config,
         signer=signer,
+        mandate_state_registry=mandate_registry,
     )
     if not isinstance(capability, SignedExecutionAuthorization):
         assert isinstance(capability, ExecutionRefusal)
@@ -188,6 +194,7 @@ def main() -> int:
                     key_id=key_id,
                     key_secret=key_secret,
                 ),
+                mandate_state_registry=mandate_registry,
             )
         except ExecutionError as error:
             raise SystemExit(str(error)) from None

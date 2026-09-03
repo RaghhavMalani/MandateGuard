@@ -9,6 +9,7 @@ from pathlib import Path
 from mandateguard.execution import (
     HMACSHA256Signer,
     HMACSHA256Verifier,
+    InMemoryMandateStateRegistry,
     SQLiteExecutionLedger,
     TrustedExecutionConfig,
 )
@@ -98,6 +99,7 @@ def make_execution_runtime(
         verifier=HMACSHA256Verifier({"agentic-test-key": SYNTHETIC_KEY}),
         ledger=ledger,
         client=client,
+        mandate_state_registry=InMemoryMandateStateRegistry(),
     )
     return runtime, ledger
 

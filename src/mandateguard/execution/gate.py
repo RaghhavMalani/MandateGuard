@@ -7,6 +7,7 @@ from datetime import datetime
 from mandateguard.core.hashing import mandate_payload_sha256, transaction_body_sha256
 from mandateguard.execution.authorization import authorization_result_sha256
 from mandateguard.execution.ledger import ExecutionLedger
+from mandateguard.execution.mandate_state import MandateStateRegistry, MandateStatus
 from mandateguard.execution.models import (
     MAX_ISSUED_AT_FUTURE_SKEW,
     ExecutionRefusal,
@@ -39,6 +40,7 @@ def validate_and_reserve_execution(
     config: TrustedExecutionConfig,
     verifier: ExecutionVerifier,
     ledger: ExecutionLedger,
+    mandate_state_registry: MandateStateRegistry,
 ) -> ValidatedExecutionGrant | ExecutionRefusal:
     """Return a reserved grant only after every signed commitment is recomputed."""
 
@@ -58,6 +60,8 @@ def validate_and_reserve_execution(
         raise ValueError("now must be a timezone-aware injected datetime")
     if not isinstance(config, TrustedExecutionConfig):
         raise TypeError("config must be TrustedExecutionConfig")
+    if not callable(getattr(mandate_state_registry, "get_current", None)):
+        raise TypeError("mandate_state_registry must be trusted server state")
 
     verification = verifier.verify(authorization)
     if verification is SignatureVerification.UNKNOWN_KEY:
@@ -112,6 +116,45 @@ def validate_and_reserve_execution(
         return ExecutionRefusal(
             ExecutionRefusalReason.EXECUTION_REQUEST_HASH_MISMATCH
         )
+
+    mandate_state_reason: ExecutionRefusalReason | None = None
+    if payload.mandate_id != mandate.payload.mandate_id:
+        mandate_state_reason = ExecutionRefusalReason.MANDATE_ID_MISMATCH
+    else:
+        current_state = mandate_state_registry.get_current(payload.mandate_id)
+        if current_state is None:
+            mandate_state_reason = ExecutionRefusalReason.MANDATE_STATE_MISSING
+        elif current_state.version != payload.mandate_version:
+            bound_state = mandate_state_registry.get_version(
+                payload.mandate_id, payload.mandate_version
+            )
+            mandate_state_reason = (
+                ExecutionRefusalReason.MANDATE_SUPERSEDED
+                if bound_state is not None
+                and bound_state.status is MandateStatus.SUPERSEDED
+                else ExecutionRefusalReason.MANDATE_VERSION_MISMATCH
+            )
+        elif current_state.status is MandateStatus.REVOKED:
+            mandate_state_reason = ExecutionRefusalReason.MANDATE_REVOKED
+        elif current_state.status is MandateStatus.SUPERSEDED:
+            mandate_state_reason = ExecutionRefusalReason.MANDATE_SUPERSEDED
+
+    if mandate_state_reason is not None:
+        # A capability presented against invalid current consent is permanently
+        # consumed. It cannot become executable if state is later mishandled.
+        if not ledger.reserve(payload.decision_nonce, rebuilt_request_sha256):
+            return ExecutionRefusal(ExecutionRefusalReason.NONCE_ALREADY_USED)
+        ledger.mark_rejected(payload.decision_nonce, rebuilt_request_sha256)
+        mandate_state_registry.record_execution_refusal(
+            mandate_id=payload.mandate_id,
+            version=payload.mandate_version,
+            occurred_at=now,
+            reason=mandate_state_reason.value,
+            decision_nonce=payload.decision_nonce,
+            execution_request_sha256=rebuilt_request_sha256,
+            authorization_result_sha256=payload.authorization_result_sha256,
+        )
+        return ExecutionRefusal(mandate_state_reason)
 
     if not ledger.reserve(payload.decision_nonce, rebuilt_request_sha256):
         return ExecutionRefusal(ExecutionRefusalReason.NONCE_ALREADY_USED)

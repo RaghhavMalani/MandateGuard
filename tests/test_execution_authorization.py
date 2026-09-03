@@ -11,6 +11,7 @@ from mandateguard.execution import (
     ExecutionRefusalReason,
     HMACSHA256Signer,
     HMACSHA256Verifier,
+    InMemoryMandateStateRegistry,
     RazorpayOrderRequest,
     SQLiteExecutionLedger,
     SignedExecutionAuthorization,
@@ -44,6 +45,12 @@ def _verifier() -> HMACSHA256Verifier:
 
 def _gate(capability, result, mandate, transaction, tmp_path, *, now=SERVER_TIME):
     ledger = SQLiteExecutionLedger(tmp_path / "execution.sqlite3")
+    mandate_state_registry = InMemoryMandateStateRegistry()
+    mandate_state_registry.register_active(
+        mandate.payload.mandate_id,
+        capability.payload.mandate_version,
+        updated_at=SERVER_TIME,
+    )
     outcome = validate_and_reserve_execution(
         authorization=capability,
         authorization_result=result,
@@ -53,6 +60,7 @@ def _gate(capability, result, mandate, transaction, tmp_path, *, now=SERVER_TIME
         config=CONFIG,
         verifier=_verifier(),
         ledger=ledger,
+        mandate_state_registry=mandate_state_registry,
     )
     return outcome, ledger
 
@@ -69,6 +77,10 @@ def _gate(capability, result, mandate, transaction, tmp_path, *, now=SERVER_TIME
 )
 def test_non_allow_decisions_return_refusal_and_no_capability(action, reason) -> None:
     result, scenario = make_authorization(action)
+    registry = InMemoryMandateStateRegistry()
+    registry.register_active(
+        scenario.mandate.payload.mandate_id, 1, updated_at=SERVER_TIME
+    )
 
     outcome = issue_execution_authorization(
         authorization_result=result,
@@ -80,6 +92,7 @@ def test_non_allow_decisions_return_refusal_and_no_capability(action, reason) ->
         decision_nonce=DECISION_NONCE,
         config=CONFIG,
         signer=_signer(),
+        mandate_state_registry=registry,
     )
 
     assert outcome == ExecutionRefusal(reason)
@@ -110,6 +123,10 @@ def test_invalid_capability_lifetime_returns_typed_refusal(
     issued_at, expires_at
 ) -> None:
     result, scenario = make_authorization()
+    registry = InMemoryMandateStateRegistry()
+    registry.register_active(
+        scenario.mandate.payload.mandate_id, 1, updated_at=SERVER_TIME
+    )
 
     outcome = issue_execution_authorization(
         authorization_result=result,
@@ -121,6 +138,7 @@ def test_invalid_capability_lifetime_returns_typed_refusal(
         decision_nonce=DECISION_NONCE,
         config=CONFIG,
         signer=_signer(),
+        mandate_state_registry=registry,
     )
 
     assert outcome == ExecutionRefusal(

@@ -238,3 +238,97 @@ test("transactability shows the current REVIEW and incomplete evidence", () => {
   assert.match(html, /MISSING/);
   assert.match(html, /cannot authorize payments/);
 });
+
+
+const CONSENT_CAPABILITY = {
+  signature_verified: true,
+  transaction_bound: true,
+  request_bound: true,
+  merchant_bound: true,
+  mandate_identity_bound: true,
+  mandate_version_bound: true,
+  expiry_valid: true,
+};
+
+
+test("issued capability offers revocation while proving zero Razorpay calls", () => {
+  const html = renderExecutionPanel({
+    status: "AUTHORIZED",
+    reason: null,
+    razorpay_calls: 0,
+    external_network_calls: 0,
+    capability: CONSENT_CAPABILITY,
+    consent: {
+      status: "ACTIVE",
+      mandate_version: 7,
+      authority: "DEMO USER REVOCATION",
+      can_revoke: true,
+      can_execute: true,
+      teaching: "MandateGuard revalidates its trusted mandate state immediately before execution.",
+    },
+  });
+  assert.match(html, /CONSENT STATE/);
+  assert.match(html, /consent-state--active/);
+  assert.match(html, /Mandate v7/);
+  assert.match(html, /CAPABILITY ISSUED/);
+  assert.match(html, /RAZORPAY CALLS 0/);
+  assert.match(html, /id="revoke-mandate-button"/);
+  assert.match(html, /id="attempt-execution-button"/);
+  assert.doesNotMatch(html, /REJECTED BEFORE NETWORK/);
+  assert.match(html, /revalidates its trusted mandate state/);
+});
+
+
+test("revoked mandate refuses a still-valid capability before any network call", () => {
+  const html = renderExecutionPanel({
+    status: "REJECTED_BEFORE_NETWORK",
+    reason: "MANDATE_REVOKED",
+    razorpay_calls: 0,
+    external_network_calls: 0,
+    capability: CONSENT_CAPABILITY,
+    consent: {
+      status: "REVOKED",
+      mandate_version: 7,
+      authority: "DEMO USER REVOCATION",
+      can_revoke: false,
+      can_execute: false,
+      teaching: "The capability is still signed and unexpired. Current consent no longer permits execution.",
+    },
+  });
+  assert.match(html, /REJECTED BEFORE NETWORK/);
+  assert.match(html, /Mandate revoked/);
+  assert.match(html, /RAZORPAY CALLS 0/);
+  assert.match(html, /consent-state--revoked/);
+  // The teaching moment: the capability itself is still cryptographically sound.
+  assert.match(html, /CRYPTOGRAPHICALLY VALID/);
+  assert.match(html, /Signature<\/span><strong data-valid="true">VERIFIED/);
+  assert.match(html, /still signed and unexpired\. Current consent no longer permits execution/);
+  // A consumed capability must not offer either control again.
+  assert.doesNotMatch(html, /id="revoke-mandate-button"/);
+  assert.doesNotMatch(html, /id="attempt-execution-button"/);
+});
+
+
+test("consent panel never claims bank, UPI, or Razorpay mandate revocation", () => {
+  const html = renderExecutionPanel({
+    status: "REJECTED_BEFORE_NETWORK",
+    reason: "MANDATE_SUPERSEDED",
+    razorpay_calls: 0,
+    external_network_calls: 0,
+    capability: { ...CONSENT_CAPABILITY, mandate_version_bound: false },
+    consent: {
+      status: "SUPERSEDED",
+      mandate_version: 7,
+      authority: "DEMO USER REVOCATION",
+      can_revoke: false,
+      can_execute: false,
+      teaching: "The capability is still signed and unexpired. Current consent no longer permits execution.",
+    },
+  });
+  assert.match(html, /Mandate superseded/);
+  assert.match(html, /Authority: DEMO USER REVOCATION/);
+  assert.match(html, /Mandate version<\/span><strong data-valid="false">FAILED/);
+  for (const overclaim of [/bank consent/i, /UPI mandate/i, /Razorpay mandate/i, /identity verified/i]) {
+    assert.doesNotMatch(html, overclaim);
+  }
+});

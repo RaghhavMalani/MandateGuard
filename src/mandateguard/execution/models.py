@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
 import re
+from uuid import UUID
 
 from mandateguard.models.decision import DecisionAction
 
@@ -60,6 +61,11 @@ class ExecutionRefusalReason(str, Enum):
     ACCOUNT_SCOPE_MISMATCH = "ACCOUNT_SCOPE_MISMATCH"
     MERCHANT_MISMATCH = "MERCHANT_MISMATCH"
     MANDATE_HASH_MISMATCH = "MANDATE_HASH_MISMATCH"
+    MANDATE_ID_MISMATCH = "MANDATE_ID_MISMATCH"
+    MANDATE_REVOKED = "MANDATE_REVOKED"
+    MANDATE_SUPERSEDED = "MANDATE_SUPERSEDED"
+    MANDATE_STATE_MISSING = "MANDATE_STATE_MISSING"
+    MANDATE_VERSION_MISMATCH = "MANDATE_VERSION_MISMATCH"
     TRANSACTION_HASH_MISMATCH = "TRANSACTION_HASH_MISMATCH"
     EXECUTION_REQUEST_HASH_MISMATCH = "EXECUTION_REQUEST_HASH_MISMATCH"
     NONCE_ALREADY_USED = "NONCE_ALREADY_USED"
@@ -103,6 +109,8 @@ class ExecutionAuthorizationPayload:
     audience: str
     account_scope: str
     merchant_id: str
+    mandate_id: str
+    mandate_version: int
     mandate_payload_sha256: str
     transaction_body_sha256: str
     authorization_result_sha256: str
@@ -129,6 +137,16 @@ class ExecutionAuthorizationPayload:
         _require_nonempty(self.audience, "audience", 128)
         _require_nonempty(self.account_scope, "account_scope", 256)
         _require_nonempty(self.merchant_id, "merchant_id", 128)
+        try:
+            UUID(self.mandate_id)
+        except (AttributeError, TypeError, ValueError) as error:
+            raise ValueError("mandate_id must be a UUID string") from error
+        if (
+            isinstance(self.mandate_version, bool)
+            or not isinstance(self.mandate_version, int)
+            or self.mandate_version < 1
+        ):
+            raise ValueError("mandate_version must be a positive integer")
         for value, name in (
             (self.mandate_payload_sha256, "mandate_payload_sha256"),
             (self.transaction_body_sha256, "transaction_body_sha256"),

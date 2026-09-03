@@ -434,6 +434,7 @@ class CacheStatus(str, Enum):
 
 class ExecutionStatus(str, Enum):
     NOT_REQUESTED = "not_requested"
+    AUTHORIZED_NOT_EXECUTED = "authorized_not_executed"
     EXECUTED = "executed"
     NOT_AUTHORIZED = "not_authorized"
     ERROR = "error"

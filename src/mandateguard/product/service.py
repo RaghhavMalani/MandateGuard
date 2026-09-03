@@ -26,9 +26,13 @@ from mandateguard.core.nonce_ledger import NonceLedgerState
 from mandateguard.execution import (
     HMACSHA256Signer,
     HMACSHA256Verifier,
+    MandateStatus,
     RazorpayTestOrdersAdapter,
     SQLiteExecutionLedger,
+    SQLiteMandateStateRegistry,
     TrustedExecutionConfig,
+    build_razorpay_order_request,
+    execution_request_sha256,
     issue_execution_authorization,
 )
 from mandateguard.execution.executor import execute_razorpay_order
@@ -150,7 +154,16 @@ DEMO_PRESETS: tuple[dict[str, str], ...] = (
         ),
     },
 )
-_PRESETS_BY_ID = {item["id"]: item for item in DEMO_PRESETS}
+REVOCATION_DEMO_PRESET: dict[str, str] = {
+    "id": "revoked-after-allow",
+    "label": "REVOKED AFTER ALLOW",
+    "intent": (
+        "Buy the StudyGlow Desk Lamp under ₹2,000 for individual study. "
+        "No subscriptions. SKU: studyglow-desk-lamp"
+    ),
+}
+PRODUCT_PRESETS = DEMO_PRESETS + (REVOCATION_DEMO_PRESET,)
+_PRESETS_BY_ID = {item["id"]: item for item in PRODUCT_PRESETS}
 
 
 # Resolve evaluation scenarios. Each one is an ordinary product intent run at the
@@ -280,6 +293,7 @@ class CommerceRun:
     mode: str
     preset_id: str | None
     top_k: int
+    defer_execution: bool = False
     state: str = "RUNNING"
     created_at: str = field(default_factory=_utc_now_text)
     updated_at: str = field(default_factory=_utc_now_text)
@@ -301,6 +315,7 @@ class CommerceRun:
     private_context: Any = None
     replay_in_flight: bool = False
     recovery_in_flight: bool = False
+    mandate_action_in_flight: bool = False
     completion: Event = field(default_factory=Event)
     lock: RLock = field(default_factory=RLock)
 
@@ -715,9 +730,12 @@ class CommerceLabService:
         self.execution_ledger = SQLiteExecutionLedger(
             state_dir / "execution-ledger.sqlite3"
         )
+        self.mandate_state_registry = SQLiteMandateStateRegistry(
+            state_dir / "mandate-state.sqlite3"
+        )
         self._offline_signing_key = secrets.token_bytes(32)
         self._runs: OrderedDict[str, CommerceRun] = OrderedDict()
-        self._requests: dict[str, tuple[str, str, str]] = {}
+        self._requests: dict[str, tuple[str, str, str, str | None, bool]] = {}
         self._lock = RLock()
 
     @staticmethod
@@ -753,6 +771,13 @@ class CommerceLabService:
         self.semantic_cache.close()
         self.recovery_audit_store.close()
         self.execution_ledger.close()
+        self.mandate_state_registry.close()
+
+    def __enter__(self) -> CommerceLabService:
+        return self
+
+    def __exit__(self, *_args: object) -> None:
+        self.close()
 
     def live_configuration(self) -> dict[str, Any]:
         required = (
@@ -799,7 +824,7 @@ class CommerceLabService:
                     **self.live_configuration(),
                 },
             },
-            "presets": [dict(item) for item in DEMO_PRESETS],
+            "presets": [dict(item) for item in PRODUCT_PRESETS],
             "research": dict(INT3_RESEARCH_FINDING),
             "failure_recovery": [dict(item) for item in FAILURE_RECOVERY_EVIDENCE],
             "resolve": {
@@ -814,6 +839,8 @@ class CommerceLabService:
                 "external_calls_on_page_load": 0,
                 "buyer_has_razorpay_authority": False,
                 "browser_receives_secrets": False,
+                "mandate_state_owner": "TRUSTED_SERVER",
+                "revocation_authority": "DEMO USER REVOCATION",
             },
         }
 
@@ -834,6 +861,7 @@ class CommerceLabService:
         request_id: str,
         preset_id: str | None = None,
         top_k: int | None = None,
+        defer_execution: bool | None = None,
     ) -> tuple[CommerceRun, bool]:
         if not isinstance(user_intent, str) or not user_intent.strip():
             raise ValueError("user_intent must be a non-empty string")
@@ -845,6 +873,8 @@ class CommerceLabService:
             raise ValueError("request_id must be a bounded identifier")
         if preset_id is not None and preset_id not in _PRESETS_BY_ID:
             raise ValueError("preset_id is not registered")
+        if defer_execution is not None and not isinstance(defer_execution, bool):
+            raise TypeError("defer_execution must be boolean or None")
         # `preset_id` selects an intent and nothing else. The evidence policy is
         # server-owned; only an explicit engineering override may replace it, and
         # the override is recorded in the run's trust configuration.
@@ -853,13 +883,29 @@ class CommerceLabService:
         if isinstance(top_k, bool) or not isinstance(top_k, int) or not 1 <= top_k <= 10:
             raise ValueError("top_k must be between 1 and 10")
         normalized_intent = user_intent.strip()
+        should_defer = (
+            preset_id == REVOCATION_DEMO_PRESET["id"]
+            if defer_execution is None
+            else defer_execution
+        )
         if mode == "live" and not self.live_configuration()["available"]:
             raise RuntimeError("live test mode is unavailable; check server configuration")
         with self._lock:
             existing = self._requests.get(request_id)
             if existing is not None:
-                run_id, existing_mode, existing_intent = existing
-                if existing_mode != mode or existing_intent != normalized_intent:
+                (
+                    run_id,
+                    existing_mode,
+                    existing_intent,
+                    existing_preset,
+                    existing_defer,
+                ) = existing
+                if (
+                    existing_mode != mode
+                    or existing_intent != normalized_intent
+                    or existing_preset != preset_id
+                    or existing_defer != should_defer
+                ):
                     raise ValueError("request_id is already bound to another request")
                 return self._runs[run_id], True
             run = CommerceRun(
@@ -869,9 +915,16 @@ class CommerceLabService:
                 mode=mode,
                 preset_id=preset_id,
                 top_k=top_k,
+                defer_execution=should_defer,
             )
             self._runs[run.run_id] = run
-            self._requests[request_id] = (run.run_id, mode, normalized_intent)
+            self._requests[request_id] = (
+                run.run_id,
+                mode,
+                normalized_intent,
+                preset_id,
+                should_defer,
+            )
             self._evict_oldest_runs()
         Thread(target=self._execute_run, args=(run,), daemon=True).start()
         return run, False
@@ -884,6 +937,7 @@ class CommerceLabService:
         request_id: str | None = None,
         preset_id: str | None = None,
         top_k: int | None = None,
+        defer_execution: bool | None = None,
         timeout_seconds: float = 20.0,
     ) -> dict[str, Any]:
         run, _ = self.start_run(
@@ -892,6 +946,7 @@ class CommerceLabService:
             request_id=request_id or ("test_" + uuid4().hex),
             preset_id=preset_id,
             top_k=top_k,
+            defer_execution=defer_execution,
         )
         if not run.completion.wait(timeout_seconds):
             raise TimeoutError("commerce lab run did not finish")
@@ -939,6 +994,9 @@ class CommerceLabService:
                 verifier=context.execution_runtime.verifier,
                 ledger=context.execution_runtime.ledger,
                 client=context.client,
+                mandate_state_registry=(
+                    context.execution_runtime.mandate_state_registry
+                ),
             )
             calls_after = context.client.adapter_calls
             external_after = context.client.external_network_calls
@@ -983,6 +1041,149 @@ class CommerceLabService:
         finally:
             with run.lock:
                 run.replay_in_flight = False
+
+    def revoke_mandate(self, run_id: str) -> dict[str, Any]:
+        """Apply the server-owned DEMO USER REVOCATION transition."""
+
+        run = self.get_run(run_id)
+        if run is None:
+            raise KeyError("run was not found")
+        with run.lock:
+            if run.state != "COMPLETE" or run.private_context is None:
+                raise RuntimeError("run is not ready for mandate revocation")
+            if run.mandate_action_in_flight:
+                raise RuntimeError("another mandate action is already in flight")
+            context: _RunContext = run.private_context
+            capability = context.checkout.execution_authorization
+            if capability is None:
+                raise RuntimeError("run does not contain an execution capability")
+            if isinstance(context.checkout.execution_result, ExecutionReceipt):
+                raise RuntimeError("execution already reached the provider")
+            run.mandate_action_in_flight = True
+
+        try:
+            current = self.mandate_state_registry.get_current(
+                capability.payload.mandate_id
+            )
+            if current is None:
+                raise RuntimeError("mandate state is missing")
+            if current.status is not MandateStatus.REVOKED:
+                state = self.mandate_state_registry.revoke(
+                    capability.payload.mandate_id,
+                    capability.payload.mandate_version,
+                    revoked_at=self._trusted_now(),
+                )
+                recorder = RunRecorder(run)
+                recorder.audit(
+                    "MANDATE_REVOKED",
+                    mandate_id=state.mandate_id,
+                    mandate_version=state.version,
+                    transition="ACTIVE -> REVOKED",
+                    authority="DEMO USER REVOCATION",
+                )
+                recorder.step(
+                    "EXECUTION",
+                    "REVOKED",
+                    "Current consent revoked; Razorpay calls: 0",
+                )
+            with run.lock:
+                run.output = self._present_result(run, context)
+                run.updated_at = _utc_now_text()
+            return run.snapshot()
+        finally:
+            with run.lock:
+                run.mandate_action_in_flight = False
+
+    def attempt_execution(self, run_id: str) -> dict[str, Any]:
+        """Present one deferred capability to the current-state execution gate."""
+
+        run = self.get_run(run_id)
+        if run is None:
+            raise KeyError("run was not found")
+        with run.lock:
+            if run.state != "COMPLETE" or run.private_context is None:
+                raise RuntimeError("run is not ready for execution")
+            if run.mandate_action_in_flight:
+                raise RuntimeError("another mandate action is already in flight")
+            context: _RunContext = run.private_context
+            checkout = context.checkout
+            capability = checkout.execution_authorization
+            if capability is None:
+                raise RuntimeError("run does not contain an execution capability")
+            if checkout.execution_result is not None:
+                raise RuntimeError("capability has already been presented for execution")
+            run.mandate_action_in_flight = True
+
+        try:
+            calls_before = context.client.adapter_calls
+            external_before = context.client.external_network_calls
+            result = execute_razorpay_order(
+                authorization=capability,
+                authorization_result=checkout.authorization_result,
+                mandate=checkout.mandate,
+                transaction=checkout.transaction,
+                now=self._trusted_now(),
+                config=context.execution_runtime.config,
+                verifier=context.execution_runtime.verifier,
+                ledger=context.execution_runtime.ledger,
+                client=context.client,
+                mandate_state_registry=context.execution_runtime.mandate_state_registry,
+            )
+            calls_after = context.client.adapter_calls
+            external_after = context.client.external_network_calls
+            context.checkout = replace(checkout, execution_result=result)
+            recorder = RunRecorder(run)
+            if isinstance(result, ExecutionRefusal):
+                if (
+                    result.reason
+                    in {
+                        ExecutionRefusalReason.MANDATE_REVOKED,
+                        ExecutionRefusalReason.MANDATE_SUPERSEDED,
+                        ExecutionRefusalReason.MANDATE_STATE_MISSING,
+                        ExecutionRefusalReason.MANDATE_VERSION_MISMATCH,
+                        ExecutionRefusalReason.MANDATE_ID_MISMATCH,
+                    }
+                    and (
+                        calls_after != calls_before
+                        or external_after != external_before
+                    )
+                ):
+                    raise RuntimeError(
+                        "mandate-state refusal occurred after provider activity"
+                    )
+                recorder.step(
+                    "EXECUTION",
+                    "REJECTED",
+                    f"{result.reason.value}; Razorpay calls: {calls_after}",
+                )
+                recorder.audit(
+                    "EXECUTION_REFUSED_MANDATE_STATE",
+                    mandate_id=capability.payload.mandate_id,
+                    mandate_version=capability.payload.mandate_version,
+                    reason=result.reason.value,
+                    decision_nonce=capability.payload.decision_nonce,
+                    execution_request_sha256=(
+                        capability.payload.execution_request_sha256
+                    ),
+                    authorization_result_sha256=(
+                        capability.payload.authorization_result_sha256
+                    ),
+                    provider_additional_calls=calls_after - calls_before,
+                )
+            else:
+                recorder.step("EXECUTION", "PASS", "Order creation response validated")
+                recorder.audit(
+                    "RAZORPAY_ORDER_CREATED",
+                    order_id=result.razorpay_order_id,
+                    environment=("OFFLINE_DEMO" if run.mode == "offline" else "TEST"),
+                )
+            with run.lock:
+                run.output = self._present_result(run, context)
+                run.updated_at = _utc_now_text()
+            return run.snapshot()
+        finally:
+            with run.lock:
+                run.mandate_action_in_flight = False
 
     def recover(self, run_id: str) -> dict[str, Any]:
         """Run one user-triggered trusted acquisition round for an existing REVIEW."""
@@ -1050,6 +1251,21 @@ class CommerceLabService:
                 decision_nonce = "mg_resolve_" + sha256(
                     f"{run.request_id}:{recovered.rounds_used}".encode("ascii")
                 ).hexdigest()[:32]
+                current_state = self.mandate_state_registry.get_current(
+                    recovered.scenario.mandate.payload.mandate_id
+                )
+                mandate_version = (
+                    1
+                    if current_state is None
+                    else current_state.version
+                    if current_state.status is MandateStatus.ACTIVE
+                    else current_state.version + 1
+                )
+                self.mandate_state_registry.register_active(
+                    recovered.scenario.mandate.payload.mandate_id,
+                    mandate_version,
+                    updated_at=recovery_time,
+                )
                 issued = issue_execution_authorization(
                     authorization_result=recovered.current_authorization,
                     authorization_scenario=recovered.scenario,
@@ -1063,28 +1279,37 @@ class CommerceLabService:
                     decision_nonce=decision_nonce,
                     config=context.execution_runtime.config,
                     signer=context.execution_runtime.signer,
+                    mandate_state_registry=self.mandate_state_registry,
+                    mandate_version=mandate_version,
                 )
                 if isinstance(issued, ExecutionRefusal):
                     raise RuntimeError(
                         f"recovered authorization capability refused: {issued.reason.value}"
                     )
                 capability = issued
-                execution_result = execute_razorpay_order(
-                    authorization=capability,
-                    authorization_result=recovered.current_authorization,
-                    mandate=recovered.scenario.mandate,
-                    transaction=recovered.scenario.transaction,
-                    now=self._trusted_now(),
-                    config=context.execution_runtime.config,
-                    verifier=context.execution_runtime.verifier,
-                    ledger=context.execution_runtime.ledger,
-                    client=context.client,
-                )
+                if not run.defer_execution:
+                    execution_result = execute_razorpay_order(
+                        authorization=capability,
+                        authorization_result=recovered.current_authorization,
+                        mandate=recovered.scenario.mandate,
+                        transaction=recovered.scenario.transaction,
+                        now=self._trusted_now(),
+                        config=context.execution_runtime.config,
+                        verifier=context.execution_runtime.verifier,
+                        ledger=context.execution_runtime.ledger,
+                        client=context.client,
+                        mandate_state_registry=self.mandate_state_registry,
+                    )
             context.checkout = replace(
                 context.checkout,
                 authorization_result=recovered.current_authorization,
                 execution_authorization=capability,
                 execution_result=execution_result,
+                mandate_version=(
+                    capability.payload.mandate_version
+                    if capability is not None
+                    else context.checkout.mandate_version
+                ),
             )
             context.semantic_evidence = recovered.current_evidence
             context.payment_provider_calls_before_final_allow = payment_calls_before
@@ -1115,6 +1340,11 @@ class CommerceLabService:
                 start=acquisition_event_count,
             )
             if capability is not None:
+                recorder.audit(
+                    "MANDATE_REGISTERED_ACTIVE",
+                    mandate_id=capability.payload.mandate_id,
+                    mandate_version=capability.payload.mandate_version,
+                )
                 recorder.audit(
                     "CAPABILITY_ISSUED",
                     decision_nonce_prefix=capability.payload.decision_nonce[:12],
@@ -1345,6 +1575,7 @@ class CommerceLabService:
                 verifier=HMACSHA256Verifier({key_id: execution_key}),
                 ledger=self.execution_ledger,
                 client=execution_client,
+                mandate_state_registry=self.mandate_state_registry,
             )
             decision_nonce = "mg_product_" + sha256(
                 run.request_id.encode("ascii")
@@ -1360,6 +1591,7 @@ class CommerceLabService:
                 alpha=self.evidence_policy.alpha,
                 retrieval_mode=self.evidence_policy.retrieval_mode,
                 execute=True,
+                defer_execution=run.defer_execution,
                 execution_runtime=runtime,
                 decision_nonce=decision_nonce,
             )
@@ -1382,6 +1614,13 @@ class CommerceLabService:
                 action=checkout.authorization_result.final_action.value,
             )
             if checkout.execution_authorization is not None:
+                recorder.audit(
+                    "MANDATE_REGISTERED_ACTIVE",
+                    mandate_id=checkout.execution_authorization.payload.mandate_id,
+                    mandate_version=(
+                        checkout.execution_authorization.payload.mandate_version
+                    ),
+                )
                 recorder.audit(
                     "CAPABILITY_ISSUED",
                     decision_nonce_prefix=(
@@ -1608,6 +1847,18 @@ class CommerceLabService:
             recorder.step("EXECUTION", "BLOCK", "Razorpay calls: 0")
         elif final is DecisionAction.REVIEW:
             recorder.step("EXECUTION", "REVIEW", "Razorpay calls: 0")
+        elif checkout.execution_authorization is not None and checkout.execution_result is None:
+            recorder.step(
+                "EXECUTION",
+                "AUTHORIZED",
+                "Capability issued; Razorpay calls: 0",
+            )
+        elif isinstance(checkout.execution_result, ExecutionRefusal):
+            recorder.step(
+                "EXECUTION",
+                "REJECTED",
+                f"{checkout.execution_result.reason.value}; rejected before network",
+            )
 
     def _present_result(
         self, run: CommerceRun, context: _RunContext
@@ -2045,8 +2296,9 @@ class CommerceLabService:
             "authority_notice": "Diagnostic only. This surface cannot authorize payments.",
         }
 
-    @staticmethod
-    def _present_execution(run: CommerceRun, context: _RunContext) -> dict[str, Any]:
+    def _present_execution(
+        self, run: CommerceRun, context: _RunContext
+    ) -> dict[str, Any]:
         checkout = context.checkout
         capability = checkout.execution_authorization
         receipt = checkout.execution_result
@@ -2071,6 +2323,9 @@ class CommerceLabService:
         ledger_record = context.execution_runtime.ledger.get(
             capability.payload.decision_nonce
         )
+        mandate_state = context.execution_runtime.mandate_state_registry.get_current(
+            capability.payload.mandate_id
+        )
         signature_valid = (
             context.execution_runtime.verifier.verify(capability)
             is SignatureVerification.VALID
@@ -2078,6 +2333,13 @@ class CommerceLabService:
         transaction_bound = (
             capability.payload.transaction_body_sha256
             == transaction_body_sha256(checkout.transaction)
+        )
+        rebuilt_request = build_razorpay_order_request(
+            checkout.transaction, capability.payload.decision_nonce
+        )
+        request_bound = (
+            capability.payload.execution_request_sha256
+            == execution_request_sha256(rebuilt_request)
         )
         order = None
         if isinstance(receipt, ExecutionReceipt):
@@ -2088,28 +2350,70 @@ class CommerceLabService:
                 "receipt": receipt.receipt,
                 "status": receipt.status,
             }
+        refusal_reason = (
+            receipt.reason.value if isinstance(receipt, ExecutionRefusal) else None
+        )
+        if order is not None:
+            status = "ORDER_CREATED"
+        elif isinstance(receipt, ExecutionRefusal):
+            status = "REJECTED_BEFORE_NETWORK"
+        else:
+            status = "AUTHORIZED"
+        current_status = (
+            mandate_state.status.value if mandate_state is not None else "MISSING"
+        )
+        current_version = mandate_state.version if mandate_state is not None else None
+        unused_capability = ledger_record is None and receipt is None
         return {
-            "status": "ORDER_CREATED" if order is not None else "EXECUTION_ERROR",
+            "status": status,
             "razorpay_calls": context.client.adapter_calls,
             "external_network_calls": context.client.external_network_calls,
-            "reason": None,
+            "reason": refusal_reason,
             "capability": {
                 "signature_verified": signature_valid,
                 "transaction_bound": transaction_bound,
-                "request_bound": (
-                    isinstance(receipt, ExecutionReceipt)
-                    and receipt.execution_request_sha256
-                    == capability.payload.execution_request_sha256
-                ),
+                "request_bound": request_bound,
                 "merchant_bound": (
                     capability.payload.merchant_id
                     == checkout.transaction.payload.merchant_id
                     == context.execution_runtime.config.merchant_id
                 ),
-                "expiry_valid": context.evaluated_at < capability.payload.expires_at,
+                "mandate_identity_bound": (
+                    capability.payload.mandate_id
+                    == checkout.mandate.payload.mandate_id
+                ),
+                "mandate_version_bound": (
+                    checkout.mandate_version == capability.payload.mandate_version
+                ),
+                "expiry_valid": self._trusted_now() < capability.payload.expires_at,
                 "single_use": (
                     ledger_record is not None
                     and ledger_record.status is ExecutionLedgerStatus.SUCCEEDED
+                ),
+                "nonce_consumed": ledger_record is not None,
+            },
+            "consent": {
+                "status": current_status,
+                "mandate_id": capability.payload.mandate_id,
+                "mandate_version": capability.payload.mandate_version,
+                "current_version": current_version,
+                "current_version_matches": (
+                    current_version == capability.payload.mandate_version
+                ),
+                "authority": "DEMO USER REVOCATION",
+                "can_revoke": (
+                    unused_capability
+                    and mandate_state is not None
+                    and mandate_state.status is MandateStatus.ACTIVE
+                    and mandate_state.version == capability.payload.mandate_version
+                ),
+                "can_execute": unused_capability,
+                "teaching": (
+                    "The capability is still signed and unexpired. Current consent "
+                    "no longer permits execution."
+                    if current_status in {"REVOKED", "SUPERSEDED"}
+                    else "MandateGuard revalidates its trusted mandate state "
+                    "immediately before execution."
                 ),
             },
             "order": order,

@@ -18,6 +18,10 @@ from mandateguard.execution.models import (
     SignedExecutionAuthorization,
     TrustedExecutionConfig,
 )
+from mandateguard.execution.mandate_state import (
+    MandateStateRegistry,
+    MandateStatus,
+)
 from mandateguard.execution.request import (
     build_razorpay_order_request,
     execution_request_sha256,
@@ -51,6 +55,8 @@ def issue_execution_authorization(
     decision_nonce: str,
     config: TrustedExecutionConfig,
     signer: ExecutionSigner,
+    mandate_state_registry: MandateStateRegistry,
+    mandate_version: int = 1,
 ) -> SignedExecutionAuthorization | ExecutionRefusal:
     """Issue only an ALLOW capability; BLOCK and REVIEW produce typed refusals."""
 
@@ -60,6 +66,14 @@ def issue_execution_authorization(
         raise TypeError("authorization_scenario must be ReplayScenario")
     if not isinstance(config, TrustedExecutionConfig):
         raise TypeError("config must be TrustedExecutionConfig")
+    if not callable(getattr(mandate_state_registry, "get_current", None)):
+        raise TypeError("mandate_state_registry must be trusted server state")
+    if (
+        isinstance(mandate_version, bool)
+        or not isinstance(mandate_version, int)
+        or mandate_version < 1
+    ):
+        raise ValueError("mandate_version must be a positive integer")
 
     if authorization_result.final_action is DecisionAction.BLOCK:
         return ExecutionRefusal(ExecutionRefusalReason.AUTHORIZATION_BLOCKED)
@@ -119,6 +133,25 @@ def issue_execution_authorization(
     ):
         return ExecutionRefusal(ExecutionRefusalReason.INVALID_CAPABILITY_LIFETIME)
 
+    current_state = mandate_state_registry.get_current(mandate.payload.mandate_id)
+    if current_state is None:
+        return ExecutionRefusal(ExecutionRefusalReason.MANDATE_STATE_MISSING)
+    if current_state.version != mandate_version:
+        bound_state = mandate_state_registry.get_version(
+            mandate.payload.mandate_id, mandate_version
+        )
+        reason = (
+            ExecutionRefusalReason.MANDATE_SUPERSEDED
+            if bound_state is not None
+            and bound_state.status is MandateStatus.SUPERSEDED
+            else ExecutionRefusalReason.MANDATE_VERSION_MISMATCH
+        )
+        return ExecutionRefusal(reason)
+    if current_state.status is MandateStatus.REVOKED:
+        return ExecutionRefusal(ExecutionRefusalReason.MANDATE_REVOKED)
+    if current_state.status is MandateStatus.SUPERSEDED:
+        return ExecutionRefusal(ExecutionRefusalReason.MANDATE_SUPERSEDED)
+
     request = build_razorpay_order_request(transaction, decision_nonce)
     semantic_decision = recomputed.semantic_decision
     payload = ExecutionAuthorizationPayload(
@@ -131,6 +164,8 @@ def issue_execution_authorization(
         audience=config.audience,
         account_scope=config.account_scope,
         merchant_id=config.merchant_id,
+        mandate_id=mandate.payload.mandate_id,
+        mandate_version=mandate_version,
         mandate_payload_sha256=mandate_payload_sha256(mandate),
         transaction_body_sha256=current_transaction_sha256,
         authorization_result_sha256=recomputed_sha256,

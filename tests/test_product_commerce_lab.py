@@ -49,11 +49,14 @@ def test_safe_purchase_allows_and_creates_one_offline_order(
     assert snapshot["result"]["execution"]["capability"] == {
         "signature_verified": True,
         "transaction_bound": True,
-        "request_bound": True,
-        "merchant_bound": True,
-        "expiry_valid": True,
-        "single_use": True,
-    }
+            "request_bound": True,
+            "merchant_bound": True,
+            "mandate_identity_bound": True,
+            "mandate_version_bound": True,
+            "expiry_valid": True,
+            "single_use": True,
+            "nonce_consumed": True,
+        }
     assert [call["name"] for call in snapshot["result"]["buyer"]["tool_calls"]] == [
         "search_catalog",
         "get_product",

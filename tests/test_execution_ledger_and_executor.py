@@ -13,6 +13,7 @@ from mandateguard.execution import (
     ExecutionRefusal,
     ExecutionRefusalReason,
     HMACSHA256Verifier,
+    InMemoryMandateStateRegistry,
     RazorpayTestOrdersAdapter,
     SQLiteExecutionLedger,
     build_razorpay_order_request,
@@ -39,6 +40,12 @@ def _verifier() -> HMACSHA256Verifier:
 
 
 def _execute(capability, result, mandate, transaction, ledger, client):
+    mandate_state_registry = InMemoryMandateStateRegistry()
+    mandate_state_registry.register_active(
+        mandate.payload.mandate_id,
+        capability.payload.mandate_version,
+        updated_at=SERVER_TIME,
+    )
     return execute_razorpay_order(
         authorization=capability,
         authorization_result=result,
@@ -49,6 +56,7 @@ def _execute(capability, result, mandate, transaction, ledger, client):
         verifier=_verifier(),
         ledger=ledger,
         client=client,
+        mandate_state_registry=mandate_state_registry,
     )
 
 

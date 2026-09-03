@@ -28,6 +28,10 @@ from mandateguard.execution.models import (
 from mandateguard.execution.razorpay import RazorpayOrdersClient
 from mandateguard.execution.signing import ExecutionSigner, ExecutionVerifier
 from mandateguard.execution.ledger import ExecutionLedger
+from mandateguard.execution.mandate_state import (
+    MandateStateRegistry,
+    MandateStatus,
+)
 from mandateguard.intelligence.buyer import CommerceBuyer
 from mandateguard.intelligence.models import (
     AgenticCheckoutTrace,
@@ -123,10 +127,13 @@ class ExecutionRuntime:
     verifier: ExecutionVerifier
     ledger: ExecutionLedger
     client: RazorpayOrdersClient
+    mandate_state_registry: MandateStateRegistry
 
     def __post_init__(self) -> None:
         if not isinstance(self.config, TrustedExecutionConfig):
             raise TypeError("config must be TrustedExecutionConfig")
+        if not callable(getattr(self.mandate_state_registry, "get_current", None)):
+            raise TypeError("mandate_state_registry must be trusted server state")
 
 
 @dataclass(frozen=True, slots=True)
@@ -141,6 +148,7 @@ class AgenticCheckoutResult:
     )
     execution_authorization: SignedExecutionAuthorization | None
     execution_result: ExecutionReceipt | ExecutionRefusal | None
+    mandate_version: int | None = None
 
 
 class _CacheFailureModel:
@@ -438,8 +446,10 @@ def run_agentic_checkout(
     alpha: float = DEFAULT_ALPHA,
     retrieval_mode: RetrievalMode = RetrievalMode.HYBRID,
     execute: bool = False,
+    defer_execution: bool = False,
     execution_runtime: ExecutionRuntime | None = None,
     decision_nonce: str | None = None,
+    mandate_version: int | None = None,
 ) -> AgenticCheckoutResult:
     """Run one vertical slice. Payment I/O is opt-in and ALLOW-capability gated."""
 
@@ -453,6 +463,16 @@ def run_agentic_checkout(
         raise TypeError("retriever must be HybridRetriever")
     if not isinstance(semantic_verifier, SemanticVerifier):
         raise TypeError("semantic_verifier must be SemanticVerifier")
+    if not isinstance(defer_execution, bool):
+        raise TypeError("defer_execution must be boolean")
+    if defer_execution and not execute:
+        raise ValueError("defer_execution requires execute=True")
+    if mandate_version is not None and (
+        isinstance(mandate_version, bool)
+        or not isinstance(mandate_version, int)
+        or mandate_version < 1
+    ):
+        raise ValueError("mandate_version must be a positive integer or None")
     now = evaluated_at or datetime.now(timezone.utc)
     if now.tzinfo is None or now.utcoffset() is None:
         raise ValueError("evaluated_at must be timezone-aware")
@@ -576,6 +596,7 @@ def run_agentic_checkout(
 
     capability: SignedExecutionAuthorization | None = None
     execution_result: ExecutionReceipt | ExecutionRefusal | None = None
+    bound_mandate_version: int | None = None
     execution_status = ExecutionStatus.NOT_REQUESTED
     execution_detail: str | None = None
     if execute and authorization.final_action is not DecisionAction.ALLOW:
@@ -588,6 +609,24 @@ def run_agentic_checkout(
             execution_status = ExecutionStatus.ERROR
             execution_detail = "execution merchant configuration mismatch"
         else:
+            current_state = execution_runtime.mandate_state_registry.get_current(
+                mandate.payload.mandate_id
+            )
+            if mandate_version is not None:
+                bound_mandate_version = mandate_version
+            elif current_state is None:
+                bound_mandate_version = 1
+            elif current_state.status is MandateStatus.ACTIVE:
+                bound_mandate_version = current_state.version
+            else:
+                # A fresh checkout after terminal consent creates a fresh
+                # mandate version; terminal versions are never reactivated.
+                bound_mandate_version = current_state.version + 1
+            execution_runtime.mandate_state_registry.register_active(
+                mandate.payload.mandate_id,
+                bound_mandate_version,
+                updated_at=now,
+            )
             nonce = decision_nonce or secrets.token_urlsafe(24)
             issued = issue_execution_authorization(
                 authorization_result=authorization,
@@ -599,6 +638,8 @@ def run_agentic_checkout(
                 decision_nonce=nonce,
                 config=execution_runtime.config,
                 signer=execution_runtime.signer,
+                mandate_state_registry=execution_runtime.mandate_state_registry,
+                mandate_version=bound_mandate_version,
             )
             if isinstance(issued, ExecutionRefusal):
                 execution_status = ExecutionStatus.ERROR
@@ -606,27 +647,34 @@ def run_agentic_checkout(
                 execution_result = issued
             else:
                 capability = issued
-                try:
-                    execution_result = execute_razorpay_order(
-                        authorization=capability,
-                        authorization_result=authorization,
-                        mandate=mandate,
-                        transaction=transaction,
-                        now=now,
-                        config=execution_runtime.config,
-                        verifier=execution_runtime.verifier,
-                        ledger=execution_runtime.ledger,
-                        client=execution_runtime.client,
-                    )
-                except ExecutionError as error:
-                    execution_status = ExecutionStatus.ERROR
-                    execution_detail = error.reason.value
+                if defer_execution:
+                    execution_status = ExecutionStatus.AUTHORIZED_NOT_EXECUTED
+                    execution_detail = "CAPABILITY_ISSUED"
                 else:
-                    if isinstance(execution_result, ExecutionRefusal):
+                    try:
+                        execution_result = execute_razorpay_order(
+                            authorization=capability,
+                            authorization_result=authorization,
+                            mandate=mandate,
+                            transaction=transaction,
+                            now=now,
+                            config=execution_runtime.config,
+                            verifier=execution_runtime.verifier,
+                            ledger=execution_runtime.ledger,
+                            client=execution_runtime.client,
+                            mandate_state_registry=(
+                                execution_runtime.mandate_state_registry
+                            ),
+                        )
+                    except ExecutionError as error:
                         execution_status = ExecutionStatus.ERROR
-                        execution_detail = execution_result.reason.value
+                        execution_detail = error.reason.value
                     else:
-                        execution_status = ExecutionStatus.EXECUTED
+                        if isinstance(execution_result, ExecutionRefusal):
+                            execution_status = ExecutionStatus.ERROR
+                            execution_detail = execution_result.reason.value
+                        else:
+                            execution_status = ExecutionStatus.EXECUTED
 
     total_latency_ms = (perf_counter() - total_started) * 1000.0
     trace = AgenticCheckoutTrace(
@@ -723,4 +771,5 @@ def run_agentic_checkout(
         authorization_result=authorization,
         execution_authorization=capability,
         execution_result=execution_result,
+        mandate_version=bound_mandate_version,
     )

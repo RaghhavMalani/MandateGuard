@@ -6,6 +6,7 @@ from datetime import datetime
 
 from mandateguard.execution.gate import validate_and_reserve_execution
 from mandateguard.execution.ledger import ExecutionLedger
+from mandateguard.execution.mandate_state import MandateStateRegistry
 from mandateguard.execution.models import (
     ExecutionError,
     ExecutionFailureReason,
@@ -38,8 +39,44 @@ def execute_razorpay_order(
     verifier: ExecutionVerifier,
     ledger: ExecutionLedger,
     client: RazorpayOrdersClient,
+    mandate_state_registry: MandateStateRegistry,
 ) -> ExecutionReceipt | ExecutionRefusal:
-    """Make at most one provider call, and only with a freshly rebuilt request."""
+    """Make at most one provider call under the trusted mandate-state guard."""
+
+    if not callable(getattr(mandate_state_registry, "execution_guard", None)):
+        raise TypeError("mandate_state_registry must be trusted server state")
+    # SQLite holds a write reservation from current-state validation through
+    # provider return. A concurrent revoke therefore orders before the call
+    # (and refuses it) or after the call; it cannot interleave between them.
+    with mandate_state_registry.execution_guard():
+        return _execute_guarded(
+            authorization=authorization,
+            authorization_result=authorization_result,
+            mandate=mandate,
+            transaction=transaction,
+            now=now,
+            config=config,
+            verifier=verifier,
+            ledger=ledger,
+            client=client,
+            mandate_state_registry=mandate_state_registry,
+        )
+
+
+def _execute_guarded(
+    *,
+    authorization: SignedExecutionAuthorization,
+    authorization_result: AuthorizationResult,
+    mandate: Mandate,
+    transaction: Transaction,
+    now: datetime,
+    config: TrustedExecutionConfig,
+    verifier: ExecutionVerifier,
+    ledger: ExecutionLedger,
+    client: RazorpayOrdersClient,
+    mandate_state_registry: MandateStateRegistry,
+) -> ExecutionReceipt | ExecutionRefusal:
+    """Validate, reserve, and perform provider I/O while state is serialized."""
 
     grant = validate_and_reserve_execution(
         authorization=authorization,
@@ -50,6 +87,7 @@ def execute_razorpay_order(
         config=config,
         verifier=verifier,
         ledger=ledger,
+        mandate_state_registry=mandate_state_registry,
     )
     if isinstance(grant, ExecutionRefusal):
         return grant

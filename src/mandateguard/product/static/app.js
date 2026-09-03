@@ -319,6 +319,59 @@ export function renderAuthorizationPanel(authorization) {
 }
 
 export function renderExecutionPanel(execution) {
+  if (execution?.status === "AUTHORIZED" || execution?.status === "REJECTED_BEFORE_NETWORK") {
+    const capability = execution.capability || {};
+    const consent = execution.consent || {};
+    const rejected = execution.status === "REJECTED_BEFORE_NETWORK";
+    const bindingRows = [
+      ["Signature", capability.signature_verified],
+      ["Transaction bound", capability.transaction_bound],
+      ["Request bound", capability.request_bound],
+      ["Merchant bound", capability.merchant_bound],
+      ["Mandate identity", capability.mandate_identity_bound],
+      ["Mandate version", capability.mandate_version_bound],
+      ["Expiry valid", capability.expiry_valid],
+    ]
+      .map(
+        ([label, value]) => `
+          <li><span>${escapeHtml(label)}</span><strong data-valid="${value ? "true" : "false"}">${yesNo(value)}</strong></li>`,
+      )
+      .join("");
+    const controls = [
+      consent.can_revoke
+        ? '<button class="button button--danger" id="revoke-mandate-button" type="button">REVOKE MANDATE</button>'
+        : "",
+      consent.can_execute
+        ? '<button class="button button--secondary" id="attempt-execution-button" type="button">ATTEMPT EXECUTION</button>'
+        : "",
+    ].join("");
+    return `
+      <div class="consent-state consent-state--${escapeHtml(String(consent.status || "missing").toLowerCase())}">
+        <div class="consent-state__heading">
+          <div><span>CONSENT STATE</span><strong>${escapeHtml(consent.status || "MISSING")}</strong></div>
+          <code>Mandate v${escapeHtml(consent.mandate_version ?? "—")}</code>
+        </div>
+        <div class="consent-state__outcome">
+          <span>${rejected ? "REJECTED BEFORE NETWORK" : "AUTHORIZED"}</span>
+          <strong>${rejected ? escapeHtml(humanize(execution.reason)) : "CAPABILITY ISSUED"}</strong>
+          <small>RAZORPAY CALLS ${escapeHtml(execution.razorpay_calls ?? 0)}</small>
+        </div>
+        <p>${escapeHtml(consent.teaching)}</p>
+        <small class="consent-authority">Authority: ${escapeHtml(consent.authority)}</small>
+        <div class="consent-actions">${controls}</div>
+      </div>
+      <div class="capability-block">
+        <div class="capability-block__heading">
+          <span>SIGNED CAPABILITY</span>
+          <strong>CRYPTOGRAPHICALLY VALID</strong>
+        </div>
+        <ul class="binding-list">${bindingRows}</ul>
+      </div>
+      <div class="network-line">
+        <span>External network calls</span><strong>${escapeHtml(execution.external_network_calls ?? 0)}</strong>
+      </div>
+    `;
+  }
   if (!execution || execution.status !== "ORDER_CREATED") {
     const decisionClass = execution?.reason?.toLowerCase().includes("review") ? "review" : "block";
     return `
@@ -555,6 +608,7 @@ function init() {
   const submitLock = new SubmissionLock();
   const replayLock = new SubmissionLock();
   const recoveryLock = new SubmissionLock();
+  const mandateLock = new SubmissionLock();
   let config;
   let selectedPreset = null;
   let currentRunId = null;
@@ -614,6 +668,10 @@ function init() {
     if (replayButton) replayButton.addEventListener("click", runReplay);
     const acquireButton = document.querySelector("#acquire-evidence-button");
     if (acquireButton) acquireButton.addEventListener("click", runRecovery);
+    const revokeButton = document.querySelector("#revoke-mandate-button");
+    if (revokeButton) revokeButton.addEventListener("click", runRevocation);
+    const executeButton = document.querySelector("#attempt-execution-button");
+    if (executeButton) executeButton.addEventListener("click", runDeferredExecution);
   };
 
   const pollRun = async (initial) => {
@@ -665,6 +723,35 @@ function init() {
     } finally {
       recoveryLock.release();
     }
+  };
+
+  const runMandateAction = async (action, buttonId, busyLabel) => {
+    if (!currentRunId || !mandateLock.acquire()) return;
+    const button = document.querySelector(buttonId);
+    if (button) {
+      button.disabled = true;
+      button.textContent = busyLabel;
+    }
+    showError("");
+    try {
+      const snapshot = await fetchJson(
+        `/api/runs/${encodeURIComponent(currentRunId)}/${action}`,
+        { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" },
+      );
+      renderSnapshot(snapshot);
+    } catch (error) {
+      showError(error.message);
+    } finally {
+      mandateLock.release();
+    }
+  };
+
+  const runRevocation = async () => {
+    await runMandateAction("revoke", "#revoke-mandate-button", "REVOKING MANDATE");
+  };
+
+  const runDeferredExecution = async () => {
+    await runMandateAction("execute", "#attempt-execution-button", "CHECKING CURRENT CONSENT");
   };
 
   const submit = async () => {

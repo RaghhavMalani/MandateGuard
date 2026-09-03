@@ -9,6 +9,7 @@ from mandateguard.core.hashing import CommittedHashes, transaction_body_sha256
 from mandateguard.core.nonce_ledger import NonceLedgerState
 from mandateguard.execution import (
     HMACSHA256Signer,
+    InMemoryMandateStateRegistry,
     SignedExecutionAuthorization,
     TrustedExecutionConfig,
     issue_execution_authorization,
@@ -96,6 +97,12 @@ def make_signed_allow(
         result = authorization_result
         scenario = authorization_scenario
     assert isinstance(scenario, ReplayScenario)
+    mandate_state_registry = InMemoryMandateStateRegistry()
+    mandate_state_registry.register_active(
+        scenario.mandate.payload.mandate_id,
+        1,
+        updated_at=SERVER_TIME,
+    )
     capability = issue_execution_authorization(
         authorization_result=result,
         authorization_scenario=scenario,
@@ -107,6 +114,7 @@ def make_signed_allow(
         config=CONFIG,
         signer=signer
         or HMACSHA256Signer(key_id=SIGNING_KEY_ID, key=SYNTHETIC_SIGNING_KEY),
+        mandate_state_registry=mandate_state_registry,
     )
     assert isinstance(capability, SignedExecutionAuthorization)
     return capability, result, scenario.mandate, scenario.transaction

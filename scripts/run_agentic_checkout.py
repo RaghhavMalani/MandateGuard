@@ -17,6 +17,7 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_FIXTURES = REPOSITORY_ROOT / "fixtures" / "agentic_commerce"
 DEFAULT_CACHE = Path(tempfile.gettempdir()) / "mandateguard-agentic-semantic.sqlite3"
 DEFAULT_LEDGER = Path(tempfile.gettempdir()) / "mandateguard-agentic-execution.sqlite3"
+DEFAULT_MANDATE_STATE = Path(tempfile.gettempdir()) / "mandateguard-agentic-mandates.sqlite3"
 sys.path.insert(0, str(REPOSITORY_ROOT / "src"))
 
 from mandateguard.execution import (  # noqa: E402
@@ -24,6 +25,7 @@ from mandateguard.execution import (  # noqa: E402
     HMACSHA256Verifier,
     RazorpayTestOrdersAdapter,
     SQLiteExecutionLedger,
+    SQLiteMandateStateRegistry,
     TrustedExecutionConfig,
 )
 from mandateguard.intelligence import (  # noqa: E402
@@ -115,7 +117,9 @@ def _live_dependencies(store: TrustedCommerceStore):
     return buyer, embedding, semantic
 
 
-def _execution_runtime(merchant_id: str) -> tuple[ExecutionRuntime, SQLiteExecutionLedger]:
+def _execution_runtime(
+    merchant_id: str,
+) -> tuple[ExecutionRuntime, SQLiteExecutionLedger, SQLiteMandateStateRegistry]:
     _load_environment()
     key_id = _required_environment("RAZORPAY_KEY_ID")
     key_secret = _required_environment("RAZORPAY_KEY_SECRET")
@@ -133,6 +137,7 @@ def _execution_runtime(merchant_id: str) -> tuple[ExecutionRuntime, SQLiteExecut
     )
     signer = HMACSHA256Signer(key_id="agentic-commerce-hmac-v1", key=hmac_key)
     ledger = SQLiteExecutionLedger(DEFAULT_LEDGER)
+    mandate_registry = SQLiteMandateStateRegistry(DEFAULT_MANDATE_STATE)
     return (
         ExecutionRuntime(
             config=config,
@@ -141,12 +146,14 @@ def _execution_runtime(merchant_id: str) -> tuple[ExecutionRuntime, SQLiteExecut
                 {"agentic-commerce-hmac-v1": hmac_key}
             ),
             ledger=ledger,
+            mandate_state_registry=mandate_registry,
             client=RazorpayTestOrdersAdapter(
                 key_id=key_id,
                 key_secret=key_secret,
             ),
         ),
         ledger,
+        mandate_registry,
     )
 
 
@@ -175,6 +182,7 @@ def main(argv: list[str] | None = None) -> int:
 
     cache: SQLiteSemanticCache | None = None
     execution_ledger: SQLiteExecutionLedger | None = None
+    mandate_registry: SQLiteMandateStateRegistry | None = None
     try:
         store = TrustedCommerceStore.from_files(
             catalog_path=args.catalog,
@@ -195,7 +203,7 @@ def main(argv: list[str] | None = None) -> int:
             # the fixed typed output is then consumed by the same orchestration path.
             buyer_output = buyer.purchase(args.intent)
             buyer = _FixedBuyer(buyer_output)
-            runtime, execution_ledger = _execution_runtime(
+            runtime, execution_ledger, mandate_registry = _execution_runtime(
                 buyer_output.proposal.merchant_id
             )
 
@@ -236,6 +244,8 @@ def main(argv: list[str] | None = None) -> int:
             cache.close()
         if execution_ledger is not None:
             execution_ledger.close()
+        if mandate_registry is not None:
+            mandate_registry.close()
 
 
 if __name__ == "__main__":

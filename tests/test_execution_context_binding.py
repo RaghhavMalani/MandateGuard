@@ -8,6 +8,7 @@ from mandateguard.execution import (
     ExecutionRefusal,
     ExecutionRefusalReason,
     HMACSHA256Signer,
+    InMemoryMandateStateRegistry,
     SQLiteExecutionLedger,
     SignedExecutionAuthorization,
     issue_execution_authorization,
@@ -92,6 +93,10 @@ def _issue(
     semantic_evidence=None,
     semantic_verifier=None,
 ):
+    registry = InMemoryMandateStateRegistry()
+    registry.register_active(
+        scenario.mandate.payload.mandate_id, 1, updated_at=SERVER_TIME
+    )
     return issue_execution_authorization(
         authorization_result=result,
         authorization_scenario=scenario,
@@ -104,6 +109,7 @@ def _issue(
         signer=HMACSHA256Signer(
             key_id=SIGNING_KEY_ID, key=SYNTHETIC_SIGNING_KEY
         ),
+        mandate_state_registry=registry,
     )
 
 

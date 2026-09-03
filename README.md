@@ -428,6 +428,7 @@ Not implemented — the honest next steps.
 | [docs/AGENTIC_COMMERCE_INTELLIGENCE.md](docs/AGENTIC_COMMERCE_INTELLIGENCE.md) | Buyer, trusted evidence, retrieval, controller composition |
 | [docs/D5_SEMANTIC_VERIFICATION.md](docs/D5_SEMANTIC_VERIFICATION.md) | Semantic verification boundary |
 | [docs/D6_RAZORPAY_EXECUTION.md](docs/D6_RAZORPAY_EXECUTION.md) | Capability signing, nonce ledger, Razorpay execution |
+| [docs/MANDATE_REVOCATION.md](docs/MANDATE_REVOCATION.md) | Trusted mandate state revalidated before execution |
 | [docs/INT2_RETRIEVAL_EXPERIMENTS.md](docs/INT2_RETRIEVAL_EXPERIMENTS.md) | Retrieval and cache methodology and limits |
 | [docs/INT3_EVIDENCE_SUFFICIENCY.md](docs/INT3_EVIDENCE_SUFFICIENCY.md) | Evidence-sufficiency methodology and limits |
 | [docs/RESOLVE_EVALUATION_PROTOCOL.md](docs/RESOLVE_EVALUATION_PROTOCOL.md) | Preregistered 20-case Resolve recovery evaluation protocol |
