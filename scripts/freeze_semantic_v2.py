@@ -183,10 +183,10 @@ def main() -> int:
         "generator_sha256": generator_sha,
         "candidate_cutoff": {"bm25": 100, "dense": 100, "final": 10},
         "dense_document_representation": {
-            "fields": ["title", "brand", "category_path"],
+            "fields": ["title", "brand", "top_category"],
             "separator": "newline",
             "maximum_sequence_length": 128,
-            "description_excluded": "historical descriptions are long/noisy; title, brand, and taxonomy are the served representation",
+            "description_excluded": "historical descriptions and leaf taxonomy repeat/noise the title; title, brand, and top category are the served representation",
         },
         "fusion_candidates": ["bm25", "dense", "rrf", "weighted_fusion"],
         "metrics": ["recall_at_1", "recall_at_5", "recall_at_10", "mrr", "ndcg_at_10"],

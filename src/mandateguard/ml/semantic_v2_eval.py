@@ -170,7 +170,7 @@ def document_embedding_text(product: DiscoveryProduct) -> str:
     """Frozen served representation: stable identity text, not noisy crawl prose."""
 
     return "\n".join(
-        part for part in (product.title, product.brand or "", product.category_text) if part
+        part for part in (product.title, product.brand or "", product.top_category) if part
     )
 
 

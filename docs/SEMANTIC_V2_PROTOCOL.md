@@ -42,9 +42,10 @@ RRF uses rank constant 60. Weighted fusion is fixed at 0.5 normalized BM25 plus
 candidate score is zero and catalog document ID breaks ties.
 
 Every dense candidate uses the same served document representation: title,
-brand, and full category path separated by newlines, truncated to 128 wordpiece
-tokens. Historical descriptions are excluded because they are long, noisy crawl
-text; this decision is frozen before a candidate completes evaluation.
+brand, and top-level category separated by newlines, truncated to 128 wordpiece
+tokens. Historical descriptions and leaf taxonomy are excluded because both are
+long, noisy crawl text and the leaf often repeats the title; this decision is
+frozen before a candidate completes evaluation.
 
 ## Metrics and slices
 

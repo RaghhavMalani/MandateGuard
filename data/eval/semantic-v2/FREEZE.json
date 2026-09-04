@@ -10,7 +10,7 @@
   "literal_count": 62,
   "paraphrase_count": 62,
   "generator": "scripts/freeze_semantic_v2.py",
-  "generator_sha256": "50a303ee07d7f5bd3f477857cdf52b3606324ac65ecafc311be77826bdb46852",
+  "generator_sha256": "f72924613186ddbd562a545dfd9b9304b380a315b6118b742a82d7bbeb9fbc98",
   "candidate_cutoff": {
     "bm25": 100,
     "dense": 100,
@@ -20,11 +20,11 @@
     "fields": [
       "title",
       "brand",
-      "category_path"
+      "top_category"
     ],
     "separator": "newline",
     "maximum_sequence_length": 128,
-    "description_excluded": "historical descriptions are long/noisy; title, brand, and taxonomy are the served representation"
+    "description_excluded": "historical descriptions and leaf taxonomy repeat/noise the title; title, brand, and top category are the served representation"
   },
   "fusion_candidates": [
     "bm25",
@@ -78,5 +78,5 @@
     "no_repeated_test_tuning": true
   },
   "outcomes_included": false,
-  "freeze_payload_sha256": "4f0e27fb7c6e24e75fd3b456b75825543f0a77508f6808dfc2b92bb345894568"
+  "freeze_payload_sha256": "76ea48a30dc1c54a68deb78427907a137d3d6b00f21b08d9a55b2242ca908279"
 }
