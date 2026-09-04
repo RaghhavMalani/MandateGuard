@@ -1,0 +1,1453 @@
+{
+  "chronology": "The world, the taxonomy, the expected safe actions, and the case descriptor stream digests were committed before this benchmark existed. Every rung below re-derives the stream and refuses to report if it disagrees.",
+  "freeze_artifact": "data/eval/authorization-scale/WORLD_FREEZE.json",
+  "freeze_payload_sha256": "01053b3329faab83a6d5146290c10a437669c49fce14e336b1d22596c4701efb",
+  "ladder": [
+    {
+      "actions": {
+        "ALLOW": 59,
+        "BLOCK": 705,
+        "REVIEW": 236
+      },
+      "authorization_latency_ms": {
+        "max": 0.8696,
+        "p50": 0.3874,
+        "p95": 0.6227,
+        "p99": 0.7259
+      },
+      "benchmark_version": "authorization-scale-benchmark-v1",
+      "by_family": {
+        "AUTHORITY_CONFLICT": {
+          "agreed": 59,
+          "authorized_setup_provider_calls": 0,
+          "cases": 59,
+          "controller_actions": {
+            "REVIEW": 59
+          },
+          "expected_safe_actions": [
+            "REVIEW"
+          ],
+          "pipeline_actions": {
+            "REVIEW": 59
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_REVIEW_REQUIRED": 59
+          }
+        },
+        "BENIGN_ALLOWED": {
+          "agreed": 59,
+          "authorized_setup_provider_calls": 0,
+          "cases": 59,
+          "controller_actions": {
+            "ALLOW": 59
+          },
+          "expected_safe_actions": [
+            "ALLOW"
+          ],
+          "pipeline_actions": {
+            "ALLOW": 59
+          },
+          "provider_calls": 59,
+          "refusal_reasons": {}
+        },
+        "BUDGET_VIOLATION": {
+          "agreed": 59,
+          "authorized_setup_provider_calls": 0,
+          "cases": 59,
+          "controller_actions": {
+            "BLOCK": 59
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 59
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_BLOCKED": 59
+          }
+        },
+        "CAPABILITY_EXPIRED": {
+          "agreed": 59,
+          "authorized_setup_provider_calls": 0,
+          "cases": 59,
+          "controller_actions": {
+            "ALLOW": 59
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 59
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "CAPABILITY_EXPIRED": 59
+          }
+        },
+        "CAPABILITY_REPLAY": {
+          "agreed": 58,
+          "authorized_setup_provider_calls": 58,
+          "cases": 58,
+          "controller_actions": {
+            "ALLOW": 58
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 58
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "NONCE_ALREADY_USED": 58
+          }
+        },
+        "EXCLUSION_VIOLATION": {
+          "agreed": 59,
+          "authorized_setup_provider_calls": 0,
+          "cases": 59,
+          "controller_actions": {
+            "BLOCK": 59
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 59
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_BLOCKED": 59
+          }
+        },
+        "MANDATE_REVOKED": {
+          "agreed": 58,
+          "authorized_setup_provider_calls": 0,
+          "cases": 58,
+          "controller_actions": {
+            "ALLOW": 58
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 58
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "MANDATE_REVOKED": 58
+          }
+        },
+        "MANDATE_SUPERSEDED": {
+          "agreed": 59,
+          "authorized_setup_provider_calls": 0,
+          "cases": 59,
+          "controller_actions": {
+            "ALLOW": 59
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 59
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "MANDATE_SUPERSEDED": 59
+          }
+        },
+        "MISSING_EVIDENCE": {
+          "agreed": 59,
+          "authorized_setup_provider_calls": 0,
+          "cases": 59,
+          "controller_actions": {
+            "REVIEW": 59
+          },
+          "expected_safe_actions": [
+            "REVIEW"
+          ],
+          "pipeline_actions": {
+            "REVIEW": 59
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_REVIEW_REQUIRED": 59
+          }
+        },
+        "PRICE_MUTATION": {
+          "agreed": 59,
+          "authorized_setup_provider_calls": 0,
+          "cases": 59,
+          "controller_actions": {
+            "ALLOW": 59
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 59
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "TRANSACTION_HASH_MISMATCH": 59
+          }
+        },
+        "PROHIBITED_PURPOSE": {
+          "agreed": 59,
+          "authorized_setup_provider_calls": 0,
+          "cases": 59,
+          "controller_actions": {
+            "BLOCK": 59
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 59
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_BLOCKED": 59
+          }
+        },
+        "RECURRING_WHEN_ONE_TIME_REQUIRED": {
+          "agreed": 59,
+          "authorized_setup_provider_calls": 0,
+          "cases": 59,
+          "controller_actions": {
+            "BLOCK": 59
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 59
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_BLOCKED": 59
+          }
+        },
+        "REQUEST_MUTATION": {
+          "agreed": 58,
+          "authorized_setup_provider_calls": 0,
+          "cases": 58,
+          "controller_actions": {
+            "ALLOW": 58
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 58
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "TRANSACTION_HASH_MISMATCH": 58
+          }
+        },
+        "STALE_EVIDENCE": {
+          "agreed": 59,
+          "authorized_setup_provider_calls": 0,
+          "cases": 59,
+          "controller_actions": {
+            "REVIEW": 59
+          },
+          "expected_safe_actions": [
+            "REVIEW"
+          ],
+          "pipeline_actions": {
+            "REVIEW": 59
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_REVIEW_REQUIRED": 59
+          }
+        },
+        "SUPERSEDED_EVIDENCE": {
+          "agreed": 59,
+          "authorized_setup_provider_calls": 0,
+          "cases": 59,
+          "controller_actions": {
+            "REVIEW": 59
+          },
+          "expected_safe_actions": [
+            "REVIEW"
+          ],
+          "pipeline_actions": {
+            "REVIEW": 59
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_REVIEW_REQUIRED": 59
+          }
+        },
+        "WRONG_MERCHANT": {
+          "agreed": 59,
+          "authorized_setup_provider_calls": 0,
+          "cases": 59,
+          "controller_actions": {
+            "ALLOW": 59
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 59
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "MERCHANT_MISMATCH": 59
+          }
+        },
+        "WRONG_SKU": {
+          "agreed": 59,
+          "authorized_setup_provider_calls": 0,
+          "cases": 59,
+          "controller_actions": {
+            "ALLOW": 59
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 59
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "TRANSACTION_HASH_MISMATCH": 59
+          }
+        }
+      },
+      "case_count": 1000,
+      "case_descriptor_stream_sha256": "3992ff77d100820ea035263f1d9f3f478222845ff314bc7147677c200cd23fe2",
+      "case_descriptor_stream_sha256_regenerated": "3992ff77d100820ea035263f1d9f3f478222845ff314bc7147677c200cd23fe2",
+      "counters": {
+        "authorizations_per_second": 2289.57,
+        "authorized_setup_provider_calls": 58,
+        "capabilities_issued": 528,
+        "merchant_sku_mismatch_rejections": 118,
+        "provider_adapter_calls": 117,
+        "provider_calls_before_allow": 0,
+        "provider_calls_on_block": 0,
+        "provider_calls_on_review": 0,
+        "replay_rejections": 58,
+        "request_mutation_rejections": 58,
+        "resident_memory_before_bytes": 30535680,
+        "resident_memory_bytes": 32309248,
+        "revocation_rejections": 58,
+        "target_invariant_agreement": 1000,
+        "target_invariant_agreement_rate": 1.0,
+        "total_cases": 1000
+      },
+      "disagreements": [],
+      "environment": {
+        "platform": "Windows-11-10.0.26200-SP0",
+        "process_count": 1,
+        "processor": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+        "python": "3.12.14"
+      },
+      "external_calls": {
+        "hugging_face_api": 0,
+        "openai": 0,
+        "razorpay_http": 0
+      },
+      "fixed_clock": "2026-09-04T00:00:00Z",
+      "freeze_status": "MATCHES_FREEZE",
+      "label_source": "construction recipe; the controller never labelled a case",
+      "merchant_count": 20,
+      "scope_limit": "One process, one machine, sequential, no concurrency and no network. The merchant universe is synthetic and is not a merchant network. Nothing here is a distributed-throughput measurement.",
+      "seed": 20260904,
+      "wall_seconds": 0.437,
+      "world_generation_version": "synthetic-merchant-universe-v1"
+    },
+    {
+      "actions": {
+        "ALLOW": 589,
+        "BLOCK": 7059,
+        "REVIEW": 2352
+      },
+      "authorization_latency_ms": {
+        "max": 9.7649,
+        "p50": 0.5457,
+        "p95": 3.5715,
+        "p99": 4.4124
+      },
+      "benchmark_version": "authorization-scale-benchmark-v1",
+      "by_family": {
+        "AUTHORITY_CONFLICT": {
+          "agreed": 588,
+          "authorized_setup_provider_calls": 0,
+          "cases": 588,
+          "controller_actions": {
+            "REVIEW": 588
+          },
+          "expected_safe_actions": [
+            "REVIEW"
+          ],
+          "pipeline_actions": {
+            "REVIEW": 588
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_REVIEW_REQUIRED": 588
+          }
+        },
+        "BENIGN_ALLOWED": {
+          "agreed": 589,
+          "authorized_setup_provider_calls": 0,
+          "cases": 589,
+          "controller_actions": {
+            "ALLOW": 589
+          },
+          "expected_safe_actions": [
+            "ALLOW"
+          ],
+          "pipeline_actions": {
+            "ALLOW": 589
+          },
+          "provider_calls": 589,
+          "refusal_reasons": {}
+        },
+        "BUDGET_VIOLATION": {
+          "agreed": 589,
+          "authorized_setup_provider_calls": 0,
+          "cases": 589,
+          "controller_actions": {
+            "BLOCK": 589
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 589
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_BLOCKED": 589
+          }
+        },
+        "CAPABILITY_EXPIRED": {
+          "agreed": 589,
+          "authorized_setup_provider_calls": 0,
+          "cases": 589,
+          "controller_actions": {
+            "ALLOW": 589
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 589
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "CAPABILITY_EXPIRED": 589
+          }
+        },
+        "CAPABILITY_REPLAY": {
+          "agreed": 588,
+          "authorized_setup_provider_calls": 588,
+          "cases": 588,
+          "controller_actions": {
+            "ALLOW": 588
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 588
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "NONCE_ALREADY_USED": 588
+          }
+        },
+        "EXCLUSION_VIOLATION": {
+          "agreed": 588,
+          "authorized_setup_provider_calls": 0,
+          "cases": 588,
+          "controller_actions": {
+            "BLOCK": 588
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 588
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_BLOCKED": 588
+          }
+        },
+        "MANDATE_REVOKED": {
+          "agreed": 588,
+          "authorized_setup_provider_calls": 0,
+          "cases": 588,
+          "controller_actions": {
+            "ALLOW": 588
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 588
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "MANDATE_REVOKED": 588
+          }
+        },
+        "MANDATE_SUPERSEDED": {
+          "agreed": 589,
+          "authorized_setup_provider_calls": 0,
+          "cases": 589,
+          "controller_actions": {
+            "ALLOW": 589
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 589
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "MANDATE_SUPERSEDED": 589
+          }
+        },
+        "MISSING_EVIDENCE": {
+          "agreed": 588,
+          "authorized_setup_provider_calls": 0,
+          "cases": 588,
+          "controller_actions": {
+            "REVIEW": 588
+          },
+          "expected_safe_actions": [
+            "REVIEW"
+          ],
+          "pipeline_actions": {
+            "REVIEW": 588
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_REVIEW_REQUIRED": 588
+          }
+        },
+        "PRICE_MUTATION": {
+          "agreed": 588,
+          "authorized_setup_provider_calls": 0,
+          "cases": 588,
+          "controller_actions": {
+            "ALLOW": 588
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 588
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "TRANSACTION_HASH_MISMATCH": 588
+          }
+        },
+        "PROHIBITED_PURPOSE": {
+          "agreed": 588,
+          "authorized_setup_provider_calls": 0,
+          "cases": 588,
+          "controller_actions": {
+            "BLOCK": 588
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 588
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_BLOCKED": 588
+          }
+        },
+        "RECURRING_WHEN_ONE_TIME_REQUIRED": {
+          "agreed": 588,
+          "authorized_setup_provider_calls": 0,
+          "cases": 588,
+          "controller_actions": {
+            "BLOCK": 588
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 588
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_BLOCKED": 588
+          }
+        },
+        "REQUEST_MUTATION": {
+          "agreed": 588,
+          "authorized_setup_provider_calls": 0,
+          "cases": 588,
+          "controller_actions": {
+            "ALLOW": 588
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 588
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "TRANSACTION_HASH_MISMATCH": 588
+          }
+        },
+        "STALE_EVIDENCE": {
+          "agreed": 588,
+          "authorized_setup_provider_calls": 0,
+          "cases": 588,
+          "controller_actions": {
+            "REVIEW": 588
+          },
+          "expected_safe_actions": [
+            "REVIEW"
+          ],
+          "pipeline_actions": {
+            "REVIEW": 588
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_REVIEW_REQUIRED": 588
+          }
+        },
+        "SUPERSEDED_EVIDENCE": {
+          "agreed": 588,
+          "authorized_setup_provider_calls": 0,
+          "cases": 588,
+          "controller_actions": {
+            "REVIEW": 588
+          },
+          "expected_safe_actions": [
+            "REVIEW"
+          ],
+          "pipeline_actions": {
+            "REVIEW": 588
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_REVIEW_REQUIRED": 588
+          }
+        },
+        "WRONG_MERCHANT": {
+          "agreed": 588,
+          "authorized_setup_provider_calls": 0,
+          "cases": 588,
+          "controller_actions": {
+            "ALLOW": 588
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 588
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "MERCHANT_MISMATCH": 588
+          }
+        },
+        "WRONG_SKU": {
+          "agreed": 588,
+          "authorized_setup_provider_calls": 0,
+          "cases": 588,
+          "controller_actions": {
+            "ALLOW": 588
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 588
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "TRANSACTION_HASH_MISMATCH": 588
+          }
+        }
+      },
+      "case_count": 10000,
+      "case_descriptor_stream_sha256": "bedaa47acb808e74d7b6d06d390bb34da183a8c509b34645089cd30846b0c62f",
+      "case_descriptor_stream_sha256_regenerated": "bedaa47acb808e74d7b6d06d390bb34da183a8c509b34645089cd30846b0c62f",
+      "counters": {
+        "authorizations_per_second": 651.24,
+        "authorized_setup_provider_calls": 588,
+        "capabilities_issued": 5295,
+        "merchant_sku_mismatch_rejections": 1176,
+        "provider_adapter_calls": 1177,
+        "provider_calls_before_allow": 0,
+        "provider_calls_on_block": 0,
+        "provider_calls_on_review": 0,
+        "replay_rejections": 588,
+        "request_mutation_rejections": 588,
+        "resident_memory_before_bytes": 39206912,
+        "resident_memory_bytes": 40554496,
+        "revocation_rejections": 588,
+        "target_invariant_agreement": 10000,
+        "target_invariant_agreement_rate": 1.0,
+        "total_cases": 10000
+      },
+      "disagreements": [],
+      "environment": {
+        "platform": "Windows-11-10.0.26200-SP0",
+        "process_count": 1,
+        "processor": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+        "python": "3.12.14"
+      },
+      "external_calls": {
+        "hugging_face_api": 0,
+        "openai": 0,
+        "razorpay_http": 0
+      },
+      "fixed_clock": "2026-09-04T00:00:00Z",
+      "freeze_status": "MATCHES_FREEZE",
+      "label_source": "construction recipe; the controller never labelled a case",
+      "merchant_count": 200,
+      "scope_limit": "One process, one machine, sequential, no concurrency and no network. The merchant universe is synthetic and is not a merchant network. Nothing here is a distributed-throughput measurement.",
+      "seed": 20260904,
+      "wall_seconds": 15.355,
+      "world_generation_version": "synthetic-merchant-universe-v1"
+    },
+    {
+      "actions": {
+        "ALLOW": 1471,
+        "BLOCK": 17646,
+        "REVIEW": 5883
+      },
+      "authorization_latency_ms": {
+        "max": 11.113,
+        "p50": 2.2835,
+        "p95": 3.9003,
+        "p99": 4.5359
+      },
+      "benchmark_version": "authorization-scale-benchmark-v1",
+      "by_family": {
+        "AUTHORITY_CONFLICT": {
+          "agreed": 1471,
+          "authorized_setup_provider_calls": 0,
+          "cases": 1471,
+          "controller_actions": {
+            "REVIEW": 1471
+          },
+          "expected_safe_actions": [
+            "REVIEW"
+          ],
+          "pipeline_actions": {
+            "REVIEW": 1471
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_REVIEW_REQUIRED": 1471
+          }
+        },
+        "BENIGN_ALLOWED": {
+          "agreed": 1471,
+          "authorized_setup_provider_calls": 0,
+          "cases": 1471,
+          "controller_actions": {
+            "ALLOW": 1471
+          },
+          "expected_safe_actions": [
+            "ALLOW"
+          ],
+          "pipeline_actions": {
+            "ALLOW": 1471
+          },
+          "provider_calls": 1471,
+          "refusal_reasons": {}
+        },
+        "BUDGET_VIOLATION": {
+          "agreed": 1471,
+          "authorized_setup_provider_calls": 0,
+          "cases": 1471,
+          "controller_actions": {
+            "BLOCK": 1471
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 1471
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_BLOCKED": 1471
+          }
+        },
+        "CAPABILITY_EXPIRED": {
+          "agreed": 1471,
+          "authorized_setup_provider_calls": 0,
+          "cases": 1471,
+          "controller_actions": {
+            "ALLOW": 1471
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 1471
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "CAPABILITY_EXPIRED": 1471
+          }
+        },
+        "CAPABILITY_REPLAY": {
+          "agreed": 1470,
+          "authorized_setup_provider_calls": 1470,
+          "cases": 1470,
+          "controller_actions": {
+            "ALLOW": 1470
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 1470
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "NONCE_ALREADY_USED": 1470
+          }
+        },
+        "EXCLUSION_VIOLATION": {
+          "agreed": 1471,
+          "authorized_setup_provider_calls": 0,
+          "cases": 1471,
+          "controller_actions": {
+            "BLOCK": 1471
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 1471
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_BLOCKED": 1471
+          }
+        },
+        "MANDATE_REVOKED": {
+          "agreed": 1470,
+          "authorized_setup_provider_calls": 0,
+          "cases": 1470,
+          "controller_actions": {
+            "ALLOW": 1470
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 1470
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "MANDATE_REVOKED": 1470
+          }
+        },
+        "MANDATE_SUPERSEDED": {
+          "agreed": 1471,
+          "authorized_setup_provider_calls": 0,
+          "cases": 1471,
+          "controller_actions": {
+            "ALLOW": 1471
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 1471
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "MANDATE_SUPERSEDED": 1471
+          }
+        },
+        "MISSING_EVIDENCE": {
+          "agreed": 1471,
+          "authorized_setup_provider_calls": 0,
+          "cases": 1471,
+          "controller_actions": {
+            "REVIEW": 1471
+          },
+          "expected_safe_actions": [
+            "REVIEW"
+          ],
+          "pipeline_actions": {
+            "REVIEW": 1471
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_REVIEW_REQUIRED": 1471
+          }
+        },
+        "PRICE_MUTATION": {
+          "agreed": 1470,
+          "authorized_setup_provider_calls": 0,
+          "cases": 1470,
+          "controller_actions": {
+            "ALLOW": 1470
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 1470
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "TRANSACTION_HASH_MISMATCH": 1470
+          }
+        },
+        "PROHIBITED_PURPOSE": {
+          "agreed": 1471,
+          "authorized_setup_provider_calls": 0,
+          "cases": 1471,
+          "controller_actions": {
+            "BLOCK": 1471
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 1471
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_BLOCKED": 1471
+          }
+        },
+        "RECURRING_WHEN_ONE_TIME_REQUIRED": {
+          "agreed": 1471,
+          "authorized_setup_provider_calls": 0,
+          "cases": 1471,
+          "controller_actions": {
+            "BLOCK": 1471
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 1471
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_BLOCKED": 1471
+          }
+        },
+        "REQUEST_MUTATION": {
+          "agreed": 1470,
+          "authorized_setup_provider_calls": 0,
+          "cases": 1470,
+          "controller_actions": {
+            "ALLOW": 1470
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 1470
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "TRANSACTION_HASH_MISMATCH": 1470
+          }
+        },
+        "STALE_EVIDENCE": {
+          "agreed": 1471,
+          "authorized_setup_provider_calls": 0,
+          "cases": 1471,
+          "controller_actions": {
+            "REVIEW": 1471
+          },
+          "expected_safe_actions": [
+            "REVIEW"
+          ],
+          "pipeline_actions": {
+            "REVIEW": 1471
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_REVIEW_REQUIRED": 1471
+          }
+        },
+        "SUPERSEDED_EVIDENCE": {
+          "agreed": 1470,
+          "authorized_setup_provider_calls": 0,
+          "cases": 1470,
+          "controller_actions": {
+            "REVIEW": 1470
+          },
+          "expected_safe_actions": [
+            "REVIEW"
+          ],
+          "pipeline_actions": {
+            "REVIEW": 1470
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_REVIEW_REQUIRED": 1470
+          }
+        },
+        "WRONG_MERCHANT": {
+          "agreed": 1470,
+          "authorized_setup_provider_calls": 0,
+          "cases": 1470,
+          "controller_actions": {
+            "ALLOW": 1470
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 1470
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "MERCHANT_MISMATCH": 1470
+          }
+        },
+        "WRONG_SKU": {
+          "agreed": 1470,
+          "authorized_setup_provider_calls": 0,
+          "cases": 1470,
+          "controller_actions": {
+            "ALLOW": 1470
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 1470
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "TRANSACTION_HASH_MISMATCH": 1470
+          }
+        }
+      },
+      "case_count": 25000,
+      "case_descriptor_stream_sha256": "a8d77ef3f7f42d354ac138fa1fb6997abbb633f06665ce6467552214938cf63a",
+      "case_descriptor_stream_sha256_regenerated": "a8d77ef3f7f42d354ac138fa1fb6997abbb633f06665ce6467552214938cf63a",
+      "counters": {
+        "authorizations_per_second": 385.36,
+        "authorized_setup_provider_calls": 1470,
+        "capabilities_issued": 13233,
+        "merchant_sku_mismatch_rejections": 2940,
+        "provider_adapter_calls": 2941,
+        "provider_calls_before_allow": 0,
+        "provider_calls_on_block": 0,
+        "provider_calls_on_review": 0,
+        "replay_rejections": 1470,
+        "request_mutation_rejections": 1470,
+        "resident_memory_before_bytes": 40001536,
+        "resident_memory_bytes": 42283008,
+        "revocation_rejections": 1470,
+        "target_invariant_agreement": 25000,
+        "target_invariant_agreement_rate": 1.0,
+        "total_cases": 25000
+      },
+      "disagreements": [],
+      "environment": {
+        "platform": "Windows-11-10.0.26200-SP0",
+        "process_count": 1,
+        "processor": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+        "python": "3.12.14"
+      },
+      "external_calls": {
+        "hugging_face_api": 0,
+        "openai": 0,
+        "razorpay_http": 0
+      },
+      "fixed_clock": "2026-09-04T00:00:00Z",
+      "freeze_status": "MATCHES_FREEZE",
+      "label_source": "construction recipe; the controller never labelled a case",
+      "merchant_count": 500,
+      "scope_limit": "One process, one machine, sequential, no concurrency and no network. The merchant universe is synthetic and is not a merchant network. Nothing here is a distributed-throughput measurement.",
+      "seed": 20260904,
+      "wall_seconds": 64.874,
+      "world_generation_version": "synthetic-merchant-universe-v1"
+    },
+    {
+      "actions": {
+        "ALLOW": 2942,
+        "BLOCK": 35294,
+        "REVIEW": 11764
+      },
+      "authorization_latency_ms": {
+        "max": 11.8517,
+        "p50": 2.2868,
+        "p95": 3.9122,
+        "p99": 4.6457
+      },
+      "benchmark_version": "authorization-scale-benchmark-v1",
+      "by_family": {
+        "AUTHORITY_CONFLICT": {
+          "agreed": 2941,
+          "authorized_setup_provider_calls": 0,
+          "cases": 2941,
+          "controller_actions": {
+            "REVIEW": 2941
+          },
+          "expected_safe_actions": [
+            "REVIEW"
+          ],
+          "pipeline_actions": {
+            "REVIEW": 2941
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_REVIEW_REQUIRED": 2941
+          }
+        },
+        "BENIGN_ALLOWED": {
+          "agreed": 2942,
+          "authorized_setup_provider_calls": 0,
+          "cases": 2942,
+          "controller_actions": {
+            "ALLOW": 2942
+          },
+          "expected_safe_actions": [
+            "ALLOW"
+          ],
+          "pipeline_actions": {
+            "ALLOW": 2942
+          },
+          "provider_calls": 2942,
+          "refusal_reasons": {}
+        },
+        "BUDGET_VIOLATION": {
+          "agreed": 2941,
+          "authorized_setup_provider_calls": 0,
+          "cases": 2941,
+          "controller_actions": {
+            "BLOCK": 2941
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 2941
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_BLOCKED": 2941
+          }
+        },
+        "CAPABILITY_EXPIRED": {
+          "agreed": 2942,
+          "authorized_setup_provider_calls": 0,
+          "cases": 2942,
+          "controller_actions": {
+            "ALLOW": 2942
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 2942
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "CAPABILITY_EXPIRED": 2942
+          }
+        },
+        "CAPABILITY_REPLAY": {
+          "agreed": 2941,
+          "authorized_setup_provider_calls": 2941,
+          "cases": 2941,
+          "controller_actions": {
+            "ALLOW": 2941
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 2941
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "NONCE_ALREADY_USED": 2941
+          }
+        },
+        "EXCLUSION_VIOLATION": {
+          "agreed": 2941,
+          "authorized_setup_provider_calls": 0,
+          "cases": 2941,
+          "controller_actions": {
+            "BLOCK": 2941
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 2941
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_BLOCKED": 2941
+          }
+        },
+        "MANDATE_REVOKED": {
+          "agreed": 2941,
+          "authorized_setup_provider_calls": 0,
+          "cases": 2941,
+          "controller_actions": {
+            "ALLOW": 2941
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 2941
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "MANDATE_REVOKED": 2941
+          }
+        },
+        "MANDATE_SUPERSEDED": {
+          "agreed": 2942,
+          "authorized_setup_provider_calls": 0,
+          "cases": 2942,
+          "controller_actions": {
+            "ALLOW": 2942
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 2942
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "MANDATE_SUPERSEDED": 2942
+          }
+        },
+        "MISSING_EVIDENCE": {
+          "agreed": 2941,
+          "authorized_setup_provider_calls": 0,
+          "cases": 2941,
+          "controller_actions": {
+            "REVIEW": 2941
+          },
+          "expected_safe_actions": [
+            "REVIEW"
+          ],
+          "pipeline_actions": {
+            "REVIEW": 2941
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_REVIEW_REQUIRED": 2941
+          }
+        },
+        "PRICE_MUTATION": {
+          "agreed": 2941,
+          "authorized_setup_provider_calls": 0,
+          "cases": 2941,
+          "controller_actions": {
+            "ALLOW": 2941
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 2941
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "TRANSACTION_HASH_MISMATCH": 2941
+          }
+        },
+        "PROHIBITED_PURPOSE": {
+          "agreed": 2941,
+          "authorized_setup_provider_calls": 0,
+          "cases": 2941,
+          "controller_actions": {
+            "BLOCK": 2941
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 2941
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_BLOCKED": 2941
+          }
+        },
+        "RECURRING_WHEN_ONE_TIME_REQUIRED": {
+          "agreed": 2941,
+          "authorized_setup_provider_calls": 0,
+          "cases": 2941,
+          "controller_actions": {
+            "BLOCK": 2941
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 2941
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_BLOCKED": 2941
+          }
+        },
+        "REQUEST_MUTATION": {
+          "agreed": 2941,
+          "authorized_setup_provider_calls": 0,
+          "cases": 2941,
+          "controller_actions": {
+            "ALLOW": 2941
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 2941
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "TRANSACTION_HASH_MISMATCH": 2941
+          }
+        },
+        "STALE_EVIDENCE": {
+          "agreed": 2941,
+          "authorized_setup_provider_calls": 0,
+          "cases": 2941,
+          "controller_actions": {
+            "REVIEW": 2941
+          },
+          "expected_safe_actions": [
+            "REVIEW"
+          ],
+          "pipeline_actions": {
+            "REVIEW": 2941
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_REVIEW_REQUIRED": 2941
+          }
+        },
+        "SUPERSEDED_EVIDENCE": {
+          "agreed": 2941,
+          "authorized_setup_provider_calls": 0,
+          "cases": 2941,
+          "controller_actions": {
+            "REVIEW": 2941
+          },
+          "expected_safe_actions": [
+            "REVIEW"
+          ],
+          "pipeline_actions": {
+            "REVIEW": 2941
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "AUTHORIZATION_REVIEW_REQUIRED": 2941
+          }
+        },
+        "WRONG_MERCHANT": {
+          "agreed": 2941,
+          "authorized_setup_provider_calls": 0,
+          "cases": 2941,
+          "controller_actions": {
+            "ALLOW": 2941
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 2941
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "MERCHANT_MISMATCH": 2941
+          }
+        },
+        "WRONG_SKU": {
+          "agreed": 2941,
+          "authorized_setup_provider_calls": 0,
+          "cases": 2941,
+          "controller_actions": {
+            "ALLOW": 2941
+          },
+          "expected_safe_actions": [
+            "BLOCK"
+          ],
+          "pipeline_actions": {
+            "BLOCK": 2941
+          },
+          "provider_calls": 0,
+          "refusal_reasons": {
+            "TRANSACTION_HASH_MISMATCH": 2941
+          }
+        }
+      },
+      "case_count": 50000,
+      "case_descriptor_stream_sha256": "38a58087f2bc8b472e81dfc1b1049a819ef63ed7df194dd79be0962b3103e58e",
+      "case_descriptor_stream_sha256_regenerated": "38a58087f2bc8b472e81dfc1b1049a819ef63ed7df194dd79be0962b3103e58e",
+      "counters": {
+        "authorizations_per_second": 384.18,
+        "authorized_setup_provider_calls": 2941,
+        "capabilities_issued": 26472,
+        "merchant_sku_mismatch_rejections": 5882,
+        "provider_adapter_calls": 5883,
+        "provider_calls_before_allow": 0,
+        "provider_calls_on_block": 0,
+        "provider_calls_on_review": 0,
+        "replay_rejections": 2941,
+        "request_mutation_rejections": 2941,
+        "resident_memory_before_bytes": 40636416,
+        "resident_memory_bytes": 44331008,
+        "revocation_rejections": 2941,
+        "target_invariant_agreement": 50000,
+        "target_invariant_agreement_rate": 1.0,
+        "total_cases": 50000
+      },
+      "disagreements": [],
+      "environment": {
+        "platform": "Windows-11-10.0.26200-SP0",
+        "process_count": 1,
+        "processor": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+        "python": "3.12.14"
+      },
+      "external_calls": {
+        "hugging_face_api": 0,
+        "openai": 0,
+        "razorpay_http": 0
+      },
+      "fixed_clock": "2026-09-04T00:00:00Z",
+      "freeze_status": "NOT_IN_FREEZE_EXPLORATORY",
+      "label_source": "construction recipe; the controller never labelled a case",
+      "merchant_count": 1000,
+      "scope_limit": "One process, one machine, sequential, no concurrency and no network. The merchant universe is synthetic and is not a merchant network. Nothing here is a distributed-throughput measurement.",
+      "seed": 20260904,
+      "wall_seconds": 130.148,
+      "world_generation_version": "synthetic-merchant-universe-v1"
+    }
+  ],
+  "schema_version": "authorization-scale-report-v1",
+  "taxonomy_sha256": "18c68bddd3d8887e4b6c1e53e7afeb08c581a9e36402779331f0e76d9766b9a7"
+}
