@@ -184,11 +184,30 @@ def main() -> int:
         "candidate_cutoff": {"bm25": 100, "dense": 100, "final": 10},
         "fusion_candidates": ["bm25", "dense", "rrf", "weighted_fusion"],
         "metrics": ["recall_at_1", "recall_at_5", "recall_at_10", "mrr", "ndcg_at_10"],
+        "metric_definitions": {
+            "recall_at_k": "relevant hits in top k divided by min(k, total relevant documents)",
+            "mrr": "reciprocal rank of the first relevant document; zero when none is retrieved",
+            "ndcg_at_10": "binary DCG at 10 divided by ideal binary DCG for min(10, total relevant documents)",
+            "aggregation": "unweighted arithmetic mean across queries in each slice",
+        },
+        "fusion_parameters": {
+            "rrf_rank_constant": 60,
+            "weighted_bm25": 0.5,
+            "weighted_dense": 0.5,
+            "weighted_normalization": "min-max independently within each top-100 candidate list; missing candidate score is zero",
+            "tie_breaker": "ascending catalog document id",
+        },
         "report_slices": ["all", "literal", "paraphrase", "category", "brand-constrained", "budget-constrained"],
         "model_selection_rule": {
             "primary": "highest paraphrase recall_at_10 on this frozen query set",
             "tie_breakers": ["all ndcg_at_10", "full discovery p95 latency", "resident memory", "artifact bytes"],
             "adoption_gate": "enable dense retrieval only for a material frozen-evaluation improvement without unacceptable measured runtime cost",
+            "materiality_threshold": "paraphrase recall_at_10 must improve by at least 0.10 absolute over BM25",
+            "runtime_thresholds": {
+                "warm_full_discovery_p95_ms_max": 250,
+                "incremental_resident_memory_bytes_max": 524288000,
+                "runtime_external_model_calls_max": 0
+            },
             "no_repeated_test_tuning": True,
         },
         "outcomes_included": False,

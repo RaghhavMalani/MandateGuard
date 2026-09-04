@@ -37,6 +37,9 @@ Each candidate generator searches the full hard-filtered catalog independently:
 The final cutoff is 10. Structured category, brand, price, and exclusion filters
 are deterministic and apply before scoring. Near-duplicate handling applies only
 after fusion and may not introduce a candidate absent from both generators.
+RRF uses rank constant 60. Weighted fusion is fixed at 0.5 normalized BM25 plus
+0.5 normalized dense score over the union of their top-100 lists; a missing
+candidate score is zero and catalog document ID breaks ties.
 
 ## Metrics and slices
 
@@ -44,6 +47,11 @@ Report Recall@1, Recall@5, Recall@10, MRR, and binary nDCG@10 for all queries an
 for these overlapping slices: literal, paraphrase, category, brand-constrained,
 and budget-constrained. A query with no relevant catalog document is a protocol
 error, not a zero-scored query.
+
+For Recall@K the denominator is `min(K, relevant document count)`, matching the
+existing catalog protocol for broad predicate sets. MRR is the reciprocal rank
+of the first relevant document. Binary nDCG@10 divides DCG by the ideal DCG for
+`min(10, relevant document count)`. Slice results are unweighted query means.
 
 Latency is measured separately for query tokenization, query embedding, BM25,
 dense exact search, fusion, and the full discovery request. Report P50/P95/P99,
@@ -56,6 +64,11 @@ nDCG@10, full-discovery P95, resident memory, then artifact bytes. Dense retriev
 is enabled in the shipped ranker only when the frozen evaluation shows a material
 improvement without unacceptable measured latency or runtime cost. A losing
 pretrained model is recorded and rejected rather than shipped.
+
+"Material" is preregistered as at least +0.10 absolute paraphrase Recall@10 over
+BM25. The selected runtime must also keep warm full-discovery P95 at or below
+250 ms, incremental resident memory at or below 500 MiB, and request-time model
+network calls at exactly zero.
 
 Every evaluated model requires a provenance record taken from its authoritative
 model source before evaluation. The record must include the exact revision,

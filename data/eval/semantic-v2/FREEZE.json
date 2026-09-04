@@ -10,7 +10,7 @@
   "literal_count": 62,
   "paraphrase_count": 62,
   "generator": "scripts/freeze_semantic_v2.py",
-  "generator_sha256": "a2edb4ab7e2bcec305c25a07312ee74eaffbd1ea006e26041e72d48705118a81",
+  "generator_sha256": "52f7aa12e1a93e543acbe283e48c5c1382969dd80985930811e468a6e3166522",
   "candidate_cutoff": {
     "bm25": 100,
     "dense": 100,
@@ -29,6 +29,19 @@
     "mrr",
     "ndcg_at_10"
   ],
+  "metric_definitions": {
+    "recall_at_k": "relevant hits in top k divided by min(k, total relevant documents)",
+    "mrr": "reciprocal rank of the first relevant document; zero when none is retrieved",
+    "ndcg_at_10": "binary DCG at 10 divided by ideal binary DCG for min(10, total relevant documents)",
+    "aggregation": "unweighted arithmetic mean across queries in each slice"
+  },
+  "fusion_parameters": {
+    "rrf_rank_constant": 60,
+    "weighted_bm25": 0.5,
+    "weighted_dense": 0.5,
+    "weighted_normalization": "min-max independently within each top-100 candidate list; missing candidate score is zero",
+    "tie_breaker": "ascending catalog document id"
+  },
   "report_slices": [
     "all",
     "literal",
@@ -46,8 +59,14 @@
       "artifact bytes"
     ],
     "adoption_gate": "enable dense retrieval only for a material frozen-evaluation improvement without unacceptable measured runtime cost",
+    "materiality_threshold": "paraphrase recall_at_10 must improve by at least 0.10 absolute over BM25",
+    "runtime_thresholds": {
+      "warm_full_discovery_p95_ms_max": 250,
+      "incremental_resident_memory_bytes_max": 524288000,
+      "runtime_external_model_calls_max": 0
+    },
     "no_repeated_test_tuning": true
   },
   "outcomes_included": false,
-  "freeze_payload_sha256": "ac5c773088eecea5a98526d7b985f6ee007047cc71a1ab2748186113c08b5413"
+  "freeze_payload_sha256": "ba5150038d5831aeb43c3a53b07b955c95421c2f7af5746f4d30c972a56ba4bd"
 }
