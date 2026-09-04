@@ -78,6 +78,14 @@ def _exact_mapping(
     return value
 
 
+#: The stores a selected identity may be resolved from. Both are server-owned,
+#: schema-valid, versioned catalogues bound to exact merchant/SKU pairs; they
+#: are listed separately so a trace says which world a selection came from. A
+#: crawled marketplace source is not on this list and cannot be added to it by
+#: anything a request carries.
+REGISTERED_SELECTION_SOURCES = frozenset({"mandateguard", "mandateguard-sandbox"})
+
+
 @dataclass(frozen=True, slots=True)
 class SelectedProductIdentity:
     """Server-resolved identity for a clicked registered catalog listing.
@@ -98,7 +106,7 @@ class SelectedProductIdentity:
         _identifier(self.catalog_product_id, "catalog_product_id")
         _identifier(self.source, "source")
         _bounded_text(self.source_product_id, "source_product_id", 512)
-        if self.source != "mandateguard":
+        if self.source not in REGISTERED_SELECTION_SOURCES:
             raise ValueError("selected product must come from the registered source")
         if self.source_product_id != f"{self.merchant_id}/{self.sku}":
             raise ValueError("selected product source identity does not match merchant and SKU")

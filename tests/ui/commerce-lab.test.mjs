@@ -10,6 +10,8 @@ import {
   escapeHtml,
   failedConstraint,
   liveModeStatusNote,
+  PLAYGROUND_RAIL,
+  railStates,
   renderAttackLab,
   renderAuthorizationPanel,
   renderBlockStory,
@@ -20,6 +22,12 @@ import {
   renderEvidencePanel,
   renderExecutionPanel,
   renderMeasuredEvidence,
+  renderNoMatch,
+  renderOnboardedResult,
+  renderOnboardingForm,
+  renderPlaygroundCandidate,
+  renderPlaygroundExecution,
+  renderPlaygroundVerdict,
   renderProvenance,
   renderResearch,
   renderReviewRecovery,
@@ -28,6 +36,7 @@ import {
   renderSpine,
   renderStory,
   renderTransactability,
+  renderTryThese,
   spineProgress,
 } from "../../src/mandateguard/product/static/app.js";
 
@@ -957,4 +966,209 @@ test("every multi-column story layout collapses to one column on small viewports
   assert.match(stylesheet, /body \{[\s\S]*?overflow-x: hidden;/);
   // Grid tracks that hold long text must be allowed to shrink below content width.
   assert.match(stylesheet, /grid-template-columns: auto minmax\(0, 1fr\)/);
+});
+
+
+// ---------------------------------------------------------------------------
+// Judge Playground
+// ---------------------------------------------------------------------------
+
+const sandboxCandidate = {
+  catalog_product_id: "sandbox.abc123",
+  merchant_id: "sandbox-brightleaf-lighting",
+  merchant: "Brightleaf Lighting (Synthetic)",
+  sku: "lighting-desk-lamps-007",
+  name: "Dimmable study lamp",
+  category: "Desk lamps",
+  category_id: "lighting-desk-lamps",
+  price_minor: 159900,
+  currency: "INR",
+  billing_model: "ONE_TIME",
+  recurring: false,
+  recurrence_declaration: "SETTLED_ONCE",
+  evidence_version: "v1",
+  effective_from: "2026-09-01T00:00:00Z",
+  why_found: {
+    semantic_similarity: 1,
+    semantic_method: "DETERMINISTIC_CATEGORY_SYNONYM_V1",
+    lexical_score: 42.15,
+    matched_terms: ["study", "lamp"],
+    exact_phrase_match: "study lamp",
+    within_budget: true,
+    brand_match: null,
+    category_match: "Desk lamps",
+  },
+  readiness: {
+    merchant_identity: "DECLARED",
+    sku_evidence: "DECLARED",
+    authoritative_price: "DECLARED",
+    billing_model: "DECLARED",
+    content_classification: "DECLARED",
+    intended_use: "DECLARED",
+    evidence_version: "CURRENT",
+  },
+};
+
+
+test("Playground is the primary tab and explains the sandbox before controls", () => {
+  const html = readFileSync(
+    fileURLToPath(new URL("../../src/mandateguard/product/static/index.html", import.meta.url)),
+    "utf8",
+  );
+  assert.ok(html.indexOf(">PLAYGROUND</button>") < html.indexOf(">MARKETPLACE</button>"));
+  assert.match(html, /SIMULATED MERCHANT SANDBOX/);
+  assert.match(html, /Test MandateGuard with arbitrary buying instructions\./);
+  assert.match(html, /Nothing here represents[\s\S]*live marketplace or real[\s\S]*money\./);
+  assert.match(html, /type="button"[^>]*id="pg-search-button"/);
+});
+
+
+test("Playground rail has the complete authorization journey and never infers a verdict", () => {
+  assert.deepEqual(
+    PLAYGROUND_RAIL.map((stage) => stage.id),
+    ["INTENT", "SEARCH", "CANDIDATES", "SELECT", "EVIDENCE", "MANDATEGUARD", "DECISION", "PAYMENT"],
+  );
+  const deciding = railStates({
+    intent: "lamp",
+    candidates: [sandboxCandidate],
+    selected: sandboxCandidate,
+    evidence: [{ evidence_id: "one" }],
+    snapshot: { state: "RUNNING" },
+  });
+  assert.equal(deciding.MANDATEGUARD, "active");
+  assert.equal(deciding.DECISION, "waiting");
+  assert.equal(deciding.PAYMENT, "waiting");
+});
+
+
+test("each sandbox result names all five retrieval signals and readiness fields", () => {
+  const html = renderPlaygroundCandidate(sandboxCandidate);
+  assert.match(html, /Dimmable study lamp/);
+  assert.match(html, /₹1,599/);
+  assert.match(html, /Brightleaf Lighting \(Synthetic\)/);
+  assert.match(html, /Desk lamps/);
+  for (const label of [
+    "Semantic similarity",
+    "Lexical signal",
+    "Budget",
+    "Brand preference",
+    "Category match",
+  ]) {
+    assert.match(html, new RegExp(label));
+  }
+  assert.match(html, /deterministic category synonym/);
+  assert.match(html, /exact phrase “study lamp”/);
+  assert.match(html, /Merchant identity/);
+  assert.match(html, /SKU evidence/);
+  assert.match(html, /Billing model/);
+  assert.match(html, /Evidence version/);
+  assert.match(html, /CHECK AUTHORIZATION/);
+});
+
+
+test("an empty sandbox search shows closest candidates and the excluding constraint", () => {
+  const html = renderNoMatch({
+    no_match_message: "No suitable sandbox product matched all of your constraints.",
+    candidates: [],
+    constraints_applied: ["Price at most INR 100.00"],
+    near_misses: [
+      {
+        name: "Dimmable study lamp",
+        price_minor: 159900,
+        currency: "INR",
+        excluded_by: "MAX_TOTAL",
+        explanation: "Priced above your INR 100.00 limit.",
+      },
+    ],
+  });
+  assert.match(html, /No suitable sandbox product matched all of your constraints\./);
+  assert.match(html, /CLOSEST CANDIDATES, AND WHAT EXCLUDED THEM/);
+  assert.match(html, /MAX_TOTAL/);
+});
+
+
+test("Playground verdict and execution claims stay literal", () => {
+  for (const [decision, headline] of [
+    ["ALLOW", "Your mandate permits this purchase."],
+    ["BLOCK", "MandateGuard stopped this before payment."],
+    ["REVIEW", "MandateGuard refused to guess."],
+  ]) {
+    const html = renderPlaygroundVerdict({
+      result: { decision },
+      explanation: { headline },
+    });
+    assert.match(html, new RegExp(decision));
+    assert.match(html, new RegExp(headline.replace(/[.]/g, "\\.")));
+  }
+  const execution = renderPlaygroundExecution({
+    result: {
+      buyer: { price_minor: 159900, currency: "INR", merchant: "sandbox-light", sku: "lamp-1" },
+      execution: {
+        status: "ORDER_CREATED",
+        razorpay_calls: 1,
+        external_network_calls: 0,
+        consent: { status: "ACTIVE" },
+        order: { order_id: "order_offline_123", amount: 159900, currency: "INR" },
+      },
+    },
+  });
+  assert.match(execution, /SIMULATED OFFLINE ORDER/);
+  assert.match(execution, /No external network call was made/);
+  assert.match(execution, /nothing was captured or settled/);
+  assert.doesNotMatch(execution, /payment captured/i);
+});
+
+
+test("merchant onboarding shows exact new declarations and the unchanged trust boundary", () => {
+  const form = renderOnboardingForm({
+    form: {
+      notice: "SIMULATION. The source remains untrusted.",
+      copied_from_listing: {
+        title: "Historical lamp",
+        category_label: "Lighting",
+        note: "Only words and shelf are carried across.",
+      },
+      generated_declarations: [
+        { field: "sku_ownership", label: "SKU ownership", value: "BOUND", why: "New exact identity." },
+        { field: "recurrence", label: "Recurrence declaration", value: "DERIVED", why: "From billing." },
+        { field: "exclusions", label: "Exclusion declaration", value: "DERIVED", why: "From content." },
+      ],
+      required_declarations: [],
+    },
+  });
+  assert.match(form, /SKU ownership/);
+  assert.match(form, /Recurrence declaration/);
+  assert.match(form, /Exclusion declaration/);
+  assert.match(form, /PUBLISH EVIDENCE AND RE-RUN AUTHORIZATION/);
+
+  const result = renderOnboardedResult({
+    notice: "A new synthetic record was created.",
+    merchant: { display_name: "Lamp Works (Synthetic)", merchant_id: "sandbox-onboarded-lamp", sku: "lamp-1" },
+    product: { ...sandboxCandidate, purpose_claims: ["individual study"], exclusion_claims: ["gambling"] },
+    readiness: sandboxCandidate.readiness,
+    source_listing: { title: "Historical lamp", still_untrusted: true, note: "The source row is unchanged." },
+  });
+  assert.match(result, /NEW SYNTHETIC MERCHANT RECORD/);
+  assert.match(result, /STILL UNTRUSTED/);
+  assert.match(result, /Authoritative price/);
+  assert.match(result, /SKU ownership/);
+  assert.match(result, /RUN AUTHORIZATION AGAINST THE NEW RECORD/);
+});
+
+
+test("try-these prompts are real keyboard buttons and remain human-readable", () => {
+  const html = renderTryThese([
+    { label: "Buy headphones under ₹5,000", intent: "Buy headphones under INR 5,000." },
+    {
+      label: "Show me what happens if I revoke permission",
+      intent: "Buy a lamp under INR 2,000.",
+      defer_execution: true,
+    },
+  ]);
+  assert.equal((html.match(/<button/g) || []).length, 2);
+  assert.equal((html.match(/type="button"/g) || []).length, 2);
+  assert.match(html, /Buy headphones under ₹5,000/);
+  assert.match(html, /data-defer-execution="true"/);
+  assert.match(stylesheet, /:focus-visible/);
+  assert.match(stylesheet, /@media \(prefers-reduced-motion: reduce\)/);
 });

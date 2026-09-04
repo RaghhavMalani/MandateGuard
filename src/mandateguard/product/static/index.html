@@ -13,11 +13,11 @@
     <script type="module" src="/assets/app.js"></script>
   </head>
   <body>
-    <a class="skip-link" href="#view-observe">Skip to the commerce lab</a>
+    <a class="skip-link" href="#view-playground">Skip to the playground</a>
 
     <header class="topbar">
       <div class="topbar__row">
-        <a class="brand" href="#observe" aria-label="MandateGuard home">
+        <a class="brand" href="#playground" aria-label="MandateGuard home">
           <span class="brand__mark" aria-hidden="true"></span>
           <span class="brand__name">MANDATEGUARD</span>
         </a>
@@ -26,13 +26,23 @@
           <div class="mainnav__list" role="tablist" aria-label="Commerce lab views">
             <button
               class="navtab"
-              id="tab-observe"
+              id="tab-playground"
               role="tab"
               type="button"
               aria-selected="true"
+              aria-controls="view-playground"
+              data-view="playground"
+            >PLAYGROUND</button>
+            <button
+              class="navtab"
+              id="tab-observe"
+              role="tab"
+              type="button"
+              aria-selected="false"
+              tabindex="-1"
               aria-controls="view-observe"
               data-view="observe"
-            >OBSERVE</button>
+            >MARKETPLACE</button>
             <button
               class="navtab"
               id="tab-attack"
@@ -43,6 +53,16 @@
               aria-controls="view-attack"
               data-view="attack"
             >ATTACK LAB</button>
+            <button
+              class="navtab"
+              id="tab-scale"
+              role="tab"
+              type="button"
+              aria-selected="false"
+              tabindex="-1"
+              aria-controls="view-scale"
+              data-view="scale"
+            >SCALE LAB</button>
             <button
               class="navtab"
               id="tab-evidence"
@@ -62,7 +82,7 @@
               tabindex="-1"
               aria-controls="view-evaluation"
               data-view="evaluation"
-            >MEASURED</button>
+            >EVALUATION</button>
           </div>
         </nav>
 
@@ -78,8 +98,126 @@
     </header>
 
     <main class="page">
-      <!-- ============================ OBSERVE ============================ -->
-      <section id="view-observe" class="view" role="tabpanel" aria-labelledby="tab-observe" tabindex="-1">
+      <!-- ============================ PLAYGROUND ============================ -->
+      <section id="view-playground" class="view" role="tabpanel" aria-labelledby="tab-playground" tabindex="-1">
+
+        <!-- What a first-time reader needs before any technical detail: an AI
+             agent can choose a product, choosing is not permission to spend,
+             and this page is simulated so anything can safely be tried. -->
+        <section class="pg-open" aria-labelledby="pg-open-title">
+          <p class="pg-open__eyebrow">THE PLAYGROUND</p>
+          <h1 class="pg-open__title" id="pg-open-title">
+            An AI agent can choose what to buy.<br />
+            <em>Choosing is not permission to spend.</em>
+          </h1>
+          <ol class="pg-primer" aria-label="What MandateGuard does">
+            <li><span class="pg-primer__k">CHECKS</span> your constraints, the merchant&rsquo;s published evidence, and your consent right now</li>
+            <li><span class="pg-primer__k pg-primer__k--allow">ALLOW</span> execution may proceed</li>
+            <li><span class="pg-primer__k pg-primer__k--block">BLOCK</span> the request breaks your mandate</li>
+            <li><span class="pg-primer__k pg-primer__k--review">REVIEW</span> the evidence is missing or contradicts itself</li>
+            <li><span class="pg-primer__k">ML</span> helps find and understand products &mdash; it never authorizes payment</li>
+          </ol>
+        </section>
+
+        <!-- Sandbox declaration. Stated before the input, not after it. -->
+        <section class="pg-sandbox" aria-labelledby="pg-sandbox-title">
+          <p class="pg-badge">SIMULATED MERCHANT SANDBOX</p>
+          <h2 class="pg-sandbox__title" id="pg-sandbox-title">
+            Test MandateGuard with arbitrary buying instructions.
+          </h2>
+          <p class="pg-sandbox__body">
+            This sandbox contains simulated merchants that publish the trusted evidence
+            MandateGuard requires. <strong>Nothing here represents a live marketplace or real
+            money.</strong>
+          </p>
+          <p class="pg-sandbox__meta" id="pg-catalog-meta"></p>
+        </section>
+
+        <!-- The instruction. Free text is the primary input; everything else -->
+        <!-- on this screen is a shortcut into the same field.                -->
+        <section class="pg-console" aria-labelledby="pg-console-title">
+          <h2 class="section-head__title" id="pg-console-title">
+            Type anything you would ask an AI shopping agent
+          </h2>
+          <div class="pg-tryrow" id="pg-try-row" aria-label="Example instructions"></div>
+          <div class="pg-field">
+            <label class="pg-field__label" for="pg-intent">YOUR BUYING INSTRUCTION</label>
+            <textarea
+              id="pg-intent"
+              class="pg-field__input"
+              rows="2"
+              maxlength="4000"
+              spellcheck="false"
+              placeholder="Buy wireless headphones under &#8377;5,000. No subscriptions."
+            ></textarea>
+          </div>
+          <div class="pg-actions">
+            <button type="button" class="pg-run" id="pg-search-button">SEARCH THE SANDBOX</button>
+            <p class="pg-actions__note" id="pg-mode-note">
+              Offline. Deterministic local agent, retrieval, verifier and order adapter.
+              External network calls: 0.
+            </p>
+          </div>
+          <p class="formerror" id="pg-error" role="alert" hidden></p>
+        </section>
+
+        <!-- The live rail. One row per stage, filled as the run progresses. -->
+        <section class="pg-rail-region" aria-labelledby="pg-rail-title" id="pg-rail-region" hidden>
+          <h2 class="visually-hidden" id="pg-rail-title">Run progress</h2>
+          <div class="pg-rail" id="pg-rail" aria-live="polite"></div>
+        </section>
+
+        <!-- Candidates. -->
+        <section class="pg-results" aria-labelledby="pg-results-title" id="pg-results-region" hidden>
+          <div class="section-head">
+            <h2 class="section-head__title" id="pg-results-title">What the agent found</h2>
+            <p class="section-head__meta" id="pg-results-meta"></p>
+          </div>
+          <div id="pg-mandate-panel" class="pg-mandate"></div>
+          <div id="pg-limit-panel" class="pg-limit" hidden></div>
+          <div id="pg-candidates" class="pg-candidates"></div>
+          <div id="pg-nomatch" class="pg-nomatch" hidden></div>
+        </section>
+
+        <!-- The chosen product and its trusted evidence, before the verdict. -->
+        <section class="pg-chosen" aria-labelledby="pg-chosen-title" id="pg-chosen-region" hidden>
+          <div class="section-head">
+            <h2 class="section-head__title" id="pg-chosen-title">Trusted merchant evidence</h2>
+            <p class="section-head__meta">What the controller is about to read</p>
+          </div>
+          <div id="pg-chosen-panel"></div>
+        </section>
+
+        <!-- Verdict, reasons, execution. -->
+        <section class="pg-outcome" aria-labelledby="pg-outcome-title" id="pg-outcome-region" hidden>
+          <h2 class="visually-hidden" id="pg-outcome-title">Authorization outcome</h2>
+          <div id="pg-verdict" class="pg-verdict"></div>
+          <div id="pg-why" class="pg-why"></div>
+          <div id="pg-execution" class="pg-execution"></div>
+          <div id="pg-followups" class="pg-followups"></div>
+        </section>
+
+        <!-- One-click scenarios. Secondary to the free-text field above. -->
+        <section class="pg-scenarios" aria-labelledby="pg-scenarios-title">
+          <div class="section-head">
+            <h2 class="section-head__title" id="pg-scenarios-title">Or run a prepared journey</h2>
+            <p class="section-head__meta">Same search, same controller, same execution gate</p>
+          </div>
+          <div id="pg-scenario-grid" class="pg-scenario-grid"></div>
+        </section>
+
+        <!-- Searchable vs buyable. The core product story, as a figure. -->
+        <section class="pg-gap" aria-labelledby="pg-gap-title">
+          <div class="section-head">
+            <h2 class="section-head__title" id="pg-gap-title">Searchable is not buyable</h2>
+            <p class="section-head__meta">Three different populations, kept apart</p>
+          </div>
+          <div id="pg-gap-figure" class="pg-gap__figure"></div>
+        </section>
+      </section>
+
+      <!-- ============================ MARKETPLACE ============================ -->
+      <section id="view-observe" class="view" role="tabpanel" aria-labelledby="tab-observe" tabindex="-1" hidden>
 
         <!-- ---------- 1. What is the problem, and where does ML sit? ----------
              Everything in this section is above the fold on a 900px viewport. The
@@ -277,6 +415,17 @@
           <div id="mandate-panel" class="mandate-panel"></div>
           <div id="discovery-results" class="discovery__results"></div>
           <p class="discovery__note" id="discovery-note"></p>
+
+          <!-- The commercial half of the story. A crawled listing is searchable
+               and unbuyable; this is what closing that gap would cost the
+               merchant, run as an explicit simulation against a new record. -->
+          <section class="onboard" id="onboard-region" aria-labelledby="onboard-title" hidden>
+            <div class="section-head">
+              <h3 class="section-head__title" id="onboard-title">Simulate merchant onboarding</h3>
+              <p class="section-head__meta">SIMULATION &mdash; creates a new synthetic record</p>
+            </div>
+            <div id="onboard-panel" class="onboard__panel"></div>
+          </section>
         </section>
 
         <!-- ---------- 5. The chronological story ---------- -->
@@ -347,6 +496,50 @@
         </p>
       </section>
 
+      <!-- ============================ SCALE LAB ============================ -->
+      <section id="view-scale" class="view" role="tabpanel" aria-labelledby="tab-scale" tabindex="-1" hidden>
+        <header class="viewhead">
+          <h2 class="viewhead__title">Measured scale</h2>
+          <p class="viewhead__body">
+            Four populations, deliberately never added together. A searchable listing is not an
+            agent-ready product, an agent-ready product is not an authorized purchase, and a
+            retrieval score is not an authorization guarantee.
+          </p>
+        </header>
+
+        <section class="measured-block" aria-labelledby="scalelab-worlds-title">
+          <div class="section-head">
+            <h3 class="section-head__title" id="scalelab-worlds-title">Populations</h3>
+            <p class="section-head__meta">Discovery, sandbox, benchmark, model</p>
+          </div>
+          <div id="scale-worlds-panel"></div>
+        </section>
+
+        <section class="measured-block" aria-labelledby="scale-title">
+          <div class="section-head">
+            <h3 class="section-head__title" id="scale-title">System scale</h3>
+            <p class="section-head__meta">Catalog, index, latency</p>
+          </div>
+          <div id="system-scale-panel"></div>
+        </section>
+
+        <section class="measured-block" aria-labelledby="quality-title">
+          <div class="section-head">
+            <h3 class="section-head__title" id="quality-title">Model quality</h3>
+            <p class="section-head__meta">Advisory only &mdash; never authorization</p>
+          </div>
+          <div id="model-quality-panel"></div>
+        </section>
+
+        <section class="measured-block" aria-labelledby="judgehealth-title">
+          <div class="section-head">
+            <h3 class="section-head__title" id="judgehealth-title">Playground outcome mix</h3>
+            <p class="section-head__meta">Frozen judge query set, measured through the real controller</p>
+          </div>
+          <div id="judge-health-panel"></div>
+        </section>
+      </section>
+
       <!-- ============================ EVIDENCE ============================ -->
       <section id="view-evidence" class="view" role="tabpanel" aria-labelledby="tab-evidence" tabindex="-1" hidden>
         <header class="viewhead">
@@ -370,22 +563,6 @@
             other.
           </p>
         </header>
-
-        <section class="measured-block" aria-labelledby="scale-title">
-          <div class="section-head">
-            <h3 class="section-head__title" id="scale-title">System scale</h3>
-            <p class="section-head__meta">Catalog, index, latency</p>
-          </div>
-          <div id="system-scale-panel"></div>
-        </section>
-
-        <section class="measured-block" aria-labelledby="quality-title">
-          <div class="section-head">
-            <h3 class="section-head__title" id="quality-title">Model quality</h3>
-            <p class="section-head__meta">Advisory only &mdash; never authorization</p>
-          </div>
-          <div id="model-quality-panel"></div>
-        </section>
 
         <section class="measured-block" aria-labelledby="authz-title">
           <div class="section-head">

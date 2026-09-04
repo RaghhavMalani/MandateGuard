@@ -18,7 +18,9 @@ docs
 schemas
 tests
 
-# Runtime fixtures only.
+# Runtime fixtures only. The judge query set is an evaluation input, read by
+# scripts/evaluate_judge_playground.py on a developer machine and never by the
+# running server, so it stays out of the image.
 fixtures/*
 !fixtures/agentic_commerce/
 !fixtures/agentic_commerce/**
@@ -57,6 +59,16 @@ data/*
 !data/provenance/
 !data/provenance/**
 data/models/category_confusion.json
+
+# The measured Playground outcome mix, rendered in SCALE LAB. Without it the
+# panel says the report was not generated rather than showing invented numbers.
+# The sandbox world itself is generated in-process from src/, so it needs no
+# data file at all; only this report travels.
+!data/eval/
+data/eval/*
+!data/eval/judge-playground/
+data/eval/judge-playground/*
+!data/eval/judge-playground/JUDGE_QUERY_REPORT.json
 
 Dockerfile
 .dockerignore

@@ -44,6 +44,11 @@ COPY data/provenance/ /app/data/provenance/
 # files out of artifacts/, plus data/models/training_report.json above.
 COPY artifacts/engineering/discovery/ /app/artifacts/engineering/discovery/
 
+# The measured Playground outcome mix. The sandbox catalogue itself is generated
+# deterministically in-process on first use, so no catalogue artifact is copied
+# and none needs to be: only this report, which SCALE LAB renders.
+COPY data/eval/judge-playground/JUDGE_QUERY_REPORT.json /app/data/eval/judge-playground/
+
 # Non-root execution with a writable scratch directory for the temporary
 # SQLite semantic cache, execution ledger, and recovery audit.
 RUN useradd --create-home --uid 10001 mandateguard \

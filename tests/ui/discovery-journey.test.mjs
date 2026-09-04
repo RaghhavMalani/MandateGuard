@@ -297,7 +297,13 @@ test("a crawled listing is labelled as a discovery listing, not a merchant", () 
   assert.match(rendered, /DISCOVERY LISTING/);
   assert.match(rendered, /REVIEW REQUIRED/);
   assert.match(rendered, /data-transactable="false"/);
-  assert.match(rendered, /WHY CAN'T I BUY THIS\?/);
+  assert.match(rendered, /NOT YET AGENT-TRANSACTABLE/);
+  assert.match(rendered, /WHAT WOULD THIS MERCHANT NEED\?/);
+  assert.match(rendered, /Publish identity/);
+  assert.match(rendered, /Publish exact SKU evidence/);
+  assert.match(rendered, /Publish billing and recurrence/);
+  assert.match(rendered, /Version the evidence/);
+  assert.match(rendered, /SIMULATE MERCHANT ONBOARDING/);
 });
 
 test("a registered listing offers authorization and says so", () => {

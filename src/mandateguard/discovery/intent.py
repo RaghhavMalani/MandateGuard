@@ -111,8 +111,14 @@ _QUANTITY_WORD_RE = re.compile(
     re.IGNORECASE,
 )
 
+# "nothing involving gambling" states an exclusion exactly as plainly as "no
+# gambling" does. Every phrasing this alternation misses is a constraint the
+# buyer wrote down and the mandate would not carry, so the list errs towards
+# catching more of them.
 _EXCLUSION_RE = re.compile(
-    r"\b(?:no|without|avoid|exclude|excluding|not?\s+any|nothing\s+(?:about|with|related\s+to))\b"
+    r"\b(?:no|without|avoid|exclude|excluding|not?\s+any"
+    r"|nothing\s+(?:about|with|involving|containing|regarding|related\s+to|to\s+do\s+with)"
+    r"|free\s+of|free\s+from)\b"
     r"[\s:]+([^.;,\n]{2,80})",
     re.IGNORECASE,
 )
@@ -368,6 +374,10 @@ def _clean_exclusion(text: str) -> str | None:
     item = _EXCLUSION_STOP_TAIL.sub("", text.strip(" -:\"'"))
     item = re.sub(r"^(?:any|the|a|an)\s+", "", item, flags=re.IGNORECASE).strip()
     item = re.sub(r"\s+related\s+products?$", "", item, flags=re.IGNORECASE).strip()
+    # "free of gambling content under 5000" states one exclusion and one
+    # ceiling. The ceiling is parsed separately; leaving it glued to the
+    # exclusion would put a price into a prohibited-characteristic constraint.
+    item = _CEILING_RE.sub("", item).strip(" -:,")
     if len(item) < 2 or len(item) > 80:
         return None
     return item

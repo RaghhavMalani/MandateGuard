@@ -18,10 +18,16 @@ with that capability. On `BLOCK` or an unresolved `REVIEW`, no payment-provider 
 made at all. A `REVIEW` can enter a bounded, user-triggered trusted-evidence recovery
 loop; the full controller must then produce a fresh `ALLOW` before execution is possible.
 
-Type any purchase you like — *"Buy Sony headphones under ₹5,000"* — and the agent searches
-a **17,702-listing catalog** imported from a public Indian e-commerce dataset. Most of what
-it finds cannot be bought by an agent at all, and the product says why, per listing, rather
-than inventing an approval. That is the point.
+The default **Playground** lets a judge type any purchase instruction and search a
+deterministic universe of **3,060 explicitly synthetic products** from 50 simulated
+merchants. Those merchants publish versioned evidence, so ordinary safe requests can reach
+the real `ALLOW` path without weakening the controller. Prepared journeys also exercise
+`BLOCK`, `REVIEW`, revocation and replay, entirely offline.
+
+The separate **Marketplace** mode still searches the **17,702-listing historical corpus**.
+Those crawled rows remain discovery-only and untrusted. A simulation can create a new
+synthetic merchant record beside one of them, but selection never promotes a historical row
+into trusted evidence.
 
 ---
 
@@ -33,12 +39,31 @@ The public deployment runs in **OFFLINE DEMO** mode. It carries no OpenAI or Raz
 credentials, makes zero external provider calls, and cannot be made to spend money.
 Live Test Mode is deliberately disabled in public and reports why.
 
-![MandateGuard Commerce Lab, deployed](docs/screenshots/deployed/desktop-1440-initial.png)
+![MandateGuard judge Playground](docs/screenshots/playground-initial.png)
 
-The clearest way to understand the product is the `BLOCK` path — the agent proposed a
-purchase, and the payment provider was never contacted:
+An ordinary sandbox request can reach `ALLOW` through the same controller and the local
+Razorpay-shaped adapter. The result is explicitly a simulated offline order: no money was
+captured or settled and external calls remain zero.
 
-![BLOCK: execution prevented before Razorpay, zero Razorpay calls](docs/screenshots/deployed/desktop-1440-block-decision.png)
+![ALLOW through the real controller and offline adapter](docs/screenshots/playground-allow.png)
+
+The `BLOCK` path shows the complementary guarantee — the agent proposed a purchase, and the
+payment provider was never contacted:
+
+![BLOCK: execution prevented before the provider, zero calls](docs/screenshots/playground-block.png)
+
+### The two commerce worlds
+
+| World | Scale | Authority |
+| --- | ---: | --- |
+| Judge Sandbox | 3,060 synthetic products, 50 simulated merchants, 34 categories | Server-generated, schema-valid, versioned evidence bound to exact merchant/SKU identities |
+| Historical Marketplace | 17,702 historical listings | Discovery only; crawled prices and text are never merchant evidence |
+
+Sandbox world `mandateguard-sandbox-commerce-v2` is generated from a fixed seed and frozen
+construction vocabulary. Product digest: `0323d4f6a052d31807667f7e0f350b3b574ccbce839033097912b8e01eff7f5e`.
+The 120-query judge evaluation found candidates for 100% of prompts; top choices produced
+108 `ALLOW`, 2 `BLOCK`, and 10 `REVIEW` decisions. Ordinary prompts reached `ALLOW` 98.7%
+of the time. These are experience measurements on synthetic data, not a safety contract.
 
 ---
 
@@ -179,9 +204,20 @@ to the preserved evidence rather than implying it just happened.
 
 ## What I measured instead of assuming
 
-Three engineering investigations. These are **non-benchmark engineering evaluations** on
+Four engineering investigations. These are **non-benchmark engineering evaluations** on
 synthetic commerce data — they are reported as what was observed, not as generalization
 claims.
+
+### Judge Playground — interactive authorization
+
+The sandbox is generated, not stored as thousands of hand-written fixtures. Its catalogue,
+trusted evidence store and search index build in 223 ms in one measured local process and
+allocate approximately 27.8 MB of Python memory. The generated catalogue text represents
+4,735,383 bytes; no materialized product catalogue is committed. The frozen query run
+measured full service search at 1.945 ms p50 / 3.418 ms p95 and authorization at 11.186 ms
+p50 / 16.126 ms p95 on the same machine. Method and machine details are frozen in
+[`data/eval/judge-playground/RUNTIME_REPORT.json`](data/eval/judge-playground/RUNTIME_REPORT.json)
+and [`data/eval/judge-playground/JUDGE_QUERY_REPORT.json`](data/eval/judge-playground/JUDGE_QUERY_REPORT.json).
 
 ### INT-1 — end to end
 
@@ -443,6 +479,7 @@ src/mandateguard/
   discovery/      large-catalog discovery: ingestion, frozen indexes, advisory signals
   ml/             offline training and evaluation (never imported by the runtime)
   product/        Commerce Lab HTTP service and static UI
+  sandbox/        deterministic judge universe, search, sessions and onboarding
   engineering/    INT-2 and INT-3 experiment harnesses
   audit/          hash-chained audit journal
   replay/         deterministic scenario replay
@@ -455,7 +492,7 @@ data/eval/              annotated query set and the frozen classifier split
 fixtures/               synthetic catalogs, merchant terms, experiment inputs
 artifacts/engineering/  immutable run records (INT-1, INT-2, INT-3, discovery)
 docs/                   methodology, deployment, screenshots
-tests/                  50 Python test modules + 2 UI suites
+tests/                  60 Python test modules + 2 UI suites
 scripts/                entry points, including the Commerce Lab launcher
 ```
 
@@ -528,8 +565,8 @@ than failing in some less obvious way.
 
 | Gate | Result |
 | --- | --- |
-| Python suite | 873 passed |
-| UI suite | 74 passed |
+| Python suite | 1,214 passed |
+| UI suite | 94 passed |
 | JavaScript syntax | passed |
 
 Test counts are **engineering quality**, reported on their own. They are not a scale
@@ -585,8 +622,9 @@ Stated plainly, because the evidence is only worth what its scope allows.
   corpus or to concurrent load.
 - The anomaly evaluation injects its own defects. A detector that finds them is **not**
   thereby shown to find fraud in production traffic.
-- Only **8 of 17,702** listings carry merchant evidence, so the transactable path is
-  demonstrated at fixture scale even though discovery runs at catalog scale.
+- Only **8 of 17,702 historical listings** carry separately registered merchant evidence.
+  The judge-facing transactable path is demonstrated in a separate 3,060-product synthetic
+  sandbox; that does not make any additional marketplace row transactable.
 
 ---
 

@@ -119,7 +119,16 @@ from mandateguard.product.evidence_policy import (
     PRODUCT_EVIDENCE_POLICY,
 )
 from mandateguard.product.discovery_service import DiscoverySurface
+from mandateguard.product.playground import (
+    PlaygroundError,
+    PlaygroundSurface,
+    SandboxRunPlan,
+    explain_decision,
+)
 from mandateguard.product.recovery_config import build_recovery_registry
+from mandateguard.sandbox.buyer import SandboxBuyer
+from mandateguard.sandbox.scenarios import Scenario
+from mandateguard.sandbox.session import JudgeSession
 from mandateguard.product.scale_evidence import (
     load_model_quality,
     load_scale_evidence,
@@ -133,6 +142,9 @@ _NO_EXCLUSION_RE = re.compile(r"\bno\s+([^.;]+)", re.IGNORECASE)
 _TERMINAL_STATES = frozenset({"COMPLETE", "ERROR"})
 _MAX_RETAINED_RUNS = 256
 RECOVERY_AUDIT_UNAVAILABLE = "RECOVERY_AUDIT_UNAVAILABLE"
+#: Commerce worlds a run may be judged in. The word names which catalogue and
+#: which evidence the controller read, and nothing about how strictly it read.
+_RUN_WORLDS = frozenset({"REGISTERED", "SANDBOX", "SANDBOX_ONBOARDED"})
 DEMO_PRESETS: tuple[dict[str, str], ...] = (
     {
         "id": "safe",
@@ -308,6 +320,15 @@ class CommerceRun:
     top_k: int
     selected_product: SelectedProductIdentity | None = None
     defer_execution: bool = False
+    #: Which commerce world this run was judged in. Never a trust level: a
+    #: sandbox run gets no easier a controller, only a different catalogue.
+    world: str = "REGISTERED"
+    #: Playground runs belong to the visitor session that started them, so one
+    #: visitor cannot inspect, revoke, replay or execute another's run.
+    session_id: str | None = None
+    #: Server-resolved sandbox plan (store and read instruction) for Playground
+    #: runs. ``None`` for registered-fixture runs, which use the shared store.
+    plan: Any = None
     state: str = "RUNNING"
     created_at: str = field(default_factory=_utc_now_text)
     updated_at: str = field(default_factory=_utc_now_text)
@@ -340,6 +361,7 @@ class CommerceRun:
                 "request_id": self.request_id,
                 "mode": self.mode,
                 "preset_id": self.preset_id,
+                "world": self.world,
                 "state": self.state,
                 "created_at": self.created_at,
                 "updated_at": self.updated_at,
@@ -802,9 +824,14 @@ class CommerceLabService:
         self._offline_signing_key = secrets.token_bytes(32)
         self._runs: OrderedDict[str, CommerceRun] = OrderedDict()
         self._requests: dict[
-            str, tuple[str, str, str, str | None, bool, str | None]
+            str,
+            tuple[str, str, str, str | None, bool, str | None, str, str | None],
         ] = {}
         self._lock = RLock()
+        # The sandbox world costs a few hundred milliseconds to generate, so a
+        # deployment that never opens the Playground never builds it and the
+        # server binds its port without waiting.
+        self._playground: PlaygroundSurface | None = None
 
     @staticmethod
     def _resolve_state_dir(state_dir: Path | None) -> tuple[Path, str]:
@@ -947,6 +974,245 @@ class CommerceLabService:
     ) -> SelectedProductIdentity:
         return self.discovery.resolve_selected_product(intent, catalog_product_id)
 
+    # -- Playground -------------------------------------------------------
+    #
+    # Every method below composes existing pieces. None of them decides
+    # anything: `playground_authorize` builds a run and hands it to the same
+    # `_execute_run` that a registered-fixture run goes through, and the
+    # narration functions read the finished run's own recorded output.
+
+    @property
+    def playground(self) -> PlaygroundSurface:
+        """The sandbox surface, generated on first use rather than at startup."""
+
+        with self._lock:
+            if self._playground is None:
+                # The surface reads its measured outcome report relative to the
+                # service's own root, not the module's. A service configured to
+                # a different tree must not quietly render the repository's
+                # numbers as though they described the world it is serving.
+                self._playground = PlaygroundSurface(
+                    repository_root=self.repository_root
+                )
+            return self._playground
+
+    def playground_config(self) -> dict[str, Any]:
+        return self.playground.public_config()
+
+    def open_judge_session(self, session_id: object = None) -> dict[str, Any]:
+        session, created = self.playground.open_session(session_id)
+        payload = session.public_mapping()
+        payload["created"] = created
+        return payload
+
+    def playground_search(
+        self,
+        *,
+        intent: str,
+        top_k: int = 8,
+        session_id: object = None,
+        max_total_minor: int | None = None,
+    ) -> dict[str, Any]:
+        """Search the sandbox catalogue. No decision, no capability, no provider."""
+
+        surface = self.playground
+        session, created = surface.open_session(session_id)
+        payload = surface.search(
+            intent_text=intent,
+            top_k=top_k,
+            declared_ceiling_minor=max_total_minor,
+            session=session,
+        )
+        payload["session"] = {"session_id": session.session_id, "created": created}
+        return payload
+
+    def playground_preview(
+        self,
+        *,
+        intent: str,
+        catalog_product_id: str,
+        session_id: object = None,
+        max_total_minor: int | None = None,
+    ) -> dict[str, Any]:
+        """Show one chosen listing and its trusted evidence, before deciding."""
+
+        surface = self.playground
+        session, created = surface.open_session(session_id)
+        plan = surface.plan_for(
+            intent_text=intent,
+            catalog_product_id=catalog_product_id,
+            declared_ceiling_minor=max_total_minor,
+            session=session,
+        )
+        payload = surface.product_panel(plan)
+        payload["session"] = {"session_id": session.session_id, "created": created}
+        return payload
+
+    def playground_authorize(
+        self,
+        *,
+        intent: str,
+        catalog_product_id: str,
+        request_id: str,
+        session_id: object = None,
+        max_total_minor: int | None = None,
+        defer_execution: bool = False,
+    ) -> tuple[CommerceRun, bool, str]:
+        """Run the real controller over one sandbox listing."""
+
+        surface = self.playground
+        session, _created = surface.open_session(session_id)
+        plan = surface.plan_for(
+            intent_text=intent,
+            catalog_product_id=catalog_product_id,
+            declared_ceiling_minor=max_total_minor,
+            session=session,
+        )
+        run, deduplicated = self._start_planned_run(
+            plan=plan,
+            session=session,
+            request_id=request_id,
+            defer_execution=defer_execution,
+        )
+        return run, deduplicated, session.session_id
+
+    def playground_scenario(
+        self,
+        *,
+        scenario_id: str,
+        request_id: str,
+        session_id: object = None,
+    ) -> tuple[CommerceRun, bool, str, Scenario]:
+        """Run one pre-written judge scenario through the ordinary pathway."""
+
+        surface = self.playground
+        session, _created = surface.open_session(session_id)
+        scenario = surface.scenario(scenario_id)
+        if scenario.world == "REGISTERED":
+            if scenario.preset_id is None:
+                raise PlaygroundError(
+                    "SCENARIO_UNAVAILABLE",
+                    "This scenario names no registered preset to run.",
+                )
+            preset = _PRESETS_BY_ID[scenario.preset_id]
+            run, deduplicated = self.start_run(
+                user_intent=preset["intent"],
+                mode="offline",
+                preset_id=scenario.preset_id,
+                request_id=request_id,
+                defer_execution=scenario.defer_execution or None,
+                session_id=session.session_id,
+            )
+            self.playground.sessions.record_run(session, run.run_id)
+            return run, deduplicated, session.session_id, scenario
+        intent, product = surface.scenario_selection(scenario)
+        plan = SandboxRunPlan(
+            world="SANDBOX",
+            store=surface.store,
+            intent=intent,
+            product=product,
+        )
+        run, deduplicated = self._start_planned_run(
+            plan=plan,
+            session=session,
+            request_id=request_id,
+            defer_execution=scenario.defer_execution,
+        )
+        return run, deduplicated, session.session_id, scenario
+
+    def _start_planned_run(
+        self,
+        *,
+        plan: SandboxRunPlan,
+        session: JudgeSession,
+        request_id: str,
+        defer_execution: bool,
+    ) -> tuple[CommerceRun, bool]:
+        run, deduplicated = self.start_run(
+            user_intent=plan.intent.raw_text,
+            mode="offline",
+            preset_id=None,
+            request_id=request_id,
+            defer_execution=defer_execution,
+            selected_product=self.playground.selected_identity(plan),
+            world=plan.world,
+            session_id=session.session_id,
+            plan=plan,
+        )
+        if not deduplicated:
+            self.playground.sessions.record_run(session, run.run_id)
+        return run, deduplicated
+
+    def playground_run_snapshot(
+        self, run: CommerceRun, plan_intent: Any = None
+    ) -> dict[str, Any]:
+        """A run snapshot with the Playground's decision narration attached."""
+
+        snapshot = run.snapshot()
+        result = snapshot.get("result")
+        intent = plan_intent if plan_intent is not None else getattr(run.plan, "intent", None)
+        if isinstance(result, dict) and intent is not None:
+            snapshot["explanation"] = explain_decision(result, intent)
+        return snapshot
+
+    def authorize_run_access(self, run: CommerceRun, session_id: object) -> None:
+        """Refuse to act on a session-bound run for anybody but its session.
+
+        Run identifiers are 128-bit and unguessable, so this is defence in
+        depth rather than the only thing standing between two visitors. It is
+        here because a revocation demo that could cancel a stranger's
+        capability would be demonstrating the wrong thing.
+        """
+
+        if run.session_id is None:
+            return
+        try:
+            session = self.playground.require_session(session_id)
+        except PlaygroundError as error:
+            raise PermissionError("the Playground session is unavailable") from error
+        if (
+            session.session_id != run.session_id
+            or not self.playground.sessions.owns_run(session, run.run_id)
+        ):
+            raise PermissionError("this run belongs to another Playground session")
+
+    def playground_onboarding_form(
+        self, *, intent: str, catalog_product_id: str
+    ) -> dict[str, Any]:
+        """The merchant-side declaration form for one marketplace listing."""
+
+        selection = self.discovery.select(intent, catalog_product_id)
+        return {
+            "listing": selection["candidate"],
+            "marketplace_status": selection["selection"],
+            "form": self.playground.onboarding_form(selection["candidate"]),
+        }
+
+    def playground_onboard(
+        self,
+        *,
+        intent: str,
+        catalog_product_id: str,
+        declaration: object,
+        session_id: object = None,
+    ) -> dict[str, Any]:
+        """Create a new synthetic merchant record beside an untouched listing."""
+
+        surface = self.playground
+        session, created = surface.open_session(session_id)
+        selection = self.discovery.select(intent, catalog_product_id)
+        merchant = surface.onboard_listing(
+            session=session,
+            listing=selection["candidate"],
+            declaration=declaration,
+        )
+        payload = surface.onboarded_panel(merchant)
+        payload["session"] = {"session_id": session.session_id, "created": created}
+        payload["marketplace_listing_after_onboarding"] = self.discovery.select(
+            intent, catalog_product_id
+        )["selection"]
+        return payload
+
     def start_run(
         self,
         *,
@@ -957,6 +1223,9 @@ class CommerceLabService:
         top_k: int | None = None,
         defer_execution: bool | None = None,
         selected_product: SelectedProductIdentity | None = None,
+        world: str = "REGISTERED",
+        session_id: str | None = None,
+        plan: Any = None,
     ) -> tuple[CommerceRun, bool]:
         if not isinstance(user_intent, str) or not user_intent.strip():
             raise ValueError("user_intent must be a non-empty string")
@@ -974,6 +1243,12 @@ class CommerceLabService:
             selected_product, SelectedProductIdentity
         ):
             raise TypeError("selected_product must be SelectedProductIdentity or None")
+        if world not in _RUN_WORLDS:
+            raise ValueError("world is not registered")
+        if plan is not None and not isinstance(plan, SandboxRunPlan):
+            raise TypeError("plan must be SandboxRunPlan or None")
+        if (plan is None) is not (world == "REGISTERED"):
+            raise ValueError("a sandbox world requires a server-resolved plan")
         # Fail before a run thread, buyer, adapter, or network client exists.
         reject_monetary_problem(parse_monetary_constraint(user_intent))
         # `preset_id` selects an intent and nothing else. The evidence policy is
@@ -1001,12 +1276,18 @@ class CommerceLabService:
                     existing_preset,
                     existing_defer,
                     existing_product_id,
+                    existing_world,
+                    existing_session,
                 ) = existing
                 if (
                     existing_mode != mode
                     or existing_intent != normalized_intent
                     or existing_preset != preset_id
                     or existing_defer != should_defer
+                    or existing_world != world
+                    # Retrying an idempotent request from a different session
+                    # must not hand that session another visitor's run.
+                    or existing_session != session_id
                     or existing_product_id
                     != (
                         selected_product.catalog_product_id
@@ -1025,6 +1306,9 @@ class CommerceLabService:
                 top_k=top_k,
                 selected_product=selected_product,
                 defer_execution=should_defer,
+                world=world,
+                session_id=session_id,
+                plan=plan,
             )
             self._runs[run.run_id] = run
             self._requests[request_id] = (
@@ -1038,6 +1322,8 @@ class CommerceLabService:
                     if selected_product is not None
                     else None
                 ),
+                world,
+                session_id,
             )
             self._evict_oldest_runs()
         Thread(target=self._execute_run, args=(run,), daemon=True).start()
@@ -1530,7 +1816,12 @@ class CommerceLabService:
             active_step = "AI_BUYER"
             recorder.step("AI_BUYER", "RUNNING", "Commerce-only buyer executing")
 
-            tools = ObservedCommerceTools(self.store, recorder.tool)
+            # A Playground run reads a different catalogue. It does not read a
+            # different controller: everything downstream of this line is the
+            # same code path a registered-fixture run takes.
+            plan: SandboxRunPlan | None = run.plan
+            store = plan.store if plan is not None else self.store
+            tools = ObservedCommerceTools(store, recorder.tool)
             operational_counters = OperationalCounters()
             run_registry = self.recovery_registry.instrumented(
                 lambda _merchant_id: (
@@ -1538,7 +1829,11 @@ class CommerceLabService:
                 )
             )
             if run.mode == "offline":
-                buyer_delegate: CommerceBuyer = ToolDrivenOfflineBuyer(tools)
+                buyer_delegate: CommerceBuyer = (
+                    SandboxBuyer(tools=tools, intent=plan.intent)
+                    if plan is not None
+                    else ToolDrivenOfflineBuyer(tools)
+                )
                 embedding = HashingEmbeddingProvider()
                 semantic_delegate = TimedSemanticModel(DeterministicSemanticModel())
                 evaluated_at = self._trusted_now()
@@ -1712,7 +2007,7 @@ class CommerceLabService:
             checkout = run_agentic_checkout(
                 user_intent=run.user_intent,
                 buyer=fixed_buyer,
-                store=self.store,
+                store=store,
                 retriever=retriever,
                 semantic_verifier=verifier,
                 evaluated_at=evaluated_at,
@@ -1767,11 +2062,11 @@ class CommerceLabService:
                     order_id=checkout.execution_result.razorpay_order_id,
                     environment=("OFFLINE_DEMO" if run.mode == "offline" else "TEST"),
                 )
-            semantic_evidence = self._semantic_evidence_for_checkout(checkout)
+            semantic_evidence = self._semantic_evidence_for_checkout(checkout, store)
             recovery_state = None
             if checkout.authorization_result.final_action is DecisionAction.REVIEW:
                 recovery_state = create_review_recovery(
-                    scenario=self._replay_scenario(checkout, evaluated_at),
+                    scenario=self._replay_scenario(checkout, evaluated_at, store),
                     authorization=checkout.authorization_result,
                     semantic_evidence=semantic_evidence,
                     registry=run_registry,
@@ -1784,7 +2079,7 @@ class CommerceLabService:
                 execution_runtime=runtime,
                 client=execution_client,
                 evaluated_at=evaluated_at,
-                store=self.store,
+                store=store,
                 semantic_verifier=verifier,
                 semantic_evidence=semantic_evidence,
                 operational_counters=operational_counters,
@@ -1820,7 +2115,7 @@ class CommerceLabService:
             run.completion.set()
 
     def _semantic_evidence_for_checkout(
-        self, checkout: AgenticCheckoutResult
+        self, checkout: AgenticCheckoutResult, store: TrustedCommerceStore
     ) -> SemanticEvidence | None:
         proposal = checkout.buyer_output.proposal
         selected_ids = tuple(
@@ -1828,7 +2123,7 @@ class CommerceLabService:
         )
         if not selected_ids:
             return None
-        entries = self.store.resolve_evidence_ids(
+        entries = store.resolve_evidence_ids(
             selected_ids,
             merchant_id=proposal.merchant_id,
             sku=proposal.sku,
@@ -1843,10 +2138,13 @@ class CommerceLabService:
         )
 
     def _replay_scenario(
-        self, checkout: AgenticCheckoutResult, evaluated_at: datetime
+        self,
+        checkout: AgenticCheckoutResult,
+        evaluated_at: datetime,
+        store: TrustedCommerceStore,
     ) -> ReplayScenario:
         merchant_id = checkout.transaction.payload.merchant_id
-        catalog = self.store.catalog_snapshot(merchant_id=merchant_id)
+        catalog = store.catalog_snapshot(merchant_id=merchant_id)
         return ReplayScenario(
             mandate=checkout.mandate,
             transaction=checkout.transaction,

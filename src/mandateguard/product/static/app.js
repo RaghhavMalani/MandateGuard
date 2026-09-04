@@ -188,7 +188,7 @@ export const EVALUATION_EVIDENCE = {
 
 /** Engineering quality only. Updated when the suites change; a test count is
     never presented as scale, model quality, or authorization evidence. */
-export const TEST_TOTALS = { python: 1061, ui: 87 };
+export const TEST_TOTALS = { python: 1214, ui: 94 };
 
 export class SubmissionLock {
   #locked = false;
@@ -685,6 +685,21 @@ export function renderDiscoveryCandidate(candidate, { selected = false } = {}) {
 
       <p class="listing__next">${escapeHtml(candidate.transactability?.next_action || "")}</p>
 
+      ${
+        registered
+          ? ""
+          : `<div class="listing__trustgap">
+              <p class="listing__notready">NOT YET AGENT-TRANSACTABLE</p>
+              <p class="listing__needsk">WHAT WOULD THIS MERCHANT NEED?</p>
+              <ul class="listing__needs">
+                <li>Publish identity</li>
+                <li>Publish exact SKU evidence</li>
+                <li>Publish billing and recurrence</li>
+                <li>Version the evidence</li>
+              </ul>
+            </div>`
+      }
+
       <details class="disclosure disclosure--inline">
         <summary class="disclosure__summary">
           <span>Technical detail</span>
@@ -719,7 +734,7 @@ export function renderDiscoveryCandidate(candidate, { selected = false } = {}) {
         <button class="btn ${
           candidate.transactable ? "btn--primary" : "btn--secondary"
         }" type="button" data-select="${escapeHtml(candidate.catalog_product_id)}">
-          ${candidate.transactable ? "AUTHORIZE THIS PURCHASE" : "WHY CAN'T I BUY THIS?"}
+          ${candidate.transactable ? "AUTHORIZE THIS PURCHASE" : "SIMULATE MERCHANT ONBOARDING"}
         </button>
       </div>
     </article>`;
@@ -2024,6 +2039,747 @@ function revealFigure(element) {
   });
 }
 
+/* ------------------------------------------------------------------ */
+/* Playground                                                          */
+/*                                                                     */
+/* Everything below renders. Nothing below decides. The verdict, the    */
+/* reasons, the provider-call counts and the readiness signals all come */
+/* from the server's recorded run; where this file computes anything it */
+/* is a label or a percentage of a bar, never a conclusion about        */
+/* whether a purchase is permitted.                                     */
+/* ------------------------------------------------------------------ */
+
+/** The stages the live rail walks through, in order. */
+export const PLAYGROUND_RAIL = [
+  { id: "INTENT", label: "User intent" },
+  { id: "SEARCH", label: "Agent searching the sandbox" },
+  { id: "CANDIDATES", label: "Candidates" },
+  { id: "SELECT", label: "Product selected" },
+  { id: "EVIDENCE", label: "Trusted evidence" },
+  { id: "MANDATEGUARD", label: "MandateGuard" },
+  { id: "DECISION", label: "Allow / Block / Review" },
+  { id: "PAYMENT", label: "Payment gate" },
+];
+
+const RAIL_ORDER = PLAYGROUND_RAIL.map((item) => item.id);
+
+/**
+ * Turn what has happened so far into one state per rail stage.
+ *
+ * `decision` is read from the run, never inferred: a rail that guessed a
+ * verdict from how far the run had got would show ALLOW while the controller
+ * was still deciding.
+ */
+export function railStates({ intent, candidates, selected, evidence, snapshot } = {}) {
+  const decision = snapshot?.result?.decision || null;
+  const running = snapshot && !terminalStates.has(snapshot.state);
+  const executionStatus = snapshot?.result?.execution?.status || null;
+  const done = (flag) => (flag ? "done" : "waiting");
+  const states = {
+    INTENT: done(Boolean(intent)),
+    SEARCH: candidates ? "done" : intent ? "active" : "waiting",
+    CANDIDATES: done(Boolean(candidates && candidates.length)),
+    SELECT: done(Boolean(selected)),
+    EVIDENCE: done(Boolean(evidence && evidence.length)),
+    MANDATEGUARD: decision ? "done" : selected && running ? "active" : "waiting",
+    DECISION: decision ? String(decision).toLowerCase() : "waiting",
+    PAYMENT: "waiting",
+  };
+  if (decision && decision !== "ALLOW") {
+    states.PAYMENT = "stopped";
+  } else if (executionStatus === "ORDER_CREATED") {
+    states.PAYMENT = "done";
+  } else if (executionStatus === "AUTHORIZED") {
+    states.PAYMENT = "active";
+  } else if (executionStatus) {
+    states.PAYMENT = "stopped";
+  }
+  return states;
+}
+
+export function renderPlaygroundRail(context) {
+  const states = railStates(context || {});
+  const detail = {
+    SEARCH: context?.catalogSize
+      ? `${Number(context.catalogSize).toLocaleString("en-IN")} sandbox products`
+      : "",
+    CANDIDATES: context?.candidates ? `${context.candidates.length} found` : "",
+    SELECT: context?.selected ? context.selected.name : "",
+    EVIDENCE: context?.evidence ? `${context.evidence.length} trusted records` : "",
+    DECISION: context?.snapshot?.result?.decision || "",
+    PAYMENT: playgroundPaymentDetail(context?.snapshot),
+  };
+  const rows = PLAYGROUND_RAIL.map((stage, index) => {
+    const state = states[stage.id] || "waiting";
+    return `
+      <li class="rail__step" data-state="${escapeHtml(state)}" data-stage="${escapeHtml(stage.id)}">
+        <span class="rail__index">${index + 1}</span>
+        <span class="rail__line" aria-hidden="true"></span>
+        <span class="rail__body">
+          <span class="rail__label">${escapeHtml(stage.label)}</span>
+          <span class="rail__detail">${escapeHtml(detail[stage.id] || "")}</span>
+        </span>
+      </li>`;
+  }).join("");
+  return `<ol class="rail__list">${rows}</ol>`;
+}
+
+function playgroundPaymentDetail(snapshot) {
+  const execution = snapshot?.result?.execution;
+  if (!execution) return "";
+  if (execution.status === "ORDER_CREATED") return "Simulated offline order created";
+  if (execution.status === "AUTHORIZED") return "Capability issued, not yet spent";
+  return `Not reached — ${execution.razorpay_calls ?? 0} provider calls`;
+}
+
+export function railProgress(context) {
+  const states = railStates(context || {});
+  const reached = RAIL_ORDER.filter((id) => states[id] !== "waiting").length;
+  return Number((reached / RAIL_ORDER.length).toFixed(3));
+}
+
+/* ---------------- readiness ---------------- */
+
+const READINESS_ROWS = [
+  ["merchant_identity", "Merchant identity"],
+  ["sku_evidence", "SKU evidence"],
+  ["authoritative_price", "Authoritative price"],
+  ["billing_model", "Billing model"],
+  ["content_classification", "Content classification"],
+  ["intended_use", "Intended use"],
+  ["evidence_version", "Evidence version"],
+];
+
+const READINESS_WORD = {
+  DECLARED: "VERIFIED",
+  NOT_DECLARED: "NOT DECLARED",
+  CONFLICTED: "CONFLICTED",
+  CURRENT: "CURRENT",
+  UNKNOWN: "UNKNOWN",
+};
+
+export function renderReadiness(readiness) {
+  if (!readiness) return "";
+  const rows = READINESS_ROWS.filter(([key]) => readiness[key] !== undefined)
+    .map(([key, label]) => {
+      const raw = String(readiness[key]);
+      const word = READINESS_WORD[raw] || raw;
+      const tone =
+        raw === "DECLARED" || raw === "CURRENT"
+          ? "ok"
+          : raw === "CONFLICTED"
+            ? "conflict"
+            : "missing";
+      return `
+        <li class="readiness__row" data-field="${escapeHtml(key)}" data-tone="${tone}">
+          <span class="readiness__k">${escapeHtml(label)}</span>
+          <span class="readiness__v">${escapeHtml(word)}</span>
+        </li>`;
+    })
+    .join("");
+  return `<ul class="readiness">${rows}</ul>`;
+}
+
+/* ---------------- candidates ---------------- */
+
+export function renderWhyFound(why) {
+  if (!why) return "";
+  const semantic = Number(why.semantic_similarity || 0);
+  const rows = [
+    [
+      "Semantic similarity",
+      semantic > 0
+        ? `${semantic.toFixed(2)} · deterministic category synonym`
+        : "no category-synonym signal",
+    ],
+    [
+      "Lexical signal",
+      why.matched_terms?.length
+        ? `${why.matched_terms.join(", ")} · score ${Number(why.lexical_score || 0).toFixed(2)}`
+        : "no direct term match",
+    ],
+    ["Budget", why.within_budget === false ? "above your limit" : "within your limit"],
+    ["Brand preference", why.brand_match || "none stated"],
+    ["Category match", why.category_match || "related listing text"],
+  ];
+  if (why.exact_phrase_match) rows[1][1] += ` · exact phrase “${why.exact_phrase_match}”`;
+  if (why.source) rows.push(["Source", "created by your simulated onboarding"]);
+  return `
+    <div class="pgcard__why">
+      <p class="pgcard__whyk">WHY THE AGENT FOUND IT</p>
+      <dl class="pgcard__signals">
+        ${rows
+          .map(
+            ([label, value]) =>
+              `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(String(value))}</dd></div>`,
+          )
+          .join("")}
+      </dl>
+    </div>`;
+}
+
+export function renderPlaygroundCandidate(candidate, { selected = false } = {}) {
+  if (!candidate) return "";
+  const recurring = candidate.recurring
+    ? '<span class="pgcard__flag" data-tone="warn">RENEWING PLAN</span>'
+    : "";
+  const onboarded = candidate.onboarded
+    ? '<span class="pgcard__flag" data-tone="new">ONBOARDED IN THIS SESSION</span>'
+    : "";
+  return `
+    <article class="pgcard" data-product="${escapeHtml(candidate.catalog_product_id)}"
+             data-selected="${selected ? "true" : "false"}">
+      <header class="pgcard__head">
+        <h3 class="pgcard__name">${escapeHtml(candidate.name)}</h3>
+        <p class="pgcard__price">${money(candidate.price_minor, candidate.currency)}</p>
+      </header>
+      <p class="pgcard__meta">
+        <span>${escapeHtml(candidate.merchant)}</span>
+        <span aria-hidden="true">·</span>
+        <span>${escapeHtml(candidate.category)}</span>
+        ${recurring}${onboarded}
+      </p>
+      ${renderWhyFound(candidate.why_found)}
+      <div class="pgcard__readiness">
+        <p class="pgcard__readinessk">AGENT READINESS</p>
+        ${renderReadiness(candidate.readiness)}
+      </div>
+      <details class="pgcard__detail">
+        <summary>Technical detail</summary>
+        <dl class="pgcard__dl">
+          <div><dt>Merchant ID</dt><dd>${escapeHtml(candidate.merchant_id)}</dd></div>
+          <div><dt>SKU</dt><dd>${escapeHtml(candidate.sku)}</dd></div>
+          <div><dt>Billing model</dt><dd>${escapeHtml(candidate.billing_model)}</dd></div>
+          <div><dt>Recurrence record</dt><dd>${escapeHtml(candidate.recurrence_declaration)}</dd></div>
+          <div><dt>Evidence version</dt><dd>${escapeHtml(candidate.evidence_version)}</dd></div>
+          <div><dt>Effective from</dt><dd>${escapeHtml(candidate.effective_from)}</dd></div>
+        </dl>
+      </details>
+      <button type="button" class="pgcard__go" data-authorize="${escapeHtml(
+        candidate.catalog_product_id,
+      )}">CHECK AUTHORIZATION</button>
+    </article>`;
+}
+
+export function renderPlaygroundCandidates(payload, selectedId = null) {
+  const candidates = payload?.candidates || [];
+  if (!candidates.length) return "";
+  return candidates
+    .map((candidate) =>
+      renderPlaygroundCandidate(candidate, {
+        selected: candidate.catalog_product_id === selectedId,
+      }),
+    )
+    .join("");
+}
+
+/**
+ * The empty-result panel.
+ *
+ * A dead end here would be a bug in the product, not a fact about the world:
+ * the search knows which constraint removed each near miss, so it says so and
+ * shows the listing rather than reporting nothing at all.
+ */
+export function renderNoMatch(payload) {
+  if (!payload || (payload.candidates || []).length) return "";
+  const applied = (payload.constraints_applied || [])
+    .map((line) => `<li>${escapeHtml(line)}</li>`)
+    .join("");
+  const misses = (payload.near_misses || [])
+    .map(
+      (miss) => `
+        <li class="nomatch__miss">
+          <p class="nomatch__name">${escapeHtml(miss.name)}
+            <span class="nomatch__price">${money(miss.price_minor, miss.currency)}</span></p>
+          <p class="nomatch__why"><span data-constraint="${escapeHtml(
+            miss.excluded_by,
+          )}">${escapeHtml(miss.excluded_by)}</span> ${escapeHtml(miss.explanation)}</p>
+        </li>`,
+    )
+    .join("");
+  return `
+    <div class="nomatch">
+      <p class="nomatch__head">${escapeHtml(
+        payload.no_match_message || "No suitable sandbox product matched all of your constraints.",
+      )}</p>
+      ${applied ? `<p class="nomatch__k">CONSTRAINTS APPLIED</p><ul class="nomatch__list">${applied}</ul>` : ""}
+      ${
+        misses
+          ? `<p class="nomatch__k">CLOSEST CANDIDATES, AND WHAT EXCLUDED THEM</p>
+             <ul class="nomatch__misses">${misses}</ul>`
+          : ""
+      }
+    </div>`;
+}
+
+/* ---------------- mandate reading ---------------- */
+
+export function renderPlaygroundMandate(payload) {
+  const lines = (payload?.mandate_plain_english || [])
+    .map((line) => `<li>${escapeHtml(line)}</li>`)
+    .join("");
+  if (!lines) return "";
+  return `
+    <div class="pgmandate">
+      <p class="pgmandate__k">WHAT MANDATEGUARD READ YOUR INSTRUCTION TO MEAN</p>
+      <ul class="pgmandate__list">${lines}</ul>
+      <p class="pgmandate__note">
+        Reading an instruction is an advisory step with no authority. Every constraint above is
+        enforced by the controller, not by the reader.
+      </p>
+    </div>`;
+}
+
+/**
+ * The spending-limit prompt.
+ *
+ * MandateGuard will not authorize an unbounded purchase, so an instruction that
+ * names no ceiling has to acquire one before the check can run. The number is
+ * asked for rather than invented, and a ceiling written into the instruction
+ * always wins over anything set here.
+ */
+export function renderSpendingLimitPrompt(payload, suggestedMinor) {
+  if (!payload?.spending_limit_required) return "";
+  const suggestion = Number.isFinite(Number(suggestedMinor))
+    ? Math.max(1, Math.round(Number(suggestedMinor) / 100))
+    : "";
+  return `
+    <div class="pglimit">
+      <p class="pglimit__head">You did not state a spending limit.</p>
+      <p class="pglimit__body">
+        MandateGuard will not authorize a purchase without one. Set the most you are willing to
+        spend, then check a candidate.
+      </p>
+      <label class="pglimit__field">
+        <span>SPENDING LIMIT (INR)</span>
+        <input type="number" id="pg-limit-input" min="1" max="1000000" step="1"
+               value="${escapeHtml(String(suggestion))}" inputmode="numeric" />
+      </label>
+    </div>`;
+}
+
+/* ---------------- chosen product and its evidence ---------------- */
+
+export function renderChosenProduct(panel) {
+  if (!panel?.product) return "";
+  const product = panel.product;
+  const evidence = (panel.trusted_evidence || [])
+    .map(
+      (entry) => `
+        <article class="pgev" data-scope="${escapeHtml(entry.scope)}">
+          <p class="pgev__head">
+            <span class="pgev__kind">${escapeHtml(humanize(entry.source_kind))}</span>
+            <span class="pgev__scope">${escapeHtml(entry.scope)}</span>
+          </p>
+          <p class="pgev__text">${escapeHtml(entry.text)}</p>
+          <p class="pgev__id">${escapeHtml(entry.evidence_id)}</p>
+        </article>`,
+    )
+    .join("");
+  return `
+    <div class="pgchosen">
+      <div class="pgchosen__head">
+        <div>
+          <h3 class="pgchosen__name">${escapeHtml(product.name)}</h3>
+          <p class="pgchosen__meta">${escapeHtml(product.merchant)} · ${escapeHtml(
+            product.sku,
+          )}</p>
+        </div>
+        <p class="pgchosen__price">${money(product.price_minor, product.currency)}</p>
+      </div>
+      <div class="pgchosen__readiness">${renderReadiness(panel.readiness)}</div>
+      <div class="pgchosen__evidence">${evidence}</div>
+      <p class="pgchosen__notice">${escapeHtml(
+        panel.notice || "SIMULATED MERCHANT SANDBOX. No real money moves.",
+      )}</p>
+    </div>`;
+}
+
+/* ---------------- verdict ---------------- */
+
+export function renderPlaygroundVerdict(snapshot) {
+  const result = snapshot?.result;
+  if (!result) return "";
+  const decision = String(result.decision || "");
+  const explanation = snapshot.explanation || {};
+  return `
+    <div class="pgverdict" data-decision="${escapeHtml(decision)}">
+      <p class="pgverdict__k">MANDATEGUARD</p>
+      <p class="pgverdict__word">${escapeHtml(decision)}</p>
+      <p class="pgverdict__headline">${escapeHtml(
+        explanation.headline || result.decision_reason || "",
+      )}</p>
+    </div>`;
+}
+
+export function renderPlaygroundWhy(snapshot) {
+  const explanation = snapshot?.explanation;
+  if (!explanation) return "";
+  const why = (explanation.why || [])
+    .map((line) => `<li>${escapeHtml(line)}</li>`)
+    .join("");
+  const failed = (explanation.failed_constraints || [])
+    .map((item) => `<li><code>${escapeHtml(item)}</code></li>`)
+    .join("");
+  return `
+    <div class="pgwhy">
+      <p class="pgwhy__k">WHY</p>
+      <ul class="pgwhy__list">${why}</ul>
+      ${
+        failed
+          ? `<p class="pgwhy__k">FAILED CONSTRAINT</p><ul class="pgwhy__failed">${failed}</ul>`
+          : ""
+      }
+      <dl class="pgwhy__counts">
+        <div><dt>PROVIDER CALLS</dt><dd>${escapeHtml(String(explanation.provider_calls ?? 0))}</dd></div>
+        <div><dt>EXTERNAL CALLS</dt><dd>${escapeHtml(
+          String(explanation.external_network_calls ?? 0),
+        )}</dd></div>
+        <div><dt>DECIDED BY</dt><dd>${escapeHtml(explanation.controller || "")}</dd></div>
+      </dl>
+    </div>`;
+}
+
+/**
+ * The execution panel.
+ *
+ * The offline adapter creates a record shaped like a Razorpay order and calls
+ * nothing. It is labelled a simulated offline order everywhere it appears,
+ * because a demo that implied money had been captured would be making a claim
+ * about a payment provider that never happened.
+ */
+export function renderPlaygroundExecution(snapshot) {
+  const execution = snapshot?.result?.execution;
+  if (!execution) return "";
+  const created = execution.status === "ORDER_CREATED";
+  const order = execution.order || null;
+  const buyer = snapshot?.result?.buyer || {};
+  const rows = [
+    ["STATUS", humanize(execution.status)],
+    ["ORDER", order?.order_id || (created ? "" : "not created")],
+    ["AMOUNT", money(order?.amount ?? buyer.price_minor, order?.currency || buyer.currency)],
+    ["MERCHANT", buyer.merchant || ""],
+    ["SKU", buyer.sku || ""],
+    ["CAPABILITY", created ? "consumed" : execution.consent?.status ? "issued" : ""],
+    // Consent is checked when the capability is spent, not only when it was
+    // issued, so the state at spend time is the interesting one to show.
+    ["CONSENT AT SPEND TIME", execution.consent?.status || ""],
+    ["REFUSED BECAUSE", execution.reason || ""],
+    ["PROVIDER ADAPTER CALLS", String(execution.razorpay_calls ?? 0)],
+    ["EXTERNAL CALLS", String(execution.external_network_calls ?? 0)],
+  ]
+    .filter(([, value]) => value !== "" && value !== null && value !== undefined)
+    .map(
+      ([key, value]) =>
+        `<div><dt>${escapeHtml(key)}</dt><dd>${escapeHtml(String(value))}</dd></div>`,
+    )
+    .join("");
+  return `
+    <div class="pgexec" data-created="${created ? "true" : "false"}">
+      <p class="pgexec__k">${created ? "SIMULATED OFFLINE ORDER" : "PAYMENT NOT REACHED"}</p>
+      <dl class="pgexec__rows">${rows}</dl>
+      <p class="pgexec__note">
+        Offline Razorpay-style test adapter. No external network call was made, no money moved,
+        and nothing was captured or settled at a payment provider.
+      </p>
+    </div>`;
+}
+
+export function renderPlaygroundFollowUps(snapshot) {
+  const result = snapshot?.result;
+  if (!result) return "";
+  const execution = result.execution || {};
+  const buttons = [];
+  if (execution.status === "AUTHORIZED") {
+    buttons.push(
+      '<button type="button" class="pgfollow__btn" id="pg-revoke">REVOKE MY PERMISSION</button>',
+      '<button type="button" class="pgfollow__btn" id="pg-execute">ATTEMPT EXECUTION</button>',
+    );
+  }
+  if (execution.status === "ORDER_CREATED" && !execution.replay) {
+    buttons.push(
+      '<button type="button" class="pgfollow__btn" id="pg-replay">REPLAY THE SAME CAPABILITY</button>',
+    );
+  }
+  if (result.decision === "REVIEW" && result.recovery?.action?.enabled) {
+    buttons.push(
+      '<button type="button" class="pgfollow__btn" id="pg-recover">ACQUIRE TRUSTED EVIDENCE</button>',
+    );
+  }
+  const note =
+    result.decision === "REVIEW" && result.recovery && !result.recovery.action?.enabled
+      ? `<p class="pgfollow__note">${escapeHtml(
+          "No trusted evidence provider is configured for this merchant, so this REVIEW cannot " +
+            "be recovered here. The RECOVERABLE REVIEW journey shows a merchant that has one.",
+        )}</p>`
+      : "";
+  const replay = execution.replay
+    ? `<p class="pgfollow__note" data-replay="${escapeHtml(execution.replay.status)}">${escapeHtml(
+        `Second presentation of the same capability: ${execution.replay.status} (${execution.replay.reason}), ` +
+          `${execution.replay.razorpay_additional_calls} additional provider calls.`,
+      )}</p>`
+    : "";
+  if (!buttons.length && !note && !replay) return "";
+  return `<div class="pgfollow">${buttons.join("")}${note}${replay}</div>`;
+}
+
+/* ---------------- scenarios, examples, the gap figure ---------------- */
+
+export function renderScenarioGrid(scenarios) {
+  return (scenarios || [])
+    .map(
+      (item) => `
+        <button type="button" class="pgscenario" data-scenario="${escapeHtml(item.scenario_id)}">
+          <span class="pgscenario__label">${escapeHtml(item.label)}</span>
+          <span class="pgscenario__story">${escapeHtml(item.story)}</span>
+          <span class="pgscenario__world" data-world="${escapeHtml(item.world)}">${escapeHtml(
+            item.world === "REGISTERED" ? "REGISTERED MERCHANT FIXTURES" : "SANDBOX",
+          )}</span>
+        </button>`,
+    )
+    .join("");
+}
+
+export function renderTryThese(examples) {
+  return (examples || [])
+    .map(
+      (item) =>
+        `<button type="button" class="pgtry" data-intent="${escapeHtml(
+          item.intent,
+        )}" data-defer-execution="${item.defer_execution ? "true" : "false"}">${escapeHtml(
+          item.label,
+        )}</button>`,
+    )
+    .join("");
+}
+
+/**
+ * Searchable, agent-ready, authorized now.
+ *
+ * Three populations that must never be added together. The bar widths are
+ * illustrative proportions of the largest population; the numbers beside them
+ * are the real counts.
+ */
+export function renderGapFigure({ marketplace, sandbox, authorizedNote } = {}) {
+  const listings = Number(marketplace || 0);
+  const products = Number(sandbox || 0);
+  const scale = Math.max(listings, products, 1);
+  const bar = (value) => Math.max(4, Math.round((Number(value || 0) / scale) * 100));
+  return `
+    <ol class="gapfig">
+      <li class="gapfig__row" data-tier="searchable">
+        <p class="gapfig__k">SEARCHABLE</p>
+        <p class="gapfig__v">${listings.toLocaleString("en-IN")}</p>
+        <p class="gapfig__what">historical marketplace listings</p>
+        <span class="gapfig__bar" style="--gap-width:${bar(listings)}%"></span>
+      </li>
+      <li class="gapfig__gap"><span>trust gap — no published merchant evidence</span></li>
+      <li class="gapfig__row" data-tier="ready">
+        <p class="gapfig__k">AGENT-READY</p>
+        <p class="gapfig__v">${products.toLocaleString("en-IN")}</p>
+        <p class="gapfig__what">synthetic sandbox products with complete evidence</p>
+        <span class="gapfig__bar" style="--gap-width:${bar(products)}%"></span>
+      </li>
+      <li class="gapfig__gap"><span>your mandate, right now</span></li>
+      <li class="gapfig__row" data-tier="authorized">
+        <p class="gapfig__k">AUTHORIZED NOW</p>
+        <p class="gapfig__v">&mdash;</p>
+        <p class="gapfig__what">${escapeHtml(
+          authorizedNote || "only the products that pass the check you just ran",
+        )}</p>
+        <span class="gapfig__bar" style="--gap-width:6%"></span>
+      </li>
+    </ol>`;
+}
+
+export function renderScaleWorlds(config, playground) {
+  const rows = [
+    [
+      "DISCOVERY REALITY",
+      Number(config?.discovery?.catalog?.listings || 0).toLocaleString("en-IN"),
+      "historical marketplace listings, searchable only",
+    ],
+    [
+      "JUDGE SANDBOX",
+      Number(playground?.catalog?.products || 0).toLocaleString("en-IN"),
+      "synthetic evidence-complete products",
+    ],
+    [
+      "AUTHORIZATION SCALE",
+      Number(config?.system_scale?.authorization_scale?.cases || 0).toLocaleString("en-IN") ||
+        "see benchmark",
+      "synthetic authorization benchmark cases",
+    ],
+    ["MODEL QUALITY", "retrieval + classifier", "advisory metrics, never authorization"],
+  ];
+  return `
+    <div class="scaleworlds">
+      ${rows
+        .map(
+          ([key, value, note]) => `
+        <div class="scaleworlds__row">
+          <p class="scaleworlds__k">${escapeHtml(key)}</p>
+          <p class="scaleworlds__v">${escapeHtml(String(value))}</p>
+          <p class="scaleworlds__n">${escapeHtml(note)}</p>
+        </div>`,
+        )
+        .join("")}
+      <p class="scaleworlds__note">
+        These are four different populations. They are never combined into a single
+        "products supported" number, because no such number would be true of all of them.
+      </p>
+    </div>`;
+}
+
+/* ---------------- simulated merchant onboarding ---------------- */
+
+export function renderOnboardingForm(payload) {
+  const form = payload?.form;
+  if (!form) return "";
+  const copied = form.copied_from_listing || {};
+  const generated = (form.generated_declarations || [])
+    .map(
+      (field) => `
+        <div class="onboard__generated">
+          <span class="onboard__label">${escapeHtml(field.label)}</span>
+          <code>${escapeHtml(field.value)}</code>
+          <span class="onboard__why">${escapeHtml(field.why)}</span>
+        </div>`,
+    )
+    .join("");
+  const fields = (form.required_declarations || [])
+    .map((field) => {
+      const id = `onboard-${field.field}`;
+      if (field.type === "choice") {
+        const options = (field.choices || [])
+          .map((choice) => `<option value="${escapeHtml(choice)}">${escapeHtml(choice)}</option>`)
+          .join("");
+        return `
+          <label class="onboard__field">
+            <span class="onboard__label">${escapeHtml(field.label)}</span>
+            <select id="${escapeHtml(id)}" data-declare="${escapeHtml(field.field)}">${options}</select>
+            <span class="onboard__why">${escapeHtml(field.why)}</span>
+          </label>`;
+      }
+      if (field.type === "multi-choice") {
+        const options = (field.choices || [])
+          .map(
+            (choice) => `
+              <label class="onboard__check">
+                <input type="checkbox" value="${escapeHtml(choice)}" data-purpose="true" />
+                <span>${escapeHtml(choice)}</span>
+              </label>`,
+          )
+          .join("");
+        return `
+          <fieldset class="onboard__field">
+            <legend class="onboard__label">${escapeHtml(field.label)}</legend>
+            <div class="onboard__checks">${options}</div>
+            <span class="onboard__why">${escapeHtml(field.why)}</span>
+          </fieldset>`;
+      }
+      const prefill = form.prefilled?.[field.field];
+      return `
+        <label class="onboard__field">
+          <span class="onboard__label">${escapeHtml(field.label)}</span>
+          <input type="${field.type === "integer" ? "number" : "text"}"
+                 id="${escapeHtml(id)}" data-declare="${escapeHtml(field.field)}"
+                 value="${escapeHtml(prefill === null || prefill === undefined ? "" : String(prefill))}" />
+          <span class="onboard__why">${escapeHtml(field.why)}</span>
+        </label>`;
+    })
+    .join("");
+  return `
+    <div class="onboard__form">
+      <p class="onboard__notice">${escapeHtml(form.notice)}</p>
+      <div class="onboard__copied">
+        <p class="onboard__k">CARRIED ACROSS FROM THE LISTING</p>
+        <p class="onboard__copiedv">${escapeHtml(copied.title || "")}</p>
+        <p class="onboard__copiedv">${escapeHtml(copied.category_label || "")}</p>
+        <p class="onboard__why">${escapeHtml(copied.note || "")}</p>
+      </div>
+      <p class="onboard__k">GENERATED, EXACTLY BOUND DECLARATIONS</p>
+      <div class="onboard__fields">${generated}</div>
+      <p class="onboard__k">THE MERCHANT MUST NOW DECLARE</p>
+      <div class="onboard__fields">${fields}</div>
+      <button type="button" class="onboard__submit" id="onboard-publish">
+        PUBLISH EVIDENCE AND RE-RUN AUTHORIZATION
+      </button>
+    </div>`;
+}
+
+export function renderOnboardedResult(payload) {
+  if (!payload?.product) return "";
+  const source = payload.source_listing || {};
+  const product = payload.product;
+  const declarationRows = [
+    ["Authoritative price", money(product.price_minor, product.currency)],
+    ["SKU ownership", `${product.merchant_id} / ${product.sku}`],
+    ["Billing model", product.billing_model],
+    ["Recurrence", product.recurrence_declaration],
+    ["Purpose", (product.purpose_claims || []).join(", ") || "not declared"],
+    ["Exclusions", (product.exclusion_claims || []).join(", ") || "not declared"],
+  ]
+    .map(
+      ([label, value]) =>
+        `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(String(value))}</dd></div>`,
+    )
+    .join("");
+  return `
+    <div class="onboarded">
+      <p class="onboarded__notice">${escapeHtml(payload.notice)}</p>
+      <div class="onboarded__grid">
+        <div class="onboarded__col">
+          <p class="onboard__k">NEW SYNTHETIC MERCHANT RECORD</p>
+          <p class="onboarded__name">${escapeHtml(payload.merchant?.display_name || "")}</p>
+          <p class="onboarded__meta">${escapeHtml(payload.merchant?.merchant_id || "")}</p>
+          <p class="onboarded__meta">${escapeHtml(payload.merchant?.sku || "")}</p>
+          ${renderReadiness(payload.readiness)}
+          <dl class="onboarded__declaration">${declarationRows}</dl>
+        </div>
+        <div class="onboarded__col">
+          <p class="onboard__k">THE ORIGINAL MARKETPLACE LISTING</p>
+          <p class="onboarded__name">${escapeHtml(source.title || "")}</p>
+          <p class="onboarded__still" data-untrusted="${source.still_untrusted ? "true" : "false"}">
+            STILL UNTRUSTED
+          </p>
+          <p class="onboarded__meta">${escapeHtml(source.note || "")}</p>
+        </div>
+      </div>
+      <button type="button" class="onboard__submit" id="onboard-authorize"
+              data-product="${escapeHtml(payload.product.catalog_product_id)}">
+        RUN AUTHORIZATION AGAINST THE NEW RECORD
+      </button>
+    </div>`;
+}
+
+export function renderJudgeHealth(report) {
+  if (!report) {
+    return `<p class="viewnote">The Playground outcome report has not been generated in this deployment.</p>`;
+  }
+  const row = (label, distribution) => `
+    <div class="health__row">
+      <p class="health__k">${escapeHtml(label)}</p>
+      <p class="health__v">allow ${escapeHtml(String(distribution.rates.ALLOW))}</p>
+      <p class="health__v">block ${escapeHtml(String(distribution.rates.BLOCK))}</p>
+      <p class="health__v">review ${escapeHtml(String(distribution.rates.REVIEW))}</p>
+      <p class="health__v">no result ${escapeHtml(String(distribution.rates.NO_RESULT))}</p>
+    </div>`;
+  return `
+    <div class="health">
+      <p class="health__meta">${escapeHtml(
+        `${report.queries} frozen judge queries, candidate found rate ${report.overall.candidate_found_rate}`,
+      )}</p>
+      ${row("Top candidate", report.overall)}
+      ${row("Ordinary requests", report.ordinary)}
+      ${row("Insisting on a flagged listing", report.insistent_selection)}
+      <p class="health__note">
+        An experience target, not a safety contract. Every outcome above came from the same
+        controller that decides a live run.
+      </p>
+    </div>`;
+}
+
 function init() {
   const $ = (selector) => document.querySelector(selector);
   const elements = {
@@ -2065,6 +2821,34 @@ function init() {
     audit: $("#audit-panel"),
     error: $("#form-error"),
     console: $("#console"),
+    onboardRegion: $("#onboard-region"),
+    onboardPanel: $("#onboard-panel"),
+    scaleWorlds: $("#scale-worlds-panel"),
+    judgeHealth: $("#judge-health-panel"),
+  };
+  const pg = {
+    catalogMeta: $("#pg-catalog-meta"),
+    tryRow: $("#pg-try-row"),
+    intent: $("#pg-intent"),
+    search: $("#pg-search-button"),
+    error: $("#pg-error"),
+    railRegion: $("#pg-rail-region"),
+    rail: $("#pg-rail"),
+    resultsRegion: $("#pg-results-region"),
+    resultsMeta: $("#pg-results-meta"),
+    mandate: $("#pg-mandate-panel"),
+    limit: $("#pg-limit-panel"),
+    candidates: $("#pg-candidates"),
+    noMatch: $("#pg-nomatch"),
+    chosenRegion: $("#pg-chosen-region"),
+    chosen: $("#pg-chosen-panel"),
+    outcomeRegion: $("#pg-outcome-region"),
+    verdict: $("#pg-verdict"),
+    why: $("#pg-why"),
+    execution: $("#pg-execution"),
+    followUps: $("#pg-followups"),
+    scenarioGrid: $("#pg-scenario-grid"),
+    gapFigure: $("#pg-gap-figure"),
   };
   const searchLock = new SubmissionLock();
   const submitLock = new SubmissionLock();
@@ -2077,6 +2861,22 @@ function init() {
   let latestDiscovery = null;
   let latestSelection = null;
   let previousConsent = null;
+  let playgroundConfig = null;
+  const pgState = {
+    sessionId: null,
+    intent: "",
+    search: null,
+    selected: null,
+    evidence: null,
+    snapshot: null,
+    runId: null,
+    limitMinor: null,
+    deferExecution: false,
+  };
+  const pgSearchLock = new SubmissionLock();
+  const pgAuthorizeLock = new SubmissionLock();
+  const pgActionLock = new SubmissionLock();
+  const onboardLock = new SubmissionLock();
 
   /* ---------------- counters ---------------- */
   const figureObserver =
@@ -2103,7 +2903,7 @@ function init() {
   const tabs = [...document.querySelectorAll(".navtab")];
   const showView = (name, { focus = false } = {}) => {
     const known = tabs.some((tab) => tab.dataset.view === name);
-    const target = known ? name : "observe";
+    const target = known ? name : "playground";
     tabs.forEach((tab) => {
       const active = tab.dataset.view === target;
       tab.setAttribute("aria-selected", active ? "true" : "false");
@@ -2318,6 +3118,348 @@ function init() {
     );
   }
 
+  /* ================= Playground ================= */
+
+  /* The visitor session is demo scoping, not a credential. It is kept in
+     sessionStorage so a reload keeps your own runs, and it is sent in a header
+     so it never lands in a URL somebody might paste. */
+  const SESSION_KEY = "mandateguard.playground.session";
+  const readStoredSession = () => {
+    try {
+      return globalThis.sessionStorage?.getItem(SESSION_KEY) || null;
+    } catch {
+      return null;
+    }
+  };
+  const storeSession = (value) => {
+    pgState.sessionId = value || null;
+    try {
+      if (value) globalThis.sessionStorage?.setItem(SESSION_KEY, value);
+    } catch {
+      /* Private-mode browsers refuse storage. The session still works. */
+    }
+  };
+
+  const pgFetch = async (url, body) => {
+    const headers = { "Content-Type": "application/json" };
+    if (pgState.sessionId) headers["X-MandateGuard-Session"] = pgState.sessionId;
+    const response = await fetch(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body ?? {}),
+    });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload?.error?.message || "The request failed safely.");
+    if (payload?.session?.session_id) storeSession(payload.session.session_id);
+    return payload;
+  };
+
+  const pgGet = async (url) => {
+    const headers = {};
+    if (pgState.sessionId) headers["X-MandateGuard-Session"] = pgState.sessionId;
+    const response = await fetch(url, { headers });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload?.error?.message || "The request failed safely.");
+    return payload;
+  };
+
+  const pgError = (message) => {
+    pg.error.textContent = message || "";
+    pg.error.hidden = !message;
+  };
+
+  const paintRail = () => {
+    pg.railRegion.hidden = false;
+    pg.rail.innerHTML = renderPlaygroundRail({
+      intent: pgState.intent,
+      candidates: pgState.search?.candidates,
+      selected: pgState.selected,
+      evidence: pgState.evidence,
+      snapshot: pgState.snapshot,
+      catalogSize: playgroundConfig?.catalog?.products,
+    });
+    pg.rail.style.setProperty(
+      "--rail-fill",
+      String(
+        railProgress({
+          intent: pgState.intent,
+          candidates: pgState.search?.candidates,
+          selected: pgState.selected,
+          evidence: pgState.evidence,
+          snapshot: pgState.snapshot,
+        }),
+      ),
+    );
+    [...pg.rail.querySelectorAll(".rail__step")].forEach((step, index) => {
+      if (step.dataset.state === "waiting") return;
+      motion(step, [{ transform: "translateY(6px)" }, { transform: "translateY(0)" }], {
+        duration: 220,
+        delay: Math.min(index * 45, 320),
+      });
+    });
+  };
+
+  const declaredLimitMinor = () => {
+    const input = document.querySelector("#pg-limit-input");
+    if (!input) return pgState.limitMinor;
+    const rupees = Number(input.value);
+    if (!Number.isFinite(rupees) || rupees <= 0) return null;
+    return Math.round(rupees) * 100;
+  };
+
+  const paintCandidates = () => {
+    const payload = pgState.search;
+    pg.resultsRegion.hidden = false;
+    pg.mandate.innerHTML = renderPlaygroundMandate(payload);
+    const suggested = payload?.candidates?.[0]?.price_minor;
+    pg.limit.innerHTML = renderSpendingLimitPrompt(payload, suggested);
+    pg.limit.hidden = !pg.limit.innerHTML.trim();
+    pg.candidates.innerHTML = renderPlaygroundCandidates(
+      payload,
+      pgState.selected?.catalog_product_id || null,
+    );
+    pg.noMatch.innerHTML = renderNoMatch(payload);
+    pg.noMatch.hidden = !pg.noMatch.innerHTML.trim();
+    pg.resultsMeta.textContent = payload
+      ? `${payload.candidates.length} of ${Number(
+          payload.retrieval.catalog_products,
+        ).toLocaleString("en-IN")} sandbox products, ${
+          payload.retrieval.considered
+        } considered`
+      : "";
+    pg.candidates.querySelectorAll("[data-authorize]").forEach((button) => {
+      button.addEventListener("click", () =>
+        pgAuthorize(button.dataset.authorize, {
+          deferExecution: pgState.deferExecution,
+        }),
+      );
+    });
+    [...pg.candidates.querySelectorAll(".pgcard")].forEach((card, index) =>
+      motion(card, [{ opacity: "0", transform: "translateY(10px)" }, { opacity: "1", transform: "translateY(0)" }], {
+        duration: 260,
+        delay: Math.min(index * 40, 320),
+      }),
+    );
+  };
+
+  const pgSearch = async (rawIntent) => {
+    if (!pgSearchLock.acquire()) return;
+    const intent = (rawIntent ?? pg.intent.value).trim();
+    pgError("");
+    if (!intent) {
+      pgError("Type what you would ask an AI shopping agent to buy.");
+      pgSearchLock.release();
+      return;
+    }
+    pg.intent.value = intent;
+    pgState.intent = intent;
+    pgState.selected = null;
+    pgState.evidence = null;
+    pgState.snapshot = null;
+    pgState.runId = null;
+    pgState.limitMinor = null;
+    pg.chosenRegion.hidden = true;
+    pg.outcomeRegion.hidden = true;
+    pg.search.disabled = true;
+    pg.search.textContent = "SEARCHING";
+    paintRail();
+    try {
+      pgState.search = await pgFetch("/api/playground/search", { intent, top_k: 8 });
+      paintCandidates();
+      paintRail();
+    } catch (error) {
+      pgError(error.message);
+    } finally {
+      pg.search.disabled = false;
+      pg.search.textContent = "SEARCH THE SANDBOX";
+      pgSearchLock.release();
+    }
+  };
+
+  const pgRenderRun = (snapshot) => {
+    pgState.snapshot = snapshot;
+    pgState.runId = snapshot.run_id;
+    pg.outcomeRegion.hidden = false;
+    pg.outcomeRegion.dataset.decision = snapshot.result?.decision || "";
+    if (snapshot.state === "ERROR") {
+      pgError(snapshot.error?.message || "The run stopped safely.");
+      pg.verdict.innerHTML = "";
+      pg.why.innerHTML = "";
+      pg.execution.innerHTML = "";
+      pg.followUps.innerHTML = "";
+      paintRail();
+      return;
+    }
+    pg.verdict.innerHTML = renderPlaygroundVerdict(snapshot);
+    pg.why.innerHTML = renderPlaygroundWhy(snapshot);
+    pg.execution.innerHTML = renderPlaygroundExecution(snapshot);
+    pg.followUps.innerHTML = renderPlaygroundFollowUps(snapshot);
+    paintRail();
+    motion(
+      pg.verdict.querySelector(".pgverdict__word"),
+      [{ transform: "translateY(14px)", opacity: "0" }, { transform: "translateY(0)", opacity: "1" }],
+      { duration: 340 },
+    );
+    const bindPg = (selector, handler) => {
+      const node = document.querySelector(selector);
+      if (node) node.addEventListener("click", handler);
+    };
+    bindPg("#pg-revoke", () => pgRunAction("revoke", "#pg-revoke", "REVOKING"));
+    bindPg("#pg-execute", () => pgRunAction("execute", "#pg-execute", "CHECKING CONSENT"));
+    bindPg("#pg-replay", () => pgRunAction("replay", "#pg-replay", "REPLAYING"));
+    bindPg("#pg-recover", () => pgRunAction("recover", "#pg-recover", "ACQUIRING EVIDENCE"));
+  };
+
+  const pgPoll = async (initial) => {
+    let snapshot = initial;
+    pgRenderRun(snapshot);
+    while (!terminalStates.has(snapshot.state)) {
+      await new Promise((resolve) => setTimeout(resolve, 180));
+      snapshot = await pgGet(`/api/runs/${encodeURIComponent(snapshot.run_id)}`);
+      pgRenderRun(snapshot);
+    }
+    return snapshot;
+  };
+
+  async function pgAuthorize(catalogProductId, { deferExecution = false } = {}) {
+    if (!pgAuthorizeLock.acquire()) return;
+    pgError("");
+    const limit = declaredLimitMinor();
+    if (pgState.search?.spending_limit_required && !limit) {
+      pgError("Set a spending limit before MandateGuard checks this purchase.");
+      pgAuthorizeLock.release();
+      return;
+    }
+    pgState.limitMinor = limit;
+    try {
+      const preview = await pgFetch("/api/playground/preview", {
+        intent: pgState.intent,
+        catalog_product_id: catalogProductId,
+        ...(limit ? { max_total_minor: limit } : {}),
+      });
+      pgState.selected = preview.product;
+      pgState.evidence = preview.trusted_evidence;
+      pg.chosenRegion.hidden = false;
+      pg.chosen.innerHTML = renderChosenProduct(preview);
+      pg.candidates.querySelectorAll(".pgcard").forEach((card) => {
+        card.dataset.selected = card.dataset.product === catalogProductId ? "true" : "false";
+      });
+      paintRail();
+      const snapshot = await pgFetch("/api/playground/authorize", {
+        intent: pgState.intent,
+        catalog_product_id: catalogProductId,
+        request_id: createRequestId(),
+        defer_execution: deferExecution,
+        ...(limit ? { max_total_minor: limit } : {}),
+      });
+      // Deferral belongs to this one authorization. Future free-text runs go
+      // back to normal execute-on-ALLOW behavior unless this example is chosen
+      // again.
+      pgState.deferExecution = false;
+      await pgPoll(snapshot);
+      pg.outcomeRegion.scrollIntoView({
+        behavior: prefersReducedMotion() ? "auto" : "smooth",
+        block: "start",
+      });
+    } catch (error) {
+      pgError(error.message);
+    } finally {
+      pgAuthorizeLock.release();
+    }
+  }
+
+  async function pgRunAction(action, selector, busyLabel) {
+    if (!pgState.runId || !pgActionLock.acquire()) return;
+    const button = document.querySelector(selector);
+    const original = button?.textContent;
+    if (button) {
+      button.disabled = true;
+      button.textContent = busyLabel;
+    }
+    pgError("");
+    try {
+      const headers = { "Content-Type": "application/json" };
+      if (pgState.sessionId) headers["X-MandateGuard-Session"] = pgState.sessionId;
+      const response = await fetch(
+        `/api/runs/${encodeURIComponent(pgState.runId)}/${action}`,
+        { method: "POST", headers, body: "{}" },
+      );
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload?.error?.message || "The request failed safely.");
+      pgRenderRun(payload);
+    } catch (error) {
+      pgError(error.message);
+      if (button) {
+        button.disabled = false;
+        button.textContent = original;
+      }
+    } finally {
+      pgActionLock.release();
+    }
+  }
+
+  const pgRunScenario = async (scenarioId) => {
+    if (!pgAuthorizeLock.acquire()) return;
+    pgError("");
+    pg.chosenRegion.hidden = true;
+    pg.outcomeRegion.hidden = true;
+    try {
+      const snapshot = await pgFetch("/api/playground/scenario", {
+        scenario_id: scenarioId,
+        request_id: createRequestId(),
+      });
+      pgState.intent = snapshot.result?.buyer?.mandate || pgState.intent;
+      pg.intent.value = pgState.intent;
+      pgState.search = null;
+      pgState.selected = snapshot.result?.buyer
+        ? { name: snapshot.result.buyer.product, catalog_product_id: null }
+        : null;
+      pg.resultsRegion.hidden = true;
+      await pgPoll(snapshot);
+      pg.outcomeRegion.scrollIntoView({
+        behavior: prefersReducedMotion() ? "auto" : "smooth",
+        block: "start",
+      });
+    } catch (error) {
+      pgError(error.message);
+    } finally {
+      pgAuthorizeLock.release();
+    }
+  };
+
+  const paintPlaygroundConfig = (payload) => {
+    playgroundConfig = payload;
+    pg.catalogMeta.textContent = `${Number(payload.catalog.products).toLocaleString(
+      "en-IN",
+    )} synthetic products · ${payload.catalog.merchants} simulated merchants · ${
+      payload.catalog.categories
+    } categories · world ${payload.catalog.world_version}`;
+    pg.tryRow.innerHTML = renderTryThese(payload.try_these);
+    pg.tryRow.querySelectorAll("[data-intent]").forEach((button) => {
+      button.addEventListener("click", () => {
+        // Inserted, not submitted. The field stays editable so a reviewer can
+        // change one word and see what that does.
+        pg.intent.value = button.dataset.intent;
+        pgState.deferExecution = button.dataset.deferExecution === "true";
+        pg.intent.focus();
+      });
+    });
+    pg.scenarioGrid.innerHTML = renderScenarioGrid(payload.scenarios);
+    pg.scenarioGrid.querySelectorAll("[data-scenario]").forEach((button) => {
+      button.addEventListener("click", () => pgRunScenario(button.dataset.scenario));
+    });
+    elements.judgeHealth.innerHTML = renderJudgeHealth(payload.outcome_health);
+  };
+
+  pg.search.addEventListener("click", () => pgSearch());
+  pg.intent.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      pgSearch();
+    }
+  });
+  storeSession(readStoredSession());
+
   /* ---------------- stage 1-5: discovery ---------------- */
   const paintDiscovery = (discovery) => {
     latestDiscovery = discovery;
@@ -2405,6 +3547,95 @@ function init() {
       elements.runState.textContent = selection.status;
       elements.resultRegion.hidden = true;
       elements.discoveryNote.textContent = selection.next_step;
+      // A listing nobody has vouched for is where the commercial half of the
+      // story starts, so offer the simulation rather than stopping.
+      await offerOnboarding(intent, catalogProductId);
+    }
+  };
+
+  /* ---------------- simulated merchant onboarding ---------------- */
+  const offerOnboarding = async (intent, catalogProductId) => {
+    elements.onboardRegion.hidden = false;
+    elements.onboardPanel.innerHTML = "";
+    let payload;
+    try {
+      payload = await postJson("/api/playground/onboarding-form", {
+        intent,
+        catalog_product_id: catalogProductId,
+      });
+    } catch (error) {
+      showError(error.message);
+      return;
+    }
+    elements.onboardPanel.innerHTML = renderOnboardingForm(payload);
+    const publish = elements.onboardPanel.querySelector("#onboard-publish");
+    if (publish) {
+      publish.addEventListener("click", () =>
+        publishOnboarding(intent, catalogProductId, publish),
+      );
+    }
+  };
+
+  const collectDeclaration = () => {
+    const read = (field) =>
+      elements.onboardPanel.querySelector(`[data-declare="${field}"]`)?.value ?? "";
+    const purposes = [
+      ...elements.onboardPanel.querySelectorAll('[data-purpose="true"]:checked'),
+    ].map((node) => node.value);
+    const price = Number(read("price_minor"));
+    return {
+      merchant_display_name: String(read("merchant_display_name")).trim(),
+      // The form asks for rupees; the record stores minor units.
+      price_minor: Number.isFinite(price) && price > 0 ? Math.round(price) * 100 : 0,
+      billing_model: read("billing_model"),
+      content_classification: read("content_classification"),
+      purposes,
+    };
+  };
+
+  const publishOnboarding = async (intent, catalogProductId, button) => {
+    if (!onboardLock.acquire()) return;
+    const original = button.textContent;
+    button.disabled = true;
+    button.textContent = "PUBLISHING EVIDENCE";
+    showError("");
+    try {
+      const declaration = collectDeclaration();
+      const headers = { "Content-Type": "application/json" };
+      if (pgState.sessionId) headers["X-MandateGuard-Session"] = pgState.sessionId;
+      const response = await fetch("/api/playground/onboard", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          intent,
+          catalog_product_id: catalogProductId,
+          declaration,
+        }),
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload?.error?.message || "The request failed safely.");
+      if (payload?.session?.session_id) storeSession(payload.session.session_id);
+      elements.onboardPanel.innerHTML = renderOnboardedResult(payload);
+      const authorizeButton = elements.onboardPanel.querySelector("#onboard-authorize");
+      if (authorizeButton) {
+        authorizeButton.addEventListener("click", async () => {
+          // Authorization for the new record runs in the Playground, because
+          // that is the world the record was created in.
+          pgState.intent = intent;
+          pg.intent.value = intent;
+          pgState.search = { spending_limit_required: false, candidates: [] };
+          pgState.limitMinor = null;
+          showView("playground");
+          window.history.replaceState(null, "", "#playground");
+          await pgAuthorize(authorizeButton.dataset.product);
+        });
+      }
+    } catch (error) {
+      showError(error.message);
+      button.disabled = false;
+      button.textContent = original;
+    } finally {
+      onboardLock.release();
     }
   };
 
@@ -2483,7 +3714,7 @@ function init() {
 
   elements.attackGrid.innerHTML = renderAttackLab();
   paintJourney(null);
-  showView((window.location.hash || "#observe").slice(1));
+  showView((window.location.hash || "#playground").slice(1));
   observeFigures(document);
 
   /* Arm the reveal only when we can drive it, and disarm unconditionally once
@@ -2551,10 +3782,23 @@ function init() {
           "straight to the authorization controller over the registered merchant catalog.";
       }
       renderExamples();
+      return fetchJson("/api/playground/config");
+    })
+    .then((payload) => {
+      if (!payload) return;
+      paintPlaygroundConfig(payload);
+      elements.scaleWorlds.innerHTML = renderScaleWorlds(config, payload);
+      pg.gapFigure.innerHTML = renderGapFigure({
+        marketplace: config?.discovery?.catalog?.listings || 0,
+        sandbox: payload.catalog.products,
+      });
+      observeFigures(document.querySelector("#view-playground"));
+      observeFigures(document.querySelector("#view-scale"));
     })
     .catch((error) => {
       elements.system.querySelector(".sysstate__text").textContent = "SYSTEM UNAVAILABLE";
       showError(error.message);
+      pgError(error.message);
     });
 }
 

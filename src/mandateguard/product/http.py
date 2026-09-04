@@ -22,6 +22,7 @@ from mandateguard.execution import (
     MandateStateCorruptionError,
 )
 from mandateguard.discovery.intent import MonetaryConstraintError
+from mandateguard.product.playground import PlaygroundError
 from mandateguard.product.service import CommerceLabService
 
 
@@ -34,6 +35,17 @@ _EXECUTE_PATH_RE = re.compile(r"^/api/runs/(run_[0-9a-f]{32})/execute$")
 _MAX_REQUEST_BYTES = 16_384
 _DISCOVERY_SEARCH_PATH = "/api/discovery/search"
 _DISCOVERY_SELECT_PATH = "/api/discovery/select"
+_PLAYGROUND_CONFIG_PATH = "/api/playground/config"
+_PLAYGROUND_SESSION_PATH = "/api/playground/session"
+_PLAYGROUND_SEARCH_PATH = "/api/playground/search"
+_PLAYGROUND_PREVIEW_PATH = "/api/playground/preview"
+_PLAYGROUND_AUTHORIZE_PATH = "/api/playground/authorize"
+_PLAYGROUND_SCENARIO_PATH = "/api/playground/scenario"
+_PLAYGROUND_ONBOARD_FORM_PATH = "/api/playground/onboarding-form"
+_PLAYGROUND_ONBOARD_PATH = "/api/playground/onboard"
+#: The visitor session travels in a header, never in a query string, so it does
+#: not land in an access log, a referrer, or a shared URL.
+_SESSION_HEADER = "X-MandateGuard-Session"
 _DEFAULT_PRODUCT_HOST = "0.0.0.0"
 _DEFAULT_PRODUCT_PORT = 8080
 _ROUTE_TEMPLATES = (
@@ -54,6 +66,14 @@ _KNOWN_ROUTES = frozenset(
         "/api/runs",
         _DISCOVERY_SEARCH_PATH,
         _DISCOVERY_SELECT_PATH,
+        _PLAYGROUND_CONFIG_PATH,
+        _PLAYGROUND_SESSION_PATH,
+        _PLAYGROUND_SEARCH_PATH,
+        _PLAYGROUND_PREVIEW_PATH,
+        _PLAYGROUND_AUTHORIZE_PATH,
+        _PLAYGROUND_SCENARIO_PATH,
+        _PLAYGROUND_ONBOARD_FORM_PATH,
+        _PLAYGROUND_ONBOARD_PATH,
     }
 )
 
@@ -180,13 +200,23 @@ class CommerceLabHandler(BaseHTTPRequestHandler):
         if path == "/api/config":
             self._send_json(HTTPStatus.OK, self.server.service.public_config())
             return
+        if path == _PLAYGROUND_CONFIG_PATH:
+            self._send_json(HTTPStatus.OK, self.server.service.playground_config())
+            return
         match = _RUN_PATH_RE.fullmatch(path)
         if match:
             run = self.server.service.get_run(match.group(1))
             if run is None:
                 self._send_error(HTTPStatus.NOT_FOUND, "RUN_NOT_FOUND", "Run not found.")
                 return
-            self._send_json(HTTPStatus.OK, run.snapshot())
+            if not self._session_may_use(run):
+                return
+            self._send_json(
+                HTTPStatus.OK,
+                self.server.service.playground_run_snapshot(run)
+                if run.plan is not None
+                else run.snapshot(),
+            )
             return
         if path in {"/", "/index.html"}:
             self._send_static(STATIC_ROOT / "index.html")
@@ -209,6 +239,8 @@ class CommerceLabHandler(BaseHTTPRequestHandler):
                 "RATE_LIMITED",
                 "Demo request limit reached. Try again shortly.",
             )
+            return
+        if path.startswith("/api/playground/") and self._handle_playground(path):
             return
         if path == _DISCOVERY_SEARCH_PATH:
             try:
@@ -325,6 +357,8 @@ class CommerceLabHandler(BaseHTTPRequestHandler):
             return
         replay_match = _REPLAY_PATH_RE.fullmatch(path)
         if replay_match:
+            if not self._guard_run(replay_match.group(1)):
+                return
             try:
                 if self.headers.get("Content-Length") not in {None, "0"}:
                     payload = self._read_json()
@@ -344,6 +378,8 @@ class CommerceLabHandler(BaseHTTPRequestHandler):
             return
         recover_match = _RECOVER_PATH_RE.fullmatch(path)
         if recover_match:
+            if not self._guard_run(recover_match.group(1)):
+                return
             try:
                 if self.headers.get("Content-Length") not in {None, "0"}:
                     payload = self._read_json()
@@ -369,6 +405,8 @@ class CommerceLabHandler(BaseHTTPRequestHandler):
             return
         revoke_match = _REVOKE_PATH_RE.fullmatch(path)
         if revoke_match:
+            if not self._guard_run(revoke_match.group(1)):
+                return
             try:
                 if self.headers.get("Content-Length") not in {None, "0"}:
                     payload = self._read_json()
@@ -410,6 +448,8 @@ class CommerceLabHandler(BaseHTTPRequestHandler):
             return
         execute_match = _EXECUTE_PATH_RE.fullmatch(path)
         if execute_match:
+            if not self._guard_run(execute_match.group(1)):
+                return
             try:
                 if self.headers.get("Content-Length") not in {None, "0"}:
                     payload = self._read_json()
@@ -449,6 +489,213 @@ class CommerceLabHandler(BaseHTTPRequestHandler):
             self._send_json(HTTPStatus.OK, response)
             return
         self._send_error(HTTPStatus.NOT_FOUND, "NOT_FOUND", "Resource not found.")
+
+    def _session_header(self) -> str | None:
+        value = self.headers.get(_SESSION_HEADER)
+        if value is None:
+            return None
+        value = value.strip()
+        return value or None
+
+    def _guard_run(self, run_id: str) -> bool:
+        """Resolve a run and refuse it to any session but the one that owns it."""
+
+        run = self.server.service.get_run(run_id)
+        if run is None:
+            self._send_error(HTTPStatus.NOT_FOUND, "RUN_NOT_FOUND", "Run not found.")
+            return False
+        return self._session_may_use(run)
+
+    def _session_may_use(self, run: object) -> bool:
+        """Guard a session-bound run, answering the client if the guard bites."""
+
+        try:
+            self.server.service.authorize_run_access(run, self._session_header())
+        except PermissionError:
+            # Not 403: a visitor who guessed or was shown somebody else's run
+            # identifier learns only that it is not one of theirs.
+            self._send_error(
+                HTTPStatus.NOT_FOUND, "RUN_NOT_FOUND", "Run not found."
+            )
+            return False
+        return True
+
+    def _playground_json(self, expected: frozenset[str], required: frozenset[str]) -> dict[str, Any]:
+        payload = self._read_json()
+        if not required.issubset(payload) or set(payload) - expected:
+            raise ValueError("request fields do not match the API schema")
+        return payload
+
+    def _handle_playground(self, path: str) -> bool:
+        """Serve one Playground route. Returns False when the path is not one."""
+
+        service = self.server.service
+        session_header = self._session_header()
+        try:
+            if path == _PLAYGROUND_SESSION_PATH:
+                if self.headers.get("Content-Length") not in {None, "0"}:
+                    if self._read_json():
+                        raise ValueError("session request body must be empty")
+                self._send_json(
+                    HTTPStatus.OK, service.open_judge_session(session_header)
+                )
+                return True
+            if path == _PLAYGROUND_SEARCH_PATH:
+                payload = self._playground_json(
+                    frozenset({"intent", "top_k", "max_total_minor"}),
+                    frozenset({"intent"}),
+                )
+                self._send_json(
+                    HTTPStatus.OK,
+                    service.playground_search(
+                        intent=payload["intent"],
+                        top_k=payload.get("top_k", 8),
+                        session_id=session_header,
+                        max_total_minor=payload.get("max_total_minor"),
+                    ),
+                )
+                return True
+            if path == _PLAYGROUND_PREVIEW_PATH:
+                payload = self._playground_json(
+                    frozenset({"intent", "catalog_product_id", "max_total_minor"}),
+                    frozenset({"intent", "catalog_product_id"}),
+                )
+                self._send_json(
+                    HTTPStatus.OK,
+                    service.playground_preview(
+                        intent=payload["intent"],
+                        catalog_product_id=payload["catalog_product_id"],
+                        session_id=session_header,
+                        max_total_minor=payload.get("max_total_minor"),
+                    ),
+                )
+                return True
+            if path == _PLAYGROUND_AUTHORIZE_PATH:
+                payload = self._playground_json(
+                    frozenset(
+                        {
+                            "intent",
+                            "catalog_product_id",
+                            "request_id",
+                            "max_total_minor",
+                            "defer_execution",
+                        }
+                    ),
+                    frozenset({"intent", "catalog_product_id", "request_id"}),
+                )
+                defer = payload.get("defer_execution", False)
+                if not isinstance(defer, bool):
+                    raise ValueError("defer_execution must be boolean")
+                run, deduplicated, session_id = service.playground_authorize(
+                    intent=payload["intent"],
+                    catalog_product_id=payload["catalog_product_id"],
+                    request_id=payload["request_id"],
+                    session_id=session_header,
+                    max_total_minor=payload.get("max_total_minor"),
+                    defer_execution=defer,
+                )
+                self._send_run(run, deduplicated, session_id)
+                return True
+            if path == _PLAYGROUND_SCENARIO_PATH:
+                payload = self._playground_json(
+                    frozenset({"scenario_id", "request_id"}),
+                    frozenset({"scenario_id", "request_id"}),
+                )
+                run, deduplicated, session_id, scenario = service.playground_scenario(
+                    scenario_id=payload["scenario_id"],
+                    request_id=payload["request_id"],
+                    session_id=session_header,
+                )
+                self._send_run(
+                    run,
+                    deduplicated,
+                    session_id,
+                    extra={
+                        "scenario": {
+                            "scenario_id": scenario.scenario_id,
+                            "label": scenario.label,
+                            "story": scenario.story,
+                            "expectation": scenario.expectation,
+                            "follow_up": scenario.follow_up,
+                            "world": scenario.world,
+                        }
+                    },
+                )
+                return True
+            if path == _PLAYGROUND_ONBOARD_FORM_PATH:
+                payload = self._playground_json(
+                    frozenset({"intent", "catalog_product_id"}),
+                    frozenset({"intent", "catalog_product_id"}),
+                )
+                self._send_json(
+                    HTTPStatus.OK,
+                    service.playground_onboarding_form(
+                        intent=payload["intent"],
+                        catalog_product_id=payload["catalog_product_id"],
+                    ),
+                )
+                return True
+            if path == _PLAYGROUND_ONBOARD_PATH:
+                payload = self._playground_json(
+                    frozenset({"intent", "catalog_product_id", "declaration"}),
+                    frozenset({"intent", "catalog_product_id", "declaration"}),
+                )
+                self._send_json(
+                    HTTPStatus.OK,
+                    service.playground_onboard(
+                        intent=payload["intent"],
+                        catalog_product_id=payload["catalog_product_id"],
+                        declaration=payload["declaration"],
+                        session_id=session_header,
+                    ),
+                )
+                return True
+        except PlaygroundError as error:
+            self._send_error(
+                HTTPStatus.BAD_REQUEST, error.code, error.public_message
+            )
+            return True
+        except MonetaryConstraintError as error:
+            self._send_error(HTTPStatus.BAD_REQUEST, error.code, error.public_message)
+            return True
+        except KeyError:
+            self._send_error(
+                HTTPStatus.NOT_FOUND,
+                "LISTING_NOT_FOUND",
+                "That listing is not in this intent's results.",
+            )
+            return True
+        except RuntimeError:
+            self._send_error(
+                HTTPStatus.SERVICE_UNAVAILABLE,
+                "DISCOVERY_ARTIFACT_UNAVAILABLE",
+                "Discovery artifacts are unavailable in this deployment.",
+            )
+            return True
+        except (TypeError, ValueError, json.JSONDecodeError) as error:
+            self._send_error(HTTPStatus.BAD_REQUEST, "INVALID_REQUEST", str(error))
+            return True
+        return False
+
+    def _send_run(
+        self,
+        run: Any,
+        deduplicated: bool,
+        session_id: str,
+        *,
+        extra: Mapping[str, Any] | None = None,
+    ) -> None:
+        response = self.server.service.playground_run_snapshot(run)
+        response["deduplicated"] = deduplicated
+        response["session"] = {"session_id": session_id}
+        if extra:
+            response.update(extra)
+        status = (
+            HTTPStatus.OK
+            if response["state"] in {"COMPLETE", "ERROR"}
+            else HTTPStatus.ACCEPTED
+        )
+        self._send_json(status, response)
 
     def _read_json(self) -> dict[str, Any]:
         raw_length = self.headers.get("Content-Length")
