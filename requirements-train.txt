@@ -1,0 +1,15 @@
+# Training and evaluation dependencies. NOT installed in the runtime image.
+#
+# Everything under `mandateguard.discovery` and `mandateguard.product` is Python
+# standard library only, which is what keeps the public demo image dependency
+# free and its cold start under a second. These packages are needed to *produce*
+# the frozen artifacts in `data/models/`, never to serve them.
+#
+#   pip install -r requirements-train.txt
+#   python scripts/import_discovery_catalog.py
+#   python scripts/train_discovery_models.py
+#   python scripts/evaluate_discovery_retrieval.py
+#   python scripts/evaluate_discovery_anomaly.py
+#   python scripts/run_discovery_scale_benchmark.py   # needs none of these
+scikit-learn>=1.8,<2
+numpy>=2,<3

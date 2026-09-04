@@ -1,0 +1,104 @@
+{
+  "analytics_version": "discovery-proposal-anomaly-v1",
+  "baseline": {
+    "average_precision": 0.994236,
+    "model": "deterministic weighted feature score",
+    "recall_at_5pct_fpr": 0.976667,
+    "roc_auc": 0.994194
+  },
+  "baseline_without_ml_mismatch_feature": {
+    "average_precision": 0.956142,
+    "model": "deterministic weighted feature score, classifier feature ablated",
+    "recall_at_5pct_fpr": 0.876667,
+    "roc_auc": 0.931656
+  },
+  "by_defect": {
+    "CAPABILITY_REPLAYED": {
+      "cases": 37,
+      "detected_above_ordinary_median": 37,
+      "mean_baseline_score": 0.162477
+    },
+    "CATEGORY_LAUNDERED": {
+      "cases": 37,
+      "detected_above_ordinary_median": 37,
+      "mean_baseline_score": 0.083316
+    },
+    "CONSENT_REVOKED": {
+      "cases": 37,
+      "detected_above_ordinary_median": 37,
+      "mean_baseline_score": 0.158727
+    },
+    "MERCHANT_SUBSTITUTED": {
+      "cases": 38,
+      "detected_above_ordinary_median": 38,
+      "mean_baseline_score": 0.138937
+    },
+    "PRICE_MUTATED_AFTER_AUTHORIZATION": {
+      "cases": 38,
+      "detected_above_ordinary_median": 38,
+      "mean_baseline_score": 0.156846
+    },
+    "RECURRING_UNDER_ONE_TIME_MANDATE": {
+      "cases": 38,
+      "detected_above_ordinary_median": 38,
+      "mean_baseline_score": 0.119799
+    },
+    "STALE_EVIDENCE": {
+      "cases": 37,
+      "detected_above_ordinary_median": 37,
+      "mean_baseline_score": 0.094817
+    },
+    "TRUSTED_EVIDENCE_REMOVED": {
+      "cases": 38,
+      "detected_above_ordinary_median": 38,
+      "mean_baseline_score": 0.158154
+    }
+  },
+  "candidate": {
+    "available": true,
+    "average_precision": 0.583138,
+    "model": "IsolationForest(n_estimators=200, fitted on ordinary rows only)",
+    "recall_at_5pct_fpr": 0.143333,
+    "roc_auc": 0.561778
+  },
+  "cases": 600,
+  "catalog_sha256": "484413db21e98e50467be5506b98c9bda759135bc66f169350acaf393bf58cf2",
+  "category_laundering_ablation": {
+    "cases": 337,
+    "defective_cases": 37,
+    "roc_auc_gain_from_classifier": 0.512838,
+    "verdict": "CLASSIFIER_SIGNAL_ADDS_DETECTION_VALUE",
+    "with_ml_mismatch_feature": {
+      "average_precision": 0.733157,
+      "recall_at_5pct_fpr": 0.810811,
+      "roc_auc": 0.96473
+    },
+    "without_ml_mismatch_feature": {
+      "average_precision": 0.099306,
+      "recall_at_5pct_fpr": 0.0,
+      "roc_auc": 0.451892
+    }
+  },
+  "circularity_note": "Seven of the eight defect classes flip a field the deterministic features already watch, so a high baseline score on those proves the features fire and nothing more. CATEGORY_LAUNDERED is the non-circular case, and category_laundering_ablation is the result that actually matters.",
+  "decision": "KEEP_DETERMINISTIC_BASELINE",
+  "decision_reason": "The learned detector did not improve the frozen evaluation by more than the threshold, so it is not shipped. The deterministic analytics stands.",
+  "defective_cases": 300,
+  "evaluation_set_digest": "b31f6c41973240739636ba8e9e533086b10d6f4508686100b05615d89b24dc1b",
+  "evaluation_version": "discovery-anomaly-eval-v1",
+  "feature_names": [
+    "category_listing_mismatch",
+    "consent_state",
+    "merchant_mismatch",
+    "missing_trusted_evidence",
+    "price_changed_after_authorization",
+    "price_vs_category",
+    "recurrence_cues",
+    "replay_attempt",
+    "sku_semantic_mismatch",
+    "stale_evidence",
+    "title_description_mismatch"
+  ],
+  "material_improvement_threshold": 0.02,
+  "roc_auc_improvement": -0.432416,
+  "scope_limit": "Defects are injected by this harness. A detector that finds them is not thereby shown to find fraud in production traffic."
+}

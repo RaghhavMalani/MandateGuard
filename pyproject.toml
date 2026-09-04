@@ -7,8 +7,17 @@ name = "mandateguard"
 version = "0.1.0"
 description = "Deterministic mandate enforcement core for agentic payments"
 requires-python = ">=3.12"
-dependencies = [
+# The runtime has no third-party dependencies. The authorization controller and
+# the discovery retrieval layer are Python standard library only, which is what
+# lets the public demo image install nothing at all.
+dependencies = []
+
+[project.optional-dependencies]
+# Needed to *produce* the frozen artifacts in data/models/, never to serve them.
+# Mirrors requirements-train.txt; see docs/DISCOVERY_CATALOG.md.
+train = [
     "scikit-learn>=1.8,<2",
+    "numpy>=2,<3",
 ]
 
 [tool.pytest.ini_options]

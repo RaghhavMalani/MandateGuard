@@ -28,97 +28,143 @@ export const ATTACK_SURFACES = [
     id: "intent-laundering",
     surface: "Intent laundering",
     detail: "The buyer restates the mandate in its own prose so the proposal reads as compliant.",
-    control: "Buyer prose is never trusted evidence",
-    treatment: "BLOCK OR REVIEW",
-    evidence: "POLICY VIOLATION preset",
+    signal: "Proposal rationale asserts a property no trusted evidence supports",
+    control: "Buyer prose is never resolvable as evidence",
+    decision: "BLOCK OR REVIEW",
+    paymentReached: "NO",
+    evidence: "POLICY VIOLATION example",
   },
   {
     id: "evidence-omission",
     surface: "Evidence omission",
-    detail: "Authoritative terms that would decide the constraint are simply absent.",
-    control: "Complete authoritative manifest",
-    treatment: "REVIEW",
-    evidence: "AMBIGUOUS EVIDENCE preset",
+    detail: "The authoritative terms that would decide the constraint are simply absent.",
+    signal: "Constraint has no resolvable merchant evidence in the top-k set",
+    control: "Semantic verifier abstains rather than defaulting",
+    decision: "REVIEW",
+    paymentReached: "NO",
+    evidence: "AMBIGUOUS EVIDENCE example",
   },
   {
     id: "price-mutation",
     surface: "Price mutation after ALLOW",
     detail: "The order amount differs from the amount the controller authorized.",
-    control: "Execution request hash",
-    treatment: "REJECT BEFORE NETWORK",
+    signal: "Execution request hash does not match the signed capability",
+    control: "Request binding checked at the execution gate",
+    decision: "REJECTED BEFORE NETWORK",
+    paymentReached: "NO",
     evidence: "tests/test_execution_authorization.py",
   },
   {
     id: "sku-substitution",
     surface: "SKU substitution",
     detail: "A different product is presented for execution than the one that was verified.",
-    control: "Transaction body hash and Tier A SKU ownership",
-    treatment: "REJECT BEFORE NETWORK",
+    signal: "Transaction body hash diverges from the authorized transaction",
+    control: "Transaction binding and SKU ownership",
+    decision: "REJECTED BEFORE NETWORK",
+    paymentReached: "NO",
     evidence: "tests/test_execution_context_binding.py",
   },
   {
     id: "recurring-disguise",
     surface: "Recurring billing disguised as one-time",
     detail: "A subscription is presented as a single charge under a no-subscriptions mandate.",
-    control: "Tier A catalog recurrence and the semantic recurrence family",
-    treatment: "BLOCK OR REVIEW",
-    evidence: "RECOVERABLE REVIEW preset",
+    signal: "Recurrence cue in listing text with no authoritative recurrence terms",
+    control: "Catalog recurrence check and the semantic recurrence family",
+    decision: "BLOCK OR REVIEW",
+    paymentReached: "NO",
+    evidence: "RECOVERABLE REVIEW example",
   },
   {
     id: "stale-evidence",
     surface: "Stale or superseded evidence",
     detail: "Evidence or a mandate version that no longer reflects current state is reused.",
+    signal: "Mandate version in the capability trails the registry",
     control: "Mandate version binding and canonical evidence set hash",
-    treatment: "REJECT BEFORE NETWORK",
+    decision: "REJECTED BEFORE NETWORK",
+    paymentReached: "NO",
     evidence: "tests/test_mandate_revocation.py",
   },
   {
     id: "cross-merchant",
     surface: "Cross-merchant evidence",
     detail: "Evidence owned by one merchant is offered to justify another merchant's product.",
-    control: "Merchant-scoped resolution and Tier A merchant binding",
-    treatment: "EVIDENCE REFUSED",
+    signal: "Requested evidence id resolves to a different merchant",
+    control: "Merchant-scoped resolution refuses the lookup",
+    decision: "EVIDENCE REFUSED",
+    paymentReached: "NO",
     evidence: "Resolve safety invariant S3: 0 observed",
   },
   {
     id: "cross-sku",
     surface: "Cross-SKU evidence",
     detail: "Evidence bound to a different SKU is offered for the proposed SKU.",
-    control: "SKU-scoped resolution",
-    treatment: "EVIDENCE REFUSED",
+    signal: "Requested evidence id resolves to a different SKU",
+    control: "SKU-scoped resolution refuses the lookup",
+    decision: "EVIDENCE REFUSED",
+    paymentReached: "NO",
     evidence: "Resolve safety invariant S4: 0 observed",
   },
   {
     id: "authority-conflict",
     surface: "Authority conflict",
     detail: "Two trusted sources make contradictory claims about the same constraint.",
-    control: "Conflict and freshness gap analysis with no forced resolution",
-    treatment: "REVIEW",
+    signal: "Gap analysis records conflicting authoritative statements",
+    control: "No forced resolution between trusted sources",
+    decision: "REVIEW",
+    paymentReached: "NO",
     evidence: "Resolve safety invariant S2: 0 observed",
   },
   {
     id: "capability-replay",
     surface: "Capability replay",
     detail: "A signed, still-valid capability is submitted for execution a second time.",
-    control: "Single-use nonce ledger",
-    treatment: "REJECT BEFORE NETWORK",
+    signal: "Decision nonce already present in the execution ledger",
+    control: "Single-use nonce ledger, checked before the provider call",
+    decision: "REJECTED BEFORE NETWORK",
+    paymentReached: "NO",
     evidence: "TEST CAPABILITY REPLAY in this lab",
   },
   {
     id: "consent-revocation",
     surface: "Consent revocation",
     detail: "The user withdraws consent after a valid capability has already been issued.",
-    control: "Current mandate registry, revalidated immediately before execution",
-    treatment: "REJECT BEFORE NETWORK",
-    evidence: "REVOKED AFTER ALLOW preset",
+    signal: "Current mandate state reads REVOKED at execution time",
+    control: "Mandate registry revalidated immediately before execution",
+    decision: "REJECTED BEFORE NETWORK",
+    paymentReached: "NO",
+    evidence: "REVOKED AFTER ALLOW example",
   },
   {
     id: "cross-run-consent",
     surface: "Cross-run consent reuse",
     detail: "One run's consent state is treated as authority for a different run.",
+    signal: "Mandate identity in the capability does not match this run's mandate",
     control: "Mandate state isolated per commerce run",
-    treatment: "REJECT BEFORE NETWORK",
+    decision: "REJECTED BEFORE NETWORK",
+    paymentReached: "NO",
     evidence: "tests/test_mandate_revocation.py",
+  },
+  {
+    id: "listing-laundering",
+    surface: "Listing category laundering",
+    detail:
+      "A listing keeps a benign declared category while its own text describes something else.",
+    signal: "Trained classifier disagrees with the listing's declared category",
+    control: "Mismatch raises investigation priority only; it cannot authorize",
+    decision: "REVIEW PRIORITY RAISED",
+    paymentReached: "NO",
+    evidence: "artifacts/engineering/discovery/anomaly_evaluation.json",
+  },
+  {
+    id: "unvouched-listing",
+    surface: "Purchase of an unvouched listing",
+    detail:
+      "An agent proposes a product from a crawled catalog that no merchant has published terms for.",
+    signal: "Zero merchant-controlled evidence resolves for this merchant and SKU",
+    control: "Discovery cannot substitute for merchant evidence",
+    decision: "REVIEW REQUIRED",
+    paymentReached: "NO",
+    evidence: "Any crawled listing in the discovery results",
   },
 ];
 
@@ -140,8 +186,9 @@ export const EVALUATION_EVIDENCE = {
     "Half of the initially non-executable cases stayed at REVIEW after bounded recovery. Evidence and execution requirements were not relaxed to improve the recovery rate.",
 };
 
-/** Secondary proof only. Updated when the suites change; never presented as scale. */
-export const TEST_TOTALS = { python: 712, ui: 38 };
+/** Engineering quality only. Updated when the suites change; a test count is
+    never presented as scale, model quality, or authorization evidence. */
+export const TEST_TOTALS = { python: 873, ui: 74 };
 
 export class SubmissionLock {
   #locked = false;
@@ -294,6 +341,382 @@ export function spineProgress(timeline) {
     advanced = index + 1;
   }
   return advanced / SPINE_ORDER.length;
+}
+
+/* ------------------------------------------------------------------ */
+/* The chronological journey                                           */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The nine stages a purchase passes through, in the order they happen.
+ *
+ * This is deliberately not the controller's internal step list. A first-time
+ * reader needs the story of the transaction; the controller's own timeline is
+ * still available underneath each stage for anyone who wants it.
+ */
+export const JOURNEY_STAGES = [
+  { id: "USER_INTENT", label: "User intent", plain: "You said what you wanted." },
+  { id: "AGENT_SEARCH", label: "Agent search", plain: "The agent searched the catalog." },
+  { id: "PRODUCT_SELECTED", label: "Product selected", plain: "One product was chosen." },
+  { id: "MANDATE_EXTRACTED", label: "Mandate extracted", plain: "Your words became checkable rules." },
+  { id: "ML_ANALYSIS", label: "Product analysis", plain: "Models read the listing and flagged what looks odd." },
+  { id: "TRUSTED_EVIDENCE", label: "Trusted evidence", plain: "We looked for what the merchant can actually prove." },
+  { id: "AUTHORIZATION", label: "Authorization", plain: "The controller decided: allow, block, or review." },
+  { id: "PAYMENT_GATE", label: "Payment gate", plain: "Only a signed capability can pass this point." },
+  { id: "OUTCOME", label: "Outcome", plain: "What happened to the money." },
+];
+
+const JOURNEY_ORDER = JOURNEY_STAGES.map((item) => item.id);
+
+function stageState(status) {
+  switch (String(status || "WAITING").toUpperCase()) {
+    case "DONE":
+    case "PASS":
+    case "ALLOW":
+    case "AUTHORIZED":
+      return "pass";
+    case "BLOCK":
+      return "block";
+    case "REVIEW":
+      return "review";
+    case "REJECTED":
+    case "STOPPED":
+      return "stopped";
+    case "RUNNING":
+      return "running";
+    default:
+      return "waiting";
+  }
+}
+
+/**
+ * Fold a discovery result and a controller run into the nine visible stages.
+ *
+ * Either half may be absent: a search with no selection yet fills the first
+ * five, and an unvouched listing stops at stage six on purpose.
+ */
+export function buildJourney({ discovery, selection, snapshot } = {}) {
+  const result = snapshot?.result;
+  const timeline = new Map((snapshot?.timeline || []).map((item) => [item.id, item]));
+  const decision = result?.decision;
+  const execution = result?.execution;
+  const stages = new Map(JOURNEY_STAGES.map((item) => [item.id, { ...item, status: "WAITING", detail: "Not reached yet." }]));
+
+  const set = (id, status, detail) => {
+    const stage = stages.get(id);
+    if (stage) Object.assign(stage, { status, detail });
+  };
+
+  if (discovery) {
+    const lines = discovery.mandate_plain_english || [];
+    set("USER_INTENT", "DONE", `“${discovery.mandate?.raw_text || ""}”`);
+    const retrieval = discovery.retrieval || {};
+    set(
+      "AGENT_SEARCH",
+      "DONE",
+      `Searched ${Number(retrieval.catalog_listings || 0).toLocaleString("en-IN")} listings, ` +
+        `considered ${retrieval.candidates_considered ?? 0}, in ${Math.round(retrieval.retrieval_ms ?? 0)} ms.`,
+    );
+    set("MANDATE_EXTRACTED", "DONE", lines.join(" "));
+    const candidates = discovery.candidates || [];
+    if (candidates.length) {
+      const flagged = candidates.filter(
+        (item) => item.anomaly?.band === "HIGH" || item.anomaly?.band === "ELEVATED",
+      ).length;
+      set(
+        "ML_ANALYSIS",
+        "DONE",
+        `Classified ${candidates.length} candidates; ${flagged} carry at least one signal worth a closer look.`,
+      );
+    }
+  }
+
+  if (selection) {
+    set("PRODUCT_SELECTED", "DONE", selection.title || "A listing was selected.");
+    if (!selection.transactable) {
+      set(
+        "TRUSTED_EVIDENCE",
+        "REVIEW",
+        "No merchant has published authoritative terms for this listing.",
+      );
+      set("AUTHORIZATION", "REVIEW", "Nothing to authorize: the evidence is incomplete.");
+      set("PAYMENT_GATE", "REVIEW", "Never reached. Payment-provider calls: 0.");
+      set(
+        "OUTCOME",
+        "REVIEW",
+        "REVIEW REQUIRED. No money moved, and none could have.",
+      );
+    }
+  }
+
+  if (result) {
+    const evidence = result.evidence || {};
+    const evidenceStep = timeline.get("EVIDENCE_RETRIEVAL");
+    set(
+      "TRUSTED_EVIDENCE",
+      evidenceStep?.status === "PASS" ? "DONE" : evidenceStep?.status || "WAITING",
+      `${evidence.trusted_evidence_count ?? 0} merchant-controlled evidence items resolved for this exact merchant and SKU.`,
+    );
+    const authorization = result.authorization || {};
+    set(
+      "AUTHORIZATION",
+      decision === "ALLOW" ? "DONE" : decision || "WAITING",
+      result.decision_reason || `Controller returned ${decision}.`,
+    );
+    const calls = execution?.razorpay_calls ?? 0;
+    if (decision === "ALLOW") {
+      set(
+        "PAYMENT_GATE",
+        execution?.status === "REJECTED_BEFORE_NETWORK" ? "REJECTED" : "DONE",
+        execution?.status === "REJECTED_BEFORE_NETWORK"
+          ? `${humanize(execution.reason)}. The gate refused before any provider call.`
+          : `Signed single-use capability accepted. Adapter calls: ${calls}.`,
+      );
+    } else {
+      set("PAYMENT_GATE", decision || "WAITING", `Never reached. Payment-provider calls: ${calls}.`);
+    }
+    set(
+      "OUTCOME",
+      execution?.status === "REJECTED_BEFORE_NETWORK" ? "REJECTED" : decision || "WAITING",
+      outcomeSentence(result),
+    );
+    if (!discovery) {
+      set("USER_INTENT", "DONE", `“${result.buyer?.mandate || ""}”`);
+      set("AGENT_SEARCH", "DONE", "The agent used the registered merchant catalog.");
+      set("PRODUCT_SELECTED", "DONE", result.buyer?.product || "");
+      set("MANDATE_EXTRACTED", "DONE", "Hard constraints and semantic constraints extracted.");
+      set("ML_ANALYSIS", "DONE", "Not applicable: this product came from the registered catalog.");
+    }
+  }
+
+  return JOURNEY_ORDER.map((id) => stages.get(id));
+}
+
+function outcomeSentence(result) {
+  const execution = result?.execution || {};
+  const order = execution.order;
+  if (execution.status === "REJECTED_BEFORE_NETWORK") {
+    return "Nothing was charged. The capability was refused at the gate.";
+  }
+  if (order) {
+    return `An order for ${money(order.amount, order.currency)} was created.`;
+  }
+  if (result?.decision === "ALLOW") {
+    return "A capability was issued and is being held, not spent.";
+  }
+  if (result?.decision === "BLOCK") {
+    return "Nothing was charged. The proposal contradicted the mandate.";
+  }
+  return "Nothing was charged. MandateGuard refused to guess.";
+}
+
+export function renderJourney(stages) {
+  const list = stages || buildJourney({});
+  const haltIndex = list.findIndex((item) => {
+    const state = stageState(item.status);
+    return state === "block" || state === "review" || state === "stopped";
+  });
+  return list
+    .map((item, index) => {
+      const state = stageState(item.status);
+      return `
+      <li class="journey__step" data-step="${escapeHtml(item.id)}" data-state="${state}"${
+        index === haltIndex ? ' data-halt="true"' : ""
+      }>
+        <span class="journey__node" aria-hidden="true"></span>
+        <span class="journey__index">${String(index + 1).padStart(2, "0")}</span>
+        <div class="journey__body">
+          <p class="journey__name">${escapeHtml(item.label)}</p>
+          <p class="journey__plain">${escapeHtml(item.plain)}</p>
+          <p class="journey__detail">${escapeHtml(item.detail || "Not reached yet.")}</p>
+        </div>
+        <span class="journey__status">${escapeHtml(item.status || "WAITING")}</span>
+      </li>`;
+    })
+    .join("");
+}
+
+export function journeyProgress(stages) {
+  const list = stages || [];
+  let advanced = 0;
+  for (const [index, item] of list.entries()) {
+    if (stageState(item.status) !== "pass") break;
+    advanced = index + 1;
+  }
+  return list.length ? advanced / list.length : 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* Discovery over the large catalog                                    */
+/* ------------------------------------------------------------------ */
+
+export function renderMandatePanel(discovery) {
+  if (!discovery) return "";
+  const lines = (discovery.mandate_plain_english || [])
+    .map((line) => `<li>${escapeHtml(line)}</li>`)
+    .join("");
+  const unresolved = (discovery.mandate?.unresolved || [])
+    .map((code) => `<code>${escapeHtml(humanize(code))}</code>`)
+    .join("");
+  const filtered = Object.entries(discovery.retrieval?.filtered_out || {})
+    .map(
+      ([reason, count]) =>
+        `<li><strong>${escapeHtml(count)}</strong> ${escapeHtml(reason)}</li>`,
+    )
+    .join("");
+  return `
+    <div class="mandate">
+      <div class="mandate__col">
+        <p class="microlabel">WHAT WE READ FROM YOUR WORDS</p>
+        <ul class="mandate__list">${lines || "<li>No constraints were extracted.</li>"}</ul>
+        ${
+          unresolved
+            ? `<p class="mandate__unresolved"><span>NOT STATED</span> ${unresolved}</p>`
+            : ""
+        }
+      </div>
+      <div class="mandate__col">
+        <p class="microlabel">WHAT THE SEARCH RULED OUT</p>
+        <ul class="mandate__list mandate__list--filtered">${
+          filtered || "<li>Nothing was filtered out by your constraints.</li>"
+        }</ul>
+        <p class="mandate__note">
+          A price ceiling is not a ranking preference. A listing above it is not a candidate at all.
+        </p>
+      </div>
+    </div>`;
+}
+
+function transactabilityRows(transactability) {
+  return (transactability?.checks || [])
+    .map(
+      (check) => `
+        <li data-status="${escapeHtml(check.status)}">
+          <span>${escapeHtml(check.label)}</span>
+          <strong data-readiness="${escapeHtml(check.status)}">${escapeHtml(check.status)}</strong>
+          <small>${escapeHtml(check.detail)}</small>
+        </li>`,
+    )
+    .join("");
+}
+
+function anomalyRows(anomaly) {
+  const triggered = (anomaly?.features || []).filter((item) => item.triggered);
+  if (!triggered.length) {
+    return '<li class="signal signal--clean">No defensive signal fired on this listing.</li>';
+  }
+  return triggered
+    .sort((a, b) => b.value * b.weight - a.value * a.weight)
+    .map(
+      (item) => `
+        <li class="signal">
+          <p class="signal__question">${escapeHtml(item.question)}</p>
+          <p class="signal__finding">${escapeHtml(item.finding)}</p>
+        </li>`,
+    )
+    .join("");
+}
+
+export function renderDiscoveryCandidate(candidate, { selected = false } = {}) {
+  const price =
+    candidate.price_minor === null || candidate.price_minor === undefined
+      ? "No published price"
+      : money(candidate.price_minor, candidate.currency);
+  const mismatch = candidate.classification?.mismatch;
+  const registered = candidate.source === "mandateguard";
+  return `
+    <article class="listing" data-transactable="${candidate.transactable ? "true" : "false"}"
+             data-selected="${selected ? "true" : "false"}"
+             data-product="${escapeHtml(candidate.catalog_product_id)}">
+      <header class="listing__head">
+        <div>
+          <p class="listing__tier">
+            <span class="tierchip tierchip--${registered ? "registered" : "discovery"}">${
+              registered ? "REGISTERED MERCHANT" : "DISCOVERY LISTING"
+            }</span>
+            <span class="listing__stage">${escapeHtml(humanize(candidate.stage))}</span>
+          </p>
+          <h3 class="listing__name">${escapeHtml(candidate.title)}</h3>
+          <p class="listing__meta">
+            ${escapeHtml(price)} &middot; ${escapeHtml(candidate.top_category)}
+            ${candidate.brand ? ` &middot; ${escapeHtml(candidate.brand)}` : ""}
+          </p>
+        </div>
+        <p class="listing__status" data-status="${escapeHtml(candidate.transactability?.status)}">
+          ${escapeHtml(candidate.transactability?.status || "UNKNOWN")}
+        </p>
+      </header>
+
+      <p class="listing__why">${escapeHtml(candidate.match?.headline || "")}</p>
+      <p class="listing__whydetail">${escapeHtml(candidate.match?.detail || "")}</p>
+
+      <ul class="readiness readiness--listing">${transactabilityRows(candidate.transactability)}</ul>
+
+      <p class="listing__next">${escapeHtml(candidate.transactability?.next_action || "")}</p>
+
+      <details class="disclosure disclosure--inline">
+        <summary class="disclosure__summary">
+          <span>Technical detail</span>
+          <small>Match scores, classifier, defensive signals</small>
+        </summary>
+        <dl class="datarows datarows--inline">
+          <div><dt>Match score</dt><dd><code>${escapeHtml(displayScore(candidate.match?.score))}</code></dd></div>
+          <div><dt>Lexical</dt><dd><code>${escapeHtml(displayScore(candidate.match?.lexical_score))}</code></dd></div>
+          <div><dt>Embedding</dt><dd><code>${escapeHtml(displayScore(candidate.match?.dense_score))}</code></dd></div>
+        </dl>
+        <p class="microlabel">CLASSIFIER (ADVISORY)</p>
+        <p class="listing__classifier">
+          Predicted category <strong>${escapeHtml(
+            candidate.classification?.predicted_category || "not classified",
+          )}</strong>${
+            mismatch
+              ? ` &middot; mismatch <strong data-severity="${escapeHtml(
+                  mismatch.severity,
+                )}">${escapeHtml(mismatch.severity)}</strong>`
+              : ""
+          }
+        </p>
+        ${mismatch ? `<p class="listing__mismatch">${escapeHtml(mismatch.rationale)}</p>` : ""}
+        <p class="microlabel">DEFENSIVE SIGNALS</p>
+        <ul class="signals">${anomalyRows(candidate.anomaly)}</ul>
+        <p class="authority-alert">${escapeHtml(
+          candidate.transactability?.authority_notice || "",
+        )}</p>
+      </details>
+
+      <div class="listing__actions">
+        <button class="btn ${
+          candidate.transactable ? "btn--primary" : "btn--secondary"
+        }" type="button" data-select="${escapeHtml(candidate.catalog_product_id)}">
+          ${candidate.transactable ? "AUTHORIZE THIS PURCHASE" : "WHY CAN'T I BUY THIS?"}
+        </button>
+      </div>
+    </article>`;
+}
+
+export function renderDiscoveryResults(discovery) {
+  if (!discovery) return "";
+  const candidates = discovery.candidates || [];
+  if (!candidates.length) {
+    return `
+      <div class="empty-evidence">
+        <strong>NO LISTING MATCHED THAT INTENT</strong>
+        <p>Every candidate was ruled out by a constraint you stated, or the catalog carries
+           nothing like it. Neither is a reason to relax the constraint.</p>
+      </div>`;
+  }
+  return candidates.map((item) => renderDiscoveryCandidate(item)).join("");
+}
+
+export function discoverySummaryLine(discovery) {
+  if (!discovery) return "";
+  const retrieval = discovery.retrieval || {};
+  const summary = discovery.summary || {};
+  const total = Number(retrieval.catalog_listings || 0).toLocaleString("en-IN");
+  return (
+    `${total} listings searched in ${Math.round(retrieval.retrieval_ms ?? 0)} ms · ` +
+    `${summary.evidence_ready ?? 0} of ${summary.listings ?? 0} shown are transactable today`
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -1066,19 +1489,26 @@ export function renderAttackLab(surfaces = ATTACK_SURFACES) {
             <h3 class="attack__name">${escapeHtml(item.surface)}</h3>
             <p class="attack__detail">${escapeHtml(item.detail)}</p>
           </div>
+          <div class="attack__signal">
+            <p class="microlabel">OBSERVED SIGNAL</p>
+            <p class="attack__signaltext">${escapeHtml(item.signal)}</p>
+          </div>
           <div class="attack__control">
-            <p class="microlabel">CONTROL</p>
+            <p class="microlabel">CONTROL HIT</p>
             <p class="attack__controltext">${escapeHtml(item.control)}</p>
           </div>
           <div class="attack__treatment">
-            <p class="microlabel">EXPECTED TREATMENT</p>
-            <p class="treatment" data-treatment="${escapeHtml(item.treatment)}">${escapeHtml(
-              item.treatment,
+            <p class="microlabel">DECISION</p>
+            <p class="treatment" data-treatment="${escapeHtml(item.decision)}">${escapeHtml(
+              item.decision,
             )}</p>
           </div>
-          <div class="attack__evidence">
-            <p class="microlabel">DEMO OR TEST EVIDENCE</p>
-            <code>${escapeHtml(item.evidence)}</code>
+          <div class="attack__payment">
+            <p class="microlabel">PAYMENT REACHED?</p>
+            <p class="paymentflag" data-reached="${escapeHtml(item.paymentReached)}">${escapeHtml(
+              item.paymentReached,
+            )}</p>
+            <code class="attack__evidence">${escapeHtml(item.evidence)}</code>
           </div>
         </article>`,
     )
@@ -1219,11 +1649,158 @@ export function renderMeasuredEvidence(evaluation = EVALUATION_EVIDENCE, totals 
         evaluation.summarySha256,
       )}</code></dd></div>
     </dl>
-    <p class="measured__tests">
-      Secondary proof: <strong>${escapeHtml(totals.python)}</strong> Python tests and
-      <strong>${escapeHtml(totals.ui)}</strong> UI tests.
-    </p>
   `;
+}
+
+/* ------------------------------------------------------------------ */
+/* Measured evidence, kept in four separate kinds                      */
+/* ------------------------------------------------------------------ */
+
+function figureRow(label, value, note) {
+  return `
+    <div class="measured__item">
+      <dt>${escapeHtml(label)}</dt>
+      <dd class="measured__value"${figureAttr(value, { animate: true })}>${escapeHtml(
+        value ?? "n/a",
+      )}</dd>
+      ${note ? `<dd class="measured__note">${escapeHtml(note)}</dd>` : ""}
+    </div>`;
+}
+
+function megabytes(bytes) {
+  const value = Number(bytes);
+  return Number.isFinite(value) ? `${(value / 1048576).toFixed(1)} MB` : "n/a";
+}
+
+/** SYSTEM SCALE. Catalog and index size, cold start, and query latency. */
+export function renderSystemScale(scale) {
+  if (!scale || !scale.available) {
+    return `<p class="measured__unavailable">${escapeHtml(
+      scale?.reason || "No scale benchmark has been recorded for this build.",
+    )}</p>`;
+  }
+  const rows = [
+    figureRow("Catalog SKUs", Number(scale.catalog_listings || 0).toLocaleString("en-IN")),
+    figureRow("Categories", scale.categories),
+    figureRow("Index size", megabytes(scale.index_bytes), "lexical + embedding, on disk"),
+    figureRow("Catalog size", megabytes(scale.catalog_bytes), "compressed, committed"),
+    figureRow("Cold load", `${Number(scale.cold_load_seconds || 0).toFixed(2)} s`),
+    figureRow("Resident memory", `${scale.resident_memory_mb ?? "n/a"} MB`),
+    figureRow("Retrieval P50", `${scale.p50_ms ?? "n/a"} ms`),
+    figureRow("Retrieval P95", `${scale.p95_ms ?? "n/a"} ms`),
+    figureRow("Retrieval P99", `${scale.p99_ms ?? "n/a"} ms`),
+    figureRow("Queries / second", scale.queries_per_second, "single process"),
+    figureRow("Queries executed", Number(scale.queries_executed || 0).toLocaleString("en-IN")),
+  ].join("");
+  return `
+    <dl class="measured__grid measured__grid--wide">${rows}</dl>
+    <p class="measured__caveat">${escapeHtml(scale.caveat || "")}</p>
+    <dl class="measured__source">
+      <div><dt>Source</dt><dd><code>${escapeHtml(scale.source)}</code></dd></div>
+    </dl>`;
+}
+
+/** MODEL QUALITY. Never merged with authorization evidence. */
+export function renderModelQuality(quality) {
+  if (!quality || !quality.available) {
+    return `<p class="measured__unavailable">${escapeHtml(
+      quality?.reason || "No model evaluation has been recorded for this build.",
+    )}</p>`;
+  }
+  const classifier = quality.classifier || {};
+  const retrieval = quality.retrieval || {};
+  const negatives = (quality.negative_results || [])
+    .map(
+      (item) => `
+        <li class="negative">
+          <p class="negative__finding">${escapeHtml(item.finding)}</p>
+          <p class="negative__detail">${escapeHtml(item.detail)}</p>
+        </li>`,
+    )
+    .join("");
+  return `
+    <div class="quality">
+      <section class="quality__col" aria-labelledby="quality-classifier">
+        <h4 class="quality__heading" id="quality-classifier">Category classifier</h4>
+        <dl class="measured__grid">
+          ${figureRow("Macro F1", classifier.macro_f1)}
+          ${figureRow("Weighted F1", classifier.weighted_f1)}
+          ${figureRow("Accuracy", classifier.accuracy)}
+          ${figureRow("Top-2 accuracy", classifier.top_2_accuracy)}
+        </dl>
+        <p class="quality__split">
+          ${escapeHtml(classifier.classes)} classes ·
+          train ${escapeHtml(Number(classifier.train || 0).toLocaleString("en-IN"))} ·
+          validation ${escapeHtml(Number(classifier.validation || 0).toLocaleString("en-IN"))} ·
+          test ${escapeHtml(Number(classifier.test || 0).toLocaleString("en-IN"))},
+          frozen before the test set was scored.
+        </p>
+        <p class="authority-alert">Advisory. This model cannot allow a payment.</p>
+      </section>
+      <section class="quality__col" aria-labelledby="quality-retrieval">
+        <h4 class="quality__heading" id="quality-retrieval">Catalog retrieval</h4>
+        <dl class="measured__grid">
+          ${figureRow("Recall@10", retrieval.recall_at_10)}
+          ${figureRow("Recall@5", retrieval.recall_at_5)}
+          ${figureRow("MRR", retrieval.mrr)}
+          ${figureRow("Distinct results", retrieval.distinct_title_fraction)}
+        </dl>
+        <p class="quality__split">
+          ${escapeHtml(retrieval.queries)} hand-authored queries, relevance defined before
+          measurement. Configuration: <code>${escapeHtml(retrieval.configuration || "n/a")}</code>.
+        </p>
+        <p class="authority-alert">${escapeHtml(quality.boundary || "")}</p>
+      </section>
+    </div>
+    <div class="negatives">
+      <p class="microlabel">WHAT WE BUILT, MEASURED, AND DID NOT SHIP</p>
+      <ul class="negatives__list">${negatives || "<li>No negative results recorded.</li>"}</ul>
+    </div>`;
+}
+
+/** ENGINEERING QUALITY. Test counts, said plainly as test counts. */
+export function renderEngineeringQuality(totals = TEST_TOTALS) {
+  return `
+    <dl class="measured__grid">
+      ${figureRow("Python tests", totals.python)}
+      ${figureRow("UI tests", totals.ui)}
+    </dl>
+    <p class="measured__caveat">
+      A passing test suite is evidence that the code does what its authors intended. It is not a
+      measurement of scale, of model quality, or of authorization correctness, and it is reported
+      here on its own so it cannot be mistaken for any of them.
+    </p>`;
+}
+
+/** Where the discovery catalog came from, and under what licence. */
+export function renderCatalogProvenance(discovery) {
+  if (!discovery?.available) {
+    return `<p class="measured__unavailable">${escapeHtml(
+      discovery?.reason || "No discovery catalog is built into this deployment.",
+    )}</p>`;
+  }
+  const provenance = discovery.provenance || {};
+  const catalog = discovery.catalog || {};
+  return `
+    <div class="catprov">
+      <p class="microlabel">DISCOVERY CATALOG PROVENANCE</p>
+      <h3 class="catprov__name">${escapeHtml(provenance.display_name || "Imported catalog")}</h3>
+      <dl class="datarows">
+        <div><dt>Publisher</dt><dd>${escapeHtml(provenance.publisher || "unknown")}</dd></div>
+        <div><dt>Licence</dt><dd>${escapeHtml(provenance.licence || "unknown")}</dd></div>
+        <div><dt>Listings</dt><dd><code>${escapeHtml(
+          Number(catalog.listings || 0).toLocaleString("en-IN"),
+        )}</code></dd></div>
+        <div><dt>Catalog SHA-256</dt><dd><code class="hash">${escapeHtml(
+          provenance.catalog_sha256 || "not recorded",
+        )}</code></dd></div>
+      </dl>
+      <p class="catprov__attribution">${escapeHtml(provenance.attribution || "")}</p>
+      <p class="catprov__boundary">
+        <strong>${escapeHtml(provenance.trust_tier || "DISCOVERY_LISTING")}.</strong>
+        ${escapeHtml(provenance.trust_note || "")}
+      </p>
+    </div>`;
 }
 
 export function renderResearch(research) {
@@ -1347,12 +1924,15 @@ function init() {
     presets: $("#preset-row"),
     intent: $("#purchase-intent"),
     run: $("#run-button"),
-    heroRun: $("#hero-run"),
     modeNote: $("#mode-note"),
     liveLabel: $("#live-mode-label"),
-    spine: $("#spine"),
-    railSignal: $("#rail-signal"),
+    journey: $("#journey"),
     runState: $("#run-state"),
+    discoveryRegion: $("#discovery-region"),
+    discoveryMeta: $("#discovery-meta"),
+    discoveryResults: $("#discovery-results"),
+    discoveryNote: $("#discovery-note"),
+    mandatePanel: $("#mandate-panel"),
     resultRegion: $("#result-region"),
     verdict: $("#verdict"),
     story: $("#story"),
@@ -1365,9 +1945,13 @@ function init() {
     authorization: $("#authorization-panel"),
     execution: $("#execution-panel"),
     provenance: $("#provenance"),
+    catalogProvenance: $("#catalog-provenance"),
     attackGrid: $("#attack-grid"),
     bounded: $("#bounded-panel"),
     measured: $("#measured-panel"),
+    systemScale: $("#system-scale-panel"),
+    modelQuality: $("#model-quality-panel"),
+    engineering: $("#engineering-panel"),
     research: $("#research-panel"),
     recovery: $("#recovery-panel"),
     auditSection: $("#audit-section"),
@@ -1375,14 +1959,16 @@ function init() {
     error: $("#form-error"),
     console: $("#console"),
   };
+  const searchLock = new SubmissionLock();
   const submitLock = new SubmissionLock();
   const replayLock = new SubmissionLock();
   const recoveryLock = new SubmissionLock();
   const mandateLock = new SubmissionLock();
   let config;
-  let selectedPreset = null;
   let currentRunId = null;
   let latestResult = null;
+  let latestDiscovery = null;
+  let latestSelection = null;
   let previousConsent = null;
 
   /* ---------------- counters ---------------- */
@@ -1422,7 +2008,10 @@ function init() {
         if (focus) tab.focus();
       }
     });
-    if (target === "evidence") elements.provenance.innerHTML = renderProvenance(latestResult);
+    if (target === "evidence") {
+      elements.catalogProvenance.innerHTML = renderCatalogProvenance(config?.discovery);
+      elements.provenance.innerHTML = renderProvenance(latestResult);
+    }
   };
 
   tabs.forEach((tab, index) => {
@@ -1440,56 +2029,34 @@ function init() {
     });
   });
 
-  /* ---------------- spine ---------------- */
-  const paintSpine = (timeline, decision) => {
-    elements.spine.innerHTML = renderSpine(timeline);
-    const state = String(decision || "waiting").toLowerCase();
-    elements.spine.dataset.decision = state;
-    elements.spine.style.setProperty("--spine-fill", String(spineProgress(timeline)));
-    const steps = [...elements.spine.querySelectorAll(".spine__step")];
-    steps.forEach((step, index) => {
+  /* ---------------- the nine-stage journey ---------------- */
+  const paintJourney = (snapshot) => {
+    const stages = buildJourney({
+      discovery: latestDiscovery,
+      selection: latestSelection,
+      snapshot,
+    });
+    elements.journey.innerHTML = renderJourney(stages);
+    const decision = snapshot?.result?.decision || latestSelection?.status || "waiting";
+    elements.journey.dataset.decision = String(decision).toLowerCase().replaceAll(" ", "-");
+    elements.journey.style.setProperty("--journey-fill", String(journeyProgress(stages)));
+    [...elements.journey.querySelectorAll(".journey__step")].forEach((step, index) => {
       if (step.dataset.state === "waiting") return;
       motion(step, [{ transform: "translateY(5px)" }, { transform: "translateY(0)" }], {
         duration: 220,
-        delay: Math.min(index * 45, 320),
+        delay: Math.min(index * 40, 300),
       });
     });
-    const halted = elements.spine.querySelector('.spine__step[data-halt="true"]');
-    if (halted && halted.dataset.state === "review") {
-      motion(
-        halted.querySelector(".spine__node"),
-        [{ transform: "scale(1)" }, { transform: "scale(1.55)" }, { transform: "scale(1)" }],
-        { duration: 900, iterations: 3 },
-      );
-    }
-  };
-
-  /* The signal traverses the authority path once, so the direction of authority is legible before any run. */
-  const runRailSignal = () => {
-    const track = elements.railSignal?.parentElement;
-    if (!track) return;
-    const distance = track.clientHeight - elements.railSignal.offsetHeight;
-    if (distance <= 0) return;
-    motion(
-      elements.railSignal,
-      [
-        { transform: "translateY(0)", opacity: 0 },
-        { transform: `translateY(${distance * 0.5}px)`, opacity: 1, offset: 0.4 },
-        { transform: `translateY(${distance}px)`, opacity: 1 },
-      ],
-      { duration: 1400, delay: 240, fill: "forwards" },
-    );
   };
 
   /* ---------------- form state ---------------- */
   const selectedMode = () =>
     document.querySelector('input[name="mode"]:checked')?.value || "offline";
 
-  const setBusy = (busy) => {
+  const setBusy = (busy, label) => {
     document.body.classList.toggle("is-running", busy);
     elements.run.disabled = busy;
-    elements.run.textContent = busy ? "BUYER RUNNING" : "RUN AI BUYER";
-    elements.heroRun.disabled = busy;
+    elements.run.textContent = busy ? label || "WORKING" : "SEARCH THE CATALOG";
     elements.intent.readOnly = busy;
     document
       .querySelectorAll('input[name="mode"], .presetbtn')
@@ -1504,7 +2071,7 @@ function init() {
   /* ---------------- rendering ---------------- */
   const renderSnapshot = (snapshot) => {
     elements.runState.textContent = snapshot.state;
-    paintSpine(snapshot.timeline, snapshot.result?.decision);
+    paintJourney(snapshot);
     if (snapshot.state === "ERROR") {
       showError(snapshot.error?.message || "The run stopped safely.");
       return;
@@ -1521,7 +2088,6 @@ function init() {
     elements.resolveRegion.hidden = !result.recovery && !result.transactability;
     elements.reviewRecovery.innerHTML = renderReviewRecovery(result.recovery, result.execution);
     elements.transactability.innerHTML = renderTransactability(result.transactability);
-    // An empty grid cell reads as a missing panel; let the surviving one span.
     elements.reviewRecovery.hidden = !elements.reviewRecovery.innerHTML.trim();
     elements.transactability.hidden = !elements.transactability.innerHTML.trim();
     elements.buyer.innerHTML = renderBuyerPanel(result.buyer);
@@ -1551,13 +2117,6 @@ function init() {
     }
     previousConsent = nextConsent;
 
-    elements.provenance
-      .querySelectorAll(".prov[data-acquisition='BOUNDED_TRUSTED_ACQUISITION']")
-      .forEach((node) =>
-        motion(node, [{ transform: "translateY(14px)" }, { transform: "translateY(0)" }], {
-          duration: 340,
-        }),
-      );
     elements.evidence
       .querySelectorAll(".evidence-card[data-acquisition='BOUNDED_TRUSTED_ACQUISITION']")
       .forEach((node) =>
@@ -1588,6 +2147,13 @@ function init() {
     if (!response.ok) throw new Error(payload?.error?.message || "The request failed safely.");
     return payload;
   };
+
+  const postJson = (url, body) =>
+    fetchJson(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
 
   const pollRun = async (initial) => {
     let snapshot = initial;
@@ -1645,35 +2211,111 @@ function init() {
     );
   }
 
-  const submit = async () => {
-    if (!submitLock.acquire()) return;
+  /* ---------------- stage 1-5: discovery ---------------- */
+  const paintDiscovery = (discovery) => {
+    latestDiscovery = discovery;
+    latestSelection = null;
+    elements.discoveryRegion.hidden = false;
+    elements.discoveryMeta.textContent = discoverySummaryLine(discovery);
+    elements.mandatePanel.innerHTML = renderMandatePanel(discovery);
+    elements.discoveryResults.innerHTML = renderDiscoveryResults(discovery);
+    const suppressed = discovery.retrieval?.duplicates_suppressed ?? 0;
+    elements.discoveryNote.textContent = suppressed
+      ? `${suppressed} near-duplicate listings were collapsed so the results are ${
+          discovery.candidates?.length ?? 0
+        } different products, not the same one repeated.`
+      : "";
+    elements.discoveryResults.querySelectorAll("[data-select]").forEach((button) => {
+      button.addEventListener("click", () => selectListing(button.dataset.select));
+    });
+    paintJourney(null);
+  };
+
+  const searchCatalog = async () => {
+    if (!searchLock.acquire()) return;
     showError("");
     const intent = elements.intent.value.trim();
     if (!intent) {
-      showError("Enter a bounded purchase mandate.");
-      submitLock.release();
+      showError("Type what the agent should buy.");
+      searchLock.release();
       return;
     }
-    setBusy(true);
+    setBusy(true, "SEARCHING");
     elements.resultRegion.hidden = true;
-    elements.resolveRegion.hidden = true;
-    delete elements.resultRegion.dataset.decision;
     elements.auditSection.hidden = true;
     currentRunId = null;
+    latestResult = null;
     previousConsent = null;
     try {
-      const snapshot = await fetchJson("/api/runs", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          intent,
-          mode: selectedMode(),
-          preset_id: selectedPreset,
-          request_id: createRequestId(),
-        }),
+      if (config?.discovery?.available) {
+        paintDiscovery(await postJson("/api/discovery/search", { intent, top_k: 6 }));
+      } else {
+        // Without the large catalog the product still works: the intent goes
+        // straight to the authorization controller over the registered catalog.
+        elements.discoveryRegion.hidden = true;
+        await authorize(intent);
+      }
+    } catch (error) {
+      showError(error.message);
+    } finally {
+      setBusy(false);
+      searchLock.release();
+    }
+  };
+
+  /* ---------------- stage 3: choose a listing ---------------- */
+  const selectListing = async (catalogProductId) => {
+    if (!latestDiscovery) return;
+    const intent = latestDiscovery.mandate?.raw_text || elements.intent.value.trim();
+    showError("");
+    let payload;
+    try {
+      payload = await postJson("/api/discovery/select", {
+        intent,
+        catalog_product_id: catalogProductId,
+      });
+    } catch (error) {
+      showError(error.message);
+      return;
+    }
+    const candidate = payload.candidate;
+    const selection = payload.selection;
+    latestSelection = {
+      title: candidate.title,
+      transactable: selection.transactable,
+      status: selection.status,
+    };
+    elements.discoveryResults.querySelectorAll(".listing").forEach((node) => {
+      node.dataset.selected = node.dataset.product === catalogProductId ? "true" : "false";
+    });
+    paintJourney(null);
+    if (selection.transactable && selection.authorization_intent) {
+      await authorize(selection.authorization_intent);
+    } else {
+      elements.runState.textContent = selection.status;
+      elements.resultRegion.hidden = true;
+      elements.discoveryNote.textContent = selection.next_step;
+    }
+  };
+
+  /* ---------------- stages 6-9: the authorization controller ---------------- */
+  const authorize = async (intent) => {
+    if (!submitLock.acquire()) return;
+    showError("");
+    setBusy(true, "VERIFYING");
+    try {
+      const snapshot = await postJson("/api/runs", {
+        intent,
+        mode: selectedMode(),
+        preset_id: null,
+        request_id: createRequestId(),
       });
       currentRunId = snapshot.run_id;
       await pollRun(snapshot);
+      elements.resultRegion.scrollIntoView({
+        behavior: prefersReducedMotion() ? "auto" : "smooth",
+        block: "start",
+      });
     } catch (error) {
       showError(error.message);
     } finally {
@@ -1682,9 +2324,12 @@ function init() {
     }
   };
 
-  /* ---------------- presets ---------------- */
-  const renderPresets = () => {
-    elements.presets.innerHTML = config.presets
+  /* ---------------- examples ---------------- */
+  const renderExamples = () => {
+    const examples = config.discovery?.available
+      ? config.discovery.presets
+      : config.presets;
+    elements.presets.innerHTML = (examples || [])
       .map(
         (preset) => `
           <button type="button" class="presetbtn" data-preset="${escapeHtml(preset.id)}"
@@ -1695,8 +2340,8 @@ function init() {
       .join("");
     elements.presets.querySelectorAll("button").forEach((button) => {
       button.addEventListener("click", () => {
-        const preset = config.presets.find((item) => item.id === button.dataset.preset);
-        selectedPreset = preset.id;
+        const preset = (examples || []).find((item) => item.id === button.dataset.preset);
+        if (!preset) return;
         elements.intent.value = preset.intent;
         elements.presets.querySelectorAll("button").forEach((item) => {
           const active = item === button;
@@ -1705,26 +2350,16 @@ function init() {
         });
       });
     });
-    elements.presets.querySelector("button")?.click();
   };
 
   /* ---------------- wiring ---------------- */
   elements.intent.addEventListener("input", () => {
-    selectedPreset = null;
     elements.presets.querySelectorAll("button").forEach((item) => {
       item.classList.remove("is-active");
       item.setAttribute("aria-pressed", "false");
     });
   });
-  elements.run.addEventListener("click", submit);
-  elements.heroRun.addEventListener("click", () => {
-    showView("observe");
-    elements.console.scrollIntoView({
-      behavior: prefersReducedMotion() ? "auto" : "smooth",
-      block: "start",
-    });
-    submit();
-  });
+  elements.run.addEventListener("click", searchCatalog);
   document.querySelectorAll('input[name="mode"]').forEach((input) => {
     input.addEventListener("change", () => {
       if (config && !config.modes.live.available) return;
@@ -1736,10 +2371,7 @@ function init() {
   });
 
   elements.attackGrid.innerHTML = renderAttackLab();
-  paintSpine(
-    SPINE_ORDER.map((id) => ({ id, status: "WAITING", detail: null })),
-    "waiting",
-  );
+  paintJourney(null);
   showView((window.location.hash || "#observe").slice(1));
   observeFigures(document);
 
@@ -1764,7 +2396,6 @@ function init() {
       delete document.documentElement.dataset.revealArmed;
     }, 1500);
   }
-  runRailSignal();
 
   fetchJson("/api/config")
     .then((payload) => {
@@ -1773,6 +2404,10 @@ function init() {
       elements.system.querySelector(".sysstate__text").textContent = "SYSTEM READY";
       elements.bounded.innerHTML = renderBoundedScale(config);
       elements.measured.innerHTML = renderMeasuredEvidence();
+      elements.systemScale.innerHTML = renderSystemScale(config.system_scale);
+      elements.modelQuality.innerHTML = renderModelQuality(config.model_quality);
+      elements.engineering.innerHTML = renderEngineeringQuality();
+      elements.catalogProvenance.innerHTML = renderCatalogProvenance(config.discovery);
       elements.research.innerHTML = renderResearch(config.research);
       elements.recovery.innerHTML = renderRecovery(config.failure_recovery);
       observeFigures(document.querySelector("#view-evaluation"));
@@ -1785,7 +2420,13 @@ function init() {
         elements.liveLabel.querySelector("span").textContent = "LIVE TEST OFF";
         elements.modeNote.textContent = unavailableNote;
       }
-      renderPresets();
+      if (!config.discovery?.available) {
+        elements.run.textContent = "RUN THE AI BUYER";
+        document.querySelector("#console-sub").textContent =
+          "The large discovery catalog is not built into this deployment, so the intent goes " +
+          "straight to the authorization controller over the registered merchant catalog.";
+      }
+      renderExamples();
     })
     .catch((error) => {
       elements.system.querySelector(".sysstate__text").textContent = "SYSTEM UNAVAILABLE";

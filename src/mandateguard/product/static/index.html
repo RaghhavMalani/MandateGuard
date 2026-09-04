@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="MandateGuard authorization infrastructure for autonomous commerce. Verify the mandate before money moves."
+      content="An AI agent can decide what to buy. Deciding is not the same as being allowed to pay. MandateGuard sits between an AI buyer and payment execution and returns ALLOW, BLOCK, or REVIEW."
     />
     <title>MandateGuard Commerce Lab</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%223%22%20fill%3D%22%230C2651%22%2F%3E%3Crect%20x%3D%2214%22%20width%3D%224%22%20height%3D%2232%22%20fill%3D%22%23305EFF%22%2F%3E%3C%2Fsvg%3E" />
@@ -62,7 +62,7 @@
               tabindex="-1"
               aria-controls="view-evaluation"
               data-view="evaluation"
-            >EVALUATION</button>
+            >MEASURED</button>
           </div>
         </nav>
 
@@ -80,59 +80,120 @@
     <main class="page">
       <!-- ============================ OBSERVE ============================ -->
       <section id="view-observe" class="view" role="tabpanel" aria-labelledby="tab-observe" tabindex="-1">
-        <section class="hero" aria-labelledby="hero-title">
-          <div class="hero__lede">
-            <p class="hero__claim" data-reveal>
-              Autonomous agents can decide what to buy.<br />
-              They shouldn&rsquo;t decide what they&rsquo;re allowed to pay for.
-            </p>
-            <h1 class="hero__title" id="hero-title" data-reveal>MANDATEGUARD</h1>
-            <p class="hero__sub" data-reveal>Verify the mandate before money moves.</p>
-            <div class="hero__cta" data-reveal>
-              <button class="btn btn--primary btn--lg" id="hero-run" type="button">
-                RUN THE COMMERCE LAB
-              </button>
-            </div>
-            <dl class="hero__facts" data-reveal>
-              <div class="fact">
-                <dt class="fact__value">0</dt>
-                <dd class="fact__label">buyer payment authority</dd>
-              </div>
-              <div class="fact">
-                <dt class="fact__value">1&#215;</dt>
-                <dd class="fact__label">bounded execution capability</dd>
-              </div>
-            </dl>
+
+        <!-- ---------- 1. What is the problem? ---------- -->
+        <section class="opening" aria-labelledby="opening-title">
+          <p class="opening__eyebrow" data-reveal>THE PROBLEM</p>
+          <h1 class="opening__title" id="opening-title" data-reveal>
+            An AI agent can decide what to buy.<br />
+            <em>Deciding is not the same as being allowed to pay.</em>
+          </h1>
+          <p class="opening__body" data-reveal>
+            Give an agent a budget and it will find you a product. It will also, sooner or later,
+            find you a subscription you said you didn&rsquo;t want, at a price that moved after you
+            agreed to it, from a seller nobody can name. A model that is usually right is still a
+            model, and &ldquo;usually&rdquo; is the wrong guarantee for money leaving an account.
+          </p>
+          <p class="opening__body" data-reveal>
+            <strong>MandateGuard sits between the AI buyer and payment execution.</strong> Nothing
+            the agent decides reaches a payment provider until MandateGuard has independently
+            checked it against what you actually asked for.
+          </p>
+        </section>
+
+        <!-- ---------- 2. Worked example ---------- -->
+        <section class="walkthrough" aria-labelledby="walkthrough-title">
+          <h2 class="walkthrough__title" id="walkthrough-title">How it works, in one purchase</h2>
+          <ol class="exchange">
+            <li class="exchange__turn exchange__turn--user">
+              <p class="exchange__who">USER</p>
+              <p class="exchange__says">
+                &ldquo;Buy wireless headphones below &#8377;4,000.<br />One-time payment only.&rdquo;
+              </p>
+            </li>
+            <li class="exchange__turn exchange__turn--agent">
+              <p class="exchange__who">AI AGENT</p>
+              <p class="exchange__says">Searches the catalog. Finds a product. Proposes it.</p>
+              <p class="exchange__aside">It has no payment credential and cannot charge anything.</p>
+            </li>
+            <li class="exchange__turn exchange__turn--guard">
+              <p class="exchange__who">MANDATEGUARD</p>
+              <p class="exchange__says">Compares five things that have to agree:</p>
+              <ul class="exchange__compares">
+                <li><span>1</span> what you asked for</li>
+                <li><span>2</span> what the agent proposed</li>
+                <li><span>3</span> what the catalog says</li>
+                <li><span>4</span> what the merchant can prove</li>
+                <li><span>5</span> whether you still consent</li>
+              </ul>
+              <p class="exchange__says">Then returns one of three answers.</p>
+            </li>
+          </ol>
+
+          <div class="outcomes" role="list">
+            <article class="outcome outcome--allow" role="listitem">
+              <p class="outcome__word">ALLOW</p>
+              <p class="outcome__meaning">The purchase is authorized and may proceed.</p>
+              <p class="outcome__detail">
+                Everything agreed. A single-use, transaction-bound capability is issued, and only
+                that capability can reach Razorpay.
+              </p>
+            </article>
+            <article class="outcome outcome--block" role="listitem">
+              <p class="outcome__word">BLOCK</p>
+              <p class="outcome__meaning">The proposal violates your mandate.</p>
+              <p class="outcome__detail">
+                Something the agent proposed contradicts something you said. No capability is
+                issued and the payment provider is never called.
+              </p>
+            </article>
+            <article class="outcome outcome--review" role="listitem">
+              <p class="outcome__word">REVIEW</p>
+              <p class="outcome__meaning">There is not enough trusted evidence to decide safely.</p>
+              <p class="outcome__detail">
+                Nobody authoritative has said whether this charge repeats, or who is selling it.
+                MandateGuard refuses to guess rather than guessing in your favour.
+              </p>
+            </article>
           </div>
 
-          <figure class="rail" id="architecture-rail" aria-labelledby="rail-caption">
-            <figcaption class="rail__caption" id="rail-caption">Authority boundary</figcaption>
-            <div class="rail__track" aria-hidden="true">
-              <span class="rail__signal" id="rail-signal"></span>
-            </div>
-            <ol class="rail__stages">
-              <li class="rail-stage" data-stage="buyer">
-                <p class="rail-stage__name">AI BUYER</p>
-                <p class="rail-stage__role">Proposes a product</p>
-                <p class="rail-stage__authority">No payment authority</p>
+          <figure class="authority" aria-labelledby="authority-caption">
+            <figcaption class="authority__caption" id="authority-caption">
+              The agent decides. MandateGuard verifies. Razorpay executes.
+            </figcaption>
+            <ol class="authority__chain">
+              <li class="authority__link">
+                <p class="authority__role">AI BUYER</p>
+                <p class="authority__can">Proposes a product</p>
+                <p class="authority__cannot">No payment authority</p>
               </li>
-              <li class="rail-stage rail-stage--guard" data-stage="guard">
-                <p class="rail-stage__name">MANDATEGUARD</p>
-                <p class="rail-stage__role">Verifies the mandate</p>
-                <p class="rail-stage__authority">Trust boundary</p>
+              <li class="authority__arrow" aria-hidden="true"></li>
+              <li class="authority__link authority__link--guard">
+                <p class="authority__role">MANDATEGUARD</p>
+                <p class="authority__can">Verifies against the mandate</p>
+                <p class="authority__cannot">The trust boundary</p>
               </li>
-              <li class="rail-stage" data-stage="provider">
-                <p class="rail-stage__name">RAZORPAY</p>
-                <p class="rail-stage__role">Executes the order</p>
-                <p class="rail-stage__authority">Signed capability only</p>
+              <li class="authority__arrow" aria-hidden="true"></li>
+              <li class="authority__link">
+                <p class="authority__role">RAZORPAY</p>
+                <p class="authority__can">Executes the order</p>
+                <p class="authority__cannot">Signed capability only</p>
               </li>
             </ol>
           </figure>
         </section>
 
+        <!-- ---------- 3. Try it: free-text intent ---------- -->
         <section class="console" id="console" aria-labelledby="console-title">
           <div class="console__head">
-            <h2 class="console__title" id="console-title">What should the agent buy?</h2>
+            <div>
+              <p class="console__eyebrow">TRY IT</p>
+              <h2 class="console__title" id="console-title">Tell the agent what to buy.</h2>
+              <p class="console__sub" id="console-sub">
+                Type anything. The agent searches a real product catalog, and MandateGuard tells you
+                what it can and cannot establish about what it found.
+              </p>
+            </div>
             <fieldset class="modeswitch" id="mode-switch">
               <legend class="visually-hidden">Execution mode</legend>
               <label class="modeswitch__opt">
@@ -146,39 +207,54 @@
             </fieldset>
           </div>
 
-          <div class="console__presets">
-            <p class="console__presets-label" id="preset-label">Scenario</p>
-            <div class="presetrow" id="preset-row" role="group" aria-labelledby="preset-label"></div>
-          </div>
-
           <div class="console__entry">
-            <label class="console__label" for="purchase-intent">Purchase mandate</label>
+            <label class="console__label" for="purchase-intent">What should the agent buy?</label>
             <textarea
               id="purchase-intent"
               name="purchase-intent"
               rows="3"
               maxlength="4000"
               spellcheck="true"
+              placeholder="Buy wireless headphones below Rs 4,000. One-time payment only."
             ></textarea>
+          </div>
+
+          <div class="console__examples">
+            <p class="console__examples-label" id="example-label">Or start from an example</p>
+            <div class="presetrow" id="preset-row" role="group" aria-labelledby="example-label"></div>
           </div>
 
           <div class="console__foot">
             <p class="console__note" id="mode-note">
               Deterministic local evaluation. External network calls: 0.
             </p>
-            <button class="btn btn--primary" id="run-button" type="button">RUN AI BUYER</button>
+            <button class="btn btn--primary btn--lg" id="run-button" type="button">
+              SEARCH THE CATALOG
+            </button>
           </div>
           <p class="formerror" id="form-error" role="alert" hidden></p>
         </section>
 
+        <!-- ---------- 4. Discovery results ---------- -->
+        <section id="discovery-region" class="discovery" aria-labelledby="discovery-title" hidden>
+          <div class="section-head">
+            <h2 class="section-head__title" id="discovery-title">What the agent found</h2>
+            <p class="section-head__meta" id="discovery-meta"></p>
+          </div>
+          <div id="mandate-panel" class="mandate-panel"></div>
+          <div id="discovery-results" class="discovery__results"></div>
+          <p class="discovery__note" id="discovery-note"></p>
+        </section>
+
+        <!-- ---------- 5. The chronological story ---------- -->
         <section class="spine-section" aria-labelledby="spine-title">
           <div class="section-head">
-            <h2 class="section-head__title" id="spine-title">Decision spine</h2>
-            <p class="runstate" id="run-state" aria-live="polite">WAITING FOR REQUEST</p>
+            <h2 class="section-head__title" id="spine-title">What happened, in order</h2>
+            <p class="runstate" id="run-state" aria-live="polite">WAITING FOR AN INTENT</p>
           </div>
-          <ol class="spine" id="spine" data-decision="waiting"></ol>
+          <ol class="journey" id="journey" data-decision="waiting"></ol>
           <p class="spine__legend" id="spine-legend">
-            Execution is the only step that can reach a payment provider, and only after a final ALLOW.
+            Only stage 8 can reach a payment provider, and only after stage 7 returns ALLOW.
           </p>
         </section>
 
@@ -219,21 +295,22 @@
         <header class="viewhead">
           <h2 class="viewhead__title">Adversarial surface</h2>
           <p class="viewhead__body">
-            Every class below is defended by a control that already exists in this repository.
-            This is a defensive taxonomy: it names the surface and the control, not a method of
-            attack.
+            Each row is a way an agentic purchase can go wrong, the signal the system observes when
+            it does, the control that catches it, and whether a payment was reached. This is a
+            defensive analysis: it names surfaces and controls, never a method for defeating one.
           </p>
         </header>
         <div class="attackhead" aria-hidden="true">
           <p>ATTACK SURFACE</p>
-          <p>CONTROL</p>
-          <p>EXPECTED TREATMENT</p>
-          <p>DEMO OR TEST EVIDENCE</p>
+          <p>OBSERVED SIGNAL</p>
+          <p>CONTROL HIT</p>
+          <p>DECISION</p>
+          <p>PAYMENT REACHED?</p>
         </div>
         <div class="attackgrid" id="attack-grid"></div>
         <p class="viewnote">
-          Treatments describe what the controller does today in this codebase. They are not a
-          claim about attacks outside these classes.
+          Treatments describe what the controller does in this codebase today. They are not a claim
+          about attacks outside these classes.
         </p>
       </section>
 
@@ -243,41 +320,68 @@
           <h2 class="viewhead__title">Evidence provenance</h2>
           <p class="viewhead__body">
             Only merchant-controlled evidence resolved for this exact merchant and SKU can move a
-            decision. Buyer prose never can.
+            decision. Buyer prose never can, and neither can a crawled catalog listing.
           </p>
         </header>
+        <div id="catalog-provenance" class="catalog-provenance"></div>
         <div id="provenance" class="provenance"></div>
       </section>
 
-      <!-- ============================ EVALUATION ============================ -->
+      <!-- ============================ MEASURED ============================ -->
       <section id="view-evaluation" class="view" role="tabpanel" aria-labelledby="tab-evaluation" tabindex="-1" hidden>
         <header class="viewhead">
-          <h2 class="viewhead__title">Bounded by design</h2>
+          <h2 class="viewhead__title">What have we measured?</h2>
           <p class="viewhead__body">
-            Scale here means a fixed budget, not throughput. Each limit below is enforced by the
-            server, not by the interface.
+            Four different kinds of evidence, kept apart. A test count is not a scale measurement, a
+            retrieval score is not an authorization guarantee, and neither is a substitute for the
+            other.
           </p>
         </header>
-        <div id="bounded-panel" class="bounded"></div>
 
-        <section class="measured" aria-labelledby="measured-title">
+        <section class="measured-block" aria-labelledby="scale-title">
           <div class="section-head">
-            <h2 class="section-head__title" id="measured-title">Measured engineering evidence</h2>
+            <h3 class="section-head__title" id="scale-title">System scale</h3>
+            <p class="section-head__meta">Catalog, index, latency</p>
+          </div>
+          <div id="system-scale-panel"></div>
+        </section>
+
+        <section class="measured-block" aria-labelledby="quality-title">
+          <div class="section-head">
+            <h3 class="section-head__title" id="quality-title">Model quality</h3>
+            <p class="section-head__meta">Advisory only &mdash; never authorization</p>
+          </div>
+          <div id="model-quality-panel"></div>
+        </section>
+
+        <section class="measured-block" aria-labelledby="authz-title">
+          <div class="section-head">
+            <h3 class="section-head__title" id="authz-title">Authorization evidence</h3>
+            <p class="section-head__meta">Frozen Resolve evaluation</p>
           </div>
           <div id="measured-panel"></div>
         </section>
 
+        <section class="measured-block" aria-labelledby="engineering-title">
+          <div class="section-head">
+            <h3 class="section-head__title" id="engineering-title">Engineering quality</h3>
+            <p class="section-head__meta">Test suites and bounded budgets</p>
+          </div>
+          <div id="engineering-panel"></div>
+          <div id="bounded-panel" class="bounded"></div>
+        </section>
+
         <section class="assurance" aria-labelledby="assurance-title">
           <div class="section-head">
-            <h2 class="section-head__title" id="assurance-title">Research and failure recovery</h2>
+            <h3 class="section-head__title" id="assurance-title">Research and failure recovery</h3>
           </div>
           <div class="assurance__grid">
             <article class="assurance__col">
-              <h3 class="assurance__heading">Evidence sufficiency</h3>
+              <h4 class="assurance__heading">Evidence sufficiency</h4>
               <div id="research-panel"></div>
             </article>
             <article class="assurance__col">
-              <h3 class="assurance__heading">Engineering failure recovery</h3>
+              <h4 class="assurance__heading">Engineering failure recovery</h4>
               <div id="recovery-panel"></div>
             </article>
           </div>

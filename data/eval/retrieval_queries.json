@@ -1,0 +1,686 @@
+{
+  "query_set_version": "discovery-retrieval-eval-v1",
+  "catalog": "flipkart discovery catalog, data/processed/discovery_catalog.jsonl.gz",
+  "authored_before_measurement": true,
+  "protocol": {
+    "summary": "Relevance is defined per query by a human-authored predicate over the listing's own structured fields, evaluated across the whole catalog.",
+    "why_not_pooled_annotation": "Pooling relevance judgements from the systems under test biases the result toward whichever system contributed the pool. A predicate applied to every listing has no pooling bias and can be re-checked by anyone reading it.",
+    "known_bias": "A predicate written over title, category, and price terms correlates with lexical evidence, so the 'literal' family understates what a dense retriever adds. The 'paraphrase' family exists to measure that separately: those queries deliberately avoid the vocabulary their own predicate uses.",
+    "predicate_fields": {
+      "require_all_terms": "every term must appear as a casefolded substring of title + category path + brand + description",
+      "require_any_terms": "at least one term must appear",
+      "require_title_any": "at least one term must appear in the title alone",
+      "exclude_terms": "no term may appear",
+      "categories": "top-level category allowlist",
+      "max_price_minor": "listing price ceiling in paise, inclusive"
+    },
+    "structured_filters_applied_at_query_time": "The retriever is given the price ceiling and exclusions parsed from the query text, exactly as the product does. Predicate price ceilings mirror the query's stated ceiling."
+  },
+  "queries": [
+    {
+      "query_id": "Q01",
+      "family": "literal",
+      "text": "Buy wired headphones under Rs 5000",
+      "note": "Any headphone or earphone listing at or below the ceiling.",
+      "relevance": {
+        "require_any_terms": [
+          "headphone",
+          "earphone"
+        ],
+        "require_title_any": [
+          "headphone",
+          "earphone",
+          "headset"
+        ],
+        "max_price_minor": 500000
+      }
+    },
+    {
+      "query_id": "Q02",
+      "family": "literal",
+      "text": "silver bracelet for women under 2000",
+      "note": "Jewellery listings whose title names a bracelet and mentions silver.",
+      "relevance": {
+        "categories": [
+          "Jewellery"
+        ],
+        "require_all_terms": [
+          "silver"
+        ],
+        "require_title_any": [
+          "bracelet"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "Q03",
+      "family": "literal",
+      "text": "car mobile phone holder mount under 500",
+      "note": "Car mounts and cradles for a phone.",
+      "relevance": {
+        "require_all_terms": [
+          "car"
+        ],
+        "require_title_any": [
+          "mount",
+          "holder",
+          "cradle"
+        ],
+        "max_price_minor": 50000
+      }
+    },
+    {
+      "query_id": "Q04",
+      "family": "literal",
+      "text": "women's printed cotton kurta below 800",
+      "note": "Clothing listings whose title names a kurta or kurti.",
+      "relevance": {
+        "categories": [
+          "Clothing",
+          "Uncategorized"
+        ],
+        "require_title_any": [
+          "kurta",
+          "kurti"
+        ],
+        "max_price_minor": 80000
+      }
+    },
+    {
+      "query_id": "Q05",
+      "family": "literal",
+      "text": "analog wrist watch for men under 3000",
+      "note": "Watch listings for men.",
+      "relevance": {
+        "categories": [
+          "Watches"
+        ],
+        "require_title_any": [
+          "watch"
+        ],
+        "require_any_terms": [
+          "men",
+          "boys"
+        ],
+        "max_price_minor": 300000
+      }
+    },
+    {
+      "query_id": "Q06",
+      "family": "literal",
+      "text": "running shoes for men under 3000",
+      "note": "Footwear listings whose title names running or sports shoes.",
+      "relevance": {
+        "categories": [
+          "Footwear"
+        ],
+        "require_title_any": [
+          "running",
+          "sports"
+        ],
+        "require_any_terms": [
+          "shoe"
+        ],
+        "max_price_minor": 300000
+      }
+    },
+    {
+      "query_id": "Q07",
+      "family": "literal",
+      "text": "school backpack for kids below 1500",
+      "note": "Backpacks and school bags.",
+      "relevance": {
+        "require_title_any": [
+          "backpack",
+          "school bag"
+        ],
+        "max_price_minor": 150000
+      }
+    },
+    {
+      "query_id": "Q08",
+      "family": "literal",
+      "text": "decorative wall clock under 1500",
+      "note": "Listings whose title names a wall clock.",
+      "relevance": {
+        "require_title_any": [
+          "wall clock"
+        ],
+        "max_price_minor": 150000
+      }
+    },
+    {
+      "query_id": "Q09",
+      "family": "literal",
+      "text": "cotton double bedsheet under 2000",
+      "note": "Bedsheet listings.",
+      "relevance": {
+        "require_title_any": [
+          "bedsheet",
+          "bed sheet"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "Q10",
+      "family": "literal",
+      "text": "flip cover case for mobile phone under 500",
+      "note": "Phone cases and covers.",
+      "relevance": {
+        "categories": [
+          "Mobiles & Accessories"
+        ],
+        "require_title_any": [
+          "cover",
+          "case",
+          "flip"
+        ],
+        "max_price_minor": 50000
+      }
+    },
+    {
+      "query_id": "Q11",
+      "family": "literal",
+      "text": "gold plated earrings under 1000",
+      "note": "Jewellery earrings.",
+      "relevance": {
+        "categories": [
+          "Jewellery"
+        ],
+        "require_title_any": [
+          "earring",
+          "jhumki",
+          "stud"
+        ],
+        "max_price_minor": 100000
+      }
+    },
+    {
+      "query_id": "Q12",
+      "family": "literal",
+      "text": "men's round neck cotton t-shirt under 700",
+      "note": "T-shirt listings for men.",
+      "relevance": {
+        "categories": [
+          "Clothing",
+          "Uncategorized"
+        ],
+        "require_title_any": [
+          "t-shirt",
+          "tshirt"
+        ],
+        "require_any_terms": [
+          "men",
+          "boys"
+        ],
+        "max_price_minor": 70000
+      }
+    },
+    {
+      "query_id": "Q13",
+      "family": "literal",
+      "text": "printed cushion covers for sofa under 900",
+      "note": "Cushion cover listings.",
+      "relevance": {
+        "require_title_any": [
+          "cushion"
+        ],
+        "max_price_minor": 90000
+      }
+    },
+    {
+      "query_id": "Q14",
+      "family": "literal",
+      "text": "aviator sunglasses under 2000",
+      "note": "Sunglasses listings.",
+      "relevance": {
+        "require_title_any": [
+          "sunglass"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "Q15",
+      "family": "literal",
+      "text": "laptop backpack bag under 2000",
+      "note": "Bags whose title names a laptop bag or laptop backpack.",
+      "relevance": {
+        "require_all_terms": [
+          "laptop"
+        ],
+        "require_title_any": [
+          "bag",
+          "backpack",
+          "sleeve"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "Q16",
+      "family": "literal",
+      "text": "stainless steel kitchen knife under 1000",
+      "note": "Kitchen knives.",
+      "relevance": {
+        "require_title_any": [
+          "knife",
+          "knives"
+        ],
+        "max_price_minor": 100000
+      }
+    },
+    {
+      "query_id": "Q17",
+      "family": "literal",
+      "text": "cricket bat under 3000",
+      "note": "Cricket bats.",
+      "relevance": {
+        "require_all_terms": [
+          "cricket"
+        ],
+        "require_title_any": [
+          "bat"
+        ],
+        "max_price_minor": 300000
+      }
+    },
+    {
+      "query_id": "Q18",
+      "family": "literal",
+      "text": "yoga mat under 2000",
+      "note": "Yoga mats and yoga mat bags.",
+      "relevance": {
+        "require_all_terms": [
+          "yoga"
+        ],
+        "require_title_any": [
+          "mat"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "Q19",
+      "family": "literal",
+      "text": "power bank for mobile under 2000",
+      "note": "Power bank listings.",
+      "relevance": {
+        "require_title_any": [
+          "power bank",
+          "powerbank",
+          "mah"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "Q20",
+      "family": "literal",
+      "text": "screwdriver bit set under 1000",
+      "note": "Screwdrivers and screwdriver bit sets.",
+      "relevance": {
+        "require_title_any": [
+          "screwdriver"
+        ],
+        "max_price_minor": 100000
+      }
+    },
+    {
+      "query_id": "Q21",
+      "family": "literal",
+      "text": "printed silk saree under 2000",
+      "note": "Saree and sari listings.",
+      "relevance": {
+        "require_title_any": [
+          "saree",
+          "sari"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "Q22",
+      "family": "literal",
+      "text": "dog shampoo and pet grooming under 500",
+      "note": "Pet supplies for dogs.",
+      "relevance": {
+        "categories": [
+          "Pet Supplies"
+        ],
+        "require_any_terms": [
+          "dog",
+          "pet"
+        ],
+        "max_price_minor": 50000
+      }
+    },
+    {
+      "query_id": "Q23",
+      "family": "literal",
+      "text": "ball pen and gel pen set under 200",
+      "note": "Pen listings in stationery.",
+      "relevance": {
+        "categories": [
+          "Pens & Stationery"
+        ],
+        "require_title_any": [
+          "pen"
+        ],
+        "exclude_terms": [
+          "pencil box"
+        ],
+        "max_price_minor": 20000
+      }
+    },
+    {
+      "query_id": "Q24",
+      "family": "literal",
+      "text": "baby cloth diaper under 1000",
+      "note": "Baby diapers.",
+      "relevance": {
+        "require_title_any": [
+          "diaper",
+          "nappy"
+        ],
+        "max_price_minor": 100000
+      }
+    },
+    {
+      "query_id": "Q25",
+      "family": "literal",
+      "text": "table lamp for study desk under 2000",
+      "note": "Lamps, excluding decorative string lights.",
+      "relevance": {
+        "require_title_any": [
+          "lamp"
+        ],
+        "exclude_terms": [
+          "rice light"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "Q26",
+      "family": "literal",
+      "text": "usb wired keyboard for computer under 2000",
+      "note": "Keyboards.",
+      "relevance": {
+        "require_title_any": [
+          "keyboard"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "Q27",
+      "family": "literal",
+      "text": "stainless steel water bottle under 500",
+      "note": "Water bottles.",
+      "relevance": {
+        "require_title_any": [
+          "bottle"
+        ],
+        "max_price_minor": 50000
+      }
+    },
+    {
+      "query_id": "Q28",
+      "family": "literal",
+      "text": "bluetooth wireless speaker under 3000",
+      "note": "Bluetooth speakers and audio receivers.",
+      "relevance": {
+        "require_all_terms": [
+          "bluetooth"
+        ],
+        "require_title_any": [
+          "speaker",
+          "headset",
+          "receiver"
+        ],
+        "max_price_minor": 300000
+      }
+    },
+    {
+      "query_id": "Q29",
+      "family": "literal",
+      "text": "umbrella for rain under 1000",
+      "note": "Umbrellas.",
+      "relevance": {
+        "require_title_any": [
+          "umbrella"
+        ],
+        "max_price_minor": 100000
+      }
+    },
+    {
+      "query_id": "Q30",
+      "family": "literal",
+      "text": "car floor mat set under 2000",
+      "note": "Automotive floor and foot mats for a car.",
+      "relevance": {
+        "categories": [
+          "Automotive"
+        ],
+        "require_title_any": [
+          "mat"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "P01",
+      "family": "paraphrase",
+      "text": "something that keeps my phone steady while I am driving",
+      "note": "Same target as Q03. The query says nothing about mounts, holders, or cradles.",
+      "relevance": {
+        "require_all_terms": [
+          "car"
+        ],
+        "require_title_any": [
+          "mount",
+          "holder",
+          "cradle"
+        ],
+        "max_price_minor": 500000
+      }
+    },
+    {
+      "query_id": "P02",
+      "family": "paraphrase",
+      "text": "I want to listen to music privately on the train",
+      "note": "Headphones and earphones. The query names neither.",
+      "relevance": {
+        "require_any_terms": [
+          "headphone",
+          "earphone"
+        ],
+        "require_title_any": [
+          "headphone",
+          "earphone",
+          "headset"
+        ],
+        "max_price_minor": 1000000
+      }
+    },
+    {
+      "query_id": "P03",
+      "family": "paraphrase",
+      "text": "my child starts school next month and needs to carry books",
+      "note": "School backpacks. The query names no bag.",
+      "relevance": {
+        "require_title_any": [
+          "backpack",
+          "school bag"
+        ],
+        "max_price_minor": 1000000
+      }
+    },
+    {
+      "query_id": "P04",
+      "family": "paraphrase",
+      "text": "I keep losing track of the time at my desk",
+      "note": "Wall clocks and table clocks.",
+      "relevance": {
+        "require_title_any": [
+          "clock"
+        ],
+        "max_price_minor": 1000000
+      }
+    },
+    {
+      "query_id": "P05",
+      "family": "paraphrase",
+      "text": "my phone dies halfway through the day when I am travelling",
+      "note": "Power banks.",
+      "relevance": {
+        "require_title_any": [
+          "power bank",
+          "powerbank",
+          "mah"
+        ],
+        "max_price_minor": 1000000
+      }
+    },
+    {
+      "query_id": "P06",
+      "family": "paraphrase",
+      "text": "I need to stretch and exercise on the floor at home",
+      "note": "Yoga mats.",
+      "relevance": {
+        "require_all_terms": [
+          "yoga"
+        ],
+        "require_title_any": [
+          "mat"
+        ],
+        "max_price_minor": 1000000
+      }
+    },
+    {
+      "query_id": "P07",
+      "family": "paraphrase",
+      "text": "protect my new handset from scratches and drops",
+      "note": "Phone cases and covers.",
+      "relevance": {
+        "categories": [
+          "Mobiles & Accessories"
+        ],
+        "require_title_any": [
+          "cover",
+          "case"
+        ],
+        "max_price_minor": 1000000
+      }
+    },
+    {
+      "query_id": "P08",
+      "family": "paraphrase",
+      "text": "the sun is too bright when I ride in the afternoon",
+      "note": "Sunglasses.",
+      "relevance": {
+        "require_title_any": [
+          "sunglass"
+        ],
+        "max_price_minor": 1000000
+      }
+    },
+    {
+      "query_id": "P09",
+      "family": "paraphrase",
+      "text": "I want to read comfortably at night without waking anyone",
+      "note": "Lamps and reading lights.",
+      "relevance": {
+        "require_title_any": [
+          "lamp"
+        ],
+        "exclude_terms": [
+          "rice light"
+        ],
+        "max_price_minor": 1000000
+      }
+    },
+    {
+      "query_id": "P10",
+      "family": "paraphrase",
+      "text": "our sofa looks tired and I want to freshen it up cheaply",
+      "note": "Cushion covers.",
+      "relevance": {
+        "require_title_any": [
+          "cushion"
+        ],
+        "max_price_minor": 1000000
+      }
+    },
+    {
+      "query_id": "P11",
+      "family": "paraphrase",
+      "text": "traditional outfit for a family wedding",
+      "note": "Sarees, lehengas, and kurtas.",
+      "relevance": {
+        "categories": [
+          "Clothing",
+          "Uncategorized"
+        ],
+        "require_title_any": [
+          "saree",
+          "sari",
+          "lehenga",
+          "kurta",
+          "kurti"
+        ],
+        "max_price_minor": 1000000
+      }
+    },
+    {
+      "query_id": "P12",
+      "family": "paraphrase",
+      "text": "something to carry my laptop safely to the office",
+      "note": "Laptop bags, backpacks, and sleeves.",
+      "relevance": {
+        "require_all_terms": [
+          "laptop"
+        ],
+        "require_title_any": [
+          "bag",
+          "backpack",
+          "sleeve"
+        ],
+        "max_price_minor": 1000000
+      }
+    },
+    {
+      "query_id": "P13",
+      "family": "paraphrase",
+      "text": "my puppy needs a bath",
+      "note": "Dog shampoos and pet grooming.",
+      "relevance": {
+        "categories": [
+          "Pet Supplies"
+        ],
+        "require_any_terms": [
+          "dog",
+          "pet"
+        ],
+        "max_price_minor": 1000000
+      }
+    },
+    {
+      "query_id": "P14",
+      "family": "paraphrase",
+      "text": "I want to stay dry walking home in the monsoon",
+      "note": "Umbrellas and raincoats.",
+      "relevance": {
+        "require_title_any": [
+          "umbrella",
+          "raincoat",
+          "rain coat"
+        ],
+        "max_price_minor": 1000000
+      }
+    }
+  ]
+}

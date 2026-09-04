@@ -5,6 +5,7 @@
 .gitattributes
 .gitignore
 .venv
+.claude
 .pytest_cache
 .pytest_tmp
 **/__pycache__
@@ -25,5 +26,17 @@ fixtures/*
 !fixtures/recovery/
 !fixtures/recovery/**
 
+# The discovery catalog and its frozen indexes are read at startup. The raw
+# dataset archive and the evaluation query set are not: training happens on a
+# developer machine, and only its outputs are served.
+data/*
+!data/processed/
+!data/processed/**
+!data/models/
+!data/models/**
+data/models/training_report.json
+data/models/category_confusion.json
+
 Dockerfile
 .dockerignore
+requirements-train.txt

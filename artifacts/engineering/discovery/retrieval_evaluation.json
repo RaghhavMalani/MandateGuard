@@ -1,0 +1,4149 @@
+{
+  "candidate_depth": 300,
+  "catalog_listings": 17702,
+  "catalog_sha256": "7ad5d4f579eca4838eabca2de755003e0b513ff4213af683b4574559421ae09f",
+  "configurations": {
+    "dense_only_alpha_0.00__deduplicated": {
+      "alpha": 0.0,
+      "by_family": {
+        "literal": {
+          "mrr": 0.84,
+          "queries": 30,
+          "recall_at_10": 0.70873,
+          "recall_at_5": 0.76
+        },
+        "paraphrase": {
+          "mrr": 0.017857,
+          "queries": 14,
+          "recall_at_10": 0.042857,
+          "recall_at_5": 0.028571
+        }
+      },
+      "deduplicated": true,
+      "distinct_title_fraction": 1.0,
+      "latency_ms": {
+        "median": 11.083,
+        "p95": 17.384
+      },
+      "mean_duplicates_suppressed": 9.090909,
+      "mrr": 0.578409,
+      "name": "dense_only_alpha_0.00__deduplicated",
+      "per_query": [
+        {
+          "family": "literal",
+          "query_id": "Q01",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 70
+        },
+        {
+          "family": "literal",
+          "query_id": "Q02",
+          "recall_at_10": 0.7,
+          "reciprocal_rank": 1.0,
+          "relevant": 30
+        },
+        {
+          "family": "literal",
+          "query_id": "Q03",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 89
+        },
+        {
+          "family": "literal",
+          "query_id": "Q04",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 227
+        },
+        {
+          "family": "literal",
+          "query_id": "Q05",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 503
+        },
+        {
+          "family": "literal",
+          "query_id": "Q06",
+          "recall_at_10": 0.8,
+          "reciprocal_rank": 0.5,
+          "relevant": 31
+        },
+        {
+          "family": "literal",
+          "query_id": "Q07",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 80
+        },
+        {
+          "family": "literal",
+          "query_id": "Q08",
+          "recall_at_10": 0.5,
+          "reciprocal_rank": 1.0,
+          "relevant": 32
+        },
+        {
+          "family": "literal",
+          "query_id": "Q09",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 37
+        },
+        {
+          "family": "literal",
+          "query_id": "Q10",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 50
+        },
+        {
+          "family": "literal",
+          "query_id": "Q11",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 74
+        },
+        {
+          "family": "literal",
+          "query_id": "Q12",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 793
+        },
+        {
+          "family": "literal",
+          "query_id": "Q13",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 81
+        },
+        {
+          "family": "literal",
+          "query_id": "Q14",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 58
+        },
+        {
+          "family": "literal",
+          "query_id": "Q15",
+          "recall_at_10": 0.7,
+          "reciprocal_rank": 1.0,
+          "relevant": 41
+        },
+        {
+          "family": "literal",
+          "query_id": "Q16",
+          "recall_at_10": 0.2,
+          "reciprocal_rank": 0.25,
+          "relevant": 5
+        },
+        {
+          "family": "literal",
+          "query_id": "Q17",
+          "recall_at_10": 0.5,
+          "reciprocal_rank": 1.0,
+          "relevant": 13
+        },
+        {
+          "family": "literal",
+          "query_id": "Q18",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 2
+        },
+        {
+          "family": "literal",
+          "query_id": "Q19",
+          "recall_at_10": 0.1,
+          "reciprocal_rank": 0.2,
+          "relevant": 70
+        },
+        {
+          "family": "literal",
+          "query_id": "Q20",
+          "recall_at_10": 0.3333,
+          "reciprocal_rank": 1.0,
+          "relevant": 9
+        },
+        {
+          "family": "literal",
+          "query_id": "Q21",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 53
+        },
+        {
+          "family": "literal",
+          "query_id": "Q22",
+          "recall_at_10": 0.8,
+          "reciprocal_rank": 1.0,
+          "relevant": 24
+        },
+        {
+          "family": "literal",
+          "query_id": "Q23",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 10
+        },
+        {
+          "family": "literal",
+          "query_id": "Q24",
+          "recall_at_10": 0.4286,
+          "reciprocal_rank": 1.0,
+          "relevant": 7
+        },
+        {
+          "family": "literal",
+          "query_id": "Q25",
+          "recall_at_10": 0.5,
+          "reciprocal_rank": 1.0,
+          "relevant": 46
+        },
+        {
+          "family": "literal",
+          "query_id": "Q26",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 10
+        },
+        {
+          "family": "literal",
+          "query_id": "Q27",
+          "recall_at_10": 0.3,
+          "reciprocal_rank": 0.25,
+          "relevant": 38
+        },
+        {
+          "family": "literal",
+          "query_id": "Q28",
+          "recall_at_10": 0.8,
+          "reciprocal_rank": 1.0,
+          "relevant": 34
+        },
+        {
+          "family": "literal",
+          "query_id": "Q29",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 7
+        },
+        {
+          "family": "literal",
+          "query_id": "Q30",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 521
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P01",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 123
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P02",
+          "recall_at_10": 0.6,
+          "reciprocal_rank": 0.25,
+          "relevant": 72
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P03",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 90
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P04",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 39
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P05",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 77
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P06",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 2
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P07",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 273
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P08",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 58
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P09",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 54
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P10",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 92
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P11",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 381
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P12",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 45
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P13",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 29
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P14",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 17
+        }
+      ],
+      "precision_at_5": 0.527273,
+      "queries": 44,
+      "recall_at_10": 0.496861,
+      "recall_at_5": 0.527273,
+      "success_at_10": 0.659091
+    },
+    "dense_only_alpha_0.00__raw": {
+      "alpha": 0.0,
+      "by_family": {
+        "literal": {
+          "mrr": 0.825,
+          "queries": 30,
+          "recall_at_10": 0.754762,
+          "recall_at_5": 0.78
+        },
+        "paraphrase": {
+          "mrr": 0.011905,
+          "queries": 14,
+          "recall_at_10": 0.035714,
+          "recall_at_5": 0.0
+        }
+      },
+      "deduplicated": false,
+      "distinct_title_fraction": 0.745455,
+      "latency_ms": {
+        "median": 9.842,
+        "p95": 15.446
+      },
+      "mean_duplicates_suppressed": 0.0,
+      "mrr": 0.566288,
+      "name": "dense_only_alpha_0.00__raw",
+      "per_query": [
+        {
+          "family": "literal",
+          "query_id": "Q01",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 70
+        },
+        {
+          "family": "literal",
+          "query_id": "Q02",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 30
+        },
+        {
+          "family": "literal",
+          "query_id": "Q03",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 89
+        },
+        {
+          "family": "literal",
+          "query_id": "Q04",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 227
+        },
+        {
+          "family": "literal",
+          "query_id": "Q05",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 503
+        },
+        {
+          "family": "literal",
+          "query_id": "Q06",
+          "recall_at_10": 0.8,
+          "reciprocal_rank": 0.5,
+          "relevant": 31
+        },
+        {
+          "family": "literal",
+          "query_id": "Q07",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 80
+        },
+        {
+          "family": "literal",
+          "query_id": "Q08",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 32
+        },
+        {
+          "family": "literal",
+          "query_id": "Q09",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 37
+        },
+        {
+          "family": "literal",
+          "query_id": "Q10",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 50
+        },
+        {
+          "family": "literal",
+          "query_id": "Q11",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 74
+        },
+        {
+          "family": "literal",
+          "query_id": "Q12",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 793
+        },
+        {
+          "family": "literal",
+          "query_id": "Q13",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 81
+        },
+        {
+          "family": "literal",
+          "query_id": "Q14",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 58
+        },
+        {
+          "family": "literal",
+          "query_id": "Q15",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 41
+        },
+        {
+          "family": "literal",
+          "query_id": "Q16",
+          "recall_at_10": 0.2,
+          "reciprocal_rank": 0.25,
+          "relevant": 5
+        },
+        {
+          "family": "literal",
+          "query_id": "Q17",
+          "recall_at_10": 0.6,
+          "reciprocal_rank": 1.0,
+          "relevant": 13
+        },
+        {
+          "family": "literal",
+          "query_id": "Q18",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 2
+        },
+        {
+          "family": "literal",
+          "query_id": "Q19",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 70
+        },
+        {
+          "family": "literal",
+          "query_id": "Q20",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 9
+        },
+        {
+          "family": "literal",
+          "query_id": "Q21",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 53
+        },
+        {
+          "family": "literal",
+          "query_id": "Q22",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 24
+        },
+        {
+          "family": "literal",
+          "query_id": "Q23",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 10
+        },
+        {
+          "family": "literal",
+          "query_id": "Q24",
+          "recall_at_10": 0.4286,
+          "reciprocal_rank": 1.0,
+          "relevant": 7
+        },
+        {
+          "family": "literal",
+          "query_id": "Q25",
+          "recall_at_10": 0.4,
+          "reciprocal_rank": 1.0,
+          "relevant": 46
+        },
+        {
+          "family": "literal",
+          "query_id": "Q26",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 10
+        },
+        {
+          "family": "literal",
+          "query_id": "Q27",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 38
+        },
+        {
+          "family": "literal",
+          "query_id": "Q28",
+          "recall_at_10": 0.8,
+          "reciprocal_rank": 1.0,
+          "relevant": 34
+        },
+        {
+          "family": "literal",
+          "query_id": "Q29",
+          "recall_at_10": 0.7143,
+          "reciprocal_rank": 1.0,
+          "relevant": 7
+        },
+        {
+          "family": "literal",
+          "query_id": "Q30",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 521
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P01",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 123
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P02",
+          "recall_at_10": 0.5,
+          "reciprocal_rank": 0.1667,
+          "relevant": 72
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P03",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 90
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P04",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 39
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P05",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 77
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P06",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 2
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P07",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 273
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P08",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 58
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P09",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 54
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P10",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 92
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P11",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 381
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P12",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 45
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P13",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 29
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P14",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 17
+        }
+      ],
+      "precision_at_5": 0.531818,
+      "queries": 44,
+      "recall_at_10": 0.525974,
+      "recall_at_5": 0.531818,
+      "success_at_10": 0.613636
+    },
+    "hybrid_alpha_0.30__deduplicated": {
+      "alpha": 0.3,
+      "by_family": {
+        "literal": {
+          "mrr": 0.936111,
+          "queries": 30,
+          "recall_at_10": 0.779683,
+          "recall_at_5": 0.856667
+        },
+        "paraphrase": {
+          "mrr": 0.008929,
+          "queries": 14,
+          "recall_at_10": 0.014286,
+          "recall_at_5": 0.0
+        }
+      },
+      "deduplicated": true,
+      "distinct_title_fraction": 1.0,
+      "latency_ms": {
+        "median": 11.441,
+        "p95": 16.727
+      },
+      "mean_duplicates_suppressed": 7.181818,
+      "mrr": 0.641098,
+      "name": "hybrid_alpha_0.30__deduplicated",
+      "per_query": [
+        {
+          "family": "literal",
+          "query_id": "Q01",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 70
+        },
+        {
+          "family": "literal",
+          "query_id": "Q02",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 30
+        },
+        {
+          "family": "literal",
+          "query_id": "Q03",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 89
+        },
+        {
+          "family": "literal",
+          "query_id": "Q04",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 227
+        },
+        {
+          "family": "literal",
+          "query_id": "Q05",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 503
+        },
+        {
+          "family": "literal",
+          "query_id": "Q06",
+          "recall_at_10": 0.7,
+          "reciprocal_rank": 0.5,
+          "relevant": 31
+        },
+        {
+          "family": "literal",
+          "query_id": "Q07",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 80
+        },
+        {
+          "family": "literal",
+          "query_id": "Q08",
+          "recall_at_10": 0.6,
+          "reciprocal_rank": 1.0,
+          "relevant": 32
+        },
+        {
+          "family": "literal",
+          "query_id": "Q09",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 37
+        },
+        {
+          "family": "literal",
+          "query_id": "Q10",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 50
+        },
+        {
+          "family": "literal",
+          "query_id": "Q11",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 74
+        },
+        {
+          "family": "literal",
+          "query_id": "Q12",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 793
+        },
+        {
+          "family": "literal",
+          "query_id": "Q13",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 81
+        },
+        {
+          "family": "literal",
+          "query_id": "Q14",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 58
+        },
+        {
+          "family": "literal",
+          "query_id": "Q15",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 41
+        },
+        {
+          "family": "literal",
+          "query_id": "Q16",
+          "recall_at_10": 0.2,
+          "reciprocal_rank": 1.0,
+          "relevant": 5
+        },
+        {
+          "family": "literal",
+          "query_id": "Q17",
+          "recall_at_10": 0.6,
+          "reciprocal_rank": 1.0,
+          "relevant": 13
+        },
+        {
+          "family": "literal",
+          "query_id": "Q18",
+          "recall_at_10": 0.5,
+          "reciprocal_rank": 1.0,
+          "relevant": 2
+        },
+        {
+          "family": "literal",
+          "query_id": "Q19",
+          "recall_at_10": 0.1,
+          "reciprocal_rank": 1.0,
+          "relevant": 70
+        },
+        {
+          "family": "literal",
+          "query_id": "Q20",
+          "recall_at_10": 0.3333,
+          "reciprocal_rank": 1.0,
+          "relevant": 9
+        },
+        {
+          "family": "literal",
+          "query_id": "Q21",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 53
+        },
+        {
+          "family": "literal",
+          "query_id": "Q22",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 24
+        },
+        {
+          "family": "literal",
+          "query_id": "Q23",
+          "recall_at_10": 0.8,
+          "reciprocal_rank": 1.0,
+          "relevant": 10
+        },
+        {
+          "family": "literal",
+          "query_id": "Q24",
+          "recall_at_10": 0.8571,
+          "reciprocal_rank": 1.0,
+          "relevant": 7
+        },
+        {
+          "family": "literal",
+          "query_id": "Q25",
+          "recall_at_10": 0.7,
+          "reciprocal_rank": 1.0,
+          "relevant": 46
+        },
+        {
+          "family": "literal",
+          "query_id": "Q26",
+          "recall_at_10": 0.2,
+          "reciprocal_rank": 0.3333,
+          "relevant": 10
+        },
+        {
+          "family": "literal",
+          "query_id": "Q27",
+          "recall_at_10": 0.3,
+          "reciprocal_rank": 0.25,
+          "relevant": 38
+        },
+        {
+          "family": "literal",
+          "query_id": "Q28",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 34
+        },
+        {
+          "family": "literal",
+          "query_id": "Q29",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 7
+        },
+        {
+          "family": "literal",
+          "query_id": "Q30",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 521
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P01",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 123
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P02",
+          "recall_at_10": 0.2,
+          "reciprocal_rank": 0.125,
+          "relevant": 72
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P03",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 90
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P04",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 39
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P05",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 77
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P06",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 2
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P07",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 273
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P08",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 58
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P09",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 54
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P10",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 92
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P11",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 381
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P12",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 45
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P13",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 29
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P14",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 17
+        }
+      ],
+      "precision_at_5": 0.577273,
+      "queries": 44,
+      "recall_at_10": 0.536147,
+      "recall_at_5": 0.584091,
+      "success_at_10": 0.704545
+    },
+    "hybrid_alpha_0.30__raw": {
+      "alpha": 0.3,
+      "by_family": {
+        "literal": {
+          "mrr": 0.927778,
+          "queries": 30,
+          "recall_at_10": 0.821905,
+          "recall_at_5": 0.856667
+        },
+        "paraphrase": {
+          "mrr": 0.0,
+          "queries": 14,
+          "recall_at_10": 0.0,
+          "recall_at_5": 0.0
+        }
+      },
+      "deduplicated": false,
+      "distinct_title_fraction": 0.761364,
+      "latency_ms": {
+        "median": 9.378,
+        "p95": 13.912
+      },
+      "mean_duplicates_suppressed": 0.0,
+      "mrr": 0.632576,
+      "name": "hybrid_alpha_0.30__raw",
+      "per_query": [
+        {
+          "family": "literal",
+          "query_id": "Q01",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 70
+        },
+        {
+          "family": "literal",
+          "query_id": "Q02",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 30
+        },
+        {
+          "family": "literal",
+          "query_id": "Q03",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 89
+        },
+        {
+          "family": "literal",
+          "query_id": "Q04",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 227
+        },
+        {
+          "family": "literal",
+          "query_id": "Q05",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 503
+        },
+        {
+          "family": "literal",
+          "query_id": "Q06",
+          "recall_at_10": 0.7,
+          "reciprocal_rank": 0.5,
+          "relevant": 31
+        },
+        {
+          "family": "literal",
+          "query_id": "Q07",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 80
+        },
+        {
+          "family": "literal",
+          "query_id": "Q08",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 32
+        },
+        {
+          "family": "literal",
+          "query_id": "Q09",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 37
+        },
+        {
+          "family": "literal",
+          "query_id": "Q10",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 50
+        },
+        {
+          "family": "literal",
+          "query_id": "Q11",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 74
+        },
+        {
+          "family": "literal",
+          "query_id": "Q12",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 793
+        },
+        {
+          "family": "literal",
+          "query_id": "Q13",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 81
+        },
+        {
+          "family": "literal",
+          "query_id": "Q14",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 58
+        },
+        {
+          "family": "literal",
+          "query_id": "Q15",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 41
+        },
+        {
+          "family": "literal",
+          "query_id": "Q16",
+          "recall_at_10": 0.2,
+          "reciprocal_rank": 1.0,
+          "relevant": 5
+        },
+        {
+          "family": "literal",
+          "query_id": "Q17",
+          "recall_at_10": 0.6,
+          "reciprocal_rank": 1.0,
+          "relevant": 13
+        },
+        {
+          "family": "literal",
+          "query_id": "Q18",
+          "recall_at_10": 0.5,
+          "reciprocal_rank": 1.0,
+          "relevant": 2
+        },
+        {
+          "family": "literal",
+          "query_id": "Q19",
+          "recall_at_10": 0.1,
+          "reciprocal_rank": 1.0,
+          "relevant": 70
+        },
+        {
+          "family": "literal",
+          "query_id": "Q20",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 9
+        },
+        {
+          "family": "literal",
+          "query_id": "Q21",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 53
+        },
+        {
+          "family": "literal",
+          "query_id": "Q22",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 24
+        },
+        {
+          "family": "literal",
+          "query_id": "Q23",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 10
+        },
+        {
+          "family": "literal",
+          "query_id": "Q24",
+          "recall_at_10": 0.8571,
+          "reciprocal_rank": 1.0,
+          "relevant": 7
+        },
+        {
+          "family": "literal",
+          "query_id": "Q25",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 46
+        },
+        {
+          "family": "literal",
+          "query_id": "Q26",
+          "recall_at_10": 0.2,
+          "reciprocal_rank": 0.3333,
+          "relevant": 10
+        },
+        {
+          "family": "literal",
+          "query_id": "Q27",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 38
+        },
+        {
+          "family": "literal",
+          "query_id": "Q28",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 34
+        },
+        {
+          "family": "literal",
+          "query_id": "Q29",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 7
+        },
+        {
+          "family": "literal",
+          "query_id": "Q30",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 521
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P01",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 123
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P02",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 72
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P03",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 90
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P04",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 39
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P05",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 77
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P06",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 2
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P07",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 273
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P08",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 58
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P09",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 54
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P10",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 92
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P11",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 381
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P12",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 45
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P13",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 29
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P14",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 17
+        }
+      ],
+      "precision_at_5": 0.577273,
+      "queries": 44,
+      "recall_at_10": 0.56039,
+      "recall_at_5": 0.584091,
+      "success_at_10": 0.659091
+    },
+    "hybrid_alpha_0.50__deduplicated": {
+      "alpha": 0.5,
+      "by_family": {
+        "literal": {
+          "mrr": 0.952778,
+          "queries": 30,
+          "recall_at_10": 0.834444,
+          "recall_at_5": 0.89
+        },
+        "paraphrase": {
+          "mrr": 0.019133,
+          "queries": 14,
+          "recall_at_10": 0.014286,
+          "recall_at_5": 0.0
+        }
+      },
+      "deduplicated": true,
+      "distinct_title_fraction": 1.0,
+      "latency_ms": {
+        "median": 12.031,
+        "p95": 16.874
+      },
+      "mean_duplicates_suppressed": 5.931818,
+      "mrr": 0.655709,
+      "name": "hybrid_alpha_0.50__deduplicated",
+      "per_query": [
+        {
+          "family": "literal",
+          "query_id": "Q01",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 70
+        },
+        {
+          "family": "literal",
+          "query_id": "Q02",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 30
+        },
+        {
+          "family": "literal",
+          "query_id": "Q03",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 89
+        },
+        {
+          "family": "literal",
+          "query_id": "Q04",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 227
+        },
+        {
+          "family": "literal",
+          "query_id": "Q05",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 503
+        },
+        {
+          "family": "literal",
+          "query_id": "Q06",
+          "recall_at_10": 0.7,
+          "reciprocal_rank": 0.3333,
+          "relevant": 31
+        },
+        {
+          "family": "literal",
+          "query_id": "Q07",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 80
+        },
+        {
+          "family": "literal",
+          "query_id": "Q08",
+          "recall_at_10": 0.6,
+          "reciprocal_rank": 1.0,
+          "relevant": 32
+        },
+        {
+          "family": "literal",
+          "query_id": "Q09",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 37
+        },
+        {
+          "family": "literal",
+          "query_id": "Q10",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 50
+        },
+        {
+          "family": "literal",
+          "query_id": "Q11",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 74
+        },
+        {
+          "family": "literal",
+          "query_id": "Q12",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 793
+        },
+        {
+          "family": "literal",
+          "query_id": "Q13",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 81
+        },
+        {
+          "family": "literal",
+          "query_id": "Q14",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 58
+        },
+        {
+          "family": "literal",
+          "query_id": "Q15",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 41
+        },
+        {
+          "family": "literal",
+          "query_id": "Q16",
+          "recall_at_10": 0.2,
+          "reciprocal_rank": 1.0,
+          "relevant": 5
+        },
+        {
+          "family": "literal",
+          "query_id": "Q17",
+          "recall_at_10": 0.5,
+          "reciprocal_rank": 1.0,
+          "relevant": 13
+        },
+        {
+          "family": "literal",
+          "query_id": "Q18",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 2
+        },
+        {
+          "family": "literal",
+          "query_id": "Q19",
+          "recall_at_10": 0.6,
+          "reciprocal_rank": 1.0,
+          "relevant": 70
+        },
+        {
+          "family": "literal",
+          "query_id": "Q20",
+          "recall_at_10": 0.3333,
+          "reciprocal_rank": 1.0,
+          "relevant": 9
+        },
+        {
+          "family": "literal",
+          "query_id": "Q21",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 53
+        },
+        {
+          "family": "literal",
+          "query_id": "Q22",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 24
+        },
+        {
+          "family": "literal",
+          "query_id": "Q23",
+          "recall_at_10": 0.7,
+          "reciprocal_rank": 1.0,
+          "relevant": 10
+        },
+        {
+          "family": "literal",
+          "query_id": "Q24",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 7
+        },
+        {
+          "family": "literal",
+          "query_id": "Q25",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 46
+        },
+        {
+          "family": "literal",
+          "query_id": "Q26",
+          "recall_at_10": 0.7,
+          "reciprocal_rank": 1.0,
+          "relevant": 10
+        },
+        {
+          "family": "literal",
+          "query_id": "Q27",
+          "recall_at_10": 0.3,
+          "reciprocal_rank": 0.25,
+          "relevant": 38
+        },
+        {
+          "family": "literal",
+          "query_id": "Q28",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 34
+        },
+        {
+          "family": "literal",
+          "query_id": "Q29",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 7
+        },
+        {
+          "family": "literal",
+          "query_id": "Q30",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 521
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P01",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 123
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P02",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 72
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P03",
+          "recall_at_10": 0.1,
+          "reciprocal_rank": 0.1429,
+          "relevant": 90
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P04",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 39
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P05",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 77
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P06",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 2
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P07",
+          "recall_at_10": 0.1,
+          "reciprocal_rank": 0.125,
+          "relevant": 273
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P08",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 58
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P09",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 54
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P10",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 92
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P11",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 381
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P12",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 45
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P13",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 29
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P14",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 17
+        }
+      ],
+      "precision_at_5": 0.6,
+      "queries": 44,
+      "recall_at_10": 0.573485,
+      "recall_at_5": 0.606818,
+      "success_at_10": 0.727273
+    },
+    "hybrid_alpha_0.50__raw": {
+      "alpha": 0.5,
+      "by_family": {
+        "literal": {
+          "mrr": 0.944444,
+          "queries": 30,
+          "recall_at_10": 0.85,
+          "recall_at_5": 0.883333
+        },
+        "paraphrase": {
+          "mrr": 0.008929,
+          "queries": 14,
+          "recall_at_10": 0.007143,
+          "recall_at_5": 0.0
+        }
+      },
+      "deduplicated": false,
+      "distinct_title_fraction": 0.763636,
+      "latency_ms": {
+        "median": 9.476,
+        "p95": 14.141
+      },
+      "mean_duplicates_suppressed": 0.0,
+      "mrr": 0.64678,
+      "name": "hybrid_alpha_0.50__raw",
+      "per_query": [
+        {
+          "family": "literal",
+          "query_id": "Q01",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 70
+        },
+        {
+          "family": "literal",
+          "query_id": "Q02",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 30
+        },
+        {
+          "family": "literal",
+          "query_id": "Q03",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 89
+        },
+        {
+          "family": "literal",
+          "query_id": "Q04",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 227
+        },
+        {
+          "family": "literal",
+          "query_id": "Q05",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 503
+        },
+        {
+          "family": "literal",
+          "query_id": "Q06",
+          "recall_at_10": 0.7,
+          "reciprocal_rank": 0.3333,
+          "relevant": 31
+        },
+        {
+          "family": "literal",
+          "query_id": "Q07",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 80
+        },
+        {
+          "family": "literal",
+          "query_id": "Q08",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 32
+        },
+        {
+          "family": "literal",
+          "query_id": "Q09",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 37
+        },
+        {
+          "family": "literal",
+          "query_id": "Q10",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 50
+        },
+        {
+          "family": "literal",
+          "query_id": "Q11",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 74
+        },
+        {
+          "family": "literal",
+          "query_id": "Q12",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 793
+        },
+        {
+          "family": "literal",
+          "query_id": "Q13",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 81
+        },
+        {
+          "family": "literal",
+          "query_id": "Q14",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 58
+        },
+        {
+          "family": "literal",
+          "query_id": "Q15",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 41
+        },
+        {
+          "family": "literal",
+          "query_id": "Q16",
+          "recall_at_10": 0.2,
+          "reciprocal_rank": 1.0,
+          "relevant": 5
+        },
+        {
+          "family": "literal",
+          "query_id": "Q17",
+          "recall_at_10": 0.6,
+          "reciprocal_rank": 1.0,
+          "relevant": 13
+        },
+        {
+          "family": "literal",
+          "query_id": "Q18",
+          "recall_at_10": 0.5,
+          "reciprocal_rank": 1.0,
+          "relevant": 2
+        },
+        {
+          "family": "literal",
+          "query_id": "Q19",
+          "recall_at_10": 0.3,
+          "reciprocal_rank": 1.0,
+          "relevant": 70
+        },
+        {
+          "family": "literal",
+          "query_id": "Q20",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 9
+        },
+        {
+          "family": "literal",
+          "query_id": "Q21",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 53
+        },
+        {
+          "family": "literal",
+          "query_id": "Q22",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 24
+        },
+        {
+          "family": "literal",
+          "query_id": "Q23",
+          "recall_at_10": 0.8,
+          "reciprocal_rank": 1.0,
+          "relevant": 10
+        },
+        {
+          "family": "literal",
+          "query_id": "Q24",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 7
+        },
+        {
+          "family": "literal",
+          "query_id": "Q25",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 46
+        },
+        {
+          "family": "literal",
+          "query_id": "Q26",
+          "recall_at_10": 0.7,
+          "reciprocal_rank": 1.0,
+          "relevant": 10
+        },
+        {
+          "family": "literal",
+          "query_id": "Q27",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 38
+        },
+        {
+          "family": "literal",
+          "query_id": "Q28",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 34
+        },
+        {
+          "family": "literal",
+          "query_id": "Q29",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 7
+        },
+        {
+          "family": "literal",
+          "query_id": "Q30",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 521
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P01",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 123
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P02",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 72
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P03",
+          "recall_at_10": 0.1,
+          "reciprocal_rank": 0.125,
+          "relevant": 90
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P04",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 39
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P05",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 77
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P06",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 2
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P07",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 273
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P08",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 58
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P09",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 54
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P10",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 92
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P11",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 381
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P12",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 45
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P13",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 29
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P14",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 17
+        }
+      ],
+      "precision_at_5": 0.595455,
+      "queries": 44,
+      "recall_at_10": 0.581818,
+      "recall_at_5": 0.602273,
+      "success_at_10": 0.681818
+    },
+    "hybrid_alpha_0.70__deduplicated": {
+      "alpha": 0.7,
+      "by_family": {
+        "literal": {
+          "mrr": 0.919444,
+          "queries": 30,
+          "recall_at_10": 0.841111,
+          "recall_at_5": 0.883333
+        },
+        "paraphrase": {
+          "mrr": 0.176871,
+          "queries": 14,
+          "recall_at_10": 0.064286,
+          "recall_at_5": 0.057143
+        }
+      },
+      "deduplicated": true,
+      "distinct_title_fraction": 1.0,
+      "latency_ms": {
+        "median": 12.634,
+        "p95": 19.895
+      },
+      "mean_duplicates_suppressed": 5.681818,
+      "mrr": 0.683171,
+      "name": "hybrid_alpha_0.70__deduplicated",
+      "per_query": [
+        {
+          "family": "literal",
+          "query_id": "Q01",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 70
+        },
+        {
+          "family": "literal",
+          "query_id": "Q02",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 30
+        },
+        {
+          "family": "literal",
+          "query_id": "Q03",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 89
+        },
+        {
+          "family": "literal",
+          "query_id": "Q04",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 227
+        },
+        {
+          "family": "literal",
+          "query_id": "Q05",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 503
+        },
+        {
+          "family": "literal",
+          "query_id": "Q06",
+          "recall_at_10": 0.7,
+          "reciprocal_rank": 0.3333,
+          "relevant": 31
+        },
+        {
+          "family": "literal",
+          "query_id": "Q07",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 80
+        },
+        {
+          "family": "literal",
+          "query_id": "Q08",
+          "recall_at_10": 0.8,
+          "reciprocal_rank": 0.5,
+          "relevant": 32
+        },
+        {
+          "family": "literal",
+          "query_id": "Q09",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 37
+        },
+        {
+          "family": "literal",
+          "query_id": "Q10",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 50
+        },
+        {
+          "family": "literal",
+          "query_id": "Q11",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 0.5,
+          "relevant": 74
+        },
+        {
+          "family": "literal",
+          "query_id": "Q12",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 793
+        },
+        {
+          "family": "literal",
+          "query_id": "Q13",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 81
+        },
+        {
+          "family": "literal",
+          "query_id": "Q14",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 58
+        },
+        {
+          "family": "literal",
+          "query_id": "Q15",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 41
+        },
+        {
+          "family": "literal",
+          "query_id": "Q16",
+          "recall_at_10": 0.2,
+          "reciprocal_rank": 1.0,
+          "relevant": 5
+        },
+        {
+          "family": "literal",
+          "query_id": "Q17",
+          "recall_at_10": 0.5,
+          "reciprocal_rank": 1.0,
+          "relevant": 13
+        },
+        {
+          "family": "literal",
+          "query_id": "Q18",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 2
+        },
+        {
+          "family": "literal",
+          "query_id": "Q19",
+          "recall_at_10": 0.8,
+          "reciprocal_rank": 1.0,
+          "relevant": 70
+        },
+        {
+          "family": "literal",
+          "query_id": "Q20",
+          "recall_at_10": 0.3333,
+          "reciprocal_rank": 1.0,
+          "relevant": 9
+        },
+        {
+          "family": "literal",
+          "query_id": "Q21",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 53
+        },
+        {
+          "family": "literal",
+          "query_id": "Q22",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 24
+        },
+        {
+          "family": "literal",
+          "query_id": "Q23",
+          "recall_at_10": 0.5,
+          "reciprocal_rank": 1.0,
+          "relevant": 10
+        },
+        {
+          "family": "literal",
+          "query_id": "Q24",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 7
+        },
+        {
+          "family": "literal",
+          "query_id": "Q25",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 46
+        },
+        {
+          "family": "literal",
+          "query_id": "Q26",
+          "recall_at_10": 0.7,
+          "reciprocal_rank": 1.0,
+          "relevant": 10
+        },
+        {
+          "family": "literal",
+          "query_id": "Q27",
+          "recall_at_10": 0.3,
+          "reciprocal_rank": 0.25,
+          "relevant": 38
+        },
+        {
+          "family": "literal",
+          "query_id": "Q28",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 34
+        },
+        {
+          "family": "literal",
+          "query_id": "Q29",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 7
+        },
+        {
+          "family": "literal",
+          "query_id": "Q30",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 521
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P01",
+          "recall_at_10": 0.1,
+          "reciprocal_rank": 0.3333,
+          "relevant": 123
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P02",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 72
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P03",
+          "recall_at_10": 0.1,
+          "reciprocal_rank": 1.0,
+          "relevant": 90
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P04",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 39
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P05",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 77
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P06",
+          "recall_at_10": 0.5,
+          "reciprocal_rank": 0.1429,
+          "relevant": 2
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P07",
+          "recall_at_10": 0.2,
+          "reciprocal_rank": 1.0,
+          "relevant": 273
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P08",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 58
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P09",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 54
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P10",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 92
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P11",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 381
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P12",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 45
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P13",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 29
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P14",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 17
+        }
+      ],
+      "precision_at_5": 0.613636,
+      "queries": 44,
+      "recall_at_10": 0.593939,
+      "recall_at_5": 0.620455,
+      "success_at_10": 0.772727
+    },
+    "hybrid_alpha_0.70__raw": {
+      "alpha": 0.7,
+      "by_family": {
+        "literal": {
+          "mrr": 0.911111,
+          "queries": 30,
+          "recall_at_10": 0.853333,
+          "recall_at_5": 0.883333
+        },
+        "paraphrase": {
+          "mrr": 0.167857,
+          "queries": 14,
+          "recall_at_10": 0.071429,
+          "recall_at_5": 0.071429
+        }
+      },
+      "deduplicated": false,
+      "distinct_title_fraction": 0.8,
+      "latency_ms": {
+        "median": 9.688,
+        "p95": 18.029
+      },
+      "mean_duplicates_suppressed": 0.0,
+      "mrr": 0.674621,
+      "name": "hybrid_alpha_0.70__raw",
+      "per_query": [
+        {
+          "family": "literal",
+          "query_id": "Q01",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 70
+        },
+        {
+          "family": "literal",
+          "query_id": "Q02",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 30
+        },
+        {
+          "family": "literal",
+          "query_id": "Q03",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 89
+        },
+        {
+          "family": "literal",
+          "query_id": "Q04",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 227
+        },
+        {
+          "family": "literal",
+          "query_id": "Q05",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 503
+        },
+        {
+          "family": "literal",
+          "query_id": "Q06",
+          "recall_at_10": 0.8,
+          "reciprocal_rank": 0.3333,
+          "relevant": 31
+        },
+        {
+          "family": "literal",
+          "query_id": "Q07",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 80
+        },
+        {
+          "family": "literal",
+          "query_id": "Q08",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 0.5,
+          "relevant": 32
+        },
+        {
+          "family": "literal",
+          "query_id": "Q09",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 37
+        },
+        {
+          "family": "literal",
+          "query_id": "Q10",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 50
+        },
+        {
+          "family": "literal",
+          "query_id": "Q11",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 0.5,
+          "relevant": 74
+        },
+        {
+          "family": "literal",
+          "query_id": "Q12",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 793
+        },
+        {
+          "family": "literal",
+          "query_id": "Q13",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 81
+        },
+        {
+          "family": "literal",
+          "query_id": "Q14",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 58
+        },
+        {
+          "family": "literal",
+          "query_id": "Q15",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 41
+        },
+        {
+          "family": "literal",
+          "query_id": "Q16",
+          "recall_at_10": 0.2,
+          "reciprocal_rank": 1.0,
+          "relevant": 5
+        },
+        {
+          "family": "literal",
+          "query_id": "Q17",
+          "recall_at_10": 0.6,
+          "reciprocal_rank": 1.0,
+          "relevant": 13
+        },
+        {
+          "family": "literal",
+          "query_id": "Q18",
+          "recall_at_10": 0.5,
+          "reciprocal_rank": 1.0,
+          "relevant": 2
+        },
+        {
+          "family": "literal",
+          "query_id": "Q19",
+          "recall_at_10": 0.7,
+          "reciprocal_rank": 1.0,
+          "relevant": 70
+        },
+        {
+          "family": "literal",
+          "query_id": "Q20",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 9
+        },
+        {
+          "family": "literal",
+          "query_id": "Q21",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 53
+        },
+        {
+          "family": "literal",
+          "query_id": "Q22",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 24
+        },
+        {
+          "family": "literal",
+          "query_id": "Q23",
+          "recall_at_10": 0.5,
+          "reciprocal_rank": 1.0,
+          "relevant": 10
+        },
+        {
+          "family": "literal",
+          "query_id": "Q24",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 7
+        },
+        {
+          "family": "literal",
+          "query_id": "Q25",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 46
+        },
+        {
+          "family": "literal",
+          "query_id": "Q26",
+          "recall_at_10": 0.7,
+          "reciprocal_rank": 1.0,
+          "relevant": 10
+        },
+        {
+          "family": "literal",
+          "query_id": "Q27",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 38
+        },
+        {
+          "family": "literal",
+          "query_id": "Q28",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 34
+        },
+        {
+          "family": "literal",
+          "query_id": "Q29",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 7
+        },
+        {
+          "family": "literal",
+          "query_id": "Q30",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 521
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P01",
+          "recall_at_10": 0.1,
+          "reciprocal_rank": 0.25,
+          "relevant": 123
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P02",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 72
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P03",
+          "recall_at_10": 0.1,
+          "reciprocal_rank": 1.0,
+          "relevant": 90
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P04",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 39
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P05",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 77
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P06",
+          "recall_at_10": 0.5,
+          "reciprocal_rank": 0.1,
+          "relevant": 2
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P07",
+          "recall_at_10": 0.3,
+          "reciprocal_rank": 1.0,
+          "relevant": 273
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P08",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 58
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P09",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 54
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P10",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 92
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P11",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 381
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P12",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 45
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P13",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 29
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P14",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 17
+        }
+      ],
+      "precision_at_5": 0.618182,
+      "queries": 44,
+      "recall_at_10": 0.604545,
+      "recall_at_5": 0.625,
+      "success_at_10": 0.75
+    },
+    "hybrid_alpha_0.90__deduplicated": {
+      "alpha": 0.9,
+      "by_family": {
+        "literal": {
+          "mrr": 0.919444,
+          "queries": 30,
+          "recall_at_10": 0.844444,
+          "recall_at_5": 0.883333
+        },
+        "paraphrase": {
+          "mrr": 0.201361,
+          "queries": 14,
+          "recall_at_10": 0.092857,
+          "recall_at_5": 0.071429
+        }
+      },
+      "deduplicated": true,
+      "distinct_title_fraction": 1.0,
+      "latency_ms": {
+        "median": 13.99,
+        "p95": 20.07
+      },
+      "mean_duplicates_suppressed": 4.840909,
+      "mrr": 0.690963,
+      "name": "hybrid_alpha_0.90__deduplicated",
+      "per_query": [
+        {
+          "family": "literal",
+          "query_id": "Q01",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 70
+        },
+        {
+          "family": "literal",
+          "query_id": "Q02",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 30
+        },
+        {
+          "family": "literal",
+          "query_id": "Q03",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 89
+        },
+        {
+          "family": "literal",
+          "query_id": "Q04",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 227
+        },
+        {
+          "family": "literal",
+          "query_id": "Q05",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 503
+        },
+        {
+          "family": "literal",
+          "query_id": "Q06",
+          "recall_at_10": 0.7,
+          "reciprocal_rank": 0.3333,
+          "relevant": 31
+        },
+        {
+          "family": "literal",
+          "query_id": "Q07",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 80
+        },
+        {
+          "family": "literal",
+          "query_id": "Q08",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 0.5,
+          "relevant": 32
+        },
+        {
+          "family": "literal",
+          "query_id": "Q09",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 37
+        },
+        {
+          "family": "literal",
+          "query_id": "Q10",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 50
+        },
+        {
+          "family": "literal",
+          "query_id": "Q11",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 0.5,
+          "relevant": 74
+        },
+        {
+          "family": "literal",
+          "query_id": "Q12",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 793
+        },
+        {
+          "family": "literal",
+          "query_id": "Q13",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 81
+        },
+        {
+          "family": "literal",
+          "query_id": "Q14",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 58
+        },
+        {
+          "family": "literal",
+          "query_id": "Q15",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 41
+        },
+        {
+          "family": "literal",
+          "query_id": "Q16",
+          "recall_at_10": 0.2,
+          "reciprocal_rank": 1.0,
+          "relevant": 5
+        },
+        {
+          "family": "literal",
+          "query_id": "Q17",
+          "recall_at_10": 0.5,
+          "reciprocal_rank": 1.0,
+          "relevant": 13
+        },
+        {
+          "family": "literal",
+          "query_id": "Q18",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 2
+        },
+        {
+          "family": "literal",
+          "query_id": "Q19",
+          "recall_at_10": 0.8,
+          "reciprocal_rank": 1.0,
+          "relevant": 70
+        },
+        {
+          "family": "literal",
+          "query_id": "Q20",
+          "recall_at_10": 0.3333,
+          "reciprocal_rank": 1.0,
+          "relevant": 9
+        },
+        {
+          "family": "literal",
+          "query_id": "Q21",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 53
+        },
+        {
+          "family": "literal",
+          "query_id": "Q22",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 24
+        },
+        {
+          "family": "literal",
+          "query_id": "Q23",
+          "recall_at_10": 0.4,
+          "reciprocal_rank": 1.0,
+          "relevant": 10
+        },
+        {
+          "family": "literal",
+          "query_id": "Q24",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 7
+        },
+        {
+          "family": "literal",
+          "query_id": "Q25",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 46
+        },
+        {
+          "family": "literal",
+          "query_id": "Q26",
+          "recall_at_10": 0.8,
+          "reciprocal_rank": 1.0,
+          "relevant": 10
+        },
+        {
+          "family": "literal",
+          "query_id": "Q27",
+          "recall_at_10": 0.3,
+          "reciprocal_rank": 0.25,
+          "relevant": 38
+        },
+        {
+          "family": "literal",
+          "query_id": "Q28",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 34
+        },
+        {
+          "family": "literal",
+          "query_id": "Q29",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 7
+        },
+        {
+          "family": "literal",
+          "query_id": "Q30",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 521
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P01",
+          "recall_at_10": 0.1,
+          "reciprocal_rank": 0.3333,
+          "relevant": 123
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P02",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 72
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P03",
+          "recall_at_10": 0.1,
+          "reciprocal_rank": 1.0,
+          "relevant": 90
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P04",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 39
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P05",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 77
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P06",
+          "recall_at_10": 0.5,
+          "reciprocal_rank": 0.1429,
+          "relevant": 2
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P07",
+          "recall_at_10": 0.3,
+          "reciprocal_rank": 1.0,
+          "relevant": 273
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P08",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 58
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P09",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 54
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P10",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 92
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P11",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 381
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P12",
+          "recall_at_10": 0.2,
+          "reciprocal_rank": 0.1429,
+          "relevant": 45
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P13",
+          "recall_at_10": 0.1,
+          "reciprocal_rank": 0.2,
+          "relevant": 29
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P14",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 17
+        }
+      ],
+      "precision_at_5": 0.618182,
+      "queries": 44,
+      "recall_at_10": 0.605303,
+      "recall_at_5": 0.625,
+      "success_at_10": 0.818182
+    },
+    "hybrid_alpha_0.90__raw": {
+      "alpha": 0.9,
+      "by_family": {
+        "literal": {
+          "mrr": 0.911111,
+          "queries": 30,
+          "recall_at_10": 0.856667,
+          "recall_at_5": 0.883333
+        },
+        "paraphrase": {
+          "mrr": 0.186905,
+          "queries": 14,
+          "recall_at_10": 0.092857,
+          "recall_at_5": 0.071429
+        }
+      },
+      "deduplicated": false,
+      "distinct_title_fraction": 0.811364,
+      "latency_ms": {
+        "median": 9.756,
+        "p95": 21.947
+      },
+      "mean_duplicates_suppressed": 0.0,
+      "mrr": 0.680682,
+      "name": "hybrid_alpha_0.90__raw",
+      "per_query": [
+        {
+          "family": "literal",
+          "query_id": "Q01",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 70
+        },
+        {
+          "family": "literal",
+          "query_id": "Q02",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 30
+        },
+        {
+          "family": "literal",
+          "query_id": "Q03",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 89
+        },
+        {
+          "family": "literal",
+          "query_id": "Q04",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 227
+        },
+        {
+          "family": "literal",
+          "query_id": "Q05",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 503
+        },
+        {
+          "family": "literal",
+          "query_id": "Q06",
+          "recall_at_10": 0.8,
+          "reciprocal_rank": 0.3333,
+          "relevant": 31
+        },
+        {
+          "family": "literal",
+          "query_id": "Q07",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 80
+        },
+        {
+          "family": "literal",
+          "query_id": "Q08",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 0.5,
+          "relevant": 32
+        },
+        {
+          "family": "literal",
+          "query_id": "Q09",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 37
+        },
+        {
+          "family": "literal",
+          "query_id": "Q10",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 50
+        },
+        {
+          "family": "literal",
+          "query_id": "Q11",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 0.5,
+          "relevant": 74
+        },
+        {
+          "family": "literal",
+          "query_id": "Q12",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 793
+        },
+        {
+          "family": "literal",
+          "query_id": "Q13",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 81
+        },
+        {
+          "family": "literal",
+          "query_id": "Q14",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 58
+        },
+        {
+          "family": "literal",
+          "query_id": "Q15",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 41
+        },
+        {
+          "family": "literal",
+          "query_id": "Q16",
+          "recall_at_10": 0.2,
+          "reciprocal_rank": 1.0,
+          "relevant": 5
+        },
+        {
+          "family": "literal",
+          "query_id": "Q17",
+          "recall_at_10": 0.6,
+          "reciprocal_rank": 1.0,
+          "relevant": 13
+        },
+        {
+          "family": "literal",
+          "query_id": "Q18",
+          "recall_at_10": 0.5,
+          "reciprocal_rank": 1.0,
+          "relevant": 2
+        },
+        {
+          "family": "literal",
+          "query_id": "Q19",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 70
+        },
+        {
+          "family": "literal",
+          "query_id": "Q20",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 9
+        },
+        {
+          "family": "literal",
+          "query_id": "Q21",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 53
+        },
+        {
+          "family": "literal",
+          "query_id": "Q22",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 24
+        },
+        {
+          "family": "literal",
+          "query_id": "Q23",
+          "recall_at_10": 0.4,
+          "reciprocal_rank": 1.0,
+          "relevant": 10
+        },
+        {
+          "family": "literal",
+          "query_id": "Q24",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 7
+        },
+        {
+          "family": "literal",
+          "query_id": "Q25",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 46
+        },
+        {
+          "family": "literal",
+          "query_id": "Q26",
+          "recall_at_10": 0.8,
+          "reciprocal_rank": 1.0,
+          "relevant": 10
+        },
+        {
+          "family": "literal",
+          "query_id": "Q27",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 38
+        },
+        {
+          "family": "literal",
+          "query_id": "Q28",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 34
+        },
+        {
+          "family": "literal",
+          "query_id": "Q29",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 7
+        },
+        {
+          "family": "literal",
+          "query_id": "Q30",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 521
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P01",
+          "recall_at_10": 0.1,
+          "reciprocal_rank": 0.25,
+          "relevant": 123
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P02",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 72
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P03",
+          "recall_at_10": 0.1,
+          "reciprocal_rank": 1.0,
+          "relevant": 90
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P04",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 39
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P05",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 77
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P06",
+          "recall_at_10": 0.5,
+          "reciprocal_rank": 0.1,
+          "relevant": 2
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P07",
+          "recall_at_10": 0.4,
+          "reciprocal_rank": 1.0,
+          "relevant": 273
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P08",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 58
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P09",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 54
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P10",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 92
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P11",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 381
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P12",
+          "recall_at_10": 0.1,
+          "reciprocal_rank": 0.1,
+          "relevant": 45
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P13",
+          "recall_at_10": 0.1,
+          "reciprocal_rank": 0.1667,
+          "relevant": 29
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P14",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 17
+        }
+      ],
+      "precision_at_5": 0.618182,
+      "queries": 44,
+      "recall_at_10": 0.613636,
+      "recall_at_5": 0.625,
+      "success_at_10": 0.795455
+    },
+    "lexical_only_alpha_1.00__deduplicated": {
+      "alpha": 1.0,
+      "by_family": {
+        "literal": {
+          "mrr": 0.919444,
+          "queries": 30,
+          "recall_at_10": 0.851111,
+          "recall_at_5": 0.883333
+        },
+        "paraphrase": {
+          "mrr": 0.21369,
+          "queries": 14,
+          "recall_at_10": 0.1,
+          "recall_at_5": 0.071429
+        }
+      },
+      "deduplicated": true,
+      "distinct_title_fraction": 1.0,
+      "latency_ms": {
+        "median": 13.208,
+        "p95": 22.049
+      },
+      "mean_duplicates_suppressed": 4.068182,
+      "mrr": 0.694886,
+      "name": "lexical_only_alpha_1.00__deduplicated",
+      "per_query": [
+        {
+          "family": "literal",
+          "query_id": "Q01",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 70
+        },
+        {
+          "family": "literal",
+          "query_id": "Q02",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 30
+        },
+        {
+          "family": "literal",
+          "query_id": "Q03",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 89
+        },
+        {
+          "family": "literal",
+          "query_id": "Q04",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 227
+        },
+        {
+          "family": "literal",
+          "query_id": "Q05",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 503
+        },
+        {
+          "family": "literal",
+          "query_id": "Q06",
+          "recall_at_10": 0.7,
+          "reciprocal_rank": 0.3333,
+          "relevant": 31
+        },
+        {
+          "family": "literal",
+          "query_id": "Q07",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 80
+        },
+        {
+          "family": "literal",
+          "query_id": "Q08",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 0.5,
+          "relevant": 32
+        },
+        {
+          "family": "literal",
+          "query_id": "Q09",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 37
+        },
+        {
+          "family": "literal",
+          "query_id": "Q10",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 50
+        },
+        {
+          "family": "literal",
+          "query_id": "Q11",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 0.5,
+          "relevant": 74
+        },
+        {
+          "family": "literal",
+          "query_id": "Q12",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 793
+        },
+        {
+          "family": "literal",
+          "query_id": "Q13",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 81
+        },
+        {
+          "family": "literal",
+          "query_id": "Q14",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 58
+        },
+        {
+          "family": "literal",
+          "query_id": "Q15",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 41
+        },
+        {
+          "family": "literal",
+          "query_id": "Q16",
+          "recall_at_10": 0.4,
+          "reciprocal_rank": 1.0,
+          "relevant": 5
+        },
+        {
+          "family": "literal",
+          "query_id": "Q17",
+          "recall_at_10": 0.5,
+          "reciprocal_rank": 1.0,
+          "relevant": 13
+        },
+        {
+          "family": "literal",
+          "query_id": "Q18",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 2
+        },
+        {
+          "family": "literal",
+          "query_id": "Q19",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 70
+        },
+        {
+          "family": "literal",
+          "query_id": "Q20",
+          "recall_at_10": 0.3333,
+          "reciprocal_rank": 1.0,
+          "relevant": 9
+        },
+        {
+          "family": "literal",
+          "query_id": "Q21",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 53
+        },
+        {
+          "family": "literal",
+          "query_id": "Q22",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 24
+        },
+        {
+          "family": "literal",
+          "query_id": "Q23",
+          "recall_at_10": 0.3,
+          "reciprocal_rank": 1.0,
+          "relevant": 10
+        },
+        {
+          "family": "literal",
+          "query_id": "Q24",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 7
+        },
+        {
+          "family": "literal",
+          "query_id": "Q25",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 46
+        },
+        {
+          "family": "literal",
+          "query_id": "Q26",
+          "recall_at_10": 0.8,
+          "reciprocal_rank": 1.0,
+          "relevant": 10
+        },
+        {
+          "family": "literal",
+          "query_id": "Q27",
+          "recall_at_10": 0.3,
+          "reciprocal_rank": 0.25,
+          "relevant": 38
+        },
+        {
+          "family": "literal",
+          "query_id": "Q28",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 34
+        },
+        {
+          "family": "literal",
+          "query_id": "Q29",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 7
+        },
+        {
+          "family": "literal",
+          "query_id": "Q30",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 521
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P01",
+          "recall_at_10": 0.1,
+          "reciprocal_rank": 0.3333,
+          "relevant": 123
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P02",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 72
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P03",
+          "recall_at_10": 0.1,
+          "reciprocal_rank": 1.0,
+          "relevant": 90
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P04",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 39
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P05",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 77
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P06",
+          "recall_at_10": 0.5,
+          "reciprocal_rank": 0.1667,
+          "relevant": 2
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P07",
+          "recall_at_10": 0.3,
+          "reciprocal_rank": 1.0,
+          "relevant": 273
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P08",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 58
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P09",
+          "recall_at_10": 0.1,
+          "reciprocal_rank": 0.125,
+          "relevant": 54
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P10",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 92
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P11",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 381
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P12",
+          "recall_at_10": 0.2,
+          "reciprocal_rank": 0.1667,
+          "relevant": 45
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P13",
+          "recall_at_10": 0.1,
+          "reciprocal_rank": 0.2,
+          "relevant": 29
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P14",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 17
+        }
+      ],
+      "precision_at_5": 0.618182,
+      "queries": 44,
+      "recall_at_10": 0.612121,
+      "recall_at_5": 0.625,
+      "success_at_10": 0.840909
+    },
+    "lexical_only_alpha_1.00__raw": {
+      "alpha": 1.0,
+      "by_family": {
+        "literal": {
+          "mrr": 0.911111,
+          "queries": 30,
+          "recall_at_10": 0.866667,
+          "recall_at_5": 0.883333
+        },
+        "paraphrase": {
+          "mrr": 0.196429,
+          "queries": 14,
+          "recall_at_10": 0.1,
+          "recall_at_5": 0.071429
+        }
+      },
+      "deduplicated": false,
+      "distinct_title_fraction": 0.815909,
+      "latency_ms": {
+        "median": 12.985,
+        "p95": 22.014
+      },
+      "mean_duplicates_suppressed": 0.0,
+      "mrr": 0.683712,
+      "name": "lexical_only_alpha_1.00__raw",
+      "per_query": [
+        {
+          "family": "literal",
+          "query_id": "Q01",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 70
+        },
+        {
+          "family": "literal",
+          "query_id": "Q02",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 30
+        },
+        {
+          "family": "literal",
+          "query_id": "Q03",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 89
+        },
+        {
+          "family": "literal",
+          "query_id": "Q04",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 227
+        },
+        {
+          "family": "literal",
+          "query_id": "Q05",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 503
+        },
+        {
+          "family": "literal",
+          "query_id": "Q06",
+          "recall_at_10": 0.8,
+          "reciprocal_rank": 0.3333,
+          "relevant": 31
+        },
+        {
+          "family": "literal",
+          "query_id": "Q07",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 80
+        },
+        {
+          "family": "literal",
+          "query_id": "Q08",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 0.5,
+          "relevant": 32
+        },
+        {
+          "family": "literal",
+          "query_id": "Q09",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 37
+        },
+        {
+          "family": "literal",
+          "query_id": "Q10",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 50
+        },
+        {
+          "family": "literal",
+          "query_id": "Q11",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 0.5,
+          "relevant": 74
+        },
+        {
+          "family": "literal",
+          "query_id": "Q12",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 793
+        },
+        {
+          "family": "literal",
+          "query_id": "Q13",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 81
+        },
+        {
+          "family": "literal",
+          "query_id": "Q14",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 58
+        },
+        {
+          "family": "literal",
+          "query_id": "Q15",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 41
+        },
+        {
+          "family": "literal",
+          "query_id": "Q16",
+          "recall_at_10": 0.4,
+          "reciprocal_rank": 1.0,
+          "relevant": 5
+        },
+        {
+          "family": "literal",
+          "query_id": "Q17",
+          "recall_at_10": 0.6,
+          "reciprocal_rank": 1.0,
+          "relevant": 13
+        },
+        {
+          "family": "literal",
+          "query_id": "Q18",
+          "recall_at_10": 0.5,
+          "reciprocal_rank": 1.0,
+          "relevant": 2
+        },
+        {
+          "family": "literal",
+          "query_id": "Q19",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 70
+        },
+        {
+          "family": "literal",
+          "query_id": "Q20",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 9
+        },
+        {
+          "family": "literal",
+          "query_id": "Q21",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 53
+        },
+        {
+          "family": "literal",
+          "query_id": "Q22",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 24
+        },
+        {
+          "family": "literal",
+          "query_id": "Q23",
+          "recall_at_10": 0.3,
+          "reciprocal_rank": 1.0,
+          "relevant": 10
+        },
+        {
+          "family": "literal",
+          "query_id": "Q24",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 7
+        },
+        {
+          "family": "literal",
+          "query_id": "Q25",
+          "recall_at_10": 0.9,
+          "reciprocal_rank": 1.0,
+          "relevant": 46
+        },
+        {
+          "family": "literal",
+          "query_id": "Q26",
+          "recall_at_10": 0.8,
+          "reciprocal_rank": 1.0,
+          "relevant": 10
+        },
+        {
+          "family": "literal",
+          "query_id": "Q27",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 38
+        },
+        {
+          "family": "literal",
+          "query_id": "Q28",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 34
+        },
+        {
+          "family": "literal",
+          "query_id": "Q29",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 7
+        },
+        {
+          "family": "literal",
+          "query_id": "Q30",
+          "recall_at_10": 1.0,
+          "reciprocal_rank": 1.0,
+          "relevant": 521
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P01",
+          "recall_at_10": 0.1,
+          "reciprocal_rank": 0.25,
+          "relevant": 123
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P02",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 72
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P03",
+          "recall_at_10": 0.1,
+          "reciprocal_rank": 1.0,
+          "relevant": 90
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P04",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 39
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P05",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 77
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P06",
+          "recall_at_10": 0.5,
+          "reciprocal_rank": 0.1111,
+          "relevant": 2
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P07",
+          "recall_at_10": 0.4,
+          "reciprocal_rank": 1.0,
+          "relevant": 273
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P08",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 58
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P09",
+          "recall_at_10": 0.1,
+          "reciprocal_rank": 0.1111,
+          "relevant": 54
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P10",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 92
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P11",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 381
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P12",
+          "recall_at_10": 0.1,
+          "reciprocal_rank": 0.1111,
+          "relevant": 45
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P13",
+          "recall_at_10": 0.1,
+          "reciprocal_rank": 0.1667,
+          "relevant": 29
+        },
+        {
+          "family": "paraphrase",
+          "query_id": "P14",
+          "recall_at_10": 0.0,
+          "reciprocal_rank": 0.0,
+          "relevant": 17
+        }
+      ],
+      "precision_at_5": 0.618182,
+      "queries": 44,
+      "recall_at_10": 0.622727,
+      "recall_at_5": 0.625,
+      "success_at_10": 0.818182
+    }
+  },
+  "disclaimer": "These are retrieval metrics over a product catalog. They say nothing about authorization correctness, and no retrieval score has ever moved a MandateGuard decision.",
+  "evaluation_version": "discovery-retrieval-eval-v1",
+  "queries": 44,
+  "query_set_version": "discovery-retrieval-eval-v1",
+  "relevant_set_sizes": {
+    "P01": 123,
+    "P02": 72,
+    "P03": 90,
+    "P04": 39,
+    "P05": 77,
+    "P06": 2,
+    "P07": 273,
+    "P08": 58,
+    "P09": 54,
+    "P10": 92,
+    "P11": 381,
+    "P12": 45,
+    "P13": 29,
+    "P14": 17,
+    "Q01": 70,
+    "Q02": 30,
+    "Q03": 89,
+    "Q04": 227,
+    "Q05": 503,
+    "Q06": 31,
+    "Q07": 80,
+    "Q08": 32,
+    "Q09": 37,
+    "Q10": 50,
+    "Q11": 74,
+    "Q12": 793,
+    "Q13": 81,
+    "Q14": 58,
+    "Q15": 41,
+    "Q16": 5,
+    "Q17": 13,
+    "Q18": 2,
+    "Q19": 70,
+    "Q20": 9,
+    "Q21": 53,
+    "Q22": 24,
+    "Q23": 10,
+    "Q24": 7,
+    "Q25": 46,
+    "Q26": 10,
+    "Q27": 38,
+    "Q28": 34,
+    "Q29": 7,
+    "Q30": 521
+  }
+}

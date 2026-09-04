@@ -7,3 +7,12 @@ Dockerfile text eol=lf
 render.yaml text eol=lf
 fixtures/engineering/resolve_recovery/**/*.json text eol=lf
 fixtures/engineering/resolve_recovery/*.json text eol=lf
+data/processed/discovery_catalog.manifest.json text eol=lf
+data/models/*.json text eol=lf
+data/eval/*.json text eol=lf
+artifacts/engineering/discovery/*.json text eol=lf
+requirements-train.txt text eol=lf
+
+# Frozen binary artifacts. Line-ending conversion would corrupt them.
+*.mgdx binary
+*.jsonl.gz binary

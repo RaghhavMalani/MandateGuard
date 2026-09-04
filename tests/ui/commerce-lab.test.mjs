@@ -16,6 +16,7 @@ import {
   renderBoundedScale,
   renderConsentStrip,
   renderDecisionBanner,
+  renderEngineeringQuality,
   renderEvidencePanel,
   renderExecutionPanel,
   renderMeasuredEvidence,
@@ -674,14 +675,23 @@ test("a refusal at the execution gate is not reported as a controller decision",
 // Attack lab
 // ---------------------------------------------------------------------------
 
-test("every attack surface names a control, a treatment, and its evidence", () => {
+test("every attack surface is analysed across all five columns", () => {
   assert.ok(ATTACK_SURFACES.length >= 12);
   const html = renderAttackLab();
   for (const surface of ATTACK_SURFACES) {
-    for (const field of ["surface", "detail", "control", "treatment", "evidence"]) {
+    for (const field of [
+      "surface",
+      "detail",
+      "signal",
+      "control",
+      "decision",
+      "paymentReached",
+      "evidence",
+    ]) {
       assert.ok(surface[field], `${surface.id} is missing ${field}`);
     }
     assert.ok(html.includes(escapeHtml(surface.surface)));
+    assert.ok(html.includes(escapeHtml(surface.signal)));
     assert.ok(html.includes(escapeHtml(surface.control)));
   }
   for (const expected of [
@@ -690,6 +700,8 @@ test("every attack surface names a control, a treatment, and its evidence", () =
     "Consent revocation",
     "Evidence omission",
     "Cross-run consent reuse",
+    "Listing category laundering",
+    "Purchase of an unvouched listing",
   ]) {
     assert.ok(
       ATTACK_SURFACES.some((item) => item.surface === expected),
@@ -699,25 +711,44 @@ test("every attack surface names a control, a treatment, and its evidence", () =
 });
 
 
-test("attack lab states defensive treatments only", () => {
+test("no analysed attack surface reaches a payment", () => {
+  for (const surface of ATTACK_SURFACES) {
+    assert.equal(
+      surface.paymentReached,
+      "NO",
+      `${surface.id} claims a payment was reached`,
+    );
+  }
+  const html = renderAttackLab();
+  assert.match(html, /PAYMENT REACHED\?/);
+  assert.match(html, /data-reached="NO"/);
+  assert.doesNotMatch(html, /data-reached="YES"/);
+});
+
+
+test("attack lab states defensive decisions only", () => {
   const allowed = new Set([
-    "REJECT BEFORE NETWORK",
+    "REJECTED BEFORE NETWORK",
     "BLOCK OR REVIEW",
     "REVIEW",
+    "REVIEW REQUIRED",
+    "REVIEW PRIORITY RAISED",
     "EVIDENCE REFUSED",
   ]);
   for (const surface of ATTACK_SURFACES) {
-    assert.ok(allowed.has(surface.treatment), `unexpected treatment: ${surface.treatment}`);
+    assert.ok(allowed.has(surface.decision), `unexpected decision: ${surface.decision}`);
   }
-  // The taxonomy describes surfaces and controls, never a procedure.
-  const prose = ATTACK_SURFACES.map((item) => `${item.detail} ${item.control}`).join(" ");
+  // The analysis describes surfaces, signals, and controls, never a procedure.
+  const prose = ATTACK_SURFACES.map(
+    (item) => `${item.detail} ${item.signal} ${item.control}`,
+  ).join(" ");
   for (const forbidden of [/step 1/i, /how to bypass/i, /in order to evade/i, /payload/i]) {
     assert.doesNotMatch(prose, forbidden);
   }
 
   const html = renderAttackLab();
-  assert.match(html, /REJECT BEFORE NETWORK/);
-  assert.match(html, /data-treatment="REJECT BEFORE NETWORK"/);
+  assert.match(html, /REJECTED BEFORE NETWORK/);
+  assert.match(html, /data-treatment="REJECTED BEFORE NETWORK"/);
 });
 
 
@@ -770,11 +801,19 @@ test("the interface never converts test counts or synthetic cases into a scale c
   assert.match(html, /not evidence of generalization/);
   assert.match(html, /not a production throughput claim/i);
   assert.match(html, /Half of the initially non-executable cases stayed at REVIEW/);
-  // Tests are secondary proof, never presented as scale.
-  assert.match(html, /Secondary proof/);
+  // Test counts belong to engineering quality and appear nowhere in the
+  // authorization-evidence block, so a reader cannot read one as the other.
+  assert.doesNotMatch(html, /Python tests/);
+  assert.doesNotMatch(html, /UI tests/);
+  assert.doesNotMatch(html, /Secondary proof/);
   for (const overclaim of [/TPS/, /requests per second/i, /production scale/i, /at scale/i]) {
     assert.doesNotMatch(html, overclaim);
   }
+
+  const engineering = renderEngineeringQuality({ python: 800, ui: 60 });
+  assert.match(engineering, /Python tests/);
+  assert.match(engineering, /UI tests/);
+  assert.match(engineering, /not a\s+measurement of scale/i);
 
   const research = renderResearch({
     authorization_use: "Not used in the authorization gate.",

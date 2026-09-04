@@ -50,6 +50,43 @@ installs no third-party packages: the offline path is Python standard library
 only, and the four judge journeys (SAFE PURCHASE, POLICY VIOLATION,
 AMBIGUOUS EVIDENCE, CAPABILITY REPLAY) run with zero external network calls.
 
+That remains true after the discovery catalog was added. The 17,702-listing
+search, its BM25 and embedding indexes, and the category classifier all run on
+the standard library, because the models are trained offline and frozen into
+binary artifacts the runtime only reads.
+
+## Discovery catalog impact on the image
+
+| | Before | After |
+| --- | ---: | ---: |
+| Packages installed in the runtime image | 0 | **0** |
+| Build context | 1.52 MB | 13.46 MB |
+| Added by frozen artifacts | — | 11.94 MB |
+| Server cold start | ~0 s | **+0.26 s** |
+| External calls on page load | 0 | **0** |
+
+The added bytes are two files under `data/processed/` (4.71 MB) and three under
+`data/models/` (7.23 MB, with the two human-readable reports excluded from the
+image by `.dockerignore`).
+
+scikit-learn and NumPy are needed only to *produce* those artifacts
+(`requirements-train.txt`) and are deliberately absent from the image. That is
+enforced rather than documented:
+`tests/test_runtime_has_no_third_party_dependencies.py` parses every served
+module and fails if one imports a training dependency, and imports each served
+module in a subprocess to confirm nothing pulls one in transitively.
+
+If the artifacts are absent from a build, the server still starts and every
+authorization journey still works. `/api/config` then reports
+`discovery.available: false` with the reason, and the interface routes the
+intent straight to the authorization controller over the registered merchant
+catalog.
+
+**Image size was not measured directly.** The Docker daemon was unavailable in
+the environment where this change was built, so the figures above are build
+context bytes rather than a `docker images` reading. The layer count and the
+installed-package count are unchanged.
+
 Live Test Mode stays opt-in and is unavailable in public deployment. With no
 credentials present, `/api/config` reports `modes.live.available: false`, the page
 shows `LIVE TEST UNAVAILABLE` with a concise reason, and `POST /api/runs` with

@@ -18,6 +18,11 @@ with that capability. On `BLOCK` or an unresolved `REVIEW`, no payment-provider 
 made at all. A `REVIEW` can enter a bounded, user-triggered trusted-evidence recovery
 loop; the full controller must then produce a fresh `ALLOW` before execution is possible.
 
+Type any purchase you like — *"Buy Sony headphones under ₹5,000"* — and the agent searches
+a **17,702-listing catalog** imported from a public Indian e-commerce dataset. Most of what
+it finds cannot be bought by an agent at all, and the product says why, per listing, rather
+than inventing an approval. That is the point.
+
 ---
 
 ## Try it
@@ -237,6 +242,104 @@ Method and limits: [docs/INT3_EVIDENCE_SUFFICIENCY.md](docs/INT3_EVIDENCE_SUFFIC
 
 ---
 
+## Scale intelligence
+
+The controller above decides about products the application has registered. That is a
+handful of SKUs. The commerce universe an agent would actually shop in is not, so the
+product now searches a real one — and is explicit about the gap between *finding* a product
+and being able to *buy* it.
+
+### The discovery catalog
+
+**17,702 listings**, 26 categories, 6,338 category paths, 3,370 brands, imported from the
+[Flipkart Products dataset](https://www.kaggle.com/datasets/PromptCloudHQ/flipkart-products)
+published by PromptCloud under **CC BY-SA 4.0** and redistributed here in normalized form
+under the same licence. The raw archive is not committed; the normalized catalog and a
+manifest recording exactly which upstream bytes produced it are.
+
+A discovery listing is **not** merchant authorization evidence, and there is a test that
+fails if any module in the discovery layer so much as imports the authorization path.
+
+Provenance, schema, and every normalization rule:
+[docs/DISCOVERY_CATALOG.md](docs/DISCOVERY_CATALOG.md).
+
+### The journey a free-text intent takes
+
+```
+1 USER INTENT        →  "Buy a study lamp under ₹2,000. No subscriptions."
+2 AGENT SEARCH       →  17,702 listings, 9 ms
+3 PRODUCT SELECTED   →  you pick one
+4 MANDATE EXTRACTED  →  ceiling, recurrence stance, exclusions — by rule, not by model
+5 PRODUCT ANALYSIS   →  category classifier, mismatch signal, defensive analytics
+6 TRUSTED EVIDENCE   →  does any merchant actually vouch for this SKU?
+7 AUTHORIZATION      →  the existing frozen controller: ALLOW / BLOCK / REVIEW
+8 PAYMENT GATE       →  signed single-use capability, or nothing
+9 OUTCOME            →  what happened to the money
+```
+
+A crawled listing with no merchant evidence stops at stage 6 with
+`DISCOVERED → MATCHED → EVIDENCE INCOMPLETE → REVIEW REQUIRED` and **zero payment-provider
+calls**. That is a designed outcome, not a failure: the alternative is manufacturing an
+`ALLOW` for a product nobody has vouched for.
+
+### Measured, including where the ML lost
+
+| | |
+| --- | ---: |
+| Catalog SKUs | 17,702 |
+| Index on disk | 6.98 MB |
+| Cold load | 0.264 s |
+| Resident memory | 47.8 MB attributable |
+| Retrieval P50 / P95 / P99 | 9.1 / 18.8 / 22.3 ms |
+| Queries per second, single process | 87.6 |
+| Queries executed in the benchmark | 1,525 |
+
+**Category classifier** (TF-IDF → LinearSVC, 22 classes, split frozen before the test set
+was scored): macro F1 **0.9436**, weighted F1 0.9747, accuracy 0.9749. Advisory only — it
+cannot allow a payment.
+
+**Retrieval** (44 hand-authored queries, relevance defined before measurement): Recall@10
+**0.6121**, Recall@5 0.6250, MRR 0.6949.
+
+Three things were built, measured, and then **not shipped as claimed**:
+
+- **The learned dense retriever did not beat BM25.** The alpha sweep is monotone in the
+  wrong direction, so the shipped blend is lexical. The embedding index earns its place
+  elsewhere — near-duplicate suppression, which moves distinct products in a top-8 result
+  from 0.82 to 1.00.
+- **Latent semantic analysis does no paraphrase matching on this corpus.** Queries that
+  describe a need without naming the product score 0.10 at best across every configuration,
+  and 0.000 across eight principled model variants. A contextual encoder would likely help
+  and could not be served in a dependency-free image. That trade-off is the finding.
+- **An unsupervised anomaly detector was rejected.** IsolationForest scored ROC AUC 0.5618
+  against 0.9942 for the deterministic analytics on the same frozen set.
+
+One ML component did earn its keep, on the one evaluation case that is not circular. When a
+listing's declared category is laundered — its text replaced with another category's while
+every structured field stays untouched — no field comparison can see it. Including the
+classifier's disagreement moves ROC AUC from **0.4519 to 0.9647**. Even there the effect is
+`SURFACE_REVIEW`: it moves a human's attention, not money.
+
+Method, full tables, and negative results:
+[retrieval](docs/DISCOVERY_RETRIEVAL.md) · [ML signals](docs/DISCOVERY_ML_SIGNALS.md) ·
+[scale](docs/DISCOVERY_SCALE.md).
+
+### The boundary
+
+> **ML understands the commerce universe.
+> MandateGuard's deterministic gate controls money.**
+
+ML may retrieve, rank, classify, detect anomalies, name evidence gaps, and explain. It may
+never issue an execution capability, override a deterministic `BLOCK`, convert missing
+trusted evidence into `ALLOW`, override a revocation, or override exact request binding.
+Those lists are code, not prose, and they are tested:
+[docs/ML_SECURITY_BOUNDARY.md](docs/ML_SECURITY_BOUNDARY.md).
+
+The money-moving controller is untouched by this work. All 712 pre-existing tests covering
+it pass unmodified.
+
+---
+
 ## Where I deliberately did not use AI
 
 The strongest model is not always the safest component.
@@ -295,18 +398,41 @@ src/mandateguard/
   evidence/       registry, provider, catalog acquisition
   intelligence/   AI buyer, commerce tools, retrieval, orchestration
   execution/      capability signing, gate, nonce ledger, Razorpay adapter
+  discovery/      large-catalog discovery: ingestion, frozen indexes, advisory signals
+  ml/             offline training and evaluation (never imported by the runtime)
   product/        Commerce Lab HTTP service and static UI
   engineering/    INT-2 and INT-3 experiment harnesses
   audit/          hash-chained audit journal
   replay/         deterministic scenario replay
   benchmark/      Tier A/B benchmark generation and execution
 
+data/import/            raw dataset archives (git-ignored, reproducible)
+data/processed/         normalized discovery catalog + provenance manifest
+data/models/            frozen indexes and the category classifier
+data/eval/              annotated query set and the frozen classifier split
 fixtures/               synthetic catalogs, merchant terms, experiment inputs
-artifacts/engineering/  immutable run records (INT-1, INT-2, INT-3)
+artifacts/engineering/  immutable run records (INT-1, INT-2, INT-3, discovery)
 docs/                   methodology, deployment, screenshots
-tests/                  41 Python test modules + UI suite
+tests/                  50 Python test modules + 2 UI suites
 scripts/                entry points, including the Commerce Lab launcher
 ```
+
+### Building the discovery artifacts
+
+The runtime installs nothing. Producing the frozen artifacts needs scikit-learn and NumPy,
+which never enter the deployed image:
+
+```bash
+pip install -r requirements-train.txt
+python scripts/import_discovery_catalog.py
+python scripts/train_discovery_models.py
+python scripts/evaluate_discovery_retrieval.py
+python scripts/evaluate_discovery_anomaly.py
+python scripts/run_discovery_scale_benchmark.py
+```
+
+If the artifacts are absent the server still starts and every authorization journey still
+works; the discovery surface reports why it is unavailable.
 
 ---
 
@@ -360,9 +486,13 @@ than failing in some less obvious way.
 
 | Gate | Result |
 | --- | --- |
-| Python suite | 648 passed |
-| UI suite | 13 passed |
+| Python suite | 873 passed |
+| UI suite | 74 passed |
 | JavaScript syntax | passed |
+
+Test counts are **engineering quality**, reported on their own. They are not a scale
+measurement, not model quality, and not authorization evidence — the product keeps those
+four kinds of evidence in four separate sections for the same reason.
 
 Verified against the public deployment: `SAFE` reached `ALLOW` with a simulated offline
 receipt, `POLICY VIOLATION` reached `BLOCK`, `AMBIGUOUS EVIDENCE` reached `REVIEW`, and
@@ -404,6 +534,17 @@ Stated plainly, because the evidence is only worth what its scope allows.
   control path rather than live provider behaviour.
 - INT-2's Precision@k figures are measured at different `k` per strategy and do not
   establish that semantic ranking is generally better.
+- The discovery catalog is a **2016 crawl**. Its prices are historical listing claims and
+  are never treated as authoritative merchant price evidence.
+- Retrieval relevance is defined by **human-authored predicates** over structured fields.
+  That correlates with lexical evidence and understates what a dense retriever would add,
+  which is why the paraphrase family is reported separately.
+- The scale benchmark is **one process on one machine**. Nothing is extrapolated to a larger
+  corpus or to concurrent load.
+- The anomaly evaluation injects its own defects. A detector that finds them is **not**
+  thereby shown to find fraud in production traffic.
+- Only **8 of 17,702** listings carry merchant evidence, so the transactable path is
+  demonstrated at fixture scale even though discovery runs at catalog scale.
 
 ---
 
@@ -418,6 +559,11 @@ Not implemented — the honest next steps.
 - Adaptive evidence acquisition driven by measured sufficiency.
 - Contextual bandits or constrained RL — but only once trustworthy sequential feedback
   actually exists.
+- A contextual sentence encoder for paraphrase retrieval, once there is a deployment target
+  that can afford one — the current negative result is a property of the model class, not of
+  the tuning.
+- Real merchant evidence for a meaningful slice of the discovery catalog, which is the only
+  thing that would move listings out of `REVIEW REQUIRED`.
 
 ---
 

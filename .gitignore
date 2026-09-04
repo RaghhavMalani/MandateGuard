@@ -9,8 +9,14 @@ __pycache__/
 *.egg-info/
 build/
 dist/
-.env
-.env.*
-!.env.example
 artifacts/engineering/semantic_mvp/*.jsonl
 artifacts/engineering/semantic_mvp/cache/
+
+# Raw dataset archives. Large, redistributable only under their own licence, and
+# reproducible with `python scripts/import_discovery_catalog.py`. What the
+# repository carries instead is the normalized catalog plus its provenance
+# manifest.
+data/import/
+
+# Local dev convenience (browser preview launcher).
+.claude/

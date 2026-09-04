@@ -31,6 +31,8 @@ _RECOVER_PATH_RE = re.compile(r"^/api/runs/(run_[0-9a-f]{32})/recover$")
 _REVOKE_PATH_RE = re.compile(r"^/api/runs/(run_[0-9a-f]{32})/revoke$")
 _EXECUTE_PATH_RE = re.compile(r"^/api/runs/(run_[0-9a-f]{32})/execute$")
 _MAX_REQUEST_BYTES = 16_384
+_DISCOVERY_SEARCH_PATH = "/api/discovery/search"
+_DISCOVERY_SELECT_PATH = "/api/discovery/select"
 _DEFAULT_PRODUCT_HOST = "0.0.0.0"
 _DEFAULT_PRODUCT_PORT = 8080
 _ROUTE_TEMPLATES = (
@@ -49,6 +51,8 @@ _KNOWN_ROUTES = frozenset(
         "/api/health",
         "/api/config",
         "/api/runs",
+        _DISCOVERY_SEARCH_PATH,
+        _DISCOVERY_SELECT_PATH,
     }
 )
 
@@ -204,6 +208,55 @@ class CommerceLabHandler(BaseHTTPRequestHandler):
                 "RATE_LIMITED",
                 "Demo request limit reached. Try again shortly.",
             )
+            return
+        if path == _DISCOVERY_SEARCH_PATH:
+            try:
+                payload = self._read_json()
+                if set(payload) - {"intent", "top_k"} or "intent" not in payload:
+                    raise ValueError("request fields do not match the API schema")
+                response = self.server.service.discovery_search(
+                    intent=payload["intent"],
+                    top_k=payload.get("top_k", 6),
+                )
+            except (TypeError, ValueError, json.JSONDecodeError) as error:
+                self._send_error(HTTPStatus.BAD_REQUEST, "INVALID_REQUEST", str(error))
+                return
+            except RuntimeError as error:
+                self._send_error(
+                    HTTPStatus.SERVICE_UNAVAILABLE,
+                    "DISCOVERY_UNAVAILABLE",
+                    str(error),
+                )
+                return
+            self._send_json(HTTPStatus.OK, response)
+            return
+        if path == _DISCOVERY_SELECT_PATH:
+            try:
+                payload = self._read_json()
+                if set(payload) != {"intent", "catalog_product_id"}:
+                    raise ValueError("request fields do not match the API schema")
+                response = self.server.service.discovery_select(
+                    intent=payload["intent"],
+                    catalog_product_id=payload["catalog_product_id"],
+                )
+            except KeyError:
+                self._send_error(
+                    HTTPStatus.NOT_FOUND,
+                    "LISTING_NOT_FOUND",
+                    "That listing is not in this intent's results.",
+                )
+                return
+            except (TypeError, ValueError, json.JSONDecodeError) as error:
+                self._send_error(HTTPStatus.BAD_REQUEST, "INVALID_REQUEST", str(error))
+                return
+            except RuntimeError as error:
+                self._send_error(
+                    HTTPStatus.SERVICE_UNAVAILABLE,
+                    "DISCOVERY_UNAVAILABLE",
+                    str(error),
+                )
+                return
+            self._send_json(HTTPStatus.OK, response)
             return
         if path == "/api/runs":
             try:

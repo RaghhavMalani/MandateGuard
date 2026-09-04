@@ -1,0 +1,150 @@
+{
+  "catalog_sha256": "7ad5d4f579eca4838eabca2de755003e0b513ff4213af683b4574559421ae09f",
+  "fractions": {
+    "test": 0.15,
+    "train": 0.7,
+    "validation": 0.15
+  },
+  "label_support": {
+    "Automotive": {
+      "test": 152,
+      "total": 1009,
+      "train": 706,
+      "validation": 151
+    },
+    "Baby Care": {
+      "test": 48,
+      "total": 324,
+      "train": 227,
+      "validation": 49
+    },
+    "Bags, Wallets & Belts": {
+      "test": 38,
+      "total": 258,
+      "train": 181,
+      "validation": 39
+    },
+    "Beauty and Personal Care": {
+      "test": 105,
+      "total": 701,
+      "train": 491,
+      "validation": 105
+    },
+    "Cameras & Accessories": {
+      "test": 13,
+      "total": 82,
+      "train": 57,
+      "validation": 12
+    },
+    "Clothing": {
+      "test": 844,
+      "total": 5623,
+      "train": 3936,
+      "validation": 843
+    },
+    "Computers": {
+      "test": 87,
+      "total": 576,
+      "train": 403,
+      "validation": 86
+    },
+    "Footwear": {
+      "test": 168,
+      "total": 1121,
+      "train": 785,
+      "validation": 168
+    },
+    "Furniture": {
+      "test": 27,
+      "total": 176,
+      "train": 123,
+      "validation": 26
+    },
+    "Health & Personal Care Appliances": {
+      "test": 7,
+      "total": 43,
+      "train": 30,
+      "validation": 6
+    },
+    "Home Decor & Festive Needs": {
+      "test": 123,
+      "total": 819,
+      "train": 573,
+      "validation": 123
+    },
+    "Home Furnishing": {
+      "test": 81,
+      "total": 545,
+      "train": 382,
+      "validation": 82
+    },
+    "Home Improvement": {
+      "test": 12,
+      "total": 81,
+      "train": 57,
+      "validation": 12
+    },
+    "Jewellery": {
+      "test": 448,
+      "total": 2982,
+      "train": 2087,
+      "validation": 447
+    },
+    "Kitchen & Dining": {
+      "test": 97,
+      "total": 643,
+      "train": 450,
+      "validation": 96
+    },
+    "Mobiles & Accessories": {
+      "test": 88,
+      "total": 588,
+      "train": 412,
+      "validation": 88
+    },
+    "Pens & Stationery": {
+      "test": 41,
+      "total": 273,
+      "train": 191,
+      "validation": 41
+    },
+    "Sports & Fitness": {
+      "test": 25,
+      "total": 166,
+      "train": 116,
+      "validation": 25
+    },
+    "Sunglasses": {
+      "test": 6,
+      "total": 40,
+      "train": 28,
+      "validation": 6
+    },
+    "Tools & Hardware": {
+      "test": 50,
+      "total": 333,
+      "train": 233,
+      "validation": 50
+    },
+    "Toys & School Supplies": {
+      "test": 47,
+      "total": 317,
+      "train": 222,
+      "validation": 48
+    },
+    "Watches": {
+      "test": 79,
+      "total": 530,
+      "train": 371,
+      "validation": 80
+    }
+  },
+  "note": "Membership is sha256(split_version|catalog_product_id) thresholded within each label. It does not depend on row order or a RNG seed.",
+  "sizes": {
+    "test": 2586,
+    "train": 12061,
+    "validation": 2583
+  },
+  "split_version": "discovery-split-v1",
+  "test_id_digest": "26e76cad667e637fef54a631646c3ca9026d7f4fa79aef52c40112bd93f36851"
+}

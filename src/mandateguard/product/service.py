@@ -112,7 +112,12 @@ from mandateguard.product.evidence_policy import (
     EvidencePolicy,
     PRODUCT_EVIDENCE_POLICY,
 )
+from mandateguard.product.discovery_service import DiscoverySurface
 from mandateguard.product.recovery_config import build_recovery_registry
+from mandateguard.product.scale_evidence import (
+    load_model_quality,
+    load_scale_evidence,
+)
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
@@ -724,6 +729,17 @@ class CommerceLabService:
             / "merchant_terms.json",
         )
         self.recovery_registry = build_recovery_registry(repository_root)
+        # The discovery catalog is optional: the product must start and serve
+        # every authorization journey whether or not the large catalog and its
+        # frozen indexes were built into this deployment.
+        self.discovery = DiscoverySurface(
+            processed_dir=repository_root / "data" / "processed",
+            models_dir=repository_root / "data" / "models",
+            store=self.store,
+        )
+        # Read once, at startup, from the artifacts that recorded them.
+        self.scale_evidence = load_scale_evidence(repository_root=repository_root)
+        self.model_quality = load_model_quality(repository_root=repository_root)
         self.semantic_cache = SQLiteSemanticCache(state_dir / "semantic-cache.sqlite3")
         self.recovery_audit_store = SQLiteRecoveryAuditStore(
             state_dir / "recovery-audit.sqlite3"
@@ -848,6 +864,9 @@ class CommerceLabService:
                 "mandate_state_owner": "TRUSTED_SERVER",
                 "revocation_authority": "DEMO USER REVOCATION",
             },
+            "discovery": self.discovery.public_config(),
+            "system_scale": dict(self.scale_evidence),
+            "model_quality": dict(self.model_quality),
         }
 
     def health(self) -> dict[str, Any]:
@@ -857,7 +876,20 @@ class CommerceLabService:
             "default_mode": self.default_mode,
             "live_mode_available": self.live_configuration()["available"],
             "state_persistence": self.state_persistence,
+            "discovery_catalog_available": self.discovery.available,
         }
+
+    def discovery_search(self, *, intent: str, top_k: int = 6) -> dict[str, Any]:
+        """Run one discovery search. No decision, no capability, no provider."""
+
+        return self.discovery.search(intent, top_k=top_k)
+
+    def discovery_select(
+        self, *, intent: str, catalog_product_id: str
+    ) -> dict[str, Any]:
+        """Report what can be done with one discovered listing."""
+
+        return self.discovery.select(intent, catalog_product_id)
 
     def start_run(
         self,

@@ -1,0 +1,166 @@
+{
+  "generated_at": "2026-09-04T02:14:12Z",
+  "import": {
+    "catalog_bytes": 4933678,
+    "catalog_sha256": "7ad5d4f579eca4838eabca2de755003e0b513ff4213af683b4574559421ae09f",
+    "member_sha256": "56f8f699c9e847356666c2eab3c3ab1244340f6a98ad08e39ea2199ebe993ad1",
+    "normalization_counts": {
+      "price_fragment_stripped": 6580,
+      "price_missing": 78,
+      "taxonomy_demoted": 400,
+      "title_prefix_stripped": 11052
+    },
+    "raw_bytes": 5765116,
+    "raw_sha256": "54a91fcd0b3d1923e3adb52c27e4dde557a7cd948dba066e3cb5bca542da1b9f",
+    "rows_committed": 17694,
+    "rows_deduplicated": 2306,
+    "rows_normalized": 20000,
+    "rows_read": 20000,
+    "source_id": "flipkart"
+  },
+  "normalized_fields": [
+    "catalog_product_id",
+    "source",
+    "source_product_id",
+    "title",
+    "description",
+    "brand",
+    "category_path",
+    "price_minor",
+    "currency",
+    "merchant_or_seller",
+    "rating",
+    "product_url",
+    "raw_source_sha256"
+  ],
+  "schema_version": "discovery-catalog-v1",
+  "source": {
+    "adapter": "flipkart_promptcloud_csv",
+    "archive": true,
+    "attribution": "Flipkart Products dataset by PromptCloud, published on Kaggle under CC BY-SA 4.0. Crawled from flipkart.com in 2015-2016. Redistributed here in normalized form under the same licence.",
+    "display_name": "Flipkart Products (pre-crawled sample)",
+    "download_url": "https://www.kaggle.com/api/v1/datasets/download/PromptCloudHQ/flipkart-products",
+    "expected_rows": 20000,
+    "landing_page": "https://www.kaggle.com/datasets/PromptCloudHQ/flipkart-products",
+    "licence": "CC BY-SA 4.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "member_filename": "flipkart_com-ecommerce_sample.csv",
+    "notes": "20,000-row public subset of a larger PromptCloud crawl. Prices are 2016 INR listing prices and are historical: they are treated as listing claims for discovery only, never as authoritative merchant price evidence.",
+    "publisher": "PromptCloud / DataStock",
+    "source_id": "flipkart"
+  },
+  "sources": [
+    {
+      "import": {
+        "catalog_bytes": 4933678,
+        "catalog_sha256": "7ad5d4f579eca4838eabca2de755003e0b513ff4213af683b4574559421ae09f",
+        "member_sha256": "56f8f699c9e847356666c2eab3c3ab1244340f6a98ad08e39ea2199ebe993ad1",
+        "normalization_counts": {
+          "price_fragment_stripped": 6580,
+          "price_missing": 78,
+          "taxonomy_demoted": 400,
+          "title_prefix_stripped": 11052
+        },
+        "raw_bytes": 5765116,
+        "raw_sha256": "54a91fcd0b3d1923e3adb52c27e4dde557a7cd948dba066e3cb5bca542da1b9f",
+        "rows_committed": 17694,
+        "rows_deduplicated": 2306,
+        "rows_normalized": 20000,
+        "rows_read": 20000,
+        "source_id": "flipkart"
+      },
+      "source": {
+        "adapter": "flipkart_promptcloud_csv",
+        "archive": true,
+        "attribution": "Flipkart Products dataset by PromptCloud, published on Kaggle under CC BY-SA 4.0. Crawled from flipkart.com in 2015-2016. Redistributed here in normalized form under the same licence.",
+        "display_name": "Flipkart Products (pre-crawled sample)",
+        "download_url": "https://www.kaggle.com/api/v1/datasets/download/PromptCloudHQ/flipkart-products",
+        "expected_rows": 20000,
+        "landing_page": "https://www.kaggle.com/datasets/PromptCloudHQ/flipkart-products",
+        "licence": "CC BY-SA 4.0",
+        "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "member_filename": "flipkart_com-ecommerce_sample.csv",
+        "notes": "20,000-row public subset of a larger PromptCloud crawl. Prices are 2016 INR listing prices and are historical: they are treated as listing claims for discovery only, never as authoritative merchant price evidence.",
+        "publisher": "PromptCloud / DataStock",
+        "source_id": "flipkart"
+      }
+    },
+    {
+      "import": {
+        "catalog_bytes": 4933678,
+        "catalog_sha256": "7ad5d4f579eca4838eabca2de755003e0b513ff4213af683b4574559421ae09f",
+        "member_sha256": "f3de4a105f8304dd0dcd61df74a2eddc3513bf9bb1e195ae75c802cb5eb0aa60",
+        "normalization_counts": {
+          "registered_product": 8
+        },
+        "raw_bytes": 3801,
+        "raw_sha256": "f3de4a105f8304dd0dcd61df74a2eddc3513bf9bb1e195ae75c802cb5eb0aa60",
+        "rows_committed": 8,
+        "rows_deduplicated": 0,
+        "rows_normalized": 8,
+        "rows_read": 8,
+        "source_id": "mandateguard"
+      },
+      "source": {
+        "adapter": "mandateguard_registry_json",
+        "archive": false,
+        "attribution": "The application-registered products the authorization controller already knows about, indexed alongside the crawled catalog so the two kinds of listing appear in one result list.",
+        "display_name": "Registered MandateGuard merchant catalog",
+        "download_url": "",
+        "expected_rows": 8,
+        "landing_page": "fixtures/agentic_commerce/merchant_catalog.json",
+        "licence": "Repository fixture",
+        "licence_url": "",
+        "member_filename": "merchant_catalog.json",
+        "notes": "Indexing a registered product for discovery does not expose its trusted evidence. Evidence resolves only through TrustedCommerceStore, by merchant and SKU.",
+        "publisher": "This repository",
+        "source_id": "mandateguard"
+      }
+    }
+  ],
+  "statistics": {
+    "distinct_brands": 3370,
+    "distinct_category_paths": 6338,
+    "listings": 17702,
+    "listings_by_source": {
+      "flipkart": 17694,
+      "mandateguard": 8
+    },
+    "listings_with_price": 17626,
+    "listings_without_price": 76,
+    "price_minor_max": 57123000,
+    "price_minor_median": 55000,
+    "price_minor_min": 3500,
+    "top_category_support": {
+      "Automotive": 1009,
+      "Baby Care": 324,
+      "Bags, Wallets & Belts": 258,
+      "Beauty and Personal Care": 701,
+      "Cameras & Accessories": 82,
+      "Clothing": 5623,
+      "Computers": 576,
+      "Footwear": 1121,
+      "Furniture": 176,
+      "Gaming": 35,
+      "Health & Personal Care Appliances": 43,
+      "Home Decor & Festive Needs": 819,
+      "Home Furnishing": 545,
+      "Home Improvement": 81,
+      "Jewellery": 2982,
+      "Kitchen & Dining": 643,
+      "Mobiles & Accessories": 588,
+      "Pens & Stationery": 273,
+      "Pet Supplies": 30,
+      "Registered Merchant Catalog": 8,
+      "Sports & Fitness": 166,
+      "Sunglasses": 40,
+      "Tools & Hardware": 333,
+      "Toys & School Supplies": 317,
+      "Uncategorized": 399,
+      "Watches": 530
+    },
+    "top_level_categories": 26
+  },
+  "trust_note": "This catalog is a discovery surface. It is not merchant authorization evidence and cannot satisfy a Tier A/B check or a semantic constraint. A registered merchant product indexed here is discoverable through this catalog; its trusted evidence still resolves only through the authorization store.",
+  "trust_tier": "DISCOVERY_LISTING"
+}
