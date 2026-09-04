@@ -1,0 +1,54 @@
+{
+  "schema_version": "semantic-model-provenance-v1",
+  "verified_before_evaluation": true,
+  "authoritative_source": "Hugging Face repository owned by the model publisher",
+  "model_id": "intfloat/e5-small-v2",
+  "revision": "ffb93f3bd4047442299a41ebb6fa998a38507c52",
+  "license": "MIT",
+  "dimension": 384,
+  "maximum_sequence_length": 512,
+  "tokenizer": "BertTokenizerFast / WordPiece, uncased, vocab size 30,522",
+  "pooling": "attention-mask mean pooling",
+  "normalization": "L2",
+  "query_prefix": "query: ",
+  "document_prefix": "passage: ",
+  "intended_usage": "English text embeddings for retrieval with mandatory query:/passage: prefixes",
+  "onnx_file": "onnx/model_O4.onnx",
+  "model_card_url": "https://huggingface.co/intfloat/e5-small-v2",
+  "pinned_model_card_url": "https://huggingface.co/intfloat/e5-small-v2/tree/ffb93f3bd4047442299a41ebb6fa998a38507c52",
+  "license_source": "https://huggingface.co/intfloat/e5-small-v2/tree/ffb93f3bd4047442299a41ebb6fa998a38507c52",
+  "tokenizer_identity": {
+    "description": "BertTokenizerFast / WordPiece, uncased, vocab size 30,522",
+    "tokenizer_json_sha256": "d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66"
+  },
+  "model_sha256": "5a0ed8686280e292eec2321fbe06f21c3c53ed434ce5548712354211ef9e70bc",
+  "files": [
+    {
+      "path": "config.json",
+      "bytes": 615,
+      "sha256": "5dfb0363cd0243be179c03bcaafd1542d0fbb95e8cbcf575fff3e229342adc2f"
+    },
+    {
+      "path": "tokenizer.json",
+      "bytes": 711396,
+      "sha256": "d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66"
+    },
+    {
+      "path": "tokenizer_config.json",
+      "bytes": 314,
+      "sha256": "ae83fa6ca0333117ff12606020af925d648667ef70d92ff7f27d781ba0ca4544"
+    },
+    {
+      "path": "special_tokens_map.json",
+      "bytes": 125,
+      "sha256": "b6d346be366a7d1d48332dbc9fdf3bf8960b5d879522b7799ddba59e76237ee3"
+    },
+    {
+      "path": "onnx/model_O4.onnx",
+      "bytes": 66578744,
+      "sha256": "5a0ed8686280e292eec2321fbe06f21c3c53ed434ce5548712354211ef9e70bc"
+    }
+  ],
+  "unsafe_serialization": false,
+  "runtime_external_calls": 0
+}

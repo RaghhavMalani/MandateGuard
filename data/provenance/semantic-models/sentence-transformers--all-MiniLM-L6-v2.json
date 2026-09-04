@@ -1,0 +1,54 @@
+{
+  "schema_version": "semantic-model-provenance-v1",
+  "verified_before_evaluation": true,
+  "authoritative_source": "Hugging Face repository owned by the model publisher",
+  "model_id": "sentence-transformers/all-MiniLM-L6-v2",
+  "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+  "license": "Apache-2.0",
+  "dimension": 384,
+  "maximum_sequence_length": 256,
+  "tokenizer": "BertTokenizerFast / WordPiece, uncased, vocab size 30,522",
+  "pooling": "attention-mask mean pooling",
+  "normalization": "L2",
+  "query_prefix": "",
+  "document_prefix": "",
+  "intended_usage": "sentence and paragraph embeddings for semantic search, clustering, and similarity",
+  "onnx_file": "onnx/model.onnx",
+  "model_card_url": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
+  "pinned_model_card_url": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/tree/1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+  "license_source": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/tree/1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+  "tokenizer_identity": {
+    "description": "BertTokenizerFast / WordPiece, uncased, vocab size 30,522",
+    "tokenizer_json_sha256": "be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037"
+  },
+  "model_sha256": "6fd5d72fe4589f189f8ebc006442dbb529bb7ce38f8082112682524616046452",
+  "files": [
+    {
+      "path": "config.json",
+      "bytes": 612,
+      "sha256": "953f9c0d463486b10a6871cc2fd59f223b2c70184f49815e7efbcab5d8908b41"
+    },
+    {
+      "path": "tokenizer.json",
+      "bytes": 466247,
+      "sha256": "be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037"
+    },
+    {
+      "path": "tokenizer_config.json",
+      "bytes": 350,
+      "sha256": "acb92769e8195aabd29b7b2137a9e6d6e25c476a4f15aa4355c233426c61576b"
+    },
+    {
+      "path": "special_tokens_map.json",
+      "bytes": 112,
+      "sha256": "303df45a03609e4ead04bc3dc1536d0ab19b5358db685b6f3da123d05ec200e3"
+    },
+    {
+      "path": "onnx/model.onnx",
+      "bytes": 90405214,
+      "sha256": "6fd5d72fe4589f189f8ebc006442dbb529bb7ce38f8082112682524616046452"
+    }
+  ],
+  "unsafe_serialization": false,
+  "runtime_external_calls": 0
+}
