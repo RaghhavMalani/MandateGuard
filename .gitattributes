@@ -10,8 +10,12 @@ fixtures/engineering/resolve_recovery/*.json text eol=lf
 data/processed/discovery_catalog.manifest.json text eol=lf
 data/models/*.json text eol=lf
 data/eval/*.json text eol=lf
+data/eval/semantic-v2/*.json text eol=lf
+data/eval/authorization-scale/*.json text eol=lf
 artifacts/engineering/discovery/*.json text eol=lf
 requirements-train.txt text eol=lf
+scripts/freeze_semantic_v2.py text eol=lf
+scripts/freeze_authorization_scale.py text eol=lf
 
 # Frozen binary artifacts. Line-ending conversion would corrupt them.
 *.mgdx binary

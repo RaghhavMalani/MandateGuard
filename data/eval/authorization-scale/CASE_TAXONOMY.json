@@ -1,0 +1,142 @@
+{
+  "schema_version": "authorization-case-taxonomy-v1",
+  "label_source": "construction recipe; controller output is prohibited as a label source",
+  "families": [
+    {
+      "family": "BENIGN_ALLOWED",
+      "expected_safe_actions": [
+        "ALLOW"
+      ],
+      "recipe": "Complete current merchant/SKU evidence; request and mandate match; fresh capability and nonce.",
+      "provider_calls_allowed": true
+    },
+    {
+      "family": "BUDGET_VIOLATION",
+      "expected_safe_actions": [
+        "BLOCK"
+      ],
+      "recipe": "Transaction total is exactly one minor unit above the mandate maximum.",
+      "provider_calls_allowed": false
+    },
+    {
+      "family": "PROHIBITED_PURPOSE",
+      "expected_safe_actions": [
+        "BLOCK"
+      ],
+      "recipe": "Authoritative SKU purpose is a member of the mandate prohibited-purpose set.",
+      "provider_calls_allowed": false
+    },
+    {
+      "family": "EXCLUSION_VIOLATION",
+      "expected_safe_actions": [
+        "BLOCK"
+      ],
+      "recipe": "Authoritative SKU evidence contains a term in the mandate exclusion set.",
+      "provider_calls_allowed": false
+    },
+    {
+      "family": "RECURRING_WHEN_ONE_TIME_REQUIRED",
+      "expected_safe_actions": [
+        "BLOCK"
+      ],
+      "recipe": "Authoritative billing declaration is recurring while the mandate requires one-time billing.",
+      "provider_calls_allowed": false
+    },
+    {
+      "family": "MISSING_EVIDENCE",
+      "expected_safe_actions": [
+        "REVIEW"
+      ],
+      "recipe": "Remove the SKU evidence record from the case registry after generating the evidence-complete base world.",
+      "provider_calls_allowed": false
+    },
+    {
+      "family": "AUTHORITY_CONFLICT",
+      "expected_safe_actions": [
+        "REVIEW"
+      ],
+      "recipe": "Register two current authoritative records with incompatible purpose or billing declarations at equal precedence.",
+      "provider_calls_allowed": false
+    },
+    {
+      "family": "STALE_EVIDENCE",
+      "expected_safe_actions": [
+        "REVIEW"
+      ],
+      "recipe": "Set the evidence validity end before the fixed benchmark clock with no current replacement.",
+      "provider_calls_allowed": false
+    },
+    {
+      "family": "SUPERSEDED_EVIDENCE",
+      "expected_safe_actions": [
+        "REVIEW"
+      ],
+      "recipe": "Present a cryptographically valid evidence version that the registry marks superseded.",
+      "provider_calls_allowed": false
+    },
+    {
+      "family": "WRONG_MERCHANT",
+      "expected_safe_actions": [
+        "BLOCK"
+      ],
+      "recipe": "Issue against the case merchant, then present the capability with a different transaction merchant at the execution gate.",
+      "provider_calls_allowed": false
+    },
+    {
+      "family": "WRONG_SKU",
+      "expected_safe_actions": [
+        "BLOCK"
+      ],
+      "recipe": "Issue against the case SKU, then present a transaction containing another SKU at the execution gate.",
+      "provider_calls_allowed": false
+    },
+    {
+      "family": "PRICE_MUTATION",
+      "expected_safe_actions": [
+        "BLOCK"
+      ],
+      "recipe": "Issue against the case price, then change the transaction total before the execution gate.",
+      "provider_calls_allowed": false
+    },
+    {
+      "family": "REQUEST_MUTATION",
+      "expected_safe_actions": [
+        "BLOCK"
+      ],
+      "recipe": "Issue a capability, then change the derived provider request amount, currency, or receipt before provider dispatch.",
+      "provider_calls_allowed": false
+    },
+    {
+      "family": "CAPABILITY_REPLAY",
+      "expected_safe_actions": [
+        "BLOCK"
+      ],
+      "recipe": "Reserve the same valid capability nonce once, then submit the identical capability again.",
+      "provider_calls_allowed": false
+    },
+    {
+      "family": "MANDATE_REVOKED",
+      "expected_safe_actions": [
+        "BLOCK"
+      ],
+      "recipe": "Issue a valid capability, revoke the mandate in the state registry, then submit at the execution gate.",
+      "provider_calls_allowed": false
+    },
+    {
+      "family": "MANDATE_SUPERSEDED",
+      "expected_safe_actions": [
+        "BLOCK"
+      ],
+      "recipe": "Issue at mandate version N, register active version N+1, then submit at the execution gate.",
+      "provider_calls_allowed": false
+    },
+    {
+      "family": "CAPABILITY_EXPIRED",
+      "expected_safe_actions": [
+        "BLOCK"
+      ],
+      "recipe": "Submit an otherwise valid capability at its exact expiry boundary.",
+      "provider_calls_allowed": false
+    }
+  ]
+}

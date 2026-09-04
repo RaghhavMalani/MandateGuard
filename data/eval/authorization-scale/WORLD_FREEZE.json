@@ -1,0 +1,180 @@
+{
+  "schema_version": "authorization-scale-freeze-v1",
+  "status": "FROZEN_BEFORE_EXECUTION",
+  "chronology_parent_commit": "36b49c2",
+  "world_namespace": "SyntheticMerchantUniverse",
+  "world_generation_version": "synthetic-merchant-universe-v1",
+  "seed": 20260904,
+  "fixed_clock": "2026-09-04T00:00:00Z",
+  "skus_per_merchant": 50,
+  "primary_case_count": 25000,
+  "scale_ladder": [
+    {
+      "case_count": 1000,
+      "merchant_count": 20,
+      "synthetic_sku_count": 1000,
+      "case_descriptor_stream_sha256": "3992ff77d100820ea035263f1d9f3f478222845ff314bc7147677c200cd23fe2",
+      "family_composition": {
+        "AUTHORITY_CONFLICT": 59,
+        "BENIGN_ALLOWED": 59,
+        "BUDGET_VIOLATION": 59,
+        "CAPABILITY_EXPIRED": 59,
+        "CAPABILITY_REPLAY": 58,
+        "EXCLUSION_VIOLATION": 59,
+        "MANDATE_REVOKED": 58,
+        "MANDATE_SUPERSEDED": 59,
+        "MISSING_EVIDENCE": 59,
+        "PRICE_MUTATION": 59,
+        "PROHIBITED_PURPOSE": 59,
+        "RECURRING_WHEN_ONE_TIME_REQUIRED": 59,
+        "REQUEST_MUTATION": 58,
+        "STALE_EVIDENCE": 59,
+        "SUPERSEDED_EVIDENCE": 59,
+        "WRONG_MERCHANT": 59,
+        "WRONG_SKU": 59
+      }
+    },
+    {
+      "case_count": 10000,
+      "merchant_count": 200,
+      "synthetic_sku_count": 10000,
+      "case_descriptor_stream_sha256": "bedaa47acb808e74d7b6d06d390bb34da183a8c509b34645089cd30846b0c62f",
+      "family_composition": {
+        "AUTHORITY_CONFLICT": 588,
+        "BENIGN_ALLOWED": 589,
+        "BUDGET_VIOLATION": 589,
+        "CAPABILITY_EXPIRED": 589,
+        "CAPABILITY_REPLAY": 588,
+        "EXCLUSION_VIOLATION": 588,
+        "MANDATE_REVOKED": 588,
+        "MANDATE_SUPERSEDED": 589,
+        "MISSING_EVIDENCE": 588,
+        "PRICE_MUTATION": 588,
+        "PROHIBITED_PURPOSE": 588,
+        "RECURRING_WHEN_ONE_TIME_REQUIRED": 588,
+        "REQUEST_MUTATION": 588,
+        "STALE_EVIDENCE": 588,
+        "SUPERSEDED_EVIDENCE": 588,
+        "WRONG_MERCHANT": 588,
+        "WRONG_SKU": 588
+      }
+    },
+    {
+      "case_count": 25000,
+      "merchant_count": 500,
+      "synthetic_sku_count": 25000,
+      "case_descriptor_stream_sha256": "a8d77ef3f7f42d354ac138fa1fb6997abbb633f06665ce6467552214938cf63a",
+      "family_composition": {
+        "AUTHORITY_CONFLICT": 1471,
+        "BENIGN_ALLOWED": 1471,
+        "BUDGET_VIOLATION": 1471,
+        "CAPABILITY_EXPIRED": 1471,
+        "CAPABILITY_REPLAY": 1470,
+        "EXCLUSION_VIOLATION": 1471,
+        "MANDATE_REVOKED": 1470,
+        "MANDATE_SUPERSEDED": 1471,
+        "MISSING_EVIDENCE": 1471,
+        "PRICE_MUTATION": 1470,
+        "PROHIBITED_PURPOSE": 1471,
+        "RECURRING_WHEN_ONE_TIME_REQUIRED": 1471,
+        "REQUEST_MUTATION": 1470,
+        "STALE_EVIDENCE": 1471,
+        "SUPERSEDED_EVIDENCE": 1470,
+        "WRONG_MERCHANT": 1470,
+        "WRONG_SKU": 1470
+      }
+    }
+  ],
+  "taxonomy_artifact": "data/eval/authorization-scale/CASE_TAXONOMY.json",
+  "taxonomy_sha256": "18c68bddd3d8887e4b6c1e53e7afeb08c581a9e36402779331f0e76d9766b9a7",
+  "generator": "scripts/freeze_authorization_scale.py",
+  "generator_sha256": "afb7f6441f917af676c19b2d446d1de0a5d3644728b0cefe53fef81fd39bc5d5",
+  "expected_safe_actions": {
+    "BENIGN_ALLOWED": [
+      "ALLOW"
+    ],
+    "BUDGET_VIOLATION": [
+      "BLOCK"
+    ],
+    "PROHIBITED_PURPOSE": [
+      "BLOCK"
+    ],
+    "EXCLUSION_VIOLATION": [
+      "BLOCK"
+    ],
+    "RECURRING_WHEN_ONE_TIME_REQUIRED": [
+      "BLOCK"
+    ],
+    "MISSING_EVIDENCE": [
+      "REVIEW"
+    ],
+    "AUTHORITY_CONFLICT": [
+      "REVIEW"
+    ],
+    "STALE_EVIDENCE": [
+      "REVIEW"
+    ],
+    "SUPERSEDED_EVIDENCE": [
+      "REVIEW"
+    ],
+    "WRONG_MERCHANT": [
+      "BLOCK"
+    ],
+    "WRONG_SKU": [
+      "BLOCK"
+    ],
+    "PRICE_MUTATION": [
+      "BLOCK"
+    ],
+    "REQUEST_MUTATION": [
+      "BLOCK"
+    ],
+    "CAPABILITY_REPLAY": [
+      "BLOCK"
+    ],
+    "MANDATE_REVOKED": [
+      "BLOCK"
+    ],
+    "MANDATE_SUPERSEDED": [
+      "BLOCK"
+    ],
+    "CAPABILITY_EXPIRED": [
+      "BLOCK"
+    ]
+  },
+  "metric_schema": {
+    "actions": [
+      "ALLOW",
+      "BLOCK",
+      "REVIEW"
+    ],
+    "latency_percentiles": [
+      50,
+      95,
+      99
+    ],
+    "counters": [
+      "total_cases",
+      "target_invariant_agreement",
+      "authorizations_per_second",
+      "capabilities_issued",
+      "provider_adapter_calls",
+      "provider_calls_before_allow",
+      "provider_calls_on_block",
+      "provider_calls_on_review",
+      "replay_rejections",
+      "revocation_rejections",
+      "request_mutation_rejections",
+      "merchant_sku_mismatch_rejections",
+      "resident_memory_bytes"
+    ]
+  },
+  "external_calls_allowed": {
+    "openai": 0,
+    "razorpay_http": 0,
+    "hugging_face_api": 0
+  },
+  "source_catalog_is_trusted_evidence": false,
+  "outcomes_included": false,
+  "freeze_payload_sha256": "01053b3329faab83a6d5146290c10a437669c49fce14e336b1d22596c4701efb"
+}
