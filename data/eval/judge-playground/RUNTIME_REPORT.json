@@ -5,24 +5,24 @@
   "world_version": "mandateguard-sandbox-commerce-v2",
   "products_sha256": "0323d4f6a052d31807667f7e0f350b3b574ccbce839033097912b8e01eff7f5e",
   "product_count": 3060,
-  "cold_playground_build_ms": 222.917,
-  "python_allocations_after_build_bytes": 27769942,
-  "python_peak_allocations_during_build_bytes": 27771415,
+  "cold_playground_build_ms": 216.762,
+  "python_allocations_after_build_bytes": 27770062,
+  "python_peak_allocations_during_build_bytes": 27771535,
   "search": {
     "queries": 120,
     "candidate_found_rate": 1.0,
     "latency_ms": {
-      "p50": 0.794,
-      "p95": 2.125,
-      "max": 3.775,
-      "median": 0.793
+      "p50": 0.745,
+      "p95": 1.939,
+      "max": 3.852,
+      "median": 0.743
     }
   },
   "artifact_bytes": {
     "materialized_catalog_on_disk": 0,
     "generated_catalog_text": 4735383,
-    "sandbox_python_source": 180528,
-    "frozen_query_and_reports": 134067,
+    "sandbox_python_source": 180851,
+    "frozen_query_and_reports": 134089,
     "full_static_ui": 295365
   }
 }

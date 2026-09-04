@@ -170,10 +170,10 @@
     }
   },
   "latency_ms": {
-    "search_p50": 1.809,
-    "search_p95": 3.386,
-    "authorization_p50": 10.855,
-    "authorization_p95": 15.114
+    "search_p50": 1.86,
+    "search_p95": 3.286,
+    "authorization_p50": 11.206,
+    "authorization_p95": 15.606
   },
   "experience_targets": {
     "candidate_found_rate_at_least": 0.95,
@@ -193,8 +193,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.362,
-      "authorization_ms": 12.912
+      "search_ms": 2.418,
+      "authorization_ms": 19.621
     },
     {
       "query_id": "Q002",
@@ -207,8 +207,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.256,
-      "authorization_ms": 10.438
+      "search_ms": 1.25,
+      "authorization_ms": 12.056
     },
     {
       "query_id": "Q003",
@@ -221,8 +221,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.795,
-      "authorization_ms": 9.855
+      "search_ms": 3.093,
+      "authorization_ms": 10.237
     },
     {
       "query_id": "Q004",
@@ -235,8 +235,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 6.296,
-      "authorization_ms": 10.676
+      "search_ms": 2.715,
+      "authorization_ms": 9.249
     },
     {
       "query_id": "Q005",
@@ -249,8 +249,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.567,
-      "authorization_ms": 10.239
+      "search_ms": 1.518,
+      "authorization_ms": 11.275
     },
     {
       "query_id": "Q006",
@@ -263,8 +263,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.877,
-      "authorization_ms": 10.142
+      "search_ms": 1.743,
+      "authorization_ms": 11.742
     },
     {
       "query_id": "Q007",
@@ -277,8 +277,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.24,
-      "authorization_ms": 9.765
+      "search_ms": 1.443,
+      "authorization_ms": 10.743
     },
     {
       "query_id": "Q008",
@@ -291,8 +291,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.268,
-      "authorization_ms": 9.774
+      "search_ms": 1.284,
+      "authorization_ms": 10.124
     },
     {
       "query_id": "Q009",
@@ -305,8 +305,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.198,
-      "authorization_ms": 9.539
+      "search_ms": 1.219,
+      "authorization_ms": 11.018
     },
     {
       "query_id": "Q010",
@@ -319,8 +319,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.273,
-      "authorization_ms": 9.784
+      "search_ms": 1.306,
+      "authorization_ms": 10.144
     },
     {
       "query_id": "Q011",
@@ -333,8 +333,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.629,
-      "authorization_ms": 11.929
+      "search_ms": 1.584,
+      "authorization_ms": 9.776
     },
     {
       "query_id": "Q012",
@@ -347,8 +347,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.871,
-      "authorization_ms": 11.264
+      "search_ms": 2.627,
+      "authorization_ms": 11.026
     },
     {
       "query_id": "Q013",
@@ -361,8 +361,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.35,
-      "authorization_ms": 12.662
+      "search_ms": 1.412,
+      "authorization_ms": 10.143
     },
     {
       "query_id": "Q014",
@@ -375,8 +375,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.675,
-      "authorization_ms": 10.949
+      "search_ms": 1.333,
+      "authorization_ms": 9.773
     },
     {
       "query_id": "Q015",
@@ -389,8 +389,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.079,
-      "authorization_ms": 10.162
+      "search_ms": 1.931,
+      "authorization_ms": 10.836
     },
     {
       "query_id": "Q016",
@@ -403,8 +403,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.437,
-      "authorization_ms": 11.284
+      "search_ms": 1.555,
+      "authorization_ms": 10.652
     },
     {
       "query_id": "Q017",
@@ -417,8 +417,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.067,
-      "authorization_ms": 10.205
+      "search_ms": 2.395,
+      "authorization_ms": 10.034
     },
     {
       "query_id": "Q018",
@@ -431,8 +431,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.944,
-      "authorization_ms": 11.083
+      "search_ms": 1.798,
+      "authorization_ms": 10.579
     },
     {
       "query_id": "Q019",
@@ -445,8 +445,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.357,
-      "authorization_ms": 10.599
+      "search_ms": 1.389,
+      "authorization_ms": 10.439
     },
     {
       "query_id": "Q020",
@@ -459,8 +459,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.239,
-      "authorization_ms": 10.762
+      "search_ms": 1.281,
+      "authorization_ms": 10.977
     },
     {
       "query_id": "Q021",
@@ -473,8 +473,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.511,
-      "authorization_ms": 10.633
+      "search_ms": 1.518,
+      "authorization_ms": 9.586
     },
     {
       "query_id": "Q022",
@@ -487,8 +487,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.848,
-      "authorization_ms": 10.534
+      "search_ms": 2.201,
+      "authorization_ms": 12.445
     },
     {
       "query_id": "Q023",
@@ -501,8 +501,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.693,
-      "authorization_ms": 9.943
+      "search_ms": 1.772,
+      "authorization_ms": 9.819
     },
     {
       "query_id": "Q024",
@@ -515,8 +515,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.261,
-      "authorization_ms": 10.022
+      "search_ms": 1.242,
+      "authorization_ms": 10.253
     },
     {
       "query_id": "Q025",
@@ -529,8 +529,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.018,
-      "authorization_ms": 9.697
+      "search_ms": 1.735,
+      "authorization_ms": 9.755
     },
     {
       "query_id": "Q026",
@@ -543,8 +543,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.269,
-      "authorization_ms": 11.641
+      "search_ms": 2.209,
+      "authorization_ms": 9.915
     },
     {
       "query_id": "Q027",
@@ -557,8 +557,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.885,
-      "authorization_ms": 11.374
+      "search_ms": 3.241,
+      "authorization_ms": 12.015
     },
     {
       "query_id": "Q028",
@@ -571,8 +571,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.407,
-      "authorization_ms": 10.541
+      "search_ms": 1.513,
+      "authorization_ms": 11.093
     },
     {
       "query_id": "Q029",
@@ -585,8 +585,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.367,
-      "authorization_ms": 11.113
+      "search_ms": 1.428,
+      "authorization_ms": 13.921
     },
     {
       "query_id": "Q030",
@@ -599,8 +599,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.289,
-      "authorization_ms": 10.141
+      "search_ms": 1.84,
+      "authorization_ms": 11.67
     },
     {
       "query_id": "Q031",
@@ -613,8 +613,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.489,
-      "authorization_ms": 11.562
+      "search_ms": 1.614,
+      "authorization_ms": 9.498
     },
     {
       "query_id": "Q032",
@@ -627,8 +627,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.375,
-      "authorization_ms": 10.725
+      "search_ms": 1.374,
+      "authorization_ms": 11.206
     },
     {
       "query_id": "Q033",
@@ -641,8 +641,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.839,
-      "authorization_ms": 10.676
+      "search_ms": 1.979,
+      "authorization_ms": 11.731
     },
     {
       "query_id": "Q034",
@@ -655,8 +655,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.601,
-      "authorization_ms": 11.095
+      "search_ms": 1.626,
+      "authorization_ms": 10.766
     },
     {
       "query_id": "Q035",
@@ -669,8 +669,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.864,
-      "authorization_ms": 10.239
+      "search_ms": 2.448,
+      "authorization_ms": 12.95
     },
     {
       "query_id": "Q036",
@@ -683,8 +683,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.646,
-      "authorization_ms": 10.286
+      "search_ms": 1.338,
+      "authorization_ms": 12.027
     },
     {
       "query_id": "Q037",
@@ -697,8 +697,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.717,
-      "authorization_ms": 11.062
+      "search_ms": 2.002,
+      "authorization_ms": 11.282
     },
     {
       "query_id": "Q038",
@@ -711,8 +711,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.052,
-      "authorization_ms": 11.139
+      "search_ms": 1.987,
+      "authorization_ms": 10.716
     },
     {
       "query_id": "Q039",
@@ -725,8 +725,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.888,
-      "authorization_ms": 10.194
+      "search_ms": 1.393,
+      "authorization_ms": 10.902
     },
     {
       "query_id": "Q040",
@@ -739,8 +739,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.255,
-      "authorization_ms": 10.275
+      "search_ms": 1.312,
+      "authorization_ms": 9.78
     },
     {
       "query_id": "Q041",
@@ -753,8 +753,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.269,
-      "authorization_ms": 9.864
+      "search_ms": 1.311,
+      "authorization_ms": 12.336
     },
     {
       "query_id": "Q042",
@@ -767,8 +767,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.339,
-      "authorization_ms": 10.225
+      "search_ms": 1.606,
+      "authorization_ms": 10.845
     },
     {
       "query_id": "Q043",
@@ -781,8 +781,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.319,
-      "authorization_ms": 10.401
+      "search_ms": 1.364,
+      "authorization_ms": 9.763
     },
     {
       "query_id": "Q044",
@@ -795,8 +795,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.946,
-      "authorization_ms": 10.855
+      "search_ms": 1.972,
+      "authorization_ms": 9.918
     },
     {
       "query_id": "Q045",
@@ -809,8 +809,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.081,
-      "authorization_ms": 11.091
+      "search_ms": 1.929,
+      "authorization_ms": 11.04
     },
     {
       "query_id": "Q046",
@@ -823,8 +823,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.349,
-      "authorization_ms": 10.769
+      "search_ms": 1.31,
+      "authorization_ms": 10.881
     },
     {
       "query_id": "Q047",
@@ -837,8 +837,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.313,
-      "authorization_ms": 10.237
+      "search_ms": 2.197,
+      "authorization_ms": 10.523
     },
     {
       "query_id": "Q048",
@@ -851,8 +851,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.318,
-      "authorization_ms": 10.364
+      "search_ms": 1.28,
+      "authorization_ms": 10.388
     },
     {
       "query_id": "Q049",
@@ -865,8 +865,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.314,
-      "authorization_ms": 10.121
+      "search_ms": 1.921,
+      "authorization_ms": 10.895
     },
     {
       "query_id": "Q050",
@@ -879,8 +879,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.269,
-      "authorization_ms": 10.589
+      "search_ms": 1.244,
+      "authorization_ms": 9.798
     },
     {
       "query_id": "Q051",
@@ -893,8 +893,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.145,
-      "authorization_ms": 16.273
+      "search_ms": 1.86,
+      "authorization_ms": 16.178
     },
     {
       "query_id": "Q052",
@@ -907,8 +907,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.744,
-      "authorization_ms": 15.279
+      "search_ms": 1.687,
+      "authorization_ms": 14.233
     },
     {
       "query_id": "Q053",
@@ -921,8 +921,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.803,
-      "authorization_ms": 14.85
+      "search_ms": 2.817,
+      "authorization_ms": 14.807
     },
     {
       "query_id": "Q054",
@@ -935,8 +935,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.326,
-      "authorization_ms": 14.091
+      "search_ms": 1.257,
+      "authorization_ms": 14.816
     },
     {
       "query_id": "Q055",
@@ -949,8 +949,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.299,
-      "authorization_ms": 13.365
+      "search_ms": 1.875,
+      "authorization_ms": 15.031
     },
     {
       "query_id": "Q056",
@@ -963,8 +963,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.444,
-      "authorization_ms": 13.396
+      "search_ms": 1.922,
+      "authorization_ms": 14.269
     },
     {
       "query_id": "Q057",
@@ -977,8 +977,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.295,
-      "authorization_ms": 14.729
+      "search_ms": 1.281,
+      "authorization_ms": 15.266
     },
     {
       "query_id": "Q058",
@@ -991,8 +991,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.385,
-      "authorization_ms": 15.114
+      "search_ms": 1.775,
+      "authorization_ms": 15.076
     },
     {
       "query_id": "Q059",
@@ -1005,8 +1005,8 @@
       "decision": "REVIEW",
       "reason": "trusted evidence is insufficient for the exclusion",
       "state": "COMPLETE",
-      "search_ms": 2.296,
-      "authorization_ms": 9.84
+      "search_ms": 2.425,
+      "authorization_ms": 10.626
     },
     {
       "query_id": "Q060",
@@ -1019,8 +1019,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.717,
-      "authorization_ms": 15.852
+      "search_ms": 1.784,
+      "authorization_ms": 14.699
     },
     {
       "query_id": "Q061",
@@ -1033,8 +1033,8 @@
       "decision": "REVIEW",
       "reason": "trusted evidence is insufficient for the exclusion",
       "state": "COMPLETE",
-      "search_ms": 1.377,
-      "authorization_ms": 10.131
+      "search_ms": 1.52,
+      "authorization_ms": 8.565
     },
     {
       "query_id": "Q062",
@@ -1047,8 +1047,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.165,
-      "authorization_ms": 14.15
+      "search_ms": 2.176,
+      "authorization_ms": 15.043
     },
     {
       "query_id": "Q063",
@@ -1061,8 +1061,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.691,
-      "authorization_ms": 13.973
+      "search_ms": 1.937,
+      "authorization_ms": 16.099
     },
     {
       "query_id": "Q064",
@@ -1075,8 +1075,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.353,
-      "authorization_ms": 13.963
+      "search_ms": 1.359,
+      "authorization_ms": 14.513
     },
     {
       "query_id": "Q065",
@@ -1089,8 +1089,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.384,
-      "authorization_ms": 14.433
+      "search_ms": 1.797,
+      "authorization_ms": 15.457
     },
     {
       "query_id": "Q066",
@@ -1103,8 +1103,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 3.043,
-      "authorization_ms": 14.6
+      "search_ms": 3.313,
+      "authorization_ms": 14.893
     },
     {
       "query_id": "Q067",
@@ -1117,8 +1117,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.035,
-      "authorization_ms": 13.598
+      "search_ms": 2.083,
+      "authorization_ms": 15.506
     },
     {
       "query_id": "Q068",
@@ -1131,8 +1131,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.732,
-      "authorization_ms": 13.399
+      "search_ms": 2.749,
+      "authorization_ms": 14.209
     },
     {
       "query_id": "Q069",
@@ -1145,8 +1145,8 @@
       "decision": "REVIEW",
       "reason": "trusted evidence is insufficient for the exclusion",
       "state": "COMPLETE",
-      "search_ms": 1.809,
-      "authorization_ms": 10.168
+      "search_ms": 1.702,
+      "authorization_ms": 9.754
     },
     {
       "query_id": "Q070",
@@ -1159,8 +1159,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.139,
-      "authorization_ms": 15.156
+      "search_ms": 2.787,
+      "authorization_ms": 14.719
     },
     {
       "query_id": "Q071",
@@ -1173,8 +1173,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 3.386,
-      "authorization_ms": 14.25
+      "search_ms": 3.201,
+      "authorization_ms": 13.558
     },
     {
       "query_id": "Q072",
@@ -1187,8 +1187,8 @@
       "decision": "REVIEW",
       "reason": "trusted evidence does not establish the declared purpose",
       "state": "COMPLETE",
-      "search_ms": 3.679,
-      "authorization_ms": 12.926
+      "search_ms": 3.545,
+      "authorization_ms": 10.279
     },
     {
       "query_id": "Q073",
@@ -1201,8 +1201,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 3.429,
-      "authorization_ms": 13.686
+      "search_ms": 3.155,
+      "authorization_ms": 14.138
     },
     {
       "query_id": "Q074",
@@ -1215,8 +1215,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.315,
-      "authorization_ms": 14.038
+      "search_ms": 2.41,
+      "authorization_ms": 15.142
     },
     {
       "query_id": "Q075",
@@ -1229,8 +1229,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 4.166,
-      "authorization_ms": 14.043
+      "search_ms": 4.392,
+      "authorization_ms": 15.08
     },
     {
       "query_id": "Q076",
@@ -1243,8 +1243,8 @@
       "decision": "REVIEW",
       "reason": "trusted evidence does not establish the declared purpose",
       "state": "COMPLETE",
-      "search_ms": 2.854,
-      "authorization_ms": 9.009
+      "search_ms": 2.791,
+      "authorization_ms": 10.266
     },
     {
       "query_id": "Q077",
@@ -1257,8 +1257,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.684,
-      "authorization_ms": 13.732
+      "search_ms": 2.657,
+      "authorization_ms": 14.853
     },
     {
       "query_id": "Q078",
@@ -1271,8 +1271,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.583,
-      "authorization_ms": 14.959
+      "search_ms": 1.648,
+      "authorization_ms": 14.082
     },
     {
       "query_id": "Q079",
@@ -1285,8 +1285,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 4.305,
-      "authorization_ms": 14.723
+      "search_ms": 3.286,
+      "authorization_ms": 14.95
     },
     {
       "query_id": "Q080",
@@ -1299,8 +1299,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.62,
-      "authorization_ms": 14.675
+      "search_ms": 1.778,
+      "authorization_ms": 14.775
     },
     {
       "query_id": "Q081",
@@ -1313,8 +1313,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.306,
-      "authorization_ms": 14.163
+      "search_ms": 2.434,
+      "authorization_ms": 14.499
     },
     {
       "query_id": "Q082",
@@ -1327,8 +1327,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.399,
-      "authorization_ms": 14.027
+      "search_ms": 2.613,
+      "authorization_ms": 14.757
     },
     {
       "query_id": "Q083",
@@ -1341,8 +1341,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.173,
-      "authorization_ms": 13.741
+      "search_ms": 2.528,
+      "authorization_ms": 13.942
     },
     {
       "query_id": "Q084",
@@ -1355,8 +1355,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.987,
-      "authorization_ms": 14.126
+      "search_ms": 3.098,
+      "authorization_ms": 14.834
     },
     {
       "query_id": "Q085",
@@ -1369,8 +1369,8 @@
       "decision": "REVIEW",
       "reason": "trusted evidence does not establish the declared purpose",
       "state": "COMPLETE",
-      "search_ms": 2.295,
-      "authorization_ms": 9.749
+      "search_ms": 2.424,
+      "authorization_ms": 10.129
     },
     {
       "query_id": "Q086",
@@ -1383,8 +1383,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.381,
-      "authorization_ms": 15.117
+      "search_ms": 1.441,
+      "authorization_ms": 13.97
     },
     {
       "query_id": "Q087",
@@ -1397,8 +1397,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.493,
-      "authorization_ms": 14.106
+      "search_ms": 1.529,
+      "authorization_ms": 30.739
     },
     {
       "query_id": "Q088",
@@ -1411,8 +1411,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.886,
-      "authorization_ms": 14.431
+      "search_ms": 2.414,
+      "authorization_ms": 18.734
     },
     {
       "query_id": "Q089",
@@ -1425,8 +1425,8 @@
       "decision": "REVIEW",
       "reason": "trusted evidence is insufficient for the exclusion",
       "state": "COMPLETE",
-      "search_ms": 1.393,
-      "authorization_ms": 8.775
+      "search_ms": 1.554,
+      "authorization_ms": 9.95
     },
     {
       "query_id": "Q090",
@@ -1439,8 +1439,8 @@
       "decision": "BLOCK",
       "reason": "trusted evidence includes the prohibited characteristic",
       "state": "COMPLETE",
-      "search_ms": 1.36,
-      "authorization_ms": 6.486
+      "search_ms": 1.42,
+      "authorization_ms": 6.451
     },
     {
       "query_id": "Q091",
@@ -1453,8 +1453,8 @@
       "decision": "REVIEW",
       "reason": "trusted evidence is insufficient for the exclusion",
       "state": "COMPLETE",
-      "search_ms": 1.376,
-      "authorization_ms": 8.85
+      "search_ms": 1.842,
+      "authorization_ms": 8.731
     },
     {
       "query_id": "Q092",
@@ -1467,8 +1467,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.564,
-      "authorization_ms": 13.634
+      "search_ms": 1.393,
+      "authorization_ms": 14.542
     },
     {
       "query_id": "Q093",
@@ -1481,8 +1481,8 @@
       "decision": "REVIEW",
       "reason": "trusted evidence is insufficient for the exclusion",
       "state": "COMPLETE",
-      "search_ms": 1.928,
-      "authorization_ms": 8.467
+      "search_ms": 2.123,
+      "authorization_ms": 10.037
     },
     {
       "query_id": "Q094",
@@ -1495,8 +1495,8 @@
       "decision": "BLOCK",
       "reason": "trusted evidence includes the prohibited characteristic",
       "state": "COMPLETE",
-      "search_ms": 2.092,
-      "authorization_ms": 5.411
+      "search_ms": 2.338,
+      "authorization_ms": 6.038
     },
     {
       "query_id": "Q095",
@@ -1509,8 +1509,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.638,
-      "authorization_ms": 13.581
+      "search_ms": 3.594,
+      "authorization_ms": 15.606
     },
     {
       "query_id": "Q096",
@@ -1523,8 +1523,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.876,
-      "authorization_ms": 9.104
+      "search_ms": 3.464,
+      "authorization_ms": 10.121
     },
     {
       "query_id": "Q097",
@@ -1537,8 +1537,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.872,
-      "authorization_ms": 11.071
+      "search_ms": 2.027,
+      "authorization_ms": 9.932
     },
     {
       "query_id": "Q098",
@@ -1551,8 +1551,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.48,
-      "authorization_ms": 11.103
+      "search_ms": 1.261,
+      "authorization_ms": 10.5
     },
     {
       "query_id": "Q099",
@@ -1565,8 +1565,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.85,
-      "authorization_ms": 10.539
+      "search_ms": 2.937,
+      "authorization_ms": 11.528
     },
     {
       "query_id": "Q100",
@@ -1579,8 +1579,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.076,
-      "authorization_ms": 10.761
+      "search_ms": 2.532,
+      "authorization_ms": 10.965
     },
     {
       "query_id": "Q101",
@@ -1593,8 +1593,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.677,
-      "authorization_ms": 13.93
+      "search_ms": 2.77,
+      "authorization_ms": 16.023
     },
     {
       "query_id": "Q102",
@@ -1607,8 +1607,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.439,
-      "authorization_ms": 10.542
+      "search_ms": 2.588,
+      "authorization_ms": 12.753
     },
     {
       "query_id": "Q103",
@@ -1621,8 +1621,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.297,
-      "authorization_ms": 9.833
+      "search_ms": 3.092,
+      "authorization_ms": 10.596
     },
     {
       "query_id": "Q104",
@@ -1635,8 +1635,8 @@
       "decision": "REVIEW",
       "reason": "trusted evidence does not establish the declared purpose",
       "state": "COMPLETE",
-      "search_ms": 3.385,
-      "authorization_ms": 9.011
+      "search_ms": 3.458,
+      "authorization_ms": 12.082
     },
     {
       "query_id": "Q105",
@@ -1649,8 +1649,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.628,
-      "authorization_ms": 11.635
+      "search_ms": 2.347,
+      "authorization_ms": 11.515
     },
     {
       "query_id": "Q106",
@@ -1663,8 +1663,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.292,
-      "authorization_ms": 14.87
+      "search_ms": 1.351,
+      "authorization_ms": 14.894
     },
     {
       "query_id": "Q107",
@@ -1677,8 +1677,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.698,
-      "authorization_ms": 9.96
+      "search_ms": 2.897,
+      "authorization_ms": 12.978
     },
     {
       "query_id": "Q108",
@@ -1691,8 +1691,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.668,
-      "authorization_ms": 20.782
+      "search_ms": 1.739,
+      "authorization_ms": 10.336
     },
     {
       "query_id": "Q109",
@@ -1705,8 +1705,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 3.813,
-      "authorization_ms": 14.171
+      "search_ms": 1.233,
+      "authorization_ms": 10.032
     },
     {
       "query_id": "Q110",
@@ -1719,8 +1719,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.303,
-      "authorization_ms": 10.561
+      "search_ms": 1.265,
+      "authorization_ms": 11.637
     },
     {
       "query_id": "Q111",
@@ -1733,8 +1733,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.693,
-      "authorization_ms": 10.698
+      "search_ms": 1.78,
+      "authorization_ms": 11.486
     },
     {
       "query_id": "Q112",
@@ -1747,8 +1747,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.954,
-      "authorization_ms": 11.361
+      "search_ms": 1.942,
+      "authorization_ms": 10.244
     },
     {
       "query_id": "Q113",
@@ -1761,8 +1761,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.43,
-      "authorization_ms": 10.176
+      "search_ms": 1.344,
+      "authorization_ms": 10.071
     },
     {
       "query_id": "Q114",
@@ -1775,8 +1775,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.573,
-      "authorization_ms": 10.559
+      "search_ms": 1.532,
+      "authorization_ms": 12.738
     },
     {
       "query_id": "Q115",
@@ -1789,8 +1789,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.672,
-      "authorization_ms": 10.477
+      "search_ms": 2.794,
+      "authorization_ms": 10.493
     },
     {
       "query_id": "Q116",
@@ -1803,8 +1803,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.518,
-      "authorization_ms": 9.32
+      "search_ms": 1.844,
+      "authorization_ms": 10.917
     },
     {
       "query_id": "Q117",
@@ -1817,8 +1817,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.605,
-      "authorization_ms": 10.787
+      "search_ms": 3.267,
+      "authorization_ms": 11.222
     },
     {
       "query_id": "Q118",
@@ -1831,8 +1831,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 1.283,
-      "authorization_ms": 14.676
+      "search_ms": 1.693,
+      "authorization_ms": 15.17
     },
     {
       "query_id": "Q119",
@@ -1845,8 +1845,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.551,
-      "authorization_ms": 10.705
+      "search_ms": 2.704,
+      "authorization_ms": 10.825
     },
     {
       "query_id": "Q120",
@@ -1859,8 +1859,8 @@
       "decision": "ALLOW",
       "reason": "All applicable deterministic and semantic checks passed.",
       "state": "COMPLETE",
-      "search_ms": 2.841,
-      "authorization_ms": 10.727
+      "search_ms": 2.794,
+      "authorization_ms": 10.54
     }
   ],
   "insistent_outcomes": [
@@ -1875,8 +1875,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.845,
-      "authorization_ms": 3.122
+      "search_ms": 1.92,
+      "authorization_ms": 3.411
     },
     {
       "query_id": "Q002",
@@ -1889,8 +1889,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.215,
-      "authorization_ms": 3.036
+      "search_ms": 1.203,
+      "authorization_ms": 3.143
     },
     {
       "query_id": "Q003",
@@ -1903,8 +1903,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 2.646,
-      "authorization_ms": 2.814
+      "search_ms": 2.664,
+      "authorization_ms": 2.793
     },
     {
       "query_id": "Q004",
@@ -1917,8 +1917,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 2.553,
-      "authorization_ms": 2.842
+      "search_ms": 2.405,
+      "authorization_ms": 2.879
     },
     {
       "query_id": "Q005",
@@ -1931,8 +1931,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.556,
-      "authorization_ms": 2.719
+      "search_ms": 1.617,
+      "authorization_ms": 3.375
     },
     {
       "query_id": "Q006",
@@ -1945,8 +1945,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.644,
-      "authorization_ms": 2.866
+      "search_ms": 1.685,
+      "authorization_ms": 2.926
     },
     {
       "query_id": "Q007",
@@ -1959,8 +1959,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.191,
-      "authorization_ms": 2.642
+      "search_ms": 1.29,
+      "authorization_ms": 2.782
     },
     {
       "query_id": "Q008",
@@ -1973,8 +1973,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.24,
-      "authorization_ms": 3.751
+      "search_ms": 1.537,
+      "authorization_ms": 5.127
     },
     {
       "query_id": "Q009",
@@ -1987,8 +1987,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 2.731,
-      "authorization_ms": 2.902
+      "search_ms": 1.204,
+      "authorization_ms": 2.842
     },
     {
       "query_id": "Q010",
@@ -2001,8 +2001,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.211,
-      "authorization_ms": 2.746
+      "search_ms": 1.186,
+      "authorization_ms": 2.658
     },
     {
       "query_id": "Q011",
@@ -2015,8 +2015,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.603,
-      "authorization_ms": 2.998
+      "search_ms": 1.531,
+      "authorization_ms": 3.871
     },
     {
       "query_id": "Q012",
@@ -2029,8 +2029,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.837,
-      "authorization_ms": 2.929
+      "search_ms": 1.909,
+      "authorization_ms": 2.893
     },
     {
       "query_id": "Q013",
@@ -2043,8 +2043,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.306,
-      "authorization_ms": 2.877
+      "search_ms": 1.309,
+      "authorization_ms": 2.625
     },
     {
       "query_id": "Q014",
@@ -2057,8 +2057,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.209,
-      "authorization_ms": 3.032
+      "search_ms": 1.462,
+      "authorization_ms": 3.688
     },
     {
       "query_id": "Q015",
@@ -2071,8 +2071,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.862,
-      "authorization_ms": 2.33
+      "search_ms": 2.05,
+      "authorization_ms": 2.694
     },
     {
       "query_id": "Q016",
@@ -2085,8 +2085,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.275,
-      "authorization_ms": 2.371
+      "search_ms": 1.327,
+      "authorization_ms": 2.862
     },
     {
       "query_id": "Q017",
@@ -2099,8 +2099,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 20.467,
-      "authorization_ms": 3.028
+      "search_ms": 18.35,
+      "authorization_ms": 2.899
     },
     {
       "query_id": "Q018",
@@ -2113,8 +2113,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 2.037,
-      "authorization_ms": 3.15
+      "search_ms": 1.708,
+      "authorization_ms": 3.201
     },
     {
       "query_id": "Q019",
@@ -2127,8 +2127,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.276,
-      "authorization_ms": 3.153
+      "search_ms": 1.283,
+      "authorization_ms": 3.345
     },
     {
       "query_id": "Q020",
@@ -2141,8 +2141,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.182,
-      "authorization_ms": 3.084
+      "search_ms": 1.263,
+      "authorization_ms": 3.375
     },
     {
       "query_id": "Q021",
@@ -2155,8 +2155,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.626,
-      "authorization_ms": 4.941
+      "search_ms": 1.573,
+      "authorization_ms": 2.95
     },
     {
       "query_id": "Q022",
@@ -2169,8 +2169,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.842,
-      "authorization_ms": 3.023
+      "search_ms": 1.938,
+      "authorization_ms": 3.077
     },
     {
       "query_id": "Q023",
@@ -2183,8 +2183,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.762,
-      "authorization_ms": 2.661
+      "search_ms": 1.693,
+      "authorization_ms": 2.665
     },
     {
       "query_id": "Q024",
@@ -2197,8 +2197,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.335,
-      "authorization_ms": 3.134
+      "search_ms": 1.366,
+      "authorization_ms": 3.177
     },
     {
       "query_id": "Q025",
@@ -2211,8 +2211,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.754,
-      "authorization_ms": 4.302
+      "search_ms": 1.841,
+      "authorization_ms": 2.915
     },
     {
       "query_id": "Q026",
@@ -2225,8 +2225,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.202,
-      "authorization_ms": 2.681
+      "search_ms": 1.596,
+      "authorization_ms": 2.682
     },
     {
       "query_id": "Q027",
@@ -2239,8 +2239,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 2.718,
-      "authorization_ms": 2.991
+      "search_ms": 2.681,
+      "authorization_ms": 3.986
     },
     {
       "query_id": "Q028",
@@ -2253,8 +2253,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.215,
-      "authorization_ms": 2.573
+      "search_ms": 1.88,
+      "authorization_ms": 3.006
     },
     {
       "query_id": "Q029",
@@ -2267,8 +2267,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.31,
-      "authorization_ms": 2.708
+      "search_ms": 1.341,
+      "authorization_ms": 2.871
     },
     {
       "query_id": "Q030",
@@ -2281,8 +2281,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.231,
-      "authorization_ms": 2.911
+      "search_ms": 1.239,
+      "authorization_ms": 3.832
     },
     {
       "query_id": "Q031",
@@ -2295,8 +2295,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.232,
-      "authorization_ms": 2.801
+      "search_ms": 1.53,
+      "authorization_ms": 2.812
     },
     {
       "query_id": "Q032",
@@ -2309,8 +2309,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.309,
-      "authorization_ms": 2.984
+      "search_ms": 1.334,
+      "authorization_ms": 3.041
     },
     {
       "query_id": "Q033",
@@ -2323,8 +2323,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 2.602,
-      "authorization_ms": 2.955
+      "search_ms": 2.18,
+      "authorization_ms": 2.934
     },
     {
       "query_id": "Q034",
@@ -2337,8 +2337,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.471,
-      "authorization_ms": 2.578
+      "search_ms": 1.854,
+      "authorization_ms": 2.614
     },
     {
       "query_id": "Q035",
@@ -2351,8 +2351,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 2.498,
-      "authorization_ms": 2.862
+      "search_ms": 2.434,
+      "authorization_ms": 2.801
     },
     {
       "query_id": "Q036",
@@ -2365,8 +2365,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.164,
-      "authorization_ms": 2.835
+      "search_ms": 1.463,
+      "authorization_ms": 3.124
     },
     {
       "query_id": "Q037",
@@ -2379,8 +2379,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.903,
-      "authorization_ms": 2.58
+      "search_ms": 2.604,
+      "authorization_ms": 3.601
     },
     {
       "query_id": "Q038",
@@ -2393,8 +2393,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 2.338,
-      "authorization_ms": 6.65
+      "search_ms": 2.013,
+      "authorization_ms": 2.822
     },
     {
       "query_id": "Q039",
@@ -2407,8 +2407,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.397,
-      "authorization_ms": 3.089
+      "search_ms": 1.427,
+      "authorization_ms": 3.638
     },
     {
       "query_id": "Q040",
@@ -2421,8 +2421,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.193,
-      "authorization_ms": 2.675
+      "search_ms": 1.775,
+      "authorization_ms": 3.406
     },
     {
       "query_id": "Q041",
@@ -2435,8 +2435,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.209,
-      "authorization_ms": 2.778
+      "search_ms": 1.291,
+      "authorization_ms": 2.712
     },
     {
       "query_id": "Q042",
@@ -2449,8 +2449,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.251,
-      "authorization_ms": 2.655
+      "search_ms": 1.242,
+      "authorization_ms": 2.765
     },
     {
       "query_id": "Q043",
@@ -2463,8 +2463,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.238,
-      "authorization_ms": 2.55
+      "search_ms": 1.262,
+      "authorization_ms": 3.032
     },
     {
       "query_id": "Q044",
@@ -2477,8 +2477,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.869,
-      "authorization_ms": 4.0
+      "search_ms": 2.059,
+      "authorization_ms": 2.649
     },
     {
       "query_id": "Q045",
@@ -2491,8 +2491,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 2.6,
-      "authorization_ms": 3.008
+      "search_ms": 2.015,
+      "authorization_ms": 3.7
     },
     {
       "query_id": "Q046",
@@ -2505,8 +2505,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.251,
-      "authorization_ms": 2.828
+      "search_ms": 1.456,
+      "authorization_ms": 3.591
     },
     {
       "query_id": "Q047",
@@ -2519,8 +2519,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 2.253,
-      "authorization_ms": 2.898
+      "search_ms": 2.279,
+      "authorization_ms": 3.29
     },
     {
       "query_id": "Q048",
@@ -2533,8 +2533,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.231,
-      "authorization_ms": 3.037
+      "search_ms": 1.384,
+      "authorization_ms": 2.945
     },
     {
       "query_id": "Q049",
@@ -2547,8 +2547,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.225,
-      "authorization_ms": 2.654
+      "search_ms": 1.278,
+      "authorization_ms": 3.093
     },
     {
       "query_id": "Q050",
@@ -2561,8 +2561,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.22,
-      "authorization_ms": 2.682
+      "search_ms": 1.631,
+      "authorization_ms": 2.864
     },
     {
       "query_id": "Q051",
@@ -2575,8 +2575,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.797,
-      "authorization_ms": 3.192
+      "search_ms": 1.795,
+      "authorization_ms": 3.332
     },
     {
       "query_id": "Q052",
@@ -2589,8 +2589,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.643,
-      "authorization_ms": 2.765
+      "search_ms": 1.628,
+      "authorization_ms": 2.934
     },
     {
       "query_id": "Q053",
@@ -2603,8 +2603,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 2.643,
-      "authorization_ms": 2.973
+      "search_ms": 3.232,
+      "authorization_ms": 4.283
     },
     {
       "query_id": "Q054",
@@ -2617,8 +2617,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.23,
-      "authorization_ms": 2.719
+      "search_ms": 1.453,
+      "authorization_ms": 3.066
     },
     {
       "query_id": "Q055",
@@ -2631,8 +2631,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.213,
-      "authorization_ms": 2.666
+      "search_ms": 1.634,
+      "authorization_ms": 4.333
     },
     {
       "query_id": "Q056",
@@ -2645,8 +2645,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.384,
-      "authorization_ms": 2.731
+      "search_ms": 1.709,
+      "authorization_ms": 3.827
     },
     {
       "query_id": "Q057",
@@ -2659,8 +2659,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.46,
-      "authorization_ms": 3.063
+      "search_ms": 1.614,
+      "authorization_ms": 3.317
     },
     {
       "query_id": "Q058",
@@ -2673,8 +2673,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.373,
-      "authorization_ms": 3.28
+      "search_ms": 1.407,
+      "authorization_ms": 6.148
     },
     {
       "query_id": "Q059",
@@ -2687,8 +2687,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.908,
-      "authorization_ms": 3.132
+      "search_ms": 2.275,
+      "authorization_ms": 3.328
     },
     {
       "query_id": "Q060",
@@ -2701,8 +2701,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.615,
-      "authorization_ms": 3.182
+      "search_ms": 1.7,
+      "authorization_ms": 3.419
     },
     {
       "query_id": "Q061",
@@ -2715,8 +2715,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.307,
-      "authorization_ms": 2.939
+      "search_ms": 2.611,
+      "authorization_ms": 3.441
     },
     {
       "query_id": "Q062",
@@ -2729,8 +2729,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 2.055,
-      "authorization_ms": 2.764
+      "search_ms": 2.321,
+      "authorization_ms": 3.156
     },
     {
       "query_id": "Q063",
@@ -2743,8 +2743,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.532,
-      "authorization_ms": 2.755
+      "search_ms": 1.784,
+      "authorization_ms": 3.121
     },
     {
       "query_id": "Q064",
@@ -2757,8 +2757,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.234,
-      "authorization_ms": 2.802
+      "search_ms": 1.622,
+      "authorization_ms": 3.104
     },
     {
       "query_id": "Q065",
@@ -2771,8 +2771,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.334,
-      "authorization_ms": 2.645
+      "search_ms": 1.357,
+      "authorization_ms": 2.773
     },
     {
       "query_id": "Q066",
@@ -2785,8 +2785,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 2.687,
-      "authorization_ms": 3.171
+      "search_ms": 2.808,
+      "authorization_ms": 3.357
     },
     {
       "query_id": "Q067",
@@ -2799,8 +2799,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 2.016,
-      "authorization_ms": 2.742
+      "search_ms": 2.65,
+      "authorization_ms": 2.875
     },
     {
       "query_id": "Q068",
@@ -2813,8 +2813,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 2.446,
-      "authorization_ms": 2.545
+      "search_ms": 2.594,
+      "authorization_ms": 3.886
     },
     {
       "query_id": "Q069",
@@ -2827,8 +2827,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.595,
-      "authorization_ms": 2.513
+      "search_ms": 1.82,
+      "authorization_ms": 4.36
     },
     {
       "query_id": "Q070",
@@ -2841,8 +2841,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.872,
-      "authorization_ms": 3.011
+      "search_ms": 2.154,
+      "authorization_ms": 3.508
     },
     {
       "query_id": "Q071",
@@ -2855,8 +2855,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 3.602,
-      "authorization_ms": 3.02
+      "search_ms": 3.398,
+      "authorization_ms": 3.323
     },
     {
       "query_id": "Q072",
@@ -2869,8 +2869,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 3.456,
-      "authorization_ms": 3.034
+      "search_ms": 4.322,
+      "authorization_ms": 3.754
     },
     {
       "query_id": "Q073",
@@ -2883,8 +2883,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 3.195,
-      "authorization_ms": 3.201
+      "search_ms": 2.983,
+      "authorization_ms": 3.504
     },
     {
       "query_id": "Q074",
@@ -2897,8 +2897,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 2.232,
-      "authorization_ms": 2.739
+      "search_ms": 2.931,
+      "authorization_ms": 3.225
     },
     {
       "query_id": "Q075",
@@ -2911,8 +2911,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 3.943,
-      "authorization_ms": 3.391
+      "search_ms": 5.5,
+      "authorization_ms": 3.36
     },
     {
       "query_id": "Q076",
@@ -2925,8 +2925,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 3.354,
-      "authorization_ms": 4.711
+      "search_ms": 3.337,
+      "authorization_ms": 3.756
     },
     {
       "query_id": "Q077",
@@ -2939,8 +2939,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 2.656,
-      "authorization_ms": 4.876
+      "search_ms": 2.599,
+      "authorization_ms": 3.097
     },
     {
       "query_id": "Q078",
@@ -2953,8 +2953,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.65,
-      "authorization_ms": 4.289
+      "search_ms": 1.54,
+      "authorization_ms": 5.514
     },
     {
       "query_id": "Q079",
@@ -2967,8 +2967,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 2.998,
-      "authorization_ms": 2.805
+      "search_ms": 14.909,
+      "authorization_ms": 15.074
     },
     {
       "query_id": "Q081",
@@ -2981,8 +2981,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 2.168,
-      "authorization_ms": 3.249
+      "search_ms": 13.905,
+      "authorization_ms": 19.669
     },
     {
       "query_id": "Q082",
@@ -2995,8 +2995,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 2.401,
-      "authorization_ms": 3.058
+      "search_ms": 12.535,
+      "authorization_ms": 17.524
     },
     {
       "query_id": "Q083",
@@ -3009,8 +3009,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 2.053,
-      "authorization_ms": 3.009
+      "search_ms": 12.7,
+      "authorization_ms": 16.097
     },
     {
       "query_id": "Q084",
@@ -3023,8 +3023,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 2.96,
-      "authorization_ms": 6.94
+      "search_ms": 13.786,
+      "authorization_ms": 14.897
     },
     {
       "query_id": "Q085",
@@ -3037,8 +3037,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 2.126,
-      "authorization_ms": 4.876
+      "search_ms": 11.469,
+      "authorization_ms": 15.196
     },
     {
       "query_id": "Q088",
@@ -3051,8 +3051,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 1.724,
-      "authorization_ms": 4.727
+      "search_ms": 7.511,
+      "authorization_ms": 13.407
     },
     {
       "query_id": "Q090",
@@ -3065,8 +3065,8 @@
       "decision": "BLOCK",
       "reason": "catalog marks a selected SKU as recurring but the mandate forbids recurrence",
       "state": "COMPLETE",
-      "search_ms": 1.744,
-      "authorization_ms": 4.501
+      "search_ms": 6.234,
+      "authorization_ms": 15.378
     },
     {
       "query_id": "Q091",
@@ -3079,8 +3079,8 @@
       "decision": "BLOCK",
       "reason": "catalog marks a selected SKU as recurring but the mandate forbids recurrence",
       "state": "COMPLETE",
-      "search_ms": 1.822,
-      "authorization_ms": 6.671
+      "search_ms": 7.517,
+      "authorization_ms": 15.035
     },
     {
       "query_id": "Q092",
@@ -3093,8 +3093,8 @@
       "decision": "BLOCK",
       "reason": "catalog marks a selected SKU as recurring but the mandate forbids recurrence",
       "state": "COMPLETE",
-      "search_ms": 2.015,
-      "authorization_ms": 16.989
+      "search_ms": 12.144,
+      "authorization_ms": 15.986
     },
     {
       "query_id": "Q093",
@@ -3107,8 +3107,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 9.373,
-      "authorization_ms": 15.863
+      "search_ms": 9.714,
+      "authorization_ms": 15.291
     },
     {
       "query_id": "Q094",
@@ -3121,8 +3121,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 11.295,
-      "authorization_ms": 15.712
+      "search_ms": 9.963,
+      "authorization_ms": 14.247
     },
     {
       "query_id": "Q095",
@@ -3135,8 +3135,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 10.155,
-      "authorization_ms": 17.096
+      "search_ms": 8.73,
+      "authorization_ms": 16.124
     },
     {
       "query_id": "Q101",
@@ -3149,8 +3149,8 @@
       "decision": "BLOCK",
       "reason": "catalog marks a selected SKU as recurring but the mandate forbids recurrence",
       "state": "COMPLETE",
-      "search_ms": 11.152,
-      "authorization_ms": 14.379
+      "search_ms": 14.73,
+      "authorization_ms": 15.2
     },
     {
       "query_id": "Q105",
@@ -3163,8 +3163,8 @@
       "decision": "BLOCK",
       "reason": "catalog marks a selected SKU as recurring but the mandate forbids recurrence",
       "state": "COMPLETE",
-      "search_ms": 7.303,
-      "authorization_ms": 14.52
+      "search_ms": 10.612,
+      "authorization_ms": 15.106
     },
     {
       "query_id": "Q106",
@@ -3177,8 +3177,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 8.303,
-      "authorization_ms": 17.559
+      "search_ms": 6.002,
+      "authorization_ms": 19.562
     },
     {
       "query_id": "Q107",
@@ -3191,8 +3191,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 13.89,
-      "authorization_ms": 16.731
+      "search_ms": 18.422,
+      "authorization_ms": 17.866
     },
     {
       "query_id": "Q108",
@@ -3205,8 +3205,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 9.995,
-      "authorization_ms": 16.481
+      "search_ms": 10.594,
+      "authorization_ms": 15.641
     },
     {
       "query_id": "Q109",
@@ -3219,8 +3219,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 7.141,
-      "authorization_ms": 16.338
+      "search_ms": 6.287,
+      "authorization_ms": 17.148
     },
     {
       "query_id": "Q110",
@@ -3233,8 +3233,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 6.705,
-      "authorization_ms": 15.079
+      "search_ms": 7.277,
+      "authorization_ms": 15.006
     },
     {
       "query_id": "Q111",
@@ -3247,8 +3247,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 9.346,
-      "authorization_ms": 17.65
+      "search_ms": 9.115,
+      "authorization_ms": 19.004
     },
     {
       "query_id": "Q112",
@@ -3261,8 +3261,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 11.364,
-      "authorization_ms": 16.654
+      "search_ms": 11.442,
+      "authorization_ms": 18.131
     },
     {
       "query_id": "Q113",
@@ -3275,8 +3275,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 9.348,
-      "authorization_ms": 15.592
+      "search_ms": 9.292,
+      "authorization_ms": 15.504
     },
     {
       "query_id": "Q114",
@@ -3289,8 +3289,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 10.725,
-      "authorization_ms": 18.163
+      "search_ms": 10.82,
+      "authorization_ms": 24.488
     },
     {
       "query_id": "Q115",
@@ -3303,8 +3303,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 15.294,
-      "authorization_ms": 19.488
+      "search_ms": 16.089,
+      "authorization_ms": 16.429
     },
     {
       "query_id": "Q116",
@@ -3317,8 +3317,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 9.831,
-      "authorization_ms": 20.74
+      "search_ms": 8.703,
+      "authorization_ms": 16.204
     },
     {
       "query_id": "Q117",
@@ -3331,8 +3331,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 12.385,
-      "authorization_ms": 14.782
+      "search_ms": 14.899,
+      "authorization_ms": 13.548
     },
     {
       "query_id": "Q118",
@@ -3345,8 +3345,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 7.404,
-      "authorization_ms": 17.719
+      "search_ms": 6.511,
+      "authorization_ms": 21.075
     },
     {
       "query_id": "Q119",
@@ -3359,8 +3359,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 12.984,
-      "authorization_ms": 16.041
+      "search_ms": 15.317,
+      "authorization_ms": 18.716
     },
     {
       "query_id": "Q120",
@@ -3373,8 +3373,8 @@
       "decision": "BLOCK",
       "reason": "catalog-derived total must equal the declared charge and stay within the mandate ceiling",
       "state": "COMPLETE",
-      "search_ms": 14.655,
-      "authorization_ms": 16.981
+      "search_ms": 15.977,
+      "authorization_ms": 15.146
     }
   ]
 }

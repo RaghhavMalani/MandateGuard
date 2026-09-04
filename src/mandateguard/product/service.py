@@ -127,8 +127,10 @@ from mandateguard.product.playground import (
 )
 from mandateguard.product.recovery_config import build_recovery_registry
 from mandateguard.sandbox.buyer import SandboxBuyer
+from mandateguard.sandbox.intent import SandboxIntentError, read_intent
 from mandateguard.sandbox.scenarios import Scenario
 from mandateguard.sandbox.session import JudgeSession
+from mandateguard.sandbox.templates import BRANDS as SANDBOX_BRANDS
 from mandateguard.product.scale_evidence import (
     load_model_quality,
     load_scale_evidence,
@@ -1146,11 +1148,24 @@ class CommerceLabService:
     def playground_run_snapshot(
         self, run: CommerceRun, plan_intent: Any = None
     ) -> dict[str, Any]:
-        """A run snapshot with the Playground's decision narration attached."""
+        """A run snapshot with the Playground's decision narration attached.
+
+        Sandbox runs carry the reading their plan was built from. A registered
+        preset run - the recoverable-REVIEW journey is one - has no plan, so the
+        reading is recomputed from the run's own recorded intent. That is a
+        second advisory read of the same text with no authority over anything:
+        ``explain_decision`` only restates what the finished run recorded, and a
+        text this reader cannot parse costs the panel, never the verdict.
+        """
 
         snapshot = run.snapshot()
         result = snapshot.get("result")
         intent = plan_intent if plan_intent is not None else getattr(run.plan, "intent", None)
+        if intent is None:
+            try:
+                intent = read_intent(run.user_intent, known_brands=SANDBOX_BRANDS)
+            except (SandboxIntentError, MonetaryConstraintError, ValueError):
+                intent = None
         if isinstance(result, dict) and intent is not None:
             snapshot["explanation"] = explain_decision(result, intent)
         return snapshot
@@ -1162,6 +1177,12 @@ class CommerceLabService:
         depth rather than the only thing standing between two visitors. It is
         here because a revocation demo that could cancel a stranger's
         capability would be demonstrating the wrong thing.
+
+        The authority is the session recorded on the run itself, which is
+        written once when the run is created and never changes. The session's
+        own list of run identifiers is a bounded recency window kept for
+        accounting, and gating on that instead would lock a busy visitor out of
+        their own older runs the moment the window rolled over.
         """
 
         if run.session_id is None:
@@ -1170,10 +1191,7 @@ class CommerceLabService:
             session = self.playground.require_session(session_id)
         except PlaygroundError as error:
             raise PermissionError("the Playground session is unavailable") from error
-        if (
-            session.session_id != run.session_id
-            or not self.playground.sessions.owns_run(session, run.run_id)
-        ):
+        if session.session_id != run.session_id:
             raise PermissionError("this run belongs to another Playground session")
 
     def playground_onboarding_form(

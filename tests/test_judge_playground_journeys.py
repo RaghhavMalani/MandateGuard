@@ -29,7 +29,10 @@ import pytest
 from mandateguard.models.decision import DecisionAction
 from mandateguard.product.playground import PlaygroundError, explain_decision
 from mandateguard.product.service import CommerceLabService
-from mandateguard.sandbox.session import MAX_ONBOARDED_PER_SESSION
+from mandateguard.sandbox.session import (
+    MAX_ONBOARDED_PER_SESSION,
+    MAX_RUNS_PER_SESSION,
+)
 from mandateguard.sandbox.templates import EvidenceFamily
 
 
@@ -953,3 +956,36 @@ def test_the_playground_works_without_the_historical_marketplace_catalog() -> No
             assert result["execution"]["external_network_calls"] == 0
     finally:
         shutil.rmtree(root, ignore_errors=True)
+
+
+def test_a_busy_visitor_keeps_access_to_their_own_older_runs(
+    service: CommerceLabService, no_network: None
+) -> None:
+    """The session on the run is the authority, not a bounded recency list.
+
+    A visitor's run list is capped, so a session that starts more runs than the
+    cap drops its oldest identifiers. If access were gated on that list, the
+    visitor would be told their own first run belonged to somebody else.
+    """
+
+    session = session_id(service)
+    intent = "Buy a desk lamp under INR 3,000. No subscriptions."
+    payload = service.playground_search(intent=intent, top_k=6, session_id=session)
+    product_id = payload["candidates"][0]["catalog_product_id"]
+    first, _deduplicated, _session = service.playground_authorize(
+        intent=intent,
+        catalog_product_id=product_id,
+        request_id="busy_first_" + uuid4().hex,
+        session_id=session,
+    )
+    assert first.completion.wait(60)
+
+    live = service.playground.sessions.get(session)
+    for index in range(MAX_RUNS_PER_SESSION + 2):
+        service.playground.sessions.record_run(live, f"run_{index:032x}")
+    assert not service.playground.sessions.owns_run(live, first.run_id)
+
+    # Still theirs, and still refused to everybody else.
+    service.authorize_run_access(first, session)
+    with pytest.raises(PermissionError):
+        service.authorize_run_access(first, session_id(service))
