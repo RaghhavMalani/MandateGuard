@@ -27,6 +27,7 @@ DENSE_WEIGHT = 0.5
 CANDIDATE_LIMIT = 100
 FINAL_LIMIT = 10
 EVALUATION_SEQUENCE_LENGTH = 128
+ONNX_CPU_THREADS = 4
 
 
 def percentile(values: Sequence[float], q: float) -> float:
@@ -96,7 +97,7 @@ class OnnxSentenceEncoder:
         started = perf_counter()
         options = ort.SessionOptions()
         options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
-        options.intra_op_num_threads = 1
+        options.intra_op_num_threads = ONNX_CPU_THREADS
         options.inter_op_num_threads = 1
         self.session = ort.InferenceSession(
             str(spec.model_path), sess_options=options, providers=["CPUExecutionProvider"]
@@ -429,6 +430,7 @@ def evaluate_candidate(
         "evaluation_sequence_length": min(
             spec.maximum_sequence_length, EVALUATION_SEQUENCE_LENGTH
         ),
+        "onnx_cpu_threads": ONNX_CPU_THREADS,
         "normalization": "L2",
         "pooling": spec.pooling,
         "cold_load": {
