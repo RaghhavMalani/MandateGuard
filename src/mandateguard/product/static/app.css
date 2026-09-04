@@ -3165,6 +3165,59 @@ a { color: var(--blue); text-underline-offset: 3px; }
   color: var(--ink);
 }
 
+/* The unresolved-requirement panel. Warning-toned rather than error-toned:
+   nothing failed, and a question is being asked. */
+.pgclarify {
+  border: 1px solid var(--warning);
+  background: var(--warning-wash);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.pgclarify__head {
+  font: 600 14px/1.45 var(--body);
+  color: var(--warning-ink);
+  margin: 0 0 10px;
+  max-width: 72ch;
+}
+.pgclarify__list { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 6px; }
+.pgclarify__q {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--surface);
+  border-left: 3px solid var(--warning);
+}
+.pgclarify__q q { font: 600 14px/1.5 var(--body); color: var(--ink); }
+.pgclarify__cue {
+  font: 600 9px/1.4 var(--mono);
+  letter-spacing: .12em;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  padding: 2px 6px;
+  white-space: nowrap;
+}
+.pgclarify__body {
+  font: 400 13px/1.6 var(--body);
+  color: var(--muted-strong);
+  margin: 0 0 12px;
+  max-width: 72ch;
+}
+.pgclarify__k {
+  font: 600 10px/1.4 var(--mono);
+  letter-spacing: .12em;
+  color: var(--muted);
+  margin: 0 0 6px;
+}
+.pgclarify__recognized { margin: 0 0 10px; padding-left: 18px; }
+.pgclarify__recognized li {
+  font: 400 12px/1.6 var(--mono);
+  color: var(--muted-strong);
+  overflow-wrap: anywhere;
+}
+.pgclarify__note { font: 400 11px/1.5 var(--body); color: var(--muted); margin: 0; }
+
 .pg-candidates {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -3252,7 +3305,13 @@ a { color: var(--blue); text-underline-offset: 3px; }
   cursor: pointer;
   transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
 }
-.pgcard__go:hover { background: var(--blue); color: #fff; }
+.pgcard__go:hover:not(:disabled) { background: var(--blue); color: #fff; }
+.pgcard__go:disabled {
+  color: var(--muted);
+  border-color: var(--line-strong);
+  background: var(--surface-soft);
+  cursor: not-allowed;
+}
 
 /* ---------- no match ---------- */
 .nomatch { border: 1px solid var(--line-strong); padding: 16px; background: var(--surface-soft); }

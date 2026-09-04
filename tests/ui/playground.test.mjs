@@ -9,6 +9,7 @@ import {
   railProgress,
   railStates,
   renderChosenProduct,
+  renderClarificationRequired,
   renderGapFigure,
   renderJudgeHealth,
   renderNoMatch,
@@ -591,9 +592,24 @@ test("the outcome-mix panel labels itself an experience target", () => {
     ordinary: { rates: { ALLOW: 0.99, BLOCK: 0, REVIEW: 0.01, NO_RESULT: 0 } },
     insistent_selection: { rates: { ALLOW: 0, BLOCK: 1, REVIEW: 0, NO_RESULT: 0 } },
   });
-  assert.match(html, /120 frozen judge queries/);
+  assert.match(html, /120 fixed judge queries/);
   assert.match(html, /Insisting on a flagged listing/);
   assert.match(html, /experience target, not a safety contract/i);
+});
+
+test("the outcome-mix panel does not claim to be preregistered", () => {
+  const html = renderJudgeHealth({
+    queries: 120,
+    overall: { rates: { ALLOW: 0.9, BLOCK: 0.02, REVIEW: 0.08, NO_RESULT: 0 }, candidate_found_rate: 1 },
+    ordinary: { rates: { ALLOW: 0.99, BLOCK: 0, REVIEW: 0.01, NO_RESULT: 0 } },
+    insistent_selection: { rates: { ALLOW: 0, BLOCK: 1, REVIEW: 0, NO_RESULT: 0 } },
+  });
+  // The questions and the first measured report landed in one commit, so the
+  // panel says so rather than borrowing the credibility of a preregistration
+  // that did not happen.
+  assert.match(html, /landed in one\s+commit/);
+  assert.match(html, /not an independently preregistered evaluation/);
+  assert.doesNotMatch(html, /\bfrozen\b/);
 });
 
 test("a missing outcome report is reported as missing, not faked", () => {
@@ -735,4 +751,84 @@ test("escapeHtml is applied to every interpolated field on a candidate", () => {
   });
   assert.doesNotMatch(html, /<script>/);
   assert.ok(html.includes(escapeHtml(hostile)));
+});
+
+/* ---------------- unresolved requirements ---------------- */
+
+const UNRESOLVED_SEARCH = {
+  candidates: [CANDIDATE],
+  clarification_required: true,
+  clarification_message:
+    "I found matching products, but I could not safely interpret one of your requirements",
+  constraint_coverage: {
+    coverage_status: "UNRESOLVED_HARD_CONSTRAINT",
+    recognized_constraints: ["MAX_TOTAL: INR 3,000.00"],
+    unresolved_constraint_spans: [
+      { cue: "only", strength: "STRONG", start: 28, end: 32, text: "vegan materials only" },
+    ],
+    blocks_authorization: true,
+  },
+};
+
+test("an unresolved requirement is quoted back in the buyer's own words", () => {
+  const html = renderClarificationRequired(UNRESOLVED_SEARCH);
+  assert.match(html, /could not safely\s+interpret one of your requirements/);
+  assert.match(html, /vegan materials only/);
+  assert.match(html, /data-status="UNRESOLVED_HARD_CONSTRAINT"/);
+});
+
+test("the panel says plainly that nothing was issued and nothing was called", () => {
+  const html = renderClarificationRequired(UNRESOLVED_SEARCH);
+  assert.match(html, /No mandate was issued/);
+  assert.match(html, /no capability exists/);
+  assert.match(html, /no payment adapter was called/);
+});
+
+test("the panel still shows what the reader did understand", () => {
+  const html = renderClarificationRequired(UNRESOLVED_SEARCH);
+  assert.match(html, /WHAT IT DID READ AS ENFORCEABLE/);
+  assert.match(html, /MAX_TOTAL: INR 3,000.00/);
+});
+
+test("a fully covered instruction renders no clarification panel at all", () => {
+  assert.equal(renderClarificationRequired({ clarification_required: false }), "");
+  assert.equal(renderClarificationRequired(null), "");
+});
+
+test("authorization is not offerable while a requirement is unresolved", () => {
+  const html = renderPlaygroundCandidates(UNRESOLVED_SEARCH);
+  assert.match(html, /disabled/);
+  assert.match(html, /CLARIFY YOUR REQUIREMENT FIRST/);
+  assert.doesNotMatch(html, /CHECK AUTHORIZATION/);
+});
+
+test("authorization stays offerable when every requirement resolved", () => {
+  const html = renderPlaygroundCandidates({
+    candidates: [CANDIDATE],
+    clarification_required: false,
+  });
+  assert.match(html, /CHECK AUTHORIZATION/);
+  assert.doesNotMatch(html, /disabled/);
+});
+
+test("the clarification panel escapes the text it quotes back", () => {
+  const html = renderClarificationRequired({
+    clarification_required: true,
+    constraint_coverage: {
+      coverage_status: "UNRESOLVED_HARD_CONSTRAINT",
+      recognized_constraints: ['<img src=x onerror="alert(1)">'],
+      unresolved_constraint_spans: [
+        { cue: "only", strength: "</span><script>alert(2)</script>", text: "<script>alert(3)</script>" },
+      ],
+    },
+  });
+  assert.doesNotMatch(html, /<script>/);
+  assert.doesNotMatch(html, /<img src=x/);
+  assert.match(html, /&lt;script&gt;/);
+});
+
+test("the Playground markup and stylesheet carry the clarification region", () => {
+  assert.match(HTML, /id="pg-clarify-panel"/);
+  assert.match(CSS, /\.pgclarify\b/);
+  assert.match(CSS, /\.pgcard__go:disabled/);
 });

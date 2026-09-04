@@ -171,13 +171,21 @@ and are capped at 512 live, 8 onboarded merchants each, 64 runs each.
 python scripts/evaluate_judge_playground.py
 ```
 
-runs a frozen set of 120 realistic buying instructions
+runs a fixed set of 120 realistic buying instructions
 (`fixtures/playground/judge_queries.json`) through search, selection and the
 real controller, and writes
 `data/eval/judge-playground/JUDGE_QUERY_REPORT.json`.
 
 The query set records the *kind* of question each entry asks and never an
 expected verdict, so there is nothing to tune the world towards.
+
+This is a **fixed engineering UX evaluation, not a preregistered one.** The
+questions and the first measured report landed in the same commit, so nothing
+in the repository proves the questions were written before the outcomes were
+seen, and this document does not claim otherwise. What the version and digest
+fields do establish is that a later change to the questions is visible: the set
+is versioned (`query_set_version`) and the report records the world digest it
+was measured against.
 
 Two passes are measured, because they answer different questions:
 

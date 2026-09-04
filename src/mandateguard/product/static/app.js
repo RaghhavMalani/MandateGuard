@@ -2218,7 +2218,10 @@ export function renderWhyFound(why) {
     </div>`;
 }
 
-export function renderPlaygroundCandidate(candidate, { selected = false } = {}) {
+export function renderPlaygroundCandidate(
+  candidate,
+  { selected = false, clarificationRequired = false } = {},
+) {
   if (!candidate) return "";
   const recurring = candidate.recurring
     ? '<span class="pgcard__flag" data-tone="warn">RENEWING PLAN</span>'
@@ -2257,20 +2260,76 @@ export function renderPlaygroundCandidate(candidate, { selected = false } = {}) 
       </details>
       <button type="button" class="pgcard__go" data-authorize="${escapeHtml(
         candidate.catalog_product_id,
-      )}">CHECK AUTHORIZATION</button>
+      )}"${clarificationRequired ? " disabled" : ""}>${
+        clarificationRequired
+          ? "CLARIFY YOUR REQUIREMENT FIRST"
+          : "CHECK AUTHORIZATION"
+      }</button>
     </article>`;
 }
 
 export function renderPlaygroundCandidates(payload, selectedId = null) {
   const candidates = payload?.candidates || [];
   if (!candidates.length) return "";
+  const clarificationRequired = Boolean(payload?.clarification_required);
   return candidates
     .map((candidate) =>
       renderPlaygroundCandidate(candidate, {
         selected: candidate.catalog_product_id === selectedId,
+        clarificationRequired,
       }),
     )
     .join("");
+}
+
+/**
+ * The unresolved-requirement panel.
+ *
+ * A requirement MandateGuard could not read is not a search failure, so the
+ * matching products stay on screen; what is withheld is authorization. The
+ * words the person actually typed are quoted back, because the person is the
+ * only party who can say what they meant — and this product will not guess on
+ * their behalf.
+ */
+export function renderClarificationRequired(payload) {
+  if (!payload?.clarification_required) return "";
+  const coverage = payload.constraint_coverage || {};
+  const spans = coverage.unresolved_constraint_spans || [];
+  const quoted = spans
+    .map(
+      (span) =>
+        `<li class="pgclarify__q"><q>${escapeHtml(span.text)}</q>
+           <span class="pgclarify__cue" data-strength="${escapeHtml(
+             span.strength || "",
+           )}">${escapeHtml(span.strength || "")}</span></li>`,
+    )
+    .join("");
+  const recognized = (coverage.recognized_constraints || [])
+    .map((line) => `<li>${escapeHtml(line)}</li>`)
+    .join("");
+  return `
+    <div class="pgclarify" role="status" data-status="${escapeHtml(
+      coverage.coverage_status || "",
+    )}">
+      <p class="pgclarify__head">I found matching products, but I could not safely
+        interpret ${spans.length === 1 ? "one of your requirements" : "some of your requirements"}.</p>
+      ${quoted ? `<ul class="pgclarify__list">${quoted}</ul>` : ""}
+      <p class="pgclarify__body">
+        MandateGuard enforces the constraints it can check against published merchant
+        evidence. It will not treat a requirement it could not read as satisfied, and it
+        will not guess what you meant. Rephrase it, or remove it if you did not mean it
+        as a hard requirement.
+      </p>
+      ${
+        recognized
+          ? `<p class="pgclarify__k">WHAT IT DID READ AS ENFORCEABLE</p>
+             <ul class="pgclarify__recognized">${recognized}</ul>`
+          : ""
+      }
+      <p class="pgclarify__note">
+        No mandate was issued, no capability exists, and no payment adapter was called.
+      </p>
+    </div>`;
 }
 
 /**
@@ -2768,7 +2827,7 @@ export function renderJudgeHealth(report) {
   return `
     <div class="health">
       <p class="health__meta">${escapeHtml(
-        `${report.queries} frozen judge queries, candidate found rate ${report.overall.candidate_found_rate}`,
+        `${report.queries} fixed judge queries, candidate found rate ${report.overall.candidate_found_rate}`,
       )}</p>
       ${row("Top candidate", report.overall)}
       ${row("Ordinary requests", report.ordinary)}
@@ -2776,6 +2835,12 @@ export function renderJudgeHealth(report) {
       <p class="health__note">
         An experience target, not a safety contract. Every outcome above came from the same
         controller that decides a live run.
+      </p>
+      <p class="health__note">
+        A fixed engineering UX evaluation. The query set and these results landed in one
+        commit, so this is not an independently preregistered evaluation and is not
+        described as one. The questions record the kind of request each asks and never an
+        expected verdict, so there is no expected answer to tune the world towards.
       </p>
     </div>`;
 }
@@ -2838,6 +2903,7 @@ function init() {
     resultsMeta: $("#pg-results-meta"),
     mandate: $("#pg-mandate-panel"),
     limit: $("#pg-limit-panel"),
+    clarify: $("#pg-clarify-panel"),
     candidates: $("#pg-candidates"),
     noMatch: $("#pg-nomatch"),
     chosenRegion: $("#pg-chosen-region"),
@@ -3214,6 +3280,8 @@ function init() {
     const suggested = payload?.candidates?.[0]?.price_minor;
     pg.limit.innerHTML = renderSpendingLimitPrompt(payload, suggested);
     pg.limit.hidden = !pg.limit.innerHTML.trim();
+    pg.clarify.innerHTML = renderClarificationRequired(payload);
+    pg.clarify.hidden = !pg.clarify.innerHTML.trim();
     pg.candidates.innerHTML = renderPlaygroundCandidates(
       payload,
       pgState.selected?.catalog_product_id || null,

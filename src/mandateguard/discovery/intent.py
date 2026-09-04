@@ -137,6 +137,15 @@ _ONE_TIME_TERMS = ("one-time", "one time", "single payment", "onetime")
 _EXCLUSION_STOP_TAIL = re.compile(
     r"\s+(?:and|or|but|please|thanks?)\s*$", re.IGNORECASE
 )
+_EXCLUSION_SPLIT_RE = re.compile(r"\bor\b|\band\b|/", re.IGNORECASE)
+
+#: Where one stated requirement ends and the next begins. Used to quote a
+#: readable clause back to a person when a requirement could not be resolved.
+#:
+#: A separator inside a digit group is not a clause break. Without that, the
+#: comma in "INR 3,000" splits the sentence mid-number and the person is asked
+#: to clarify "000 vegan materials only".
+_CLAUSE_SPLIT_RE = re.compile(r"[,.;:\n]+(?!\d)|(?<!\d)[,.;:\n]+")
 
 #: Phrases that are grammar around the request rather than search intent.
 _QUERY_NOISE = (
@@ -370,6 +379,16 @@ class ParsedIntent:
         return lines
 
 
+def _exclusion_parts(text: str) -> list[str]:
+    """Split one exclusion match into the separate items it lists.
+
+    Shared with the coverage auditor so that what it believes the parser
+    extracted cannot drift from what the parser actually extracted.
+    """
+
+    return _EXCLUSION_SPLIT_RE.split(text)
+
+
 def _clean_exclusion(text: str) -> str | None:
     item = _EXCLUSION_STOP_TAIL.sub("", text.strip(" -:\"'"))
     item = re.sub(r"^(?:any|the|a|an)\s+", "", item, flags=re.IGNORECASE).strip()
@@ -431,7 +450,7 @@ def parse_intent(text: str, *, known_brands: Sequence[str] = ()) -> ParsedIntent
     exclusions: list[str] = []
     seen: set[str] = set()
     for match in _EXCLUSION_RE.finditer(raw):
-        for part in re.split(r"\bor\b|\band\b|/", match.group(1), flags=re.IGNORECASE):
+        for part in _exclusion_parts(match.group(1)):
             item = _clean_exclusion(part)
             if item and item.casefold() not in seen:
                 exclusions.append(item)

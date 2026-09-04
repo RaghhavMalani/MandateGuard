@@ -39,6 +39,7 @@ from mandateguard.discovery.intent import (
 )
 from mandateguard.intelligence.models import InterpretedPurchaseIntent
 
+from mandateguard.sandbox.coverage import ConstraintCoverage, assess_coverage
 from mandateguard.sandbox.templates import ALL_PURPOSES
 
 
@@ -98,6 +99,7 @@ class SandboxIntent:
     exclusions: tuple[str, ...]
     brand_hints: tuple[str, ...]
     parsed: ParsedIntent
+    coverage: ConstraintCoverage
 
     def to_mapping(self) -> dict[str, Any]:
         return {
@@ -113,6 +115,7 @@ class SandboxIntent:
             "purpose": self.purpose,
             "exclusions": list(self.exclusions),
             "brand_hints": list(self.brand_hints),
+            "coverage": self.coverage.to_mapping(),
             "authority": "NONE",
         }
 
@@ -151,6 +154,14 @@ class SandboxIntent:
             lines.append(f"Nothing involving {item}.")
         for item in self.brand_hints:
             lines.append(f"Prefer the brand {item}.")
+        # Say what was *not* understood in the same list as what was. A
+        # requirement the mandate does not carry is the one a person most needs
+        # to see, so it is never relegated to a separate panel.
+        for quote in self.coverage.quoted:
+            lines.append(
+                f"“{quote}” could not be interpreted as an enforceable "
+                "constraint, so MandateGuard will not authorize on it."
+            )
         return lines
 
     def interpreted(
@@ -166,6 +177,15 @@ class SandboxIntent:
                 "SPENDING_LIMIT_REQUIRED",
                 "A spending limit is required before authorization can run.",
             )
+        # Last line of defence. ``PlaygroundSurface.plan_for`` refuses an
+        # unresolved instruction before a run is ever created; this refuses it
+        # again at the point the mandate would be built, so a future caller
+        # that reaches the mandate by another route cannot skip the check.
+        if self.coverage.blocks_authorization:
+            raise SandboxIntentError(
+                "INPUT_CLARIFICATION_REQUIRED",
+                self.coverage.clarification_message(),
+            )
         return InterpretedPurchaseIntent(
             max_total_minor=self.max_total_minor,
             quantity=self.quantity,
@@ -178,18 +198,27 @@ class SandboxIntent:
         )
 
 
-def _purpose_in(text: str) -> str | None:
+def _purpose_in(text: str) -> tuple[str | None, tuple[int, int] | None]:
+    """The declared purpose and the span it was read from.
+
+    The span is returned so the coverage auditor can tell that these words were
+    accounted for. Without it, "for the purpose of ..." would be re-read as
+    unexplained language and produce a clarification prompt for a constraint
+    that was in fact recognised.
+    """
+
     explicit = _EXPLICIT_PURPOSE_RE.search(text)
     if explicit is not None:
         stated = explicit.group(1).strip(" -\"'")
         for canonical, pattern in _PURPOSE_PATTERNS:
             if pattern.search(stated):
-                return canonical
-        return stated[:120] if stated else None
+                return canonical, explicit.span()
+        return (stated[:120] if stated else None), explicit.span()
     for canonical, pattern in _PURPOSE_PATTERNS:
-        if pattern.search(text):
-            return canonical
-    return None
+        found = pattern.search(text)
+        if found is not None:
+            return canonical, found.span()
+    return None, None
 
 
 def read_intent(
@@ -231,6 +260,7 @@ def read_intent(
             ceiling = declared_ceiling_minor
             ceiling_source = "SET_FOR_THIS_CHECK"
 
+    purpose, purpose_span = _purpose_in(parsed.raw_text)
     return SandboxIntent(
         raw_text=parsed.raw_text,
         search_text=parsed.search_text or parsed.raw_text.strip().lower(),
@@ -242,10 +272,16 @@ def read_intent(
         # permitted. Silence is not consent to be billed again next month.
         recurring_allowed=parsed.recurring_allowed is True,
         recurrence_stated=parsed.recurring_allowed is not None,
-        purpose=_purpose_in(parsed.raw_text),
+        purpose=purpose,
         exclusions=parsed.exclusions,
         brand_hints=parsed.brand_hints,
         parsed=parsed,
+        coverage=assess_coverage(
+            parsed.raw_text,
+            parsed=parsed,
+            purpose=purpose,
+            purpose_span=purpose_span,
+        ),
     )
 
 

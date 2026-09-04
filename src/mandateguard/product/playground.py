@@ -265,6 +265,17 @@ class PlaygroundSurface:
             "candidates": candidates,
             "near_misses": [item.to_mapping() for item in result.near_misses],
             "constraints_applied": excluded_summary(intent),
+            # Search still runs and still returns products: retrieval is
+            # advisory, and hiding the matches would teach a person nothing.
+            # What changes is that authorization is announced as unavailable
+            # here, at the point of choosing, rather than after a click.
+            "constraint_coverage": intent.coverage.to_mapping(),
+            "clarification_required": intent.coverage.blocks_authorization,
+            "clarification_message": (
+                intent.coverage.clarification_message()
+                if intent.coverage.blocks_authorization
+                else None
+            ),
             "no_match_message": (
                 None
                 if candidates
@@ -339,6 +350,15 @@ class PlaygroundSurface:
                 "SPENDING_LIMIT_REQUIRED",
                 "Your instruction states no spending limit. Set one before "
                 "MandateGuard checks this purchase.",
+            )
+        # A restriction the reader could not turn into a constraint is refused
+        # here, before a run exists. Failing at this point rather than inside
+        # the run is what makes "no capability was issued" true by construction
+        # instead of by inspection: there is nothing yet to issue one against.
+        if intent.coverage.blocks_authorization:
+            raise PlaygroundError(
+                "INPUT_CLARIFICATION_REQUIRED",
+                intent.coverage.clarification_message(),
             )
         product = self._universe.by_catalog_id(catalog_product_id)
         if product is not None:
