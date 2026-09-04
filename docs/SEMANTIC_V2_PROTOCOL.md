@@ -41,6 +41,11 @@ RRF uses rank constant 60. Weighted fusion is fixed at 0.5 normalized BM25 plus
 0.5 normalized dense score over the union of their top-100 lists; a missing
 candidate score is zero and catalog document ID breaks ties.
 
+Every dense candidate uses the same served document representation: title,
+brand, and full category path separated by newlines, truncated to 128 wordpiece
+tokens. Historical descriptions are excluded because they are long, noisy crawl
+text; this decision is frozen before a candidate completes evaluation.
+
 ## Metrics and slices
 
 Report Recall@1, Recall@5, Recall@10, MRR, and binary nDCG@10 for all queries and

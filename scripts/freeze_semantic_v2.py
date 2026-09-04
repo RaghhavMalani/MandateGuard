@@ -182,6 +182,12 @@ def main() -> int:
         "generator": "scripts/freeze_semantic_v2.py",
         "generator_sha256": generator_sha,
         "candidate_cutoff": {"bm25": 100, "dense": 100, "final": 10},
+        "dense_document_representation": {
+            "fields": ["title", "brand", "category_path"],
+            "separator": "newline",
+            "maximum_sequence_length": 128,
+            "description_excluded": "historical descriptions are long/noisy; title, brand, and taxonomy are the served representation",
+        },
         "fusion_candidates": ["bm25", "dense", "rrf", "weighted_fusion"],
         "metrics": ["recall_at_1", "recall_at_5", "recall_at_10", "mrr", "ndcg_at_10"],
         "metric_definitions": {

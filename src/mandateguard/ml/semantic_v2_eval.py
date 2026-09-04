@@ -157,13 +157,21 @@ def embed_catalog(
     started = perf_counter()
     for offset in range(0, len(catalog), batch_size):
         products = catalog.products[offset : offset + batch_size]
-        texts = [product.indexed_text() for product in products]
+        texts = [document_embedding_text(product) for product in products]
         vectors, _, _ = encoder.embed(texts, kind="document")
         blocks.append(vectors)
     result = np.concatenate(blocks, axis=0)
     cache_path.parent.mkdir(parents=True, exist_ok=True)
     np.save(cache_path, result, allow_pickle=False)
     return result, (perf_counter() - started) * 1000.0
+
+
+def document_embedding_text(product: DiscoveryProduct) -> str:
+    """Frozen served representation: stable identity text, not noisy crawl prose."""
+
+    return "\n".join(
+        part for part in (product.title, product.brand or "", product.category_text) if part
+    )
 
 
 def _haystack(product: DiscoveryProduct) -> str:
