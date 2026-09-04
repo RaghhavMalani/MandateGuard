@@ -26,6 +26,7 @@ from mandateguard.discovery.search import (
 from mandateguard.discovery.transactability import DISCOVERY_ONLY_TERMINAL_STATUS
 from mandateguard.discovery.trust import DISCOVERY_ONLY_STAGES, boundary_declaration
 from mandateguard.intelligence.store import CommerceStoreError, TrustedCommerceStore
+from mandateguard.intelligence.models import SelectedProductIdentity
 
 
 REGISTERED_SOURCE = "mandateguard"
@@ -45,7 +46,7 @@ class DiscoverySelection:
     status: str
     transactable: bool
     next_step: str
-    authorization_intent: str | None
+    product_identity: SelectedProductIdentity | None
 
     def to_mapping(self) -> dict[str, Any]:
         return {
@@ -53,7 +54,11 @@ class DiscoverySelection:
             "status": self.status,
             "transactable": self.transactable,
             "next_step": self.next_step,
-            "authorization_intent": self.authorization_intent,
+            "product_identity": (
+                self.product_identity.to_mapping()
+                if self.product_identity is not None
+                else None
+            ),
             "stages": list(DISCOVERY_ONLY_STAGES),
             "payment_provider_calls": 0,
         }
@@ -74,9 +79,12 @@ def build_trusted_lookup(
         if getattr(product, "source", None) != REGISTERED_SOURCE:
             return TrustedListingFacts()
         merchant_id, separator, sku = str(product.source_product_id).partition("/")
-        if not separator or not merchant_id or not sku:
+        if not separator or not merchant_id or not sku or "/" in sku:
             return TrustedListingFacts()
         try:
+            registered = store.get_product(merchant_id=merchant_id, sku=sku)
+            if registered.merchant_id != merchant_id or registered.sku != sku:
+                return TrustedListingFacts()
             entries = store.evidence_for_product(merchant_id=merchant_id, sku=sku)
         except CommerceStoreError:
             return TrustedListingFacts()
@@ -188,27 +196,40 @@ class DiscoverySurface:
                 }
         raise KeyError("the selected listing is not in this intent's results")
 
+    def resolve_selected_product(
+        self, intent: str, catalog_product_id: str, *, top_k: int = 12
+    ) -> SelectedProductIdentity:
+        """Resolve a browser selection again on the server before authorization."""
+
+        payload = self.select(intent, catalog_product_id, top_k=top_k)
+        mapping = payload["selection"].get("product_identity")
+        if mapping is None:
+            raise ValueError("the selected catalog listing is not transactable")
+        return SelectedProductIdentity.from_mapping(mapping)
+
 
 def select(candidate: Mapping[str, Any], intent: str) -> DiscoverySelection:
     """What can actually be done with this listing, said plainly."""
 
     if candidate.get("transactable"):
-        product_id = str(candidate["catalog_product_id"])
-        merchant, _, sku = _registered_identity(candidate)
-        authorization_intent = (
-            f"{intent.strip()} SKU: {sku}" if sku else intent.strip()
-        )
+        identity = _registered_identity(candidate)
+        if identity is None:
+            return _review_selection()
         return DiscoverySelection(
             stage=DISCOVERY_ONLY_STAGES[1],
             status="READY FOR AUTHORIZATION",
             transactable=True,
             next_step=(
-                f"{merchant or product_id} publishes authoritative terms for this "
-                "SKU. The authorization controller can now decide it, and may "
+                f"{identity.merchant_id} publishes authoritative terms for this "
+                "registered product. The authorization controller can now decide it, and may "
                 "still answer BLOCK or REVIEW."
             ),
-            authorization_intent=authorization_intent,
+            product_identity=identity,
         )
+    return _review_selection()
+
+
+def _review_selection() -> DiscoverySelection:
     return DiscoverySelection(
         stage=DISCOVERY_ONLY_STAGES[3],
         status=DISCOVERY_ONLY_TERMINAL_STATUS,
@@ -219,20 +240,29 @@ def select(candidate: Mapping[str, Any], intent: str) -> DiscoverySelection:
             "manufacture an ALLOW for a product nobody has vouched for, so the "
             "journey ends here with zero payment-provider calls."
         ),
-        authorization_intent=None,
+        product_identity=None,
     )
 
 
 def _registered_identity(
     candidate: Mapping[str, Any],
-) -> tuple[str | None, str, str | None]:
+) -> SelectedProductIdentity | None:
     """Split a registered listing's ``merchant/sku`` source identifier."""
 
     product_id = str(candidate.get("catalog_product_id", ""))
     if candidate.get("source") != REGISTERED_SOURCE:
-        return None, product_id, None
+        return None
     raw = str(candidate.get("source_product_id", ""))
     merchant, separator, sku = raw.partition("/")
-    if not separator:
-        return None, product_id, None
-    return merchant or None, product_id, sku or None
+    if not separator or not merchant or not sku or "/" in sku:
+        return None
+    try:
+        return SelectedProductIdentity(
+            merchant_id=merchant,
+            sku=sku,
+            catalog_product_id=product_id,
+            source=REGISTERED_SOURCE,
+            source_product_id=raw,
+        )
+    except (TypeError, ValueError):
+        return None

@@ -21,6 +21,7 @@ from mandateguard.execution import (
     MandateStateBusyError,
     MandateStateCorruptionError,
 )
+from mandateguard.discovery.intent import MonetaryConstraintError
 from mandateguard.product.service import CommerceLabService
 
 
@@ -218,14 +219,17 @@ class CommerceLabHandler(BaseHTTPRequestHandler):
                     intent=payload["intent"],
                     top_k=payload.get("top_k", 6),
                 )
+            except MonetaryConstraintError as error:
+                self._send_error(HTTPStatus.BAD_REQUEST, error.code, error.public_message)
+                return
             except (TypeError, ValueError, json.JSONDecodeError) as error:
                 self._send_error(HTTPStatus.BAD_REQUEST, "INVALID_REQUEST", str(error))
                 return
-            except RuntimeError as error:
+            except RuntimeError:
                 self._send_error(
                     HTTPStatus.SERVICE_UNAVAILABLE,
-                    "DISCOVERY_UNAVAILABLE",
-                    str(error),
+                    "DISCOVERY_ARTIFACT_UNAVAILABLE",
+                    "Discovery artifacts are unavailable in this deployment.",
                 )
                 return
             self._send_json(HTTPStatus.OK, response)
@@ -246,14 +250,17 @@ class CommerceLabHandler(BaseHTTPRequestHandler):
                     "That listing is not in this intent's results.",
                 )
                 return
+            except MonetaryConstraintError as error:
+                self._send_error(HTTPStatus.BAD_REQUEST, error.code, error.public_message)
+                return
             except (TypeError, ValueError, json.JSONDecodeError) as error:
                 self._send_error(HTTPStatus.BAD_REQUEST, "INVALID_REQUEST", str(error))
                 return
-            except RuntimeError as error:
+            except RuntimeError:
                 self._send_error(
                     HTTPStatus.SERVICE_UNAVAILABLE,
-                    "DISCOVERY_UNAVAILABLE",
-                    str(error),
+                    "DISCOVERY_ARTIFACT_UNAVAILABLE",
+                    "Discovery artifacts are unavailable in this deployment.",
                 )
                 return
             self._send_json(HTTPStatus.OK, response)
@@ -261,15 +268,42 @@ class CommerceLabHandler(BaseHTTPRequestHandler):
         if path == "/api/runs":
             try:
                 payload = self._read_json()
-                expected = {"intent", "mode", "preset_id", "request_id"}
-                if set(payload) != expected:
+                required = {
+                    "intent",
+                    "mode",
+                    "preset_id",
+                    "request_id",
+                }
+                allowed = required | {"selected_catalog_product_id"}
+                if not required.issubset(payload) or set(payload) - allowed:
                     raise ValueError("request fields do not match the API schema")
+                selected_product = None
+                selected_id = payload.get("selected_catalog_product_id")
+                if selected_id is not None:
+                    if not isinstance(selected_id, str) or not selected_id:
+                        raise ValueError(
+                            "selected_catalog_product_id must be a non-empty string or null"
+                        )
+                    selected_product = self.server.service.resolve_selected_product(
+                        intent=payload["intent"], catalog_product_id=selected_id
+                    )
                 run, deduplicated = self.server.service.start_run(
                     user_intent=payload["intent"],
                     mode=payload["mode"],
                     preset_id=payload["preset_id"],
                     request_id=payload["request_id"],
+                    selected_product=selected_product,
                 )
+            except MonetaryConstraintError as error:
+                self._send_error(HTTPStatus.BAD_REQUEST, error.code, error.public_message)
+                return
+            except KeyError:
+                self._send_error(
+                    HTTPStatus.BAD_REQUEST,
+                    "SELECTED_PRODUCT_NOT_FOUND",
+                    "The selected catalog listing could not be resolved for this intent.",
+                )
+                return
             except RuntimeError as error:
                 self._send_error(
                     HTTPStatus.SERVICE_UNAVAILABLE,

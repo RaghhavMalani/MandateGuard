@@ -18,7 +18,7 @@ arbitrary intent text
    │                                                 candidate, not a lower rank
    ├─ lexical candidate generation ────────────────► BM25 over a frozen inverted
    │                                                 index, field-weighted
-   ├─ dense rerank ────────────────────────────────► cosine in a frozen LSA
+   ├─ dense scoring (evaluated, NOT shipped for ranking) ► cosine in a frozen LSA
    │                                                 space, candidates only
    ├─ hybrid score ────────────────────────────────► α·lexical + (1−α)·dense
    │                                                 both min-max normalized
@@ -87,15 +87,17 @@ reported alongside because they carry no such caveat.
 
 Candidate depth 300, top-k 10, 44 queries, 17,702 listings.
 
-| Configuration | R@5 | R@10 | P@5 | MRR | literal R@10 | paraphrase R@10 | distinct | p50 ms |
+Query set digest `d369cf66c0504e995414210e88c8d364f554d5b217bfe5382b49fb5b2f5d9763`. The set and these results were committed together, so this is a **fixed evaluation set committed with this engineering milestone**, not an independently preregistered evaluation, and it is not described as one. Future retrieval work freezes the query set in one commit and executes it in a later one.
+
+| Configuration | R@5 | R@10 | P@5 | MRR | literal R@10 | paraphrase R@10 | DistinctTitle@8 | p50 ms |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `lexical_only_alpha_1.00__deduplicated` **(shipped)** | 0.6250 | 0.6121 | 0.6182 | **0.6949** | 0.8511 | 0.1000 | **1.00** | 13.2 |
-| `lexical_only_alpha_1.00__raw` | 0.6250 | **0.6227** | 0.6182 | 0.6837 | **0.8667** | 0.1000 | 0.82 | 13.0 |
-| `hybrid_alpha_0.90__raw` | 0.6250 | 0.6136 | 0.6182 | 0.6807 | 0.8567 | 0.0929 | 0.81 | 9.8 |
-| `hybrid_alpha_0.70__raw` | 0.6250 | 0.6045 | 0.6182 | 0.6746 | 0.8533 | 0.0714 | 0.80 | 9.7 |
-| `hybrid_alpha_0.50__raw` | 0.6023 | 0.5818 | 0.5955 | 0.6468 | 0.8500 | 0.0071 | 0.76 | 9.5 |
-| `hybrid_alpha_0.30__raw` | 0.5841 | 0.5604 | 0.5773 | 0.6326 | 0.8219 | 0.0000 | 0.76 | 9.4 |
-| `dense_only_alpha_0.00__raw` | 0.5318 | 0.5260 | 0.5318 | 0.5663 | 0.7548 | 0.0357 | 0.75 | 9.8 |
+| `lexical_only_alpha_1.00__deduplicated` **(shipped)** | 0.6205 | 0.6205 | 0.6136 | 0.6851 | 0.8633 | 0.1000 | 0.8523 | 13.9 |
+| `lexical_only_alpha_1.00__raw` | 0.6250 | 0.6227 | 0.6182 | 0.6837 | 0.8667 | 0.1000 | 0.8239 | 13.3 |
+| `hybrid_alpha_0.90__raw` | 0.6250 | 0.6136 | 0.6182 | 0.6807 | 0.8567 | 0.0929 | 0.8239 | 34.2 |
+| `hybrid_alpha_0.70__raw` | 0.6250 | 0.6045 | 0.6182 | 0.6746 | 0.8533 | 0.0714 | 0.8153 | 38.1 |
+| `hybrid_alpha_0.50__raw` | 0.6023 | 0.5818 | 0.5955 | 0.6468 | 0.8500 | 0.0071 | 0.7898 | 36.9 |
+| `hybrid_alpha_0.30__raw` | 0.5841 | 0.5604 | 0.5773 | 0.6326 | 0.8219 | 0.0000 | 0.7699 | 33.3 |
+| `dense_only_alpha_0.00__raw` | 0.5318 | 0.5260 | 0.5318 | 0.5663 | 0.7548 | 0.0357 | 0.7699 | 35.3 |
 
 Full report, including every per-query result:
 [`artifacts/engineering/discovery/retrieval_evaluation.json`](../artifacts/engineering/discovery/retrieval_evaluation.json).
@@ -143,18 +145,38 @@ products.
 
 Document-to-document similarity is the direction the frozen LSA space is
 actually good at: both sides are in-vocabulary product text of similar length.
-Enabling suppression moves the distinct-product fraction of a top-8 result from
-**0.82 to 1.00**, raises MRR from 0.6837 to **0.6949**, and costs 0.0106 of
-capped R@10 — because the relevance predicates count each duplicate listing as
-separately relevant, so collapsing four copies of one bracelet costs recall
-while making the answer more useful. Both halves of that trade are in the
-report.
+Enabling suppression moves **DistinctTitle@8** from
+0.8239 to **0.8523**, moves MRR from
+0.6837 to **0.6851**, and costs
+0.0023 of capped R@10 — because the relevance
+predicates count each duplicate listing as separately relevant, so collapsing four
+copies of one bracelet costs recall while making the answer more useful. Both
+halves of that trade are in the report.
 
-Suppression requires **two independent signals to agree**: embedding similarity
-≥ 0.985 *and* title-token Jaccard ≥ 0.6 (an exact title match is sufficient on
-its own). Requiring both means a degenerate or badly fitted embedding cannot
-hide a genuinely different product from the user, which would be a worse failure
-than showing a duplicate.
+`DistinctTitle@8` is named for what it counts: **unique display titles** among the
+eight results the interface shows. It is not a count of distinct *products*. Two
+listings can share a title and be different offers, which is exactly why the
+suppression rule below is what it is.
+
+Suppression requires **four things to agree**:
+
+1. the structured identity fields — same source, brand, top category, currency,
+   **and price**;
+2. embedding similarity ≥ 0.985;
+3. title-token Jaccard ≥ 0.6; and
+4. neither listing is a registered product.
+
+An earlier revision suppressed on an **exact title match alone**, and reported
+DistinctTitle@8 of 1.00 as a result. That number was bought by hiding listings
+that were not duplicates: the crawl carries the same title at different prices,
+in different sizes and colours, from different sellers, and collapsing on the
+display string discarded the cheaper offer roughly half the time. The shortcut
+is gone and the honest figure is 0.8523.
+
+Requiring the embedding *and* the fields also means a degenerate or badly fitted
+embedding cannot hide a genuinely different product on its own, which would be a
+worse failure than showing a duplicate. A registered product is never suppressed
+at all: it is the only kind of listing that can reach authorization.
 
 ### 4. A dense fallback was built and then deleted
 

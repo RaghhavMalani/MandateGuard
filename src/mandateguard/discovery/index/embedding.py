@@ -37,6 +37,7 @@ from mandateguard.discovery.index.artifacts import (
     pack_string_table,
     read_artifact,
     unpack_string_table,
+    validate_catalog_binding,
     write_artifact,
 )
 
@@ -75,6 +76,7 @@ class EmbeddingIndex:
     projection_scales: array
     document_vectors: bytes
     document_count: int
+    catalog_sha256: str
     index_bytes: int
     explained_variance: float
 
@@ -218,34 +220,68 @@ def write_embedding_index(
     return write_artifact(path, header, sections)
 
 
-def load_embedding_index(path: Path) -> EmbeddingIndex:
+def load_embedding_index(
+    path: Path,
+    *,
+    expected_catalog_sha256: str | None = None,
+    expected_document_count: int | None = None,
+) -> EmbeddingIndex:
     artifact = read_artifact(path)
+    expected_sections = {
+        "terms",
+        "term_offsets",
+        "projection",
+        "projection_scales",
+        "document_vectors",
+    }
+    if set(artifact.sections) != expected_sections:
+        raise ArtifactError("embedding index sections do not match its schema")
     if artifact.require("kind") != INDEX_KIND:
         raise ArtifactError(f"expected {INDEX_KIND}, found {artifact.header.get('kind')!r}")
     if artifact.require("analyzer_version") != ANALYZER_VERSION:
         raise ArtifactError(
             "embedding index was built by a different analyzer version; rebuild"
         )
-    dimensions = int(artifact.require("dimensions"))
+    catalog_sha256, document_count = validate_catalog_binding(
+        artifact,
+        expected_catalog_sha256=expected_catalog_sha256,
+        expected_document_count=expected_document_count,
+    )
+    dimensions_value = artifact.require("dimensions")
+    if (
+        isinstance(dimensions_value, bool)
+        or not isinstance(dimensions_value, int)
+        or not 1 <= dimensions_value <= 4096
+    ):
+        raise ArtifactError("embedding dimensions are invalid")
+    dimensions = dimensions_value
     terms = tuple(
         unpack_string_table(artifact.section("terms"), artifact.section("term_offsets"))
     )
     scales = array("f")
-    scales.frombytes(artifact.section("projection_scales"))
+    raw_scales = artifact.section("projection_scales")
+    if len(raw_scales) % 4:
+        raise ArtifactError("embedding projection scales are truncated")
+    scales.frombytes(raw_scales)
     if len(scales) != len(terms):
         raise ArtifactError("projection scales and vocabulary disagree in length")
+    if int(artifact.require("vocabulary_size")) != len(terms):
+        raise ArtifactError("embedding vocabulary count does not match its table")
+    projection = artifact.section("projection")
+    if len(projection) != len(terms) * dimensions:
+        raise ArtifactError("embedding projection table has an unexpected size")
     document_vectors = artifact.section("document_vectors")
-    document_count = int(artifact.require("document_count"))
     if len(document_vectors) != document_count * dimensions:
         raise ArtifactError("document vector table has an unexpected size")
     return EmbeddingIndex(
         dimensions=dimensions,
         terms=terms,
         term_positions={term: position for position, term in enumerate(terms)},
-        projection=artifact.section("projection"),
+        projection=projection,
         projection_scales=scales,
         document_vectors=document_vectors,
         document_count=document_count,
+        catalog_sha256=catalog_sha256,
         index_bytes=Path(path).stat().st_size,
         explained_variance=float(artifact.require("explained_variance")),
     )

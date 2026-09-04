@@ -17,6 +17,7 @@ is inventing an ``ALLOW`` for a product nobody has vouched for.
 from __future__ import annotations
 
 from dataclasses import dataclass
+import logging
 from pathlib import Path
 from time import perf_counter
 from typing import Any, Callable, Mapping, Sequence
@@ -45,7 +46,12 @@ from mandateguard.discovery.index.hybrid import (
     StructuredFilter,
 )
 from mandateguard.discovery.index.lexical import LexicalIndex, load_lexical_index
-from mandateguard.discovery.intent import ParsedIntent, parse_intent
+from mandateguard.discovery.intent import (
+    ParsedIntent,
+    parse_intent,
+    reject_monetary_problem,
+    parse_monetary_constraint,
+)
 from mandateguard.discovery.mismatch import MismatchSignal, evaluate_mismatch
 from mandateguard.discovery.transactability import (
     TransactabilityReport,
@@ -53,6 +59,9 @@ from mandateguard.discovery.transactability import (
     summarize,
 )
 from mandateguard.discovery.trust import DISCOVERY_ONLY_STAGES, boundary_declaration
+
+
+_LOG = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True, slots=True)
@@ -284,14 +293,33 @@ class DiscoveryEngine:
     ) -> DiscoveryEngine:
         started = perf_counter()
         catalog = load_catalog(processed_dir)
-        lexical = load_lexical_index(Path(models_dir) / LEXICAL_INDEX_FILENAME)
+        # The catalog's digest is recomputed from the bytes just read, and every
+        # artifact must name that exact digest and document count. An artifact
+        # built against a different catalog is refused, never warned about: the
+        # document ids in a stale index address different products, so a
+        # mismatched pair returns confident answers about the wrong listings.
+        expected_catalog_sha256 = catalog.catalog_sha256
+        expected_document_count = len(catalog)
+        lexical = load_lexical_index(
+            Path(models_dir) / LEXICAL_INDEX_FILENAME,
+            expected_catalog_sha256=expected_catalog_sha256,
+            expected_document_count=expected_document_count,
+        )
         embedding = (
-            load_embedding_index(Path(models_dir) / EMBEDDING_INDEX_FILENAME)
+            load_embedding_index(
+                Path(models_dir) / EMBEDDING_INDEX_FILENAME,
+                expected_catalog_sha256=expected_catalog_sha256,
+                expected_document_count=expected_document_count,
+            )
             if with_embedding
             else None
         )
         classifier = (
-            load_classifier(Path(models_dir) / CLASSIFIER_FILENAME)
+            load_classifier(
+                Path(models_dir) / CLASSIFIER_FILENAME,
+                expected_catalog_sha256=expected_catalog_sha256,
+                expected_document_count=expected_document_count,
+            )
             if with_classifier
             else None
         )
@@ -317,6 +345,7 @@ class DiscoveryEngine:
     ) -> DiscoveryResult:
         started = perf_counter()
         intent = self.parse(text)
+        reject_monetary_problem(parse_monetary_constraint(text))
         structured = StructuredFilter(
             max_unit_price_minor=intent.max_unit_price_minor,
             currency=intent.currency,
@@ -455,6 +484,15 @@ def _frequent_brands(catalog: DiscoveryCatalog, *, minimum: int = 5) -> tuple[st
     )
 
 
+#: What a visitor is told when discovery cannot serve. One code, one sentence,
+#: no filesystem topology. The specific cause is logged for the operator.
+DISCOVERY_ARTIFACT_UNAVAILABLE = "DISCOVERY_ARTIFACT_UNAVAILABLE"
+PUBLIC_UNAVAILABLE_REASON = (
+    "The discovery catalog and its frozen indexes are not available in this "
+    "deployment. Authorization journeys are unaffected."
+)
+
+
 def try_load(
     *, processed_dir: Path, models_dir: Path, **kwargs: Any
 ) -> tuple[DiscoveryEngine | None, str | None]:
@@ -462,6 +500,10 @@ def try_load(
 
     The product must start and serve its authorization journeys whether or not
     the discovery artifacts are present, so this reports rather than raises.
+
+    The returned reason is the public one. The underlying exception names an
+    artifact and sometimes a path, so it goes to the operator's log and never
+    into an HTTP response.
     """
 
     try:
@@ -469,7 +511,12 @@ def try_load(
             processed_dir=processed_dir, models_dir=models_dir, **kwargs
         )
     except (CatalogUnavailableError, OSError, ValueError, RuntimeError) as error:
-        return None, str(error)
+        _LOG.warning(
+            "discovery artifacts did not load: %s: %s",
+            type(error).__name__,
+            error,
+        )
+        return None, PUBLIC_UNAVAILABLE_REASON
     return engine, None
 
 

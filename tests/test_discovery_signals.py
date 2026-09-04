@@ -48,6 +48,7 @@ def _classifier(tmp_path: Path) -> CategoryClassifier:
         coefficients=[[3.0, -3.0], [-3.0, 3.0]],
         intercepts=[0.0, 0.0],
         catalog_sha256="0" * 64,
+        document_count=2,
         metrics={"test": {"macro_f1": 0.9}},
         trainer={"features": "title + description"},
     )

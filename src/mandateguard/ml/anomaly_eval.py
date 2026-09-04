@@ -10,27 +10,41 @@ Protocol
   ordinary and half carrying a named, injected defect (price mutated after
   authorization, merchant swapped, recurring listing under a one-time mandate,
   category laundering, evidence removed, capability replayed).
+* The ordinary rows are split deterministically into an **ordinary training
+  control** and an **ordinary evaluation control**. Nothing the candidate is
+  fitted on is ever scored as if it were held out.
 * The **baseline** is the deterministic scorer in
   ``mandateguard.discovery.anomaly`` - one number, no fitting.
-* The **candidate** is an unsupervised IsolationForest fitted on the *ordinary*
-  half only, scoring the same feature vectors.
+* The **candidate** is an unsupervised IsolationForest fitted on the ordinary
+  *training* control only.
 * Both are scored by ROC AUC, average precision, and recall at a fixed 5% false
-  positive rate on the held-out half.
+  positive rate on the same held-out population: the ordinary evaluation control
+  plus every defective row.
 * The candidate is kept only if it improves the primary metric by more than
-  ``MATERIAL_IMPROVEMENT`` on the frozen set. Otherwise the baseline stands and
-  the negative result is written down.
+  ``MATERIAL_IMPROVEMENT`` on that held-out population. Otherwise the baseline
+  stands and the negative result is written down.
+
+An earlier revision fitted the forest on all ordinary rows and then scored those
+same rows. That gives the candidate an in-sample advantage on exactly the
+negatives it is judged against, so the comparison was not a comparison. The
+split below is the fix; the verdict did not change.
 
 Circularity, and what is done about it
 --------------------------------------
 Most injected defects flip a field the deterministic scorer already watches, so
 the baseline scoring near-perfectly on them proves only that the features fire.
 To ask a question that is not circular, the set also contains
-``CATEGORY_LAUNDERED``: the listing keeps its declared category while its text is
-replaced with another category's, so no rule-based field comparison sees
-anything wrong. Only the trained classifier's disagreement with the declared
-category can catch it. The report therefore scores the baseline twice - with the
-ML-derived mismatch feature and with it zeroed - which is the actual test of
-whether the supervised model earns its place in the detection path.
+``CATEGORY_LAUNDERED``: the listing keeps its declared category while its title
+and description are replaced with another category's, so no rule-based field
+comparison sees anything wrong. Only the trained classifier's disagreement with
+the declared category can catch it. The report therefore scores the baseline
+twice - with the ML-derived mismatch feature and with it zeroed - which is the
+actual test of whether the supervised model earns its place.
+
+The laundering changes the semantic text and nothing else. Brand is a structured
+field, so an earlier revision that also replaced it was quietly weakening the
+claim that "every structured field stays exactly as it was"; ``_launder`` now
+leaves brand alone.
 
 The evaluation set is synthetic. It measures whether a detector notices defects
 we injected, which is a far weaker claim than noticing fraud in the wild, and
@@ -64,6 +78,9 @@ from mandateguard.discovery.schema import DiscoveryProduct
 EVALUATION_VERSION = "discovery-anomaly-eval-v1"
 EVALUATION_SEED = 20260903
 DEFAULT_SAMPLE = 600
+#: Salt for the ordinary train/evaluation control split. Frozen: changing it
+#: changes which ordinary rows the candidate is fitted on.
+ORDINARY_CONTROL_SALT = "discovery-anomaly-ordinary-control-v1"
 #: The candidate must beat the baseline by more than this on ROC AUC to ship.
 #: Anything smaller is a coin landing the same way twice on 600 synthetic rows.
 MATERIAL_IMPROVEMENT = 0.02
@@ -148,17 +165,22 @@ def _inject(context: ProposalContext, defect: str) -> ProposalContext:
 
 
 def _launder(product: DiscoveryProduct, donor: DiscoveryProduct) -> DiscoveryProduct:
-    """Keep the declared category; replace the text with another category's.
+    """Keep every structured field; replace only the semantic text.
 
     This is what a listing looks like when the shelf it sits on and the thing it
     is have been separated on purpose.
+
+    Title and description are the semantic surface the classifier reads, and they
+    are all that moves. Brand, category, price, currency, merchant, and every
+    identifier stay exactly as they were - otherwise the deterministic features
+    would have a structured field to notice, and the one non-circular defect in
+    this set would stop being non-circular.
     """
 
     return replace(
         product,
         title=donor.title[:400],
         description=donor.description[:4000],
-        brand=donor.brand,
     )
 
 
@@ -222,6 +244,28 @@ def build_evaluation_set(
         ).encode("utf-8")
     ).hexdigest()
     return rows, digest
+
+
+def _partition_ordinary(
+    rows: Sequence[EvaluationRow],
+) -> tuple[list[EvaluationRow], list[EvaluationRow]]:
+    """Split the ordinary rows into disjoint training and evaluation controls.
+
+    Membership is a hash of the case id, so it does not depend on row order and
+    survives a refactor of the loop that built the set.
+    """
+
+    training: list[EvaluationRow] = []
+    evaluation: list[EvaluationRow] = []
+    for row in rows:
+        if row.defective:
+            continue
+        digest = sha256(f"{ORDINARY_CONTROL_SALT}\x1f{row.case_id}".encode("utf-8"))
+        if int.from_bytes(digest.digest()[:8], "big") / float(1 << 64) < 0.5:
+            training.append(row)
+        else:
+            evaluation.append(row)
+    return training, evaluation
 
 
 def score_without(assessment: AnomalyAssessment, feature_id: str) -> float:
@@ -312,16 +356,23 @@ def evaluate(
     rows, digest = build_evaluation_set(
         catalog, sample=sample, classifier=classifier
     )
-    labels = [row.defective for row in rows]
-    baseline = _score_block([row.baseline_score for row in rows], labels)
+    ordinary_train, ordinary_eval = _partition_ordinary(rows)
+    # Everything below is scored on this population and only this one: the
+    # ordinary rows the candidate never saw, plus every defective row.
+    held_out = [row for row in rows if row.defective] + list(ordinary_eval)
+    held_out.sort(key=lambda row: row.case_id)
+    labels = [row.defective for row in held_out]
+    baseline = _score_block([row.baseline_score for row in held_out], labels)
     without_ml = _score_block(
-        [row.baseline_score_without_ml for row in rows], labels
+        [row.baseline_score_without_ml for row in held_out], labels
     )
 
     # The question that is not circular: on the one defect no field comparison
     # can see, does the trained classifier's disagreement change the outcome?
+    # Same held-out controls, so this number sits in the same population as the
+    # rest of the report.
     laundered = [
-        row for row in rows if row.defect == ML_ONLY_DEFECT or not row.defective
+        row for row in held_out if row.defect == ML_ONLY_DEFECT or not row.defective
     ]
     laundered_labels = [row.defective for row in laundered]
     ml_only = {
@@ -350,19 +401,29 @@ def evaluate(
         import numpy as np
         from sklearn.ensemble import IsolationForest
 
-        matrix = np.array([row.vector for row in rows], dtype=np.float64)
-        ordinary = matrix[[not row.defective for row in rows]]
+        # Fitted on the ordinary *training* control, scored on the held-out
+        # population. The two sets are disjoint by construction, so no row the
+        # forest was fitted on appears among the negatives it is judged against.
+        training = np.array(
+            [row.vector for row in ordinary_train], dtype=np.float64
+        )
+        evaluated = np.array([row.vector for row in held_out], dtype=np.float64)
         forest = IsolationForest(
             n_estimators=200,
             contamination="auto",
             random_state=EVALUATION_SEED,
         )
-        forest.fit(ordinary)
+        forest.fit(training)
         # Higher must mean "more anomalous", so the sign is flipped.
-        learned = (-forest.score_samples(matrix)).tolist()
+        learned = (-forest.score_samples(evaluated)).tolist()
         candidate = {
-            "model": "IsolationForest(n_estimators=200, fitted on ordinary rows only)",
+            "model": (
+                "IsolationForest(n_estimators=200), fitted on the ordinary "
+                "training control and scored on disjoint held-out rows"
+            ),
             "available": True,
+            "fitted_on_ordinary_rows": len(ordinary_train),
+            "scored_rows": len(held_out),
             **_score_block(learned, labels),
         }
     except ImportError:
@@ -379,16 +440,14 @@ def evaluate(
     )
     kept = bool(improvement is not None and improvement > MATERIAL_IMPROVEMENT)
     by_defect: dict[str, Any] = {}
+    ordinary_scores = [row.baseline_score for row in ordinary_eval]
+    median_ordinary = (
+        sorted(ordinary_scores)[len(ordinary_scores) // 2] if ordinary_scores else 0.0
+    )
     for defect in DEFECTS:
         subset = [row for row in rows if row.defect == defect]
         if not subset:
             continue
-        ordinary_scores = [row.baseline_score for row in rows if not row.defective]
-        median_ordinary = (
-            sorted(ordinary_scores)[len(ordinary_scores) // 2]
-            if ordinary_scores
-            else 0.0
-        )
         by_defect[defect] = {
             "cases": len(subset),
             "mean_baseline_score": round(
@@ -402,9 +461,22 @@ def evaluate(
         "evaluation_version": EVALUATION_VERSION,
         "analytics_version": ANALYTICS_VERSION,
         "catalog_sha256": catalog.catalog_sha256,
+        "catalog_listings": len(catalog),
         "evaluation_set_digest": digest,
         "cases": len(rows),
-        "defective_cases": sum(labels),
+        "held_out_cases": len(held_out),
+        "held_out_defective_cases": sum(labels),
+        "defective_cases": sum(1 for row in rows if row.defective),
+        "controls": {
+            "ordinary_training_control": len(ordinary_train),
+            "ordinary_evaluation_control": len(ordinary_eval),
+            "note": (
+                "Disjoint by construction. Every metric in this report is scored "
+                "on the ordinary evaluation control plus the defective rows; the "
+                "learned candidate is fitted only on the ordinary training "
+                "control."
+            ),
+        },
         "feature_names": feature_names(),
         "baseline": {
             "model": "deterministic weighted feature score",
@@ -436,7 +508,15 @@ def evaluate(
             "Seven of the eight defect classes flip a field the deterministic "
             "features already watch, so a high baseline score on those proves "
             "the features fire and nothing more. CATEGORY_LAUNDERED is the "
-            "non-circular case, and category_laundering_ablation is the result "
-            "that actually matters."
+            "non-circular case - it moves title and description only, leaving "
+            "brand, category, price, merchant and every identifier untouched - "
+            "and category_laundering_ablation is the result that actually "
+            "matters."
+        ),
+        "advisory_boundary": (
+            "This detector is advisory. It may raise REVIEW or open an "
+            "investigation. It cannot ALLOW, cannot issue a capability, cannot "
+            "override the controller or a revocation, and cannot create trusted "
+            "evidence."
         ),
     }

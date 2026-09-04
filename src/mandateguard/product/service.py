@@ -51,6 +51,7 @@ from mandateguard.intelligence.buyer import (
     CommerceBuyer,
     OpenAIResponsesBuyer,
     parse_offline_intent,
+    require_selected_product,
 )
 from mandateguard.intelligence.cache.semantic_cache import SQLiteSemanticCache
 from mandateguard.intelligence.models import (
@@ -58,6 +59,11 @@ from mandateguard.intelligence.models import (
     InterpretedPurchaseIntent,
     RetrievalResult,
     RetrievalSource,
+    SelectedProductIdentity,
+)
+from mandateguard.discovery.intent import (
+    parse_monetary_constraint,
+    reject_monetary_problem,
 )
 from mandateguard.intelligence.offline import (
     DeterministicSemanticModel,
@@ -300,6 +306,7 @@ class CommerceRun:
     mode: str
     preset_id: str | None
     top_k: int
+    selected_product: SelectedProductIdentity | None = None
     defer_execution: bool = False
     state: str = "RUNNING"
     created_at: str = field(default_factory=_utc_now_text)
@@ -407,37 +414,72 @@ class ToolDrivenOfflineBuyer:
         self.model_id = "offline-deterministic-buyer-v1"
         self.tools = tools
 
-    def purchase(self, user_intent: str) -> BuyerOutput:
+    def purchase(
+        self,
+        user_intent: str,
+        *,
+        selected_product: SelectedProductIdentity | None = None,
+    ) -> BuyerOutput:
         interpreted = _offline_interpret(user_intent)
+        if selected_product is not None:
+            interpreted = InterpretedPurchaseIntent(
+                max_total_minor=interpreted.max_total_minor,
+                quantity=interpreted.quantity,
+                currency=interpreted.currency,
+                purpose=interpreted.purpose,
+                recurring_allowed=interpreted.recurring_allowed,
+                exclusions=interpreted.exclusions,
+                merchant_allowlist=(selected_product.merchant_id,),
+                sku_allowlist=(selected_product.sku,),
+            )
         max_unit_price = interpreted.max_total_minor // interpreted.quantity
-        search = self.tools.dispatch(
-            "search_catalog",
-            {
-                "query": user_intent,
-                "filters": {
-                    "currency": interpreted.currency,
-                    "max_unit_price_minor": max_unit_price,
-                    "merchant_ids": (
-                        list(interpreted.merchant_allowlist)
-                        if interpreted.merchant_allowlist is not None
-                        else None
-                    ),
-                    "sku_ids": (
-                        list(interpreted.sku_allowlist)
-                        if interpreted.sku_allowlist is not None
-                        else None
-                    ),
-                    "recurring": None if interpreted.recurring_allowed else False,
-                    "limit": 10,
+        if selected_product is not None:
+            found = self.tools.dispatch(
+                "get_product",
+                {
+                    "merchant_id": selected_product.merchant_id,
+                    "sku": selected_product.sku,
                 },
-            },
-        )
-        if not isinstance(search, Mapping):
-            raise RuntimeError("offline catalog search returned an invalid result")
-        products = search.get("products")
-        if not isinstance(products, list) or not products:
-            raise RuntimeError("no registered product satisfies the hard discovery filters")
-        selected = products[0]
+            )
+            selected = found.get("product") if isinstance(found, Mapping) else None
+            if not isinstance(selected, Mapping):
+                raise RuntimeError("selected registered product could not be resolved")
+            if (
+                selected.get("currency") != interpreted.currency
+                or selected.get("effective_unit_price_minor", max_unit_price + 1)
+                > max_unit_price
+                or (not interpreted.recurring_allowed and selected.get("recurring") is not False)
+            ):
+                raise RuntimeError("selected product does not satisfy the hard intent filters")
+        else:
+            search = self.tools.dispatch(
+                "search_catalog",
+                {
+                    "query": user_intent,
+                    "filters": {
+                        "currency": interpreted.currency,
+                        "max_unit_price_minor": max_unit_price,
+                        "merchant_ids": (
+                            list(interpreted.merchant_allowlist)
+                            if interpreted.merchant_allowlist is not None
+                            else None
+                        ),
+                        "sku_ids": (
+                            list(interpreted.sku_allowlist)
+                            if interpreted.sku_allowlist is not None
+                            else None
+                        ),
+                        "recurring": None if interpreted.recurring_allowed else False,
+                        "limit": 10,
+                    },
+                },
+            )
+            if not isinstance(search, Mapping):
+                raise RuntimeError("offline catalog search returned an invalid result")
+            products = search.get("products")
+            if not isinstance(products, list) or not products:
+                raise RuntimeError("no registered product satisfies the hard discovery filters")
+            selected = products[0]
         merchant_id = selected["merchant_id"]
         sku = selected["sku"]
         self.tools.dispatch("get_product", {"merchant_id": merchant_id, "sku": sku})
@@ -474,11 +516,13 @@ class ToolDrivenOfflineBuyer:
         )
         if not isinstance(draft, BuyerDraft):
             raise RuntimeError("offline buyer did not produce a typed proposal")
-        return BuyerOutput(
+        output = BuyerOutput(
             proposal=draft.proposal,
             interpreted_intent=draft.interpreted_intent,
             model_id=self.model_id,
         )
+        require_selected_product(output, selected_product)
+        return output
 
 
 class ObservedBuyer:
@@ -491,8 +535,13 @@ class ObservedBuyer:
         self.model_id = delegate.model_id
         self.on_complete = on_complete
 
-    def purchase(self, user_intent: str) -> BuyerOutput:
-        output = self.delegate.purchase(user_intent)
+    def purchase(
+        self,
+        user_intent: str,
+        *,
+        selected_product: SelectedProductIdentity | None = None,
+    ) -> BuyerOutput:
+        output = self.delegate.purchase(user_intent, selected_product=selected_product)
         self.on_complete(output)
         return output
 
@@ -752,7 +801,9 @@ class CommerceLabService:
         )
         self._offline_signing_key = secrets.token_bytes(32)
         self._runs: OrderedDict[str, CommerceRun] = OrderedDict()
-        self._requests: dict[str, tuple[str, str, str, str | None, bool]] = {}
+        self._requests: dict[
+            str, tuple[str, str, str, str | None, bool, str | None]
+        ] = {}
         self._lock = RLock()
 
     @staticmethod
@@ -891,6 +942,11 @@ class CommerceLabService:
 
         return self.discovery.select(intent, catalog_product_id)
 
+    def resolve_selected_product(
+        self, *, intent: str, catalog_product_id: str
+    ) -> SelectedProductIdentity:
+        return self.discovery.resolve_selected_product(intent, catalog_product_id)
+
     def start_run(
         self,
         *,
@@ -900,6 +956,7 @@ class CommerceLabService:
         preset_id: str | None = None,
         top_k: int | None = None,
         defer_execution: bool | None = None,
+        selected_product: SelectedProductIdentity | None = None,
     ) -> tuple[CommerceRun, bool]:
         if not isinstance(user_intent, str) or not user_intent.strip():
             raise ValueError("user_intent must be a non-empty string")
@@ -913,6 +970,12 @@ class CommerceLabService:
             raise ValueError("preset_id is not registered")
         if defer_execution is not None and not isinstance(defer_execution, bool):
             raise TypeError("defer_execution must be boolean or None")
+        if selected_product is not None and not isinstance(
+            selected_product, SelectedProductIdentity
+        ):
+            raise TypeError("selected_product must be SelectedProductIdentity or None")
+        # Fail before a run thread, buyer, adapter, or network client exists.
+        reject_monetary_problem(parse_monetary_constraint(user_intent))
         # `preset_id` selects an intent and nothing else. The evidence policy is
         # server-owned; only an explicit engineering override may replace it, and
         # the override is recorded in the run's trust configuration.
@@ -937,12 +1000,19 @@ class CommerceLabService:
                     existing_intent,
                     existing_preset,
                     existing_defer,
+                    existing_product_id,
                 ) = existing
                 if (
                     existing_mode != mode
                     or existing_intent != normalized_intent
                     or existing_preset != preset_id
                     or existing_defer != should_defer
+                    or existing_product_id
+                    != (
+                        selected_product.catalog_product_id
+                        if selected_product is not None
+                        else None
+                    )
                 ):
                     raise ValueError("request_id is already bound to another request")
                 return self._runs[run_id], True
@@ -953,6 +1023,7 @@ class CommerceLabService:
                 mode=mode,
                 preset_id=preset_id,
                 top_k=top_k,
+                selected_product=selected_product,
                 defer_execution=should_defer,
             )
             self._runs[run.run_id] = run
@@ -962,6 +1033,11 @@ class CommerceLabService:
                 normalized_intent,
                 preset_id,
                 should_defer,
+                (
+                    selected_product.catalog_product_id
+                    if selected_product is not None
+                    else None
+                ),
             )
             self._evict_oldest_runs()
         Thread(target=self._execute_run, args=(run,), daemon=True).start()
@@ -976,6 +1052,7 @@ class CommerceLabService:
         preset_id: str | None = None,
         top_k: int | None = None,
         defer_execution: bool | None = None,
+        selected_product: SelectedProductIdentity | None = None,
         timeout_seconds: float = 20.0,
     ) -> dict[str, Any]:
         run, _ = self.start_run(
@@ -985,6 +1062,7 @@ class CommerceLabService:
             preset_id=preset_id,
             top_k=top_k,
             defer_execution=defer_execution,
+            selected_product=selected_product,
         )
         if not run.completion.wait(timeout_seconds):
             raise TimeoutError("commerce lab run did not finish")
@@ -1612,7 +1690,9 @@ class CommerceLabService:
             # The selected merchant is not known until the buyer runs. The config used by
             # the frozen executor must match it, so resolve the proposal once through the
             # observed buyer and consume that fixed typed output in the normal pathway.
-            first_output = buyer.purchase(run.user_intent)
+            first_output = buyer.purchase(
+                run.user_intent, selected_product=run.selected_product
+            )
             fixed_buyer = _FixedObservedBuyer(first_output)
             config = TrustedExecutionConfig(
                 merchant_id=first_output.proposal.merchant_id,
@@ -1647,6 +1727,7 @@ class CommerceLabService:
                 # visitors who type the same sentence get two mandates and one
                 # visitor's revocation cannot reach the other's capability.
                 mandate_identity_seed=run.run_id,
+                selected_product=run.selected_product,
             )
             self._complete_timeline(recorder, checkout)
             recorder.audit(
@@ -2486,5 +2567,11 @@ class _FixedObservedBuyer:
         self.output = output
         self.model_id = output.model_id
 
-    def purchase(self, _user_intent: str) -> BuyerOutput:
+    def purchase(
+        self,
+        _user_intent: str,
+        *,
+        selected_product: SelectedProductIdentity | None = None,
+    ) -> BuyerOutput:
+        require_selected_product(self.output, selected_product)
         return self.output

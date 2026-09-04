@@ -7,7 +7,8 @@ Produces, under `data/models/`:
 * `lexical_index.mgdx`   - BM25 inverted index (no training, deterministic build)
 * `embedding_index.mgdx` - TF-IDF -> truncated SVD projection and document vectors
 * `category_classifier.mgdx` - linear category classifier
-* `category_confusion.json`  - confusion matrix over the frozen test partition
+* `category_confusion.json`  - confusion matrix over the frozen grouped-family
+                               test partition
 * `training_report.json`     - every number this run measured
 
 Needs the training dependencies (`requirements-train.txt`). The runtime never
@@ -87,7 +88,11 @@ def main(argv: list[str] | None = None) -> int:
             catalog,
             model_path=args.models_dir / "category_classifier.mgdx",
             split_manifest_path=args.eval_dir / "category_split.frozen.json",
+            grouped_split_manifest_path=(
+                args.eval_dir / "category_split.grouped.frozen.json"
+            ),
             confusion_path=args.models_dir / "category_confusion.json",
+            repository_root=REPOSITORY_ROOT,
             max_features=args.classifier_max_features,
         )
         report["category_classifier"] = classifier.to_mapping()

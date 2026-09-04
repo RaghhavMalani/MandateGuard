@@ -295,7 +295,13 @@ def test_a_catalog_that_disagrees_with_its_manifest_digest_is_refused(tmp_path: 
 def test_a_missing_catalog_is_an_error_not_an_empty_result(tmp_path: Path) -> None:
     with pytest.raises(CatalogUnavailableError) as error:
         load_catalog(tmp_path)
-    assert "import_discovery_catalog" in str(error.value)
+    message = str(error.value)
+    # The artifact is named; where it lives is not. This string reaches a public
+    # deployment, and a filesystem path there is deployment topology a visitor
+    # has no business learning from an error message.
+    assert "discovery_catalog.jsonl.gz" in message
+    assert str(tmp_path) not in message
+    assert ":\\" not in message and "/" not in message
 
 
 def test_a_corrupt_catalog_line_is_refused_rather_than_skipped(tmp_path: Path) -> None:

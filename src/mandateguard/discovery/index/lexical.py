@@ -22,6 +22,7 @@ from mandateguard.discovery.index.artifacts import (
     read_artifact,
     unpack_string_table,
     unpack_varints,
+    validate_catalog_binding,
     write_artifact,
 )
 
@@ -70,6 +71,7 @@ class LexicalIndex:
     document_lengths: tuple[int, ...]
     average_length: float
     document_count: int
+    catalog_sha256: str
     index_bytes: int
 
     def __post_init__(self) -> None:
@@ -234,9 +236,19 @@ def write_lexical_index(
     return write_artifact(path, header, sections)
 
 
-def load_lexical_index(path: Path) -> LexicalIndex:
+def load_lexical_index(
+    path: Path,
+    *,
+    expected_catalog_sha256: str | None = None,
+    expected_document_count: int | None = None,
+) -> LexicalIndex:
     artifact = read_artifact(path)
     _validate(artifact)
+    catalog_sha256, document_count = validate_catalog_binding(
+        artifact,
+        expected_catalog_sha256=expected_catalog_sha256,
+        expected_document_count=expected_document_count,
+    )
     terms = unpack_string_table(
         artifact.section("terms"), artifact.section("term_offsets")
     )
@@ -257,19 +269,47 @@ def load_lexical_index(path: Path) -> LexicalIndex:
     )
     if not (len(terms) == len(offsets) == len(counts)):
         raise ArtifactError("lexical index term tables disagree in length")
+    if len(raw_offsets) % 5 or len(raw_counts) % 4 or len(raw_lengths) % 4:
+        raise ArtifactError("lexical index numeric table is truncated")
+    if len(lengths) != document_count:
+        raise ArtifactError("lexical index document lengths disagree with document count")
+    if int(artifact.require("term_count")) != len(terms):
+        raise ArtifactError("lexical index term count does not match its tables")
+    postings = artifact.section("postings")
+    for offset, count in zip(offsets, counts, strict=True):
+        if offset > len(postings):
+            raise ArtifactError("lexical posting offset is out of bounds")
+        deltas, cursor = unpack_varints(postings, offset, count)
+        frequencies, _ = unpack_varints(postings, cursor, count)
+        running = 0
+        for delta, frequency in zip(deltas, frequencies, strict=True):
+            running += delta
+            if running >= document_count or frequency <= 0:
+                raise ArtifactError("lexical posting contains an invalid document or frequency")
     return LexicalIndex(
         terms=tuple(terms),
-        postings=artifact.section("postings"),
+        postings=postings,
         term_offsets=offsets,
         term_counts=counts,
         document_lengths=lengths,
         average_length=float(artifact.require("average_length")) or 1.0,
-        document_count=int(artifact.require("document_count")),
+        document_count=document_count,
+        catalog_sha256=catalog_sha256,
         index_bytes=Path(path).stat().st_size,
     )
 
 
 def _validate(artifact: Artifact) -> None:
+    expected_sections = {
+        "terms",
+        "term_offsets",
+        "postings",
+        "posting_offsets",
+        "posting_counts",
+        "document_lengths",
+    }
+    if set(artifact.sections) != expected_sections:
+        raise ArtifactError("lexical index sections do not match its schema")
     if artifact.require("kind") != INDEX_KIND:
         raise ArtifactError(f"expected {INDEX_KIND}, found {artifact.header.get('kind')!r}")
     if artifact.require("analyzer_version") != ANALYZER_VERSION:

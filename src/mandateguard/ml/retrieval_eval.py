@@ -10,11 +10,25 @@ Near-duplicate suppression trades measured recall for measured diversity: the
 relevance predicates count each duplicate listing as separately relevant, so
 collapsing four copies of one bracelet costs recall while making the answer more
 useful. Both halves of that trade are in the report.
+
+Two diversity numbers are reported and they are not interchangeable:
+
+``unique_title_fraction_at_10``
+    Unique display titles divided by the number of results, over the top 10 that
+    this evaluation requests. It counts *titles*, not products - two listings
+    with the same title can be different offers - so it is named for titles.
+
+``distinct_title_at_8``
+    The same quantity computed over the top 8, which is the depth the product
+    surface actually shows (``DEFAULT_TOP_K``). Quoting an @10 measurement as if
+    it described the shipped 8-result page is how a metric ends up meaning
+    something other than its label.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
+from hashlib import sha256
 import json
 from pathlib import Path
 from statistics import median
@@ -30,7 +44,10 @@ from mandateguard.discovery.intent import parse_intent
 from mandateguard.discovery.schema import DiscoveryProduct
 
 
-EVALUATION_VERSION = "discovery-retrieval-eval-v1"
+EVALUATION_VERSION = "discovery-retrieval-eval-v2"
+#: The result depth the product surface actually renders. The diversity metric
+#: quoted in the interface is computed at this depth, not at the evaluation's.
+SHIPPED_TOP_K = 8
 
 #: Retrieval quality is not authorization quality. Naming it here so a number
 #: lifted out of the report carries the disclaimer with it.
@@ -38,6 +55,15 @@ NOT_A_SAFETY_METRIC = (
     "These are retrieval metrics over a product catalog. They say nothing about "
     "authorization correctness, and no retrieval score has ever moved a "
     "MandateGuard decision."
+)
+
+#: What the sweep concluded, in one sentence, carried inside the artifact so it
+#: travels with the numbers.
+RANKING_FINDING = (
+    "A learned dense ranker was evaluated and did not improve retrieval over "
+    "BM25 on this corpus, so it is not used for ranking. The shipped "
+    "configuration is BM25 with structured filters, plus learned "
+    "embedding-based near-duplicate suppression."
 )
 
 CONFIGURATIONS: tuple[tuple[str, float], ...] = (
@@ -101,7 +127,8 @@ class QueryResult:
     success_at_10: bool
     reciprocal_rank: float
     latency_ms: float
-    distinct_title_fraction: float
+    unique_title_fraction_at_10: float
+    distinct_title_at_8: float
     duplicates_suppressed: int
 
 
@@ -127,6 +154,20 @@ def _score_ranking(
     return recall5, recall10, precision5, hits10 > 0, reciprocal
 
 
+def query_set_sha256(query_set: Mapping[str, Any]) -> str:
+    """Digest of the evaluation query set, recorded with every result.
+
+    Retrieval numbers are only comparable across runs that asked the same
+    questions, so the questions get a digest and the digest travels in the
+    report.
+    """
+
+    canonical = json.dumps(
+        query_set, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    )
+    return sha256(canonical.encode("utf-8")).hexdigest()
+
+
 def evaluate_retrieval(
     catalog: DiscoveryCatalog,
     retriever: HybridDiscoveryRetriever,
@@ -134,6 +175,7 @@ def evaluate_retrieval(
     *,
     candidate_depth: int = 300,
 ) -> dict[str, Any]:
+    query_set_digest = query_set_sha256(query_set)
     queries = query_set.get("queries")
     if not isinstance(queries, list) or not queries:
         raise ValueError("query set contains no queries")
@@ -175,6 +217,8 @@ def evaluate_retrieval(
                 titles = {
                     item.product.title.casefold() for item in outcome.listings
                 }
+                top_eight = outcome.listings[:SHIPPED_TOP_K]
+                titles_at_8 = {item.product.title.casefold() for item in top_eight}
                 results.append(
                     QueryResult(
                         query_id=entry["query_id"],
@@ -186,10 +230,13 @@ def evaluate_retrieval(
                         success_at_10=success,
                         reciprocal_rank=reciprocal,
                         latency_ms=latency,
-                        distinct_title_fraction=(
+                        unique_title_fraction_at_10=(
                             len(titles) / len(outcome.listings)
                             if outcome.listings
                             else 0.0
+                        ),
+                        distinct_title_at_8=(
+                            len(titles_at_8) / len(top_eight) if top_eight else 0.0
                         ),
                         duplicates_suppressed=outcome.duplicates_suppressed,
                     )
@@ -206,6 +253,9 @@ def evaluate_retrieval(
         "queries": len(queries),
         "candidate_depth": candidate_depth,
         "disclaimer": NOT_A_SAFETY_METRIC,
+        "ranking_finding": RANKING_FINDING,
+        "shipped_top_k": SHIPPED_TOP_K,
+        "query_set_sha256": query_set_digest,
         "configurations": per_configuration,
         "relevant_set_sizes": {
             key: len(value) for key, value in sorted(relevance.items())
@@ -243,9 +293,10 @@ def _summarize(
         "precision_at_5": mean([item.precision_at_5 for item in results]),
         "success_at_10": mean([1.0 if item.success_at_10 else 0.0 for item in results]),
         "mrr": mean([item.reciprocal_rank for item in results]),
-        "distinct_title_fraction": mean(
-            [item.distinct_title_fraction for item in results]
+        "unique_title_fraction_at_10": mean(
+            [item.unique_title_fraction_at_10 for item in results]
         ),
+        "distinct_title_at_8": mean([item.distinct_title_at_8 for item in results]),
         "mean_duplicates_suppressed": mean(
             [float(item.duplicates_suppressed) for item in results]
         ),

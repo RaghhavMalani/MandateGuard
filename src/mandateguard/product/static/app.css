@@ -2331,8 +2331,10 @@ a { color: var(--blue); text-underline-offset: 3px; }
    ========================================================================== */
 
 .opening {
-  max-width: 74ch;
-  padding: clamp(44px, 6vw, 88px) 0 clamp(28px, 4vw, 44px);
+  max-width: 96ch;
+  /* Tightened so the pipeline and the thesis line land above the fold rather
+     than one scroll below the headline. */
+  padding: clamp(26px, 3.4vw, 52px) 0 clamp(22px, 3vw, 36px);
 }
 .opening__eyebrow {
   color: var(--blue-ink);
@@ -2342,8 +2344,8 @@ a { color: var(--blue); text-underline-offset: 3px; }
   letter-spacing: .16em;
 }
 .opening__title {
-  margin-top: 16px;
-  font-size: clamp(30px, 4.4vw, 54px);
+  margin-top: 12px;
+  font-size: clamp(27px, 3.6vw, 44px);
   line-height: 1.08;
   letter-spacing: -0.028em;
 }
@@ -2354,13 +2356,97 @@ a { color: var(--blue); text-underline-offset: 3px; }
   font-style: normal;
 }
 .opening__body {
-  max-width: 66ch;
-  margin-top: 20px;
+  max-width: 72ch;
+  margin-top: 14px;
   color: var(--muted-strong);
-  font-size: clamp(15px, 1.35vw, 17px);
-  line-height: 1.62;
+  font-size: clamp(14px, 1.2vw, 16px);
+  line-height: 1.58;
 }
 .opening__body strong { color: var(--ink); }
+
+/* ---------- The compact pipeline, above the fold ---------- */
+
+.pipeline {
+  margin-top: clamp(18px, 2.4vw, 28px);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  list-style: none;
+  counter-reset: none;
+}
+.pipeline__stage {
+  position: relative;
+  padding: 12px 13px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-1);
+  background: var(--surface);
+}
+/* The arrow between stages. Decorative, so it is hidden from assistive tech;
+   the ordered list already carries the sequence. */
+.pipeline__stage + .pipeline__stage::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -8px;
+  width: 6px;
+  height: 6px;
+  border-top: 1.5px solid var(--line-strong);
+  border-right: 1.5px solid var(--line-strong);
+  transform: translateY(-50%) rotate(45deg);
+}
+.pipeline__stage[data-role="corpus"] { background: var(--surface-soft); }
+.pipeline__stage[data-role="ml"] { background: var(--surface-soft); }
+/* The boundary: everything left of here guesses, everything right of here
+   decides. The colour change is the seam, not decoration. */
+.pipeline__stage[data-role="trust"] { border-color: var(--line-strong); }
+.pipeline__stage[data-role="authorize"] {
+  border-color: var(--blue);
+  box-shadow: inset 3px 0 0 var(--blue);
+}
+.pipeline__count {
+  font-size: clamp(20px, 2.2vw, 27px);
+  font-weight: 680;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+.pipeline__label,
+.pipeline__stage[data-role="corpus"] .pipeline__what {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+.pipeline__label { line-height: 1.4; }
+.pipeline__stage[data-role="authorize"] .pipeline__label { color: var(--blue-ink); }
+.pipeline__what { margin-top: 5px; font-size: 13px; line-height: 1.35; }
+.pipeline__what em { color: var(--blue); font-style: italic; }
+.pipeline__why {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 11.5px;
+  line-height: 1.42;
+}
+.opening__thesis {
+  margin-top: clamp(14px, 1.8vw, 20px);
+  padding: 12px 14px;
+  border-left: 3px solid var(--blue);
+  border-radius: 0 var(--r-1) var(--r-1) 0;
+  background: var(--surface-soft);
+  font-size: clamp(14px, 1.25vw, 16.5px);
+  line-height: 1.5;
+}
+.opening__thesis strong { display: block; color: var(--ink); }
+.opening__thesis span { display: block; margin-top: 3px; color: var(--muted-strong); }
+
+@media (max-width: 900px) {
+  .pipeline { grid-template-columns: repeat(2, 1fr); }
+  .pipeline__stage + .pipeline__stage::before { display: none; }
+}
+@media (max-width: 560px) {
+  .pipeline { grid-template-columns: 1fr; }
+}
 
 /* ---------- Worked example ---------- */
 
@@ -2604,7 +2690,38 @@ a { color: var(--blue); text-underline-offset: 3px; }
   text-transform: uppercase;
 }
 .listing__name { margin-top: 8px; font-size: 17px; }
-.listing__meta { margin-top: 4px; color: var(--muted-strong); font-size: 13px; }
+
+/* A crawled price is a 2015-2016 listing claim. It is never rendered as a bare
+   number next to a buy button, because a bare number reads as a live offer. */
+.listing__price {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  align-items: baseline;
+}
+.listing__pricelabel {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  flex-basis: 100%;
+}
+.listing__pricevalue { font-size: 19px; font-weight: 650; }
+.listing__pricevalue--absent { font-size: 14px; color: var(--muted); font-weight: 500; }
+.listing__pricenote { color: var(--warning-ink); font-size: 11.5px; }
+.listing-note {
+  margin-bottom: 14px;
+  padding: 9px 12px;
+  border-radius: var(--r-1);
+  background: var(--warning-wash);
+  color: var(--warning-ink);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.listing__meta { margin-top: 6px; color: var(--muted-strong); font-size: 13px; }
 .listing__status {
   padding: 5px 10px;
   border-radius: var(--r-1);

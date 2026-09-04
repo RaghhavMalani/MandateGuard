@@ -1,19 +1,22 @@
 """Hybrid retrieval over the large discovery catalog.
 
-The pipeline is retrieve-then-rerank, chosen so the dense stage stays cheap
-enough for pure Python:
+The pipeline is built to allow a dense stage cheap enough for pure Python. The
+shipped configuration does not use one for ranking; steps 3 and 4 remain because
+the sweep that measured them is reproducible.
 
 1. **Structured filters** - price ceiling, currency, category, and mandate
    exclusions. Deterministic, applied first, never traded off against a score.
 2. **Lexical candidate generation** - BM25 over the frozen inverted index,
-   producing ``candidate_depth`` documents.
-3. **Dense rerank** - cosine similarity in the frozen LSA space, computed only
-   for those candidates.
-4. **Hybrid score** - ``alpha * lexical + (1 - alpha) * dense``, with both terms
-   min-max normalized within the candidate set so alpha means what it says.
-5. **Near-duplicate suppression** - a candidate that is the same product as one
-   already selected is skipped, using document-to-document similarity in the
-   frozen embedding space.
+   producing ``candidate_depth`` documents. This is what orders the shipped
+   results.
+3. **Dense scoring (evaluated, not shipped for ranking)** - cosine similarity in
+   the frozen LSA space, computed only for those candidates.
+4. **Blend** - ``alpha * lexical + (1 - alpha) * dense``, with both terms min-max
+   normalized within the candidate set so alpha means what it says. At the
+   shipped ``DEFAULT_ALPHA`` of 1.0 this is exactly the lexical order.
+5. **Near-duplicate suppression** - a candidate that is demonstrably the same
+   product as one already selected is skipped. Several independent signals have
+   to agree before that happens; see ``_is_duplicate``.
 
 Step 1 is not a ranking signal. A listing above the stated price ceiling is not
 "ranked lower"; it is not a candidate, because the ceiling came from the user.
@@ -22,14 +25,22 @@ What the frozen evaluation actually found
 -----------------------------------------
 On this catalog the dense contribution to *ranking* is not an improvement: the
 alpha sweep is monotone in the wrong direction, and the paraphrase family scores
-near zero for every blend. So ``DEFAULT_ALPHA`` is 1.0, and what the embedding
-index actually earns its place with is step 5, where it raises the fraction of
-distinct products in a top-8 result from 0.82 to 1.00. A dense full-scan
-*fallback* was considered and deliberately not shipped: the lexical vocabulary
-(min_df=1) is a strict superset of the embedding vocabulary (min_df=3) over the
-same corpus and analyzer, so a query the dense index could encode is always a
-query BM25 has postings for, and the fallback could never execute. The numbers,
-including the negative ones, are in `docs/DISCOVERY_RETRIEVAL.md`.
+near zero for every blend. ``DEFAULT_ALPHA`` is therefore 1.0, which means step 3
+contributes nothing to the shipped ordering: **the shipped ranker is BM25**. The
+embedding index is still loaded and still used, but only in step 5, where the
+document-to-document similarity is one of the signals that must agree before a
+listing is suppressed as a duplicate.
+
+Saying that precisely matters, because "hybrid retrieval with semantic rerank"
+describes a system this is not. A learned dense ranker was evaluated here and did
+not improve retrieval over BM25 on this corpus, so it is not used for ranking.
+
+A dense full-scan *fallback* was considered and deliberately not shipped: the
+lexical vocabulary (min_df=1) is a strict superset of the embedding vocabulary
+(min_df=3) over the same corpus and analyzer, so a query the dense index could
+encode is always a query BM25 has postings for, and the fallback could never
+execute. The numbers, including the negative ones, are in
+`docs/DISCOVERY_RETRIEVAL.md`.
 """
 
 from __future__ import annotations
@@ -46,19 +57,27 @@ from mandateguard.discovery.schema import DiscoveryProduct
 
 #: Selected by the frozen retrieval evaluation, not by preference. On this
 #: catalog the sweep over alpha in {0.0 .. 1.0} put every dense contribution at
-#: or below the lexical baseline, so the default blend is lexical. The dense
-#: index still runs: it suppresses near-duplicate results, which is measurable.
+#: or below the lexical baseline. At 1.0 the embedding contributes nothing to
+#: ranking; embeddings do not rerank search here. The dense index still loads,
+#: and is used only for near-duplicate suppression, which is measurable.
 #: See docs/DISCOVERY_RETRIEVAL.md.
 DEFAULT_ALPHA = 1.0
 DEFAULT_TOP_K = 8
 DEFAULT_CANDIDATE_DEPTH = 300
-#: Two listings this close in the frozen LSA space, whose titles also agree,
-#: are the same product twice. Both conditions are required - see
-#: ``_is_duplicate`` for why one is not enough.
+#: Embedding agreement required before two listings can be called one product.
 DEFAULT_DUPLICATE_SIMILARITY = 0.985
 #: Jaccard overlap of the two titles' analyzed tokens.
 TITLE_AGREEMENT = 0.6
-RETRIEVAL_METHOD = "BM25_WITH_STRUCTURED_FILTERS_AND_FROZEN_LSA_RERANK"
+#: Named for what actually runs. Alpha is 1.0, so the ordering is BM25 over the
+#: frozen inverted index after the structured filters have removed
+#: non-candidates; the learned embedding participates only in duplicate
+#: suppression, never in ranking.
+RETRIEVAL_METHOD = (
+    "BM25_WITH_STRUCTURED_FILTERS_AND_LEARNED_NEAR_DUPLICATE_SUPPRESSION"
+)
+#: The listing source whose products carry registered merchant identity. A
+#: listing from this source is never hidden by duplicate suppression.
+REGISTERED_SOURCE = "mandateguard"
 
 
 @dataclass(frozen=True, slots=True)
@@ -296,36 +315,78 @@ class HybridDiscoveryRetriever:
         seller listings. Showing eight of them is a worse answer than showing
         eight different products.
 
-        Two independent signals have to agree before anything is suppressed: the
-        embedding must place the listings almost on top of each other, *and*
-        their titles must substantially overlap. Requiring both means a
-        degenerate or badly fitted embedding - one that maps everything to the
-        same direction - can hide a genuinely different product from the user,
-        which is a worse failure than showing a duplicate. An exact title match
-        is sufficient on its own.
+        Suppression is deliberately hard to trigger, because a hidden listing is
+        the failure the user cannot see. Four things must all hold:
+
+        1. the structured identity fields agree (``_identity_agrees``),
+        2. the frozen embedding places the two listings almost on top of each
+           other,
+        3. their analyzed titles substantially overlap, and
+        4. neither listing is a registered product.
+
+        Title text alone is never sufficient, in either direction. Two listings
+        can carry the same display title and still be different offers - a
+        different size, colour, variant, seller, or price - so collapsing them on
+        the strings alone silently removes a product the user might have wanted,
+        and where the prices differ it discards the cheaper one about half the
+        time. Requiring the embedding as well as the fields means a degenerate or
+        badly fitted embedding cannot hide a product on its own either.
         """
 
         embedding = self.embedding
         if embedding is None or not selected:
             return False
         product = self.product_at(document_id)
-        title = product.title.casefold()
+        if product.source == REGISTERED_SOURCE:
+            # A registered product is the only kind of listing that can reach
+            # authorization. It is never collapsed into a crawled lookalike.
+            return False
         tokens = frozenset(analyze(product.title))
+        if not tokens:
+            return False
         for chosen in selected:
-            if title == chosen.product.title.casefold():
-                return True
+            other_product = chosen.product
+            if other_product.source == REGISTERED_SOURCE:
+                continue
+            if not _identity_agrees(product, other_product):
+                continue
             if (
                 embedding.document_similarity(document_id, chosen.document_id)
                 < threshold
             ):
                 continue
-            other = frozenset(analyze(chosen.product.title))
-            if not tokens or not other:
+            other = frozenset(analyze(other_product.title))
+            if not other:
                 continue
             overlap = len(tokens & other) / len(tokens | other)
             if overlap >= TITLE_AGREEMENT:
                 return True
         return False
+
+
+def _identity_agrees(left: DiscoveryProduct, right: DiscoveryProduct) -> bool:
+    """Do the structured fields say these are one product rather than two?
+
+    Price is included on purpose. Two listings that differ in price are two
+    offers whatever their titles say, and suppressing one of them would remove
+    the cheaper offer from the answer roughly half the time.
+    """
+
+    if left.source != right.source:
+        return False
+    if _fold(left.brand) != _fold(right.brand):
+        return False
+    if left.top_category != right.top_category:
+        return False
+    if left.currency != right.currency:
+        return False
+    if left.price_minor != right.price_minor:
+        return False
+    return True
+
+
+def _fold(value: str | None) -> str:
+    return (value or "").strip().casefold()
 
 
 def _document_terms(product: DiscoveryProduct) -> frozenset[str]:

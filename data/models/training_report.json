@@ -6,8 +6,8 @@
   },
   "category_classifier": {
     "advisory_only": true,
-    "artifact_bytes": 262838,
-    "artifact_sha256": "eb3f83395468e74022535a31d3bece1f1e79e56c6834eedd9d7b1b3f0faf213c",
+    "artifact_bytes": 264145,
+    "artifact_sha256": "bff05df94b7e8f42f87ed1c449e647e98d57ef54bfe4219e6655abbb07081318",
     "authorization_authority": "NONE",
     "class_count": 22,
     "classes": [
@@ -34,202 +34,604 @@
       "Toys & School Supplies",
       "Watches"
     ],
-    "confusion_matrix_artifact": "D:\\Personal_Projects\\MandateGuard\\data\\models\\category_confusion.json",
-    "fit_seconds": 2.878,
+    "confusion_matrix_artifact": "data/models/category_confusion.json",
+    "fit_seconds": 9.211,
+    "grouped_family": {
+      "candidates": {
+        "linear_svc": {
+          "accuracy": 0.967072,
+          "macro_f1": 0.919841,
+          "samples": 2551,
+          "weighted_f1": 0.96609
+        },
+        "logistic_regression": {
+          "accuracy": 0.9608,
+          "macro_f1": 0.90679,
+          "samples": 2551,
+          "weighted_f1": 0.95836
+        }
+      },
+      "caveat": "Whole product families are assigned to one partition, so no test listing has a near-identical twin in training. Advisory classification quality only: it is not authorization accuracy, and no score here has ever changed a MandateGuard decision.",
+      "evaluation": "grouped_product_family_holdout",
+      "family_key_version": "discovery-product-family-v1",
+      "fit_seconds": 9.211,
+      "group_counts": {
+        "test": 1748,
+        "total": 11662,
+        "train": 8163,
+        "validation": 1751
+      },
+      "per_category": {
+        "Automotive": {
+          "f1": 0.958801,
+          "precision": 0.969697,
+          "recall": 0.948148,
+          "test_support": 135,
+          "train_support": 744
+        },
+        "Baby Care": {
+          "f1": 0.85,
+          "precision": 0.871795,
+          "recall": 0.829268,
+          "test_support": 41,
+          "train_support": 240
+        },
+        "Bags, Wallets & Belts": {
+          "f1": 0.901408,
+          "precision": 0.888889,
+          "recall": 0.914286,
+          "test_support": 35,
+          "train_support": 188
+        },
+        "Beauty and Personal Care": {
+          "f1": 0.986175,
+          "precision": 0.990741,
+          "recall": 0.981651,
+          "test_support": 109,
+          "train_support": 497
+        },
+        "Cameras & Accessories": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "test_support": 10,
+          "train_support": 46
+        },
+        "Clothing": {
+          "f1": 0.993231,
+          "precision": 0.9914,
+          "recall": 0.995068,
+          "test_support": 811,
+          "train_support": 3965
+        },
+        "Computers": {
+          "f1": 0.972376,
+          "precision": 0.967033,
+          "recall": 0.977778,
+          "test_support": 90,
+          "train_support": 401
+        },
+        "Footwear": {
+          "f1": 0.997015,
+          "precision": 0.994048,
+          "recall": 1.0,
+          "test_support": 167,
+          "train_support": 782
+        },
+        "Furniture": {
+          "f1": 0.976744,
+          "precision": 0.954545,
+          "recall": 1.0,
+          "test_support": 21,
+          "train_support": 129
+        },
+        "Health & Personal Care Appliances": {
+          "f1": 0.909091,
+          "precision": 1.0,
+          "recall": 0.833333,
+          "test_support": 6,
+          "train_support": 31
+        },
+        "Home Decor & Festive Needs": {
+          "f1": 0.964143,
+          "precision": 0.945312,
+          "recall": 0.98374,
+          "test_support": 123,
+          "train_support": 581
+        },
+        "Home Furnishing": {
+          "f1": 0.97931,
+          "precision": 0.986111,
+          "recall": 0.972603,
+          "test_support": 73,
+          "train_support": 403
+        },
+        "Home Improvement": {
+          "f1": 0.923077,
+          "precision": 0.857143,
+          "recall": 1.0,
+          "test_support": 12,
+          "train_support": 57
+        },
+        "Jewellery": {
+          "f1": 0.996798,
+          "precision": 0.993617,
+          "recall": 1.0,
+          "test_support": 467,
+          "train_support": 2101
+        },
+        "Kitchen & Dining": {
+          "f1": 0.928177,
+          "precision": 0.94382,
+          "recall": 0.913043,
+          "test_support": 92,
+          "train_support": 456
+        },
+        "Mobiles & Accessories": {
+          "f1": 0.980132,
+          "precision": 0.961039,
+          "recall": 1.0,
+          "test_support": 74,
+          "train_support": 388
+        },
+        "Pens & Stationery": {
+          "f1": 0.842105,
+          "precision": 0.96,
+          "recall": 0.75,
+          "test_support": 32,
+          "train_support": 200
+        },
+        "Sports & Fitness": {
+          "f1": 0.8,
+          "precision": 0.758621,
+          "recall": 0.846154,
+          "test_support": 26,
+          "train_support": 113
+        },
+        "Sunglasses": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "test_support": 6,
+          "train_support": 25
+        },
+        "Tools & Hardware": {
+          "f1": 0.972222,
+          "precision": 1.0,
+          "recall": 0.945946,
+          "test_support": 74,
+          "train_support": 209
+        },
+        "Toys & School Supplies": {
+          "f1": 0.845361,
+          "precision": 0.854167,
+          "recall": 0.836735,
+          "test_support": 49,
+          "train_support": 220
+        },
+        "Watches": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "test_support": 86,
+          "train_support": 364
+        }
+      },
+      "selected_model": "linear_svc",
+      "sizes": {
+        "test": 2539,
+        "train": 12140,
+        "validation": 2551
+      },
+      "split_version": "discovery-grouped-split-v1",
+      "test": {
+        "accuracy": 0.975581,
+        "macro_f1": 0.944371,
+        "samples": 2539,
+        "top_2_accuracy": 0.990547,
+        "top_3_accuracy": 0.99488,
+        "weighted_f1": 0.975392
+      },
+      "test_id_digest": "999f842b4faef1d649ecf26dbeb5dc2180f496a2e17a1412c27c5948fdd886d0",
+      "validation": {
+        "accuracy": 0.967072,
+        "macro_f1": 0.919841,
+        "samples": 2551,
+        "weighted_f1": 0.96609
+      }
+    },
+    "headline_evaluation": "grouped_product_family_holdout",
     "model_id": "discovery-category-linear-v1",
     "per_category": {
       "Automotive": {
-        "f1": 0.983713,
-        "precision": 0.974194,
-        "recall": 0.993421,
-        "test_support": 152,
-        "train_support": 706
+        "f1": 0.958801,
+        "precision": 0.969697,
+        "recall": 0.948148,
+        "test_support": 135,
+        "train_support": 744
       },
       "Baby Care": {
-        "f1": 0.808511,
-        "precision": 0.826087,
-        "recall": 0.791667,
-        "test_support": 48,
-        "train_support": 227
+        "f1": 0.85,
+        "precision": 0.871795,
+        "recall": 0.829268,
+        "test_support": 41,
+        "train_support": 240
       },
       "Bags, Wallets & Belts": {
-        "f1": 0.918919,
-        "precision": 0.944444,
-        "recall": 0.894737,
-        "test_support": 38,
-        "train_support": 181
+        "f1": 0.901408,
+        "precision": 0.888889,
+        "recall": 0.914286,
+        "test_support": 35,
+        "train_support": 188
       },
       "Beauty and Personal Care": {
-        "f1": 0.990385,
-        "precision": 1.0,
-        "recall": 0.980952,
-        "test_support": 105,
-        "train_support": 491
+        "f1": 0.986175,
+        "precision": 0.990741,
+        "recall": 0.981651,
+        "test_support": 109,
+        "train_support": 497
       },
       "Cameras & Accessories": {
-        "f1": 0.96,
+        "f1": 1.0,
         "precision": 1.0,
-        "recall": 0.923077,
-        "test_support": 13,
-        "train_support": 57
+        "recall": 1.0,
+        "test_support": 10,
+        "train_support": 46
       },
       "Clothing": {
-        "f1": 0.994055,
-        "precision": 0.997613,
-        "recall": 0.990521,
-        "test_support": 844,
-        "train_support": 3936
+        "f1": 0.993231,
+        "precision": 0.9914,
+        "recall": 0.995068,
+        "test_support": 811,
+        "train_support": 3965
       },
       "Computers": {
-        "f1": 0.953488,
-        "precision": 0.964706,
-        "recall": 0.942529,
-        "test_support": 87,
-        "train_support": 403
+        "f1": 0.972376,
+        "precision": 0.967033,
+        "recall": 0.977778,
+        "test_support": 90,
+        "train_support": 401
       },
       "Footwear": {
-        "f1": 1.0,
-        "precision": 1.0,
+        "f1": 0.997015,
+        "precision": 0.994048,
         "recall": 1.0,
-        "test_support": 168,
-        "train_support": 785
+        "test_support": 167,
+        "train_support": 782
       },
       "Furniture": {
-        "f1": 0.892857,
-        "precision": 0.862069,
-        "recall": 0.925926,
-        "test_support": 27,
-        "train_support": 123
+        "f1": 0.976744,
+        "precision": 0.954545,
+        "recall": 1.0,
+        "test_support": 21,
+        "train_support": 129
       },
       "Health & Personal Care Appliances": {
-        "f1": 1.0,
-        "precision": 1.0,
-        "recall": 1.0,
-        "test_support": 7,
-        "train_support": 30
-      },
-      "Home Decor & Festive Needs": {
-        "f1": 0.963563,
-        "precision": 0.959677,
-        "recall": 0.96748,
-        "test_support": 123,
-        "train_support": 573
-      },
-      "Home Furnishing": {
-        "f1": 0.981818,
-        "precision": 0.964286,
-        "recall": 1.0,
-        "test_support": 81,
-        "train_support": 382
-      },
-      "Home Improvement": {
         "f1": 0.909091,
         "precision": 1.0,
         "recall": 0.833333,
+        "test_support": 6,
+        "train_support": 31
+      },
+      "Home Decor & Festive Needs": {
+        "f1": 0.964143,
+        "precision": 0.945312,
+        "recall": 0.98374,
+        "test_support": 123,
+        "train_support": 581
+      },
+      "Home Furnishing": {
+        "f1": 0.97931,
+        "precision": 0.986111,
+        "recall": 0.972603,
+        "test_support": 73,
+        "train_support": 403
+      },
+      "Home Improvement": {
+        "f1": 0.923077,
+        "precision": 0.857143,
+        "recall": 1.0,
         "test_support": 12,
         "train_support": 57
       },
       "Jewellery": {
-        "f1": 0.997768,
-        "precision": 0.997768,
-        "recall": 0.997768,
-        "test_support": 448,
-        "train_support": 2087
+        "f1": 0.996798,
+        "precision": 0.993617,
+        "recall": 1.0,
+        "test_support": 467,
+        "train_support": 2101
       },
       "Kitchen & Dining": {
-        "f1": 0.95,
-        "precision": 0.92233,
-        "recall": 0.979381,
-        "test_support": 97,
-        "train_support": 450
+        "f1": 0.928177,
+        "precision": 0.94382,
+        "recall": 0.913043,
+        "test_support": 92,
+        "train_support": 456
       },
       "Mobiles & Accessories": {
-        "f1": 0.928177,
-        "precision": 0.903226,
-        "recall": 0.954545,
-        "test_support": 88,
-        "train_support": 412
+        "f1": 0.980132,
+        "precision": 0.961039,
+        "recall": 1.0,
+        "test_support": 74,
+        "train_support": 388
       },
       "Pens & Stationery": {
-        "f1": 0.8,
-        "precision": 0.882353,
-        "recall": 0.731707,
-        "test_support": 41,
-        "train_support": 191
+        "f1": 0.842105,
+        "precision": 0.96,
+        "recall": 0.75,
+        "test_support": 32,
+        "train_support": 200
       },
       "Sports & Fitness": {
-        "f1": 0.857143,
-        "precision": 0.875,
-        "recall": 0.84,
-        "test_support": 25,
-        "train_support": 116
+        "f1": 0.8,
+        "precision": 0.758621,
+        "recall": 0.846154,
+        "test_support": 26,
+        "train_support": 113
       },
       "Sunglasses": {
         "f1": 1.0,
         "precision": 1.0,
         "recall": 1.0,
         "test_support": 6,
-        "train_support": 28
+        "train_support": 25
       },
       "Tools & Hardware": {
-        "f1": 1.0,
+        "f1": 0.972222,
         "precision": 1.0,
-        "recall": 1.0,
-        "test_support": 50,
-        "train_support": 233
+        "recall": 0.945946,
+        "test_support": 74,
+        "train_support": 209
       },
       "Toys & School Supplies": {
-        "f1": 0.868687,
-        "precision": 0.826923,
-        "recall": 0.914894,
-        "test_support": 47,
-        "train_support": 222
+        "f1": 0.845361,
+        "precision": 0.854167,
+        "recall": 0.836735,
+        "test_support": 49,
+        "train_support": 220
       },
       "Watches": {
         "f1": 1.0,
         "precision": 1.0,
         "recall": 1.0,
-        "test_support": 79,
-        "train_support": 371
+        "test_support": 86,
+        "train_support": 364
+      }
+    },
+    "row_wise": {
+      "candidates": {
+        "linear_svc": {
+          "accuracy": 0.975223,
+          "macro_f1": 0.939828,
+          "samples": 2583,
+          "weighted_f1": 0.975126
+        },
+        "logistic_regression": {
+          "accuracy": 0.971351,
+          "macro_f1": 0.926388,
+          "samples": 2583,
+          "weighted_f1": 0.970787
+        }
+      },
+      "caveat": "Row-wise split. The catalog repeats one product across sizes, colours, sellers, and re-postings, so a listing's near-identical twin can sit in the training partition. This number is therefore an upper bound that includes memorization; the grouped product-family result is the one to quote.",
+      "evaluation": "row_wise_holdout",
+      "fit_seconds": 9.88,
+      "per_category": {
+        "Automotive": {
+          "f1": 0.983713,
+          "precision": 0.974194,
+          "recall": 0.993421,
+          "test_support": 152,
+          "train_support": 706
+        },
+        "Baby Care": {
+          "f1": 0.808511,
+          "precision": 0.826087,
+          "recall": 0.791667,
+          "test_support": 48,
+          "train_support": 227
+        },
+        "Bags, Wallets & Belts": {
+          "f1": 0.918919,
+          "precision": 0.944444,
+          "recall": 0.894737,
+          "test_support": 38,
+          "train_support": 181
+        },
+        "Beauty and Personal Care": {
+          "f1": 0.990385,
+          "precision": 1.0,
+          "recall": 0.980952,
+          "test_support": 105,
+          "train_support": 491
+        },
+        "Cameras & Accessories": {
+          "f1": 0.96,
+          "precision": 1.0,
+          "recall": 0.923077,
+          "test_support": 13,
+          "train_support": 57
+        },
+        "Clothing": {
+          "f1": 0.994055,
+          "precision": 0.997613,
+          "recall": 0.990521,
+          "test_support": 844,
+          "train_support": 3936
+        },
+        "Computers": {
+          "f1": 0.953488,
+          "precision": 0.964706,
+          "recall": 0.942529,
+          "test_support": 87,
+          "train_support": 403
+        },
+        "Footwear": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "test_support": 168,
+          "train_support": 785
+        },
+        "Furniture": {
+          "f1": 0.892857,
+          "precision": 0.862069,
+          "recall": 0.925926,
+          "test_support": 27,
+          "train_support": 123
+        },
+        "Health & Personal Care Appliances": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "test_support": 7,
+          "train_support": 30
+        },
+        "Home Decor & Festive Needs": {
+          "f1": 0.963563,
+          "precision": 0.959677,
+          "recall": 0.96748,
+          "test_support": 123,
+          "train_support": 573
+        },
+        "Home Furnishing": {
+          "f1": 0.981818,
+          "precision": 0.964286,
+          "recall": 1.0,
+          "test_support": 81,
+          "train_support": 382
+        },
+        "Home Improvement": {
+          "f1": 0.909091,
+          "precision": 1.0,
+          "recall": 0.833333,
+          "test_support": 12,
+          "train_support": 57
+        },
+        "Jewellery": {
+          "f1": 0.997768,
+          "precision": 0.997768,
+          "recall": 0.997768,
+          "test_support": 448,
+          "train_support": 2087
+        },
+        "Kitchen & Dining": {
+          "f1": 0.95,
+          "precision": 0.92233,
+          "recall": 0.979381,
+          "test_support": 97,
+          "train_support": 450
+        },
+        "Mobiles & Accessories": {
+          "f1": 0.928177,
+          "precision": 0.903226,
+          "recall": 0.954545,
+          "test_support": 88,
+          "train_support": 412
+        },
+        "Pens & Stationery": {
+          "f1": 0.8,
+          "precision": 0.882353,
+          "recall": 0.731707,
+          "test_support": 41,
+          "train_support": 191
+        },
+        "Sports & Fitness": {
+          "f1": 0.857143,
+          "precision": 0.875,
+          "recall": 0.84,
+          "test_support": 25,
+          "train_support": 116
+        },
+        "Sunglasses": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "test_support": 6,
+          "train_support": 28
+        },
+        "Tools & Hardware": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "test_support": 50,
+          "train_support": 233
+        },
+        "Toys & School Supplies": {
+          "f1": 0.868687,
+          "precision": 0.826923,
+          "recall": 0.914894,
+          "test_support": 47,
+          "train_support": 222
+        },
+        "Watches": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "test_support": 79,
+          "train_support": 371
+        }
+      },
+      "selected_model": "linear_svc",
+      "sizes": {
+        "test": 2586,
+        "train": 12061,
+        "validation": 2583
+      },
+      "split_version": "discovery-split-v1",
+      "test": {
+        "accuracy": 0.974865,
+        "macro_f1": 0.943553,
+        "samples": 2586,
+        "top_2_accuracy": 0.989559,
+        "top_3_accuracy": 0.992266,
+        "weighted_f1": 0.974712
+      },
+      "test_id_digest": "26e76cad667e637fef54a631646c3ca9026d7f4fa79aef52c40112bd93f36851",
+      "validation": {
+        "accuracy": 0.975223,
+        "macro_f1": 0.939828,
+        "samples": 2583,
+        "weighted_f1": 0.975126
       }
     },
     "selected_model": "linear_svc",
     "sizes": {
       "dropped_rows": 472,
       "labelled_rows": 17230,
-      "test": 2586,
-      "train": 12061,
-      "validation": 2583
+      "test": 2539,
+      "train": 12140,
+      "validation": 2551
     },
     "test": {
-      "accuracy": 0.974865,
-      "macro_f1": 0.943553,
-      "samples": 2586,
-      "top_2_accuracy": 0.989559,
-      "top_3_accuracy": 0.992266,
-      "weighted_f1": 0.974712
+      "accuracy": 0.975581,
+      "macro_f1": 0.944371,
+      "samples": 2539,
+      "top_2_accuracy": 0.990547,
+      "top_3_accuracy": 0.99488,
+      "weighted_f1": 0.975392
     },
     "validation": {
-      "accuracy": 0.975223,
-      "macro_f1": 0.939828,
-      "samples": 2583,
-      "weighted_f1": 0.975126
+      "accuracy": 0.967072,
+      "macro_f1": 0.919841,
+      "samples": 2551,
+      "weighted_f1": 0.96609
     }
   },
   "embedding_index": {
-    "artifact_bytes": 5305240,
-    "artifact_sha256": "196e9b44f98e5b90abbb907a9b2405c27d1c4e101f56387e841c0ca58a806498",
+    "artifact_bytes": 5305286,
+    "artifact_sha256": "6df7bdee9fe87e47f4bbca644b549ef5c44e11b13303708aa0241efbb797fb01",
     "dimensions": 192,
     "document_count": 17702,
     "explained_variance": 0.458214,
-    "fit_seconds": 3.505,
+    "fit_seconds": 14.239,
     "trainer": "tfidf-truncated-svd-lsa-v1",
     "vocabulary_size": 9243
   },
   "lexical_index": {
-    "artifact_bytes": 2012379,
-    "artifact_sha256": "0a0a6ef3c93c63eb357c03091faa7f7722d89fa2122b035ff337081e0b5b7feb",
-    "build_seconds": 2.012,
+    "artifact_bytes": 2012425,
+    "artifact_sha256": "829f41b57708dc57f58e2eb4b62a2d4e314ea6b87c2cc95b22bc8c4c7279e659",
+    "build_seconds": 3.248,
     "documents": 17702,
     "terms": 25539
   }

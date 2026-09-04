@@ -7,6 +7,16 @@ thing it described has changed.
 
 If an artifact is missing, the corresponding block reports itself unavailable
 rather than falling back to a remembered value.
+
+Two rules about naming, both learned the hard way:
+
+*   A latency field named ``retrieval`` carries retrieval latency. The scale
+    benchmark measures two different things - the retrieval call alone, and the
+    whole discovery request including intent parsing, classification, mismatch,
+    anomaly and transactability - and they are ~2 ms apart. They are surfaced as
+    separate fields with separate labels; neither is loaded into the other.
+*   A metric is named for what was computed. The diversity figure counts unique
+    *titles*, so it is called a title metric, not "distinct products".
 """
 
 from __future__ import annotations
@@ -31,6 +41,14 @@ EVIDENCE_KINDS = (
     "ENGINEERING_QUALITY",
 )
 
+#: The configuration the runtime actually serves.
+SHIPPED_CONFIGURATION = "lexical_only_alpha_1.00__deduplicated"
+
+MEASUREMENT_SCOPE = (
+    "Single process, one machine, no concurrency, no network, measured on the "
+    "imported catalog. Not a distributed-throughput claim and not extrapolated."
+)
+
 
 def _read(path: Path) -> dict[str, Any] | None:
     try:
@@ -41,12 +59,12 @@ def _read(path: Path) -> dict[str, Any] | None:
 
 
 def _best_retrieval_configuration(report: Mapping[str, Any]) -> dict[str, Any] | None:
-    """The configuration the runtime actually uses: lexical, deduplicated."""
+    """The configuration the runtime actually uses: BM25, deduplicated."""
 
     configurations = report.get("configurations")
     if not isinstance(configurations, Mapping):
         return None
-    preferred = configurations.get("lexical_only_alpha_1.00__deduplicated")
+    preferred = configurations.get(SHIPPED_CONFIGURATION)
     if isinstance(preferred, Mapping):
         return dict(preferred)
     for value in configurations.values():
@@ -58,14 +76,16 @@ def _best_retrieval_configuration(report: Mapping[str, Any]) -> dict[str, Any] |
 def system_scale(
     *, repository_root: Path, models_dir: Path
 ) -> dict[str, Any]:
-    """Catalog size, index size, and measured retrieval latency."""
+    """Catalog size, index size, and measured latency at both boundaries."""
 
     scale = _read(repository_root / ARTIFACT_DIR / SCALE_REPORT)
     training = _read(models_dir / TRAINING_REPORT)
     retrieval = _read(repository_root / ARTIFACT_DIR / RETRIEVAL_REPORT)
     if scale is None and training is None:
         return {"available": False, "reason": "No scale benchmark has been recorded."}
-    latency = (scale or {}).get("query_latency_ms", {})
+    # Two distinct measurements, kept in two distinct fields.
+    retrieval_latency = (scale or {}).get("retrieval_latency_ms", {}) or {}
+    request_latency = (scale or {}).get("query_latency_ms", {}) or {}
     return {
         "available": True,
         "kind": "SYSTEM_SCALE",
@@ -77,15 +97,29 @@ def system_scale(
         "cold_load_seconds": (scale or {}).get("cold_load_seconds"),
         "resident_memory_mb": (scale or {}).get("resident_memory_mb"),
         "queries_executed": (scale or {}).get("queries_executed"),
+        "queries_timed": (scale or {}).get("queries_timed"),
         "queries_per_second": (scale or {}).get("queries_per_second"),
-        "p50_ms": latency.get("p50"),
-        "p95_ms": latency.get("p95"),
-        "p99_ms": latency.get("p99"),
+        "retrieval_queries_per_second": (scale or {}).get(
+            "retrieval_queries_per_second"
+        ),
+        # Retrieval alone: structured filters, BM25 over the frozen index, and
+        # near-duplicate suppression.
+        "retrieval_p50_ms": retrieval_latency.get("p50"),
+        "retrieval_p95_ms": retrieval_latency.get("p95"),
+        "retrieval_p99_ms": retrieval_latency.get("p99"),
+        # The whole discovery request: the above plus intent parsing,
+        # classification, mismatch, anomaly, and transactability per candidate.
+        "request_p50_ms": request_latency.get("p50"),
+        "request_p95_ms": request_latency.get("p95"),
+        "request_p99_ms": request_latency.get("p99"),
         "evaluated_queries": (retrieval or {}).get("queries"),
+        "environment": (scale or {}).get("environment"),
         "source": f"{ARTIFACT_DIR.as_posix()}/{SCALE_REPORT}",
-        "caveat": (
-            "Single process, one machine, measured on the imported catalog. "
-            "Not a distributed-throughput claim and not extrapolated."
+        "caveat": MEASUREMENT_SCOPE,
+        "latency_note": (
+            "Retrieval percentiles time the retrieval call. Request percentiles "
+            "time the whole discovery request. They are different measurements "
+            "and are never substituted for one another."
         ),
     }
 
@@ -99,7 +133,11 @@ def model_quality(*, repository_root: Path, models_dir: Path) -> dict[str, Any]:
     if training is None and retrieval is None:
         return {"available": False, "reason": "No model evaluation has been recorded."}
     classifier = (training or {}).get("category_classifier", {})
-    test = classifier.get("test", {})
+    # The headline is the grouped product-family evaluation. The row-wise number
+    # is carried alongside, labelled, so the earlier claim stays visible.
+    grouped = classifier.get("grouped_family", {})
+    row_wise = classifier.get("row_wise", {})
+    headline = grouped.get("test", {}) or classifier.get("test", {})
     best = _best_retrieval_configuration(retrieval or {}) or {}
     return {
         "available": True,
@@ -107,22 +145,41 @@ def model_quality(*, repository_root: Path, models_dir: Path) -> dict[str, Any]:
         "classifier": {
             "model": classifier.get("selected_model"),
             "classes": classifier.get("class_count"),
-            "accuracy": test.get("accuracy"),
-            "macro_f1": test.get("macro_f1"),
-            "weighted_f1": test.get("weighted_f1"),
-            "top_2_accuracy": test.get("top_2_accuracy"),
-            "train": classifier.get("sizes", {}).get("train"),
-            "validation": classifier.get("sizes", {}).get("validation"),
-            "test": classifier.get("sizes", {}).get("test"),
+            "evaluation": classifier.get(
+                "headline_evaluation", "grouped_product_family_holdout"
+            ),
+            "accuracy": headline.get("accuracy"),
+            "macro_f1": headline.get("macro_f1"),
+            "weighted_f1": headline.get("weighted_f1"),
+            "top_2_accuracy": headline.get("top_2_accuracy"),
+            "train": grouped.get("sizes", {}).get("train"),
+            "validation": grouped.get("sizes", {}).get("validation"),
+            "test": grouped.get("sizes", {}).get("test"),
+            "family_groups": grouped.get("group_counts", {}).get("total"),
+            "family_key_version": grouped.get("family_key_version"),
+            "split_note": grouped.get("caveat"),
+            "row_wise": {
+                "accuracy": row_wise.get("test", {}).get("accuracy"),
+                "macro_f1": row_wise.get("test", {}).get("macro_f1"),
+                "weighted_f1": row_wise.get("test", {}).get("weighted_f1"),
+                "caveat": row_wise.get("caveat"),
+            },
             "advisory_only": True,
         },
         "retrieval": {
             "configuration": best.get("name"),
+            "method": (
+                "BM25 ranking, plus learned embedding-based near-duplicate "
+                "suppression. Embeddings do not rerank search."
+            ),
             "recall_at_5": best.get("recall_at_5"),
             "recall_at_10": best.get("recall_at_10"),
             "mrr": best.get("mrr"),
             "queries": best.get("queries"),
-            "distinct_title_fraction": best.get("distinct_title_fraction"),
+            "distinct_title_at_8": best.get("distinct_title_at_8"),
+            "unique_title_fraction_at_10": best.get("unique_title_fraction_at_10"),
+            "query_set_sha256": (retrieval or {}).get("query_set_sha256"),
+            "ranking_finding": (retrieval or {}).get("ranking_finding"),
         },
         "negative_results": _negative_results(retrieval, anomaly),
         "boundary": (
@@ -141,18 +198,24 @@ def _negative_results(
     findings: list[dict[str, str]] = []
     if retrieval:
         configurations = retrieval.get("configurations", {})
-        lexical = configurations.get("lexical_only_alpha_1.00__deduplicated", {})
+        lexical = configurations.get(SHIPPED_CONFIGURATION, {})
         dense = configurations.get("dense_only_alpha_0.00__deduplicated", {})
         if lexical and dense:
             findings.append(
                 {
-                    "finding": "The learned dense retriever did not beat BM25.",
+                    "finding": (
+                        "A learned dense ranker was evaluated and did not improve "
+                        "retrieval over BM25 on this corpus, so it is not used "
+                        "for ranking."
+                    ),
                     "detail": (
                         f"Recall@10 {dense.get('recall_at_10')} against "
-                        f"{lexical.get('recall_at_10')} for lexical alone, and every "
-                        "intermediate blend fell between them. The default blend is "
-                        "therefore lexical; the embedding index is kept for "
-                        "near-duplicate suppression, where it is measurably useful."
+                        f"{lexical.get('recall_at_10')} for BM25 alone, and every "
+                        "intermediate blend fell between them. The shipped alpha "
+                        "is 1.0, which means the embedding contributes nothing to "
+                        "ranking. The embedding index is still loaded, and earns "
+                        "its place in near-duplicate suppression, where it is "
+                        "measurably useful."
                     ),
                 }
             )
@@ -161,12 +224,16 @@ def _negative_results(
             )
             findings.append(
                 {
-                    "finding": "Latent semantic analysis does not do paraphrase matching here.",
+                    "finding": (
+                        "Latent semantic analysis does not do paraphrase matching "
+                        "here."
+                    ),
                     "detail": (
                         "On queries that describe a need without naming the product "
-                        f"({paraphrase} Recall@10 for the best configuration), no blend "
-                        "recovered the intended listings. A contextual encoder would "
-                        "likely help and could not be served in a dependency-free image."
+                        f"({paraphrase} Recall@10 for the shipped configuration), no "
+                        "blend recovered the intended listings. A contextual encoder "
+                        "would likely help and could not be served in a "
+                        "dependency-free image."
                     ),
                 }
             )
@@ -178,7 +245,9 @@ def _negative_results(
                     f"IsolationForest scored ROC AUC "
                     f"{anomaly.get('candidate', {}).get('roc_auc')} against "
                     f"{anomaly.get('baseline', {}).get('roc_auc')} for the "
-                    "deterministic analytics on the same frozen set, so it is not "
+                    "deterministic analytics on the same held-out rows - fitted "
+                    "on an ordinary training control and scored on disjoint "
+                    "ordinary controls plus the defective rows - so it is not "
                     "shipped."
                 ),
             }
@@ -189,11 +258,13 @@ def _negative_results(
                 {
                     "finding": "The supervised classifier did earn its place.",
                     "detail": (
-                        "On listings whose category claim was laundered - the one "
-                        "defect no field comparison can see - including the "
+                        "On listings whose category claim was laundered - title and "
+                        "description replaced, every structured field left alone, "
+                        "the one defect no field comparison can see - including the "
                         "classifier's disagreement moved ROC AUC from "
                         f"{ablation.get('without_ml_mismatch_feature', {}).get('roc_auc')} "
-                        f"to {ablation.get('with_ml_mismatch_feature', {}).get('roc_auc')}."
+                        f"to {ablation.get('with_ml_mismatch_feature', {}).get('roc_auc')}. "
+                        "It raises REVIEW. It cannot ALLOW."
                     ),
                 }
             )

@@ -79,6 +79,64 @@ def _exact_mapping(
 
 
 @dataclass(frozen=True, slots=True)
+class SelectedProductIdentity:
+    """Server-resolved identity for a clicked registered catalog listing.
+
+    This value never comes from buyer prose. Once present, every proposal must
+    match its exact merchant and SKU or authorization stops.
+    """
+
+    merchant_id: str
+    sku: str
+    catalog_product_id: str
+    source: str
+    source_product_id: str
+
+    def __post_init__(self) -> None:
+        _identifier(self.merchant_id, "merchant_id")
+        _identifier(self.sku, "sku")
+        _identifier(self.catalog_product_id, "catalog_product_id")
+        _identifier(self.source, "source")
+        _bounded_text(self.source_product_id, "source_product_id", 512)
+        if self.source != "mandateguard":
+            raise ValueError("selected product must come from the registered source")
+        if self.source_product_id != f"{self.merchant_id}/{self.sku}":
+            raise ValueError("selected product source identity does not match merchant and SKU")
+
+    @classmethod
+    def from_mapping(cls, value: object) -> SelectedProductIdentity:
+        data = _exact_mapping(
+            value,
+            frozenset(
+                {
+                    "merchant_id",
+                    "sku",
+                    "catalog_product_id",
+                    "source",
+                    "source_product_id",
+                }
+            ),
+            "selected_product_identity",
+        )
+        return cls(
+            merchant_id=data["merchant_id"],
+            sku=data["sku"],
+            catalog_product_id=data["catalog_product_id"],
+            source=data["source"],
+            source_product_id=data["source_product_id"],
+        )
+
+    def to_mapping(self) -> dict[str, str]:
+        return {
+            "merchant_id": self.merchant_id,
+            "sku": self.sku,
+            "catalog_product_id": self.catalog_product_id,
+            "source": self.source,
+            "source_product_id": self.source_product_id,
+        }
+
+
+@dataclass(frozen=True, slots=True)
 class InterpretedPurchaseIntent:
     """Typed interpretation used to construct the authoritative mandate."""
 

@@ -22,6 +22,10 @@ class CatalogUnavailableError(RuntimeError):
     Raised, never swallowed: a silently empty catalog would make the product
     report "no product matches your intent" for every intent, which reads as a
     policy result rather than a missing file.
+
+    The message names the artifact, never where it lives. A public deployment
+    surfaces these strings, and a filesystem path is deployment topology that a
+    visitor has no business learning from an error.
     """
 
 
@@ -102,8 +106,7 @@ def load_catalog(processed_dir: Path) -> DiscoveryCatalog:
         payload = catalog_path.read_bytes()
     except OSError as error:
         raise CatalogUnavailableError(
-            f"discovery catalog not found at {catalog_path}. "
-            "Run scripts/import_discovery_catalog.py."
+            f"{CATALOG_FILENAME} is not present in this deployment"
         ) from error
     digest = sha256(payload).hexdigest()
     try:
@@ -118,7 +121,7 @@ def load_catalog(processed_dir: Path) -> DiscoveryCatalog:
             products.append(DiscoveryProduct.from_mapping(json.loads(line)))
         except (json.JSONDecodeError, DiscoverySchemaError) as error:
             raise CatalogUnavailableError(
-                f"discovery catalog line {number} is invalid: {error}"
+                f"{CATALOG_FILENAME} line {number} is invalid"
             ) from error
     if not products:
         raise CatalogUnavailableError("discovery catalog contains no listings")

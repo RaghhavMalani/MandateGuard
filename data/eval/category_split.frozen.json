@@ -139,7 +139,7 @@
       "validation": 80
     }
   },
-  "note": "Membership is sha256(split_version|catalog_product_id) thresholded within each label. It does not depend on row order or a RNG seed.",
+  "note": "Membership is sha256(split_version|unit_id) thresholded within each label, where the unit is a row for the row-wise split and a product family for the grouped split. It does not depend on row order or a RNG seed.",
   "sizes": {
     "test": 2586,
     "train": 12061,

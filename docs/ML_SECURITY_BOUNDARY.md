@@ -142,6 +142,6 @@ layer is additive, and it is additive on the *outside* of the boundary.
 | Transactability | naming what is missing | declaring a purchase safe |
 
 The one place a trained model does something the deterministic layer
-demonstrably cannot is category laundering — ROC AUC 0.4519 without the
-classifier, 0.9647 with it, on the frozen non-circular evaluation. Even there,
+demonstrably cannot is category laundering — ROC AUC 0.4272 without
+the classifier, 0.9497 with it, on the held-out non-circular evaluation. Even there,
 the effect is `SURFACE_REVIEW`. It moves a human's attention, not money.

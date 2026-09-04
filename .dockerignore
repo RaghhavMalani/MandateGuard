@@ -13,7 +13,6 @@
 **/*.egg-info
 
 # Not read by the running server.
-artifacts
 benchmark
 docs
 schemas
@@ -26,15 +25,37 @@ fixtures/*
 !fixtures/recovery/
 !fixtures/recovery/**
 
-# The discovery catalog and its frozen indexes are read at startup. The raw
-# dataset archive and the evaluation query set are not: training happens on a
-# developer machine, and only its outputs are served.
+# The measured reports the product actually renders.
+#
+# SYSTEM SCALE and MODEL QUALITY are read at startup by
+# src/mandateguard/product/scale_evidence.py. Excluding them made the interface
+# advertise measurements the container could not load, so the four files that
+# module reads are allowlisted by name - and nothing else under artifacts/ is.
+# Each parent directory is re-included explicitly, because an excluded directory
+# is not descended into.
+artifacts/*
+!artifacts/engineering
+artifacts/engineering/*
+!artifacts/engineering/discovery
+artifacts/engineering/discovery/*
+!artifacts/engineering/discovery/scale_benchmark.json
+!artifacts/engineering/discovery/retrieval_evaluation.json
+!artifacts/engineering/discovery/anomaly_evaluation.json
+
+# The discovery catalog, its frozen indexes, and the training report that the
+# MODEL QUALITY surface reads. The raw dataset archive and the evaluation query
+# sets are not shipped: training and evaluation happen on a developer machine,
+# and only their outputs are served.
+#
+# data/provenance/ travels with the image because the normalized catalog is a
+# CC BY-SA 4.0 derivative, and the attribution has to be wherever the data is.
 data/*
 !data/processed/
 !data/processed/**
 !data/models/
 !data/models/**
-data/models/training_report.json
+!data/provenance/
+!data/provenance/**
 data/models/category_confusion.json
 
 Dockerfile

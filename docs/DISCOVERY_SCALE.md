@@ -48,7 +48,8 @@ Executed: **1,525** queries (25 warm-up + 500 retrieval-only + 500 throughput +
 
 | | |
 | --- | ---: |
-| Catalog SKUs | **17,702** |
+| Catalog listings | **17,702** |
+| Of those, registered products with merchant evidence | 8 |
 | Top-level categories | 26 |
 | Distinct category paths | 6,338 |
 | Distinct brands | 3,370 |
@@ -132,7 +133,7 @@ excluded from the sample.
 ## What this does not show
 
 * **Not distributed throughput.** One process, one machine, sequential.
-* **Not extrapolated.** There is no "and therefore N million SKUs" claim here,
+* **Not extrapolated.** There is no "and therefore N million listings" claim here,
   because nothing was measured at that size.
 * **Not production traffic.** A generated workload over a 2016 crawl.
 * **Not authorization performance.** These are retrieval numbers. The
@@ -140,9 +141,15 @@ excluded from the sample.
   separately, in
   [`RESOLVE_EVALUATION_RESULTS.md`](RESOLVE_EVALUATION_RESULTS.md).
 
-The honest ceiling of this measurement: a single free-tier container serves
-this catalog with sub-30 ms P99 and under 50 MB of resident state. What happens
-at 10× or 1,000× the corpus was not measured and is not claimed.
+The honest ceiling of this measurement: one Python process on the machine named
+above served this catalog at a 73.9 ms retrieval P99 and a
+86.2 ms full-request P99, with
+48.2 MB of resident state attributable to the engine.
+
+No container was measured. An earlier revision of this document claimed a
+free-tier container figure that no benchmark here produced; the sentence has been
+removed rather than re-derived. What happens at 10× or 1,000× the corpus, on
+other hardware, or under concurrency was not measured and is not claimed.
 
 Full report:
 [`artifacts/engineering/discovery/scale_benchmark.json`](../artifacts/engineering/discovery/scale_benchmark.json).

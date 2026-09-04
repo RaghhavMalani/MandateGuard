@@ -66,7 +66,7 @@ def main(argv: list[str] | None = None) -> int:
             f"{block['precision_at_5']:7.4f} {block['mrr']:7.4f} "
             f"{block['by_family']['literal']['recall_at_10']:7.4f} "
             f"{block['by_family']['paraphrase']['recall_at_10']:7.4f} "
-            f"{block['distinct_title_fraction']:8.4f} "
+            f"{block['distinct_title_at_8']:8.4f} "
             f"{block['latency_ms']['median']:7.2f}"
         )
     print(f"report: {args.out}")

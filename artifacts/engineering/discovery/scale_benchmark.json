@@ -2,39 +2,42 @@
   "benchmark_version": "discovery-scale-benchmark-v1",
   "catalog_bytes": 4933678,
   "catalog_listings": 17702,
+  "catalog_sha256": "7ad5d4f579eca4838eabca2de755003e0b513ff4213af683b4574559421ae09f",
   "categories": 26,
   "category_paths": 6338,
-  "cold_load_seconds": 0.2641,
+  "cold_load_seconds": 0.5544,
+  "document_count": 17702,
   "embedding_dimensions": 192,
   "empty_result_queries": 7,
   "environment": {
     "platform": "Windows-11-10.0.26200-SP0",
     "process_count": 1,
     "processor": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
-    "python": "3.12.13"
+    "python": "3.12.14"
   },
-  "index_bytes": 7317619,
+  "index_bytes": 7317711,
+  "latency_note": "retrieval_latency_ms times the retrieval call alone. query_latency_ms times the whole discovery request, which also parses the intent and runs classification, mismatch, anomaly and transactability per candidate. They are not interchangeable.",
   "lexical_terms": 25539,
-  "memory_attributable_to_engine_mb": 47.8,
+  "memory_attributable_to_engine_mb": 48.2,
   "queries_executed": 1525,
-  "queries_per_second": 87.63,
+  "queries_per_second": 26.22,
   "queries_timed": 500,
   "query_latency_ms": {
-    "max": 27.485,
-    "p50": 11.183,
-    "p95": 21.011,
-    "p99": 24.64
+    "max": 103.206,
+    "p50": 35.009,
+    "p95": 72.48,
+    "p99": 86.182
   },
-  "resident_memory_before_load_mb": 22.5,
-  "resident_memory_mb": 70.3,
+  "resident_memory_before_load_mb": 24.2,
+  "resident_memory_mb": 72.4,
   "retrieval_latency_ms": {
-    "max": 27.356,
-    "p50": 9.065,
-    "p95": 18.845,
-    "p99": 22.308
+    "max": 84.012,
+    "p50": 16.717,
+    "p95": 58.991,
+    "p99": 73.862
   },
-  "retrieval_queries_per_second": 108.6,
-  "scope_limit": "One process, one machine, no concurrency, no network. This is not a distributed-throughput measurement and nothing here is extrapolated to a larger corpus.",
+  "retrieval_queries_per_second": 44.25,
+  "scope_limit": "One process, one machine, no concurrency, no network. This is not a distributed-throughput measurement and nothing here is extrapolated to a larger corpus, to a container, or to any other hardware.",
   "top_k": 8,
   "workload_digest": "6608ba78d170764b1ac7ef2289a1c9f1d61ce9409f4dece55c0bba4ccd8de34f"
 }

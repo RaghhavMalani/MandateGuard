@@ -16,6 +16,7 @@ import urllib.request
 import pytest
 
 from mandateguard.discovery.trust import DISCOVERY_ONLY_STAGES
+from mandateguard.intelligence.models import SelectedProductIdentity
 from mandateguard.product.discovery_service import (
     DiscoverySurface,
     build_trusted_lookup,
@@ -101,7 +102,7 @@ def test_the_measured_negative_results_are_published_not_hidden(service) -> None
     findings = service.public_config()["model_quality"]["negative_results"]
     assert findings
     joined = " ".join(item["finding"] for item in findings)
-    assert "did not beat" in joined
+    assert "did not improve retrieval over BM25" in joined
     assert "rejected" in joined.lower()
 
 
@@ -158,13 +159,20 @@ def test_a_crawled_listing_ends_at_review_required_with_no_provider_call(service
     assert selection["transactable"] is False
     assert selection["status"] == "REVIEW REQUIRED"
     assert selection["stage"] == DISCOVERY_ONLY_STAGES[3]
-    assert selection["authorization_intent"] is None
+    assert selection["product_identity"] is None
     assert selection["payment_provider_calls"] == 0
     assert "will not manufacture an ALLOW" in selection["next_step"]
 
 
 @requires_catalog
-def test_a_registered_listing_hands_a_bound_intent_to_the_controller(service) -> None:
+def test_a_registered_listing_hands_a_typed_identity_to_the_controller(service) -> None:
+    """The handoff is a structured identity, never a sentence.
+
+    The previous design appended "SKU: <sku>" to the user's own text and let the
+    buyer's parser find it again. That made product identity a property of prose,
+    which the user also writes.
+    """
+
     intent = "Buy a study lamp under Rs 2000. No subscriptions."
     payload = service.discovery_search(intent=intent, top_k=8)
     vouched = next(item for item in payload["candidates"] if item["transactable"])
@@ -174,8 +182,16 @@ def test_a_registered_listing_hands_a_bound_intent_to_the_controller(service) ->
     assert selection["transactable"] is True
     assert selection["status"] == "READY FOR AUTHORIZATION"
     assert selection["stage"] == DISCOVERY_ONLY_STAGES[1]
-    assert "SKU:" in selection["authorization_intent"]
     assert selection["payment_provider_calls"] == 0
+
+    identity = selection["product_identity"]
+    assert identity is not None
+    assert identity["source"] == "mandateguard"
+    assert identity["merchant_id"] and identity["sku"]
+    assert identity["source_product_id"] == f"{identity['merchant_id']}/{identity['sku']}"
+    assert identity["catalog_product_id"] == vouched["catalog_product_id"]
+    # There is no prose channel left to carry identity.
+    assert "authorization_intent" not in selection
 
 
 @requires_catalog
@@ -186,8 +202,9 @@ def test_the_whole_journey_reaches_a_real_controller_decision(service) -> None:
     selection = service.discovery_select(
         intent=intent, catalog_product_id=vouched["catalog_product_id"]
     )["selection"]
+    identity = SelectedProductIdentity.from_mapping(selection["product_identity"])
     snapshot = service.run_sync(
-        user_intent=selection["authorization_intent"], timeout_seconds=60.0
+        user_intent=intent, selected_product=identity, timeout_seconds=60.0
     )
     result = snapshot["result"]
     assert result["decision"] in {"ALLOW", "BLOCK", "REVIEW"}
@@ -196,6 +213,12 @@ def test_the_whole_journey_reaches_a_real_controller_decision(service) -> None:
     )
     assert result["observed_counters"]["openai_calls"] == 0
     assert result["execution"]["external_network_calls"] == 0
+    # Whatever the controller decided, it decided about the clicked product.
+    assert result["buyer"]["merchant"] == identity.merchant_id
+    assert result["buyer"]["sku"] == identity.sku
+    # And the buyer saw the user's own sentence, with nothing appended to it.
+    assert result["buyer"]["buyer_provided_text"] == intent
+    assert "SKU:" not in result["buyer"]["buyer_provided_text"]
 
 
 @requires_catalog
@@ -262,13 +285,53 @@ def test_a_listing_whose_identifier_is_malformed_resolves_to_nothing(service) ->
     assert lookup(forged).evidence_count == 0
 
 
-def test_selection_of_an_untransactable_candidate_never_produces_an_intent() -> None:
+def test_selection_of_an_untransactable_candidate_never_produces_an_identity() -> None:
     selection = select(
         {"catalog_product_id": "flipkart.abc", "transactable": False, "source": "flipkart"},
         "buy something",
     )
-    assert selection.authorization_intent is None
+    assert selection.product_identity is None
     assert selection.transactable is False
+
+
+def test_a_crawled_listing_cannot_forge_a_registered_identity() -> None:
+    """A crawled listing that claims registered identity resolves to nothing.
+
+    `transactable` is set by the trusted-evidence lookup, so a candidate cannot
+    reach here claiming it. This asserts the second gate anyway: even a mapping
+    that claims both, from the wrong source, yields no identity.
+    """
+
+    for forged in (
+        {
+            "catalog_product_id": "flipkart.abc",
+            "transactable": True,
+            "source": "flipkart",
+            "source_product_id": "merchant-scholarly/studyglow-desk-lamp",
+        },
+        {
+            "catalog_product_id": "flipkart.abc",
+            "transactable": True,
+            "source": "MandateGuard",
+            "source_product_id": "merchant-scholarly/studyglow-desk-lamp",
+        },
+        {
+            "catalog_product_id": "flipkart.abc",
+            "transactable": True,
+            "source": "mandateguard",
+            "source_product_id": "no-slash-here",
+        },
+        {
+            "catalog_product_id": "flipkart.abc",
+            "transactable": True,
+            "source": "mandateguard",
+            "source_product_id": "merchant/with/extra/slashes",
+        },
+    ):
+        selection = select(forged, "buy something")
+        assert selection.product_identity is None
+        assert selection.transactable is False
+        assert selection.status == "REVIEW REQUIRED"
 
 
 # --------------------------------------------------------------------------

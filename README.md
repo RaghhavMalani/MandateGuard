@@ -251,11 +251,21 @@ and being able to *buy* it.
 
 ### The discovery catalog
 
-**17,702 listings**, 26 categories, 6,338 category paths, 3,370 brands, imported from the
-[Flipkart Products dataset](https://www.kaggle.com/datasets/PromptCloudHQ/flipkart-products)
+**17,702 catalog listings**, 26 categories, 6,338 category paths, 3,370 brands. 17,694 come
+from the [Flipkart Products dataset](https://www.kaggle.com/datasets/PromptCloudHQ/flipkart-products)
 published by PromptCloud under **CC BY-SA 4.0** and redistributed here in normalized form
-under the same licence. The raw archive is not committed; the normalized catalog and a
-manifest recording exactly which upstream bytes produced it are.
+under the same licence; the other 8 are separately registered MandateGuard merchant products.
+
+The licence is not asserted from memory. Kaggle's public dataset API response is preserved
+verbatim in [`data/provenance/flipkart-products/`](data/provenance/flipkart-products/)
+alongside the archive and member SHA-256s, the upstream row count, the retrieval date, and
+a written record of every transformation applied. The raw archive is not committed; the
+normalized catalog and a manifest recording exactly which upstream bytes produced it are.
+
+Every price in the crawled portion is a **historical listing price** captured between
+December 2015 and June 2016. The interface labels it as such wherever it appears; it is
+never presented as a live offer, and the controller never treats it as merchant price
+evidence.
 
 A discovery listing is **not** merchant authorization evidence, and there is a test that
 fails if any module in the discovery layer so much as imports the authorization path.
@@ -284,40 +294,72 @@ calls**. That is a designed outcome, not a failure: the alternative is manufactu
 
 ### Measured, including where the ML lost
 
+17,702 **catalog listings** — historical marketplace listings that are *searchable*. Only
+the 8 separately registered merchant products are transactable. Searchable is not
+transactable, and the two counts are never merged.
+
 | | |
 | --- | ---: |
-| Catalog SKUs | 17,702 |
+| Catalog listings | 17,702 |
+| Of those, registered products with merchant evidence | 8 |
 | Index on disk | 6.98 MB |
-| Cold load | 0.264 s |
-| Resident memory | 47.8 MB attributable |
-| Retrieval P50 / P95 / P99 | 9.1 / 18.8 / 22.3 ms |
-| Queries per second, single process | 87.6 |
+| Cold load | 0.554 s |
+| Resident memory | 48.2 MB attributable |
+| **Retrieval** P50 / P95 / P99 | 16.7 / 59.0 / 73.9 ms |
+| **Full discovery request** P50 / P95 / P99 | 35.0 / 72.5 / 86.2 ms |
+| Retrieval calls per second, single process | 44.25 |
+| Full requests per second, single process | 26.22 |
 | Queries executed in the benchmark | 1,525 |
 
-**Category classifier** (TF-IDF → LinearSVC, 22 classes, split frozen before the test set
-was scored): macro F1 **0.9436**, weighted F1 0.9747, accuracy 0.9749. Advisory only — it
-cannot allow a payment.
+Retrieval times the retrieval call. The full request adds intent parsing, classification,
+mismatch, anomaly, and transactability for every candidate. They are ~2× apart and are never
+substituted for one another. One process, one machine, no concurrency, no network,
+on `Windows-11-10.0.26200-SP0`. Nothing here is extrapolated to a container or to
+other hardware.
 
-**Retrieval** (44 hand-authored queries, relevance defined before measurement): Recall@10
-**0.6121**, Recall@5 0.6250, MRR 0.6949.
+**Category classifier** (TF-IDF → LinearSVC, 22 classes). The headline is a **grouped
+product-family hold-out**: 11,662 families, assigned whole to one
+partition, so no test listing has a near-identical twin in training. Macro F1
+**0.9444**, weighted F1 0.9754, accuracy
+0.9756. The earlier row-wise split, which did not guarantee that,
+scored macro F1 0.9436 / accuracy 0.9749 —
+so on this corpus the leak was worth about 0.0008 macro F1,
+which is to say almost nothing. Both numbers are reported; the grouped one is quoted.
+Advisory only — it cannot allow a payment.
+
+**Retrieval** (44 hand-authored queries; a fixed evaluation set committed with this
+milestone, digest `d369cf66c0504e99…`, not an independently preregistered
+evaluation): Recall@10 **0.6205**, Recall@5 0.6205,
+MRR 0.6851, DistinctTitle@8 0.8523.
+
+The shipped ranker is **BM25** with structured filters, plus **learned embedding-based
+near-duplicate suppression**. `DEFAULT_ALPHA` is 1.0, so embeddings do not rerank search.
 
 Three things were built, measured, and then **not shipped as claimed**:
 
-- **The learned dense retriever did not beat BM25.** The alpha sweep is monotone in the
-  wrong direction, so the shipped blend is lexical. The embedding index earns its place
-  elsewhere — near-duplicate suppression, which moves distinct products in a top-8 result
-  from 0.82 to 1.00.
+- **A learned dense ranker was evaluated and did not improve retrieval over BM25 on this
+  corpus, so it is not used for ranking.** Recall@10 0.5338 against
+  0.6205 for BM25 alone, and every intermediate blend fell between them.
+  The embedding index earns its place elsewhere — near-duplicate suppression, which moves
+  DistinctTitle@8 from 0.8239 to 0.8523.
+  That is a smaller gain than an earlier revision claimed: the previous 1.00 came from a
+  shortcut that suppressed any listing sharing a display title, which also hid genuinely
+  different offers at different prices. The shortcut is gone.
 - **Latent semantic analysis does no paraphrase matching on this corpus.** Queries that
   describe a need without naming the product score 0.10 at best across every configuration,
   and 0.000 across eight principled model variants. A contextual encoder would likely help
   and could not be served in a dependency-free image. That trade-off is the finding.
-- **An unsupervised anomaly detector was rejected.** IsolationForest scored ROC AUC 0.5618
-  against 0.9942 for the deterministic analytics on the same frozen set.
+- **An unsupervised anomaly detector was rejected.** IsolationForest scored ROC AUC
+  0.5362 against 0.9913 for the
+  deterministic analytics — fitted on 151 ordinary
+  training rows and scored on 449 disjoint held-out rows, so the
+  negatives it is judged against are not rows it was fitted on.
 
 One ML component did earn its keep, on the one evaluation case that is not circular. When a
-listing's declared category is laundered — its text replaced with another category's while
-every structured field stays untouched — no field comparison can see it. Including the
-classifier's disagreement moves ROC AUC from **0.4519 to 0.9647**. Even there the effect is
+listing's declared category is laundered — its title and description replaced with another
+category's while every structured field, brand included, stays untouched — no field
+comparison can see it. Including the classifier's disagreement moves ROC AUC from
+**0.4272 to 0.9497**. Even there the effect is
 `SURFACE_REVIEW`: it moves a human's attention, not money.
 
 Method, full tables, and negative results:

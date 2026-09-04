@@ -210,6 +210,11 @@ def run_benchmark(
     return {
         "benchmark_version": BENCHMARK_VERSION,
         "workload_digest": digest,
+        # Binds this measurement to the exact catalog it was taken on, the same
+        # way every frozen index is bound. A benchmark that does not name its
+        # corpus is a number without a subject.
+        "catalog_sha256": engine.catalog.catalog_sha256,
+        "document_count": len(engine.catalog),
         "queries_executed": len(queries) * 3 + WARMUP_QUERIES,
         "queries_timed": len(queries),
         "top_k": top_k,
@@ -252,6 +257,12 @@ def run_benchmark(
         "scope_limit": (
             "One process, one machine, no concurrency, no network. This is not a "
             "distributed-throughput measurement and nothing here is extrapolated "
-            "to a larger corpus."
+            "to a larger corpus, to a container, or to any other hardware."
+        ),
+        "latency_note": (
+            "retrieval_latency_ms times the retrieval call alone. "
+            "query_latency_ms times the whole discovery request, which also "
+            "parses the intent and runs classification, mismatch, anomaly and "
+            "transactability per candidate. They are not interchangeable."
         ),
     }

@@ -360,7 +360,9 @@ test("an unstated constraint is surfaced rather than hidden", () => {
 
 test("the summary line reports catalog size and how many are transactable", () => {
   const line = discoverySummaryLine(discovery);
-  assert.match(line, /17,702 listings searched/);
+  assert.match(line, /17,702 catalog listings searched/);
+  // "Listings", not "SKUs": only the separately registered products have one.
+  assert.doesNotMatch(line, /SKU/);
   assert.match(line, /1 of 2 shown are transactable today/);
 });
 
@@ -377,26 +379,74 @@ test("system scale reports catalog, index, and latency without model metrics", (
     catalog_bytes: 4933678,
     cold_load_seconds: 0.264,
     resident_memory_mb: 70.3,
-    p50_ms: 9.065,
-    p95_ms: 18.845,
-    p99_ms: 22.308,
-    queries_per_second: 87.63,
+    retrieval_p50_ms: 16.652,
+    retrieval_p95_ms: 58.019,
+    retrieval_p99_ms: 73.668,
+    request_p50_ms: 37.094,
+    request_p95_ms: 75.881,
+    request_p99_ms: 91.584,
+    queries_per_second: 25.76,
+    retrieval_queries_per_second: 44.63,
     queries_executed: 1525,
+    environment: { platform: "Windows-11" },
     caveat: "Single process, one machine.",
+    latency_note: "They are not interchangeable.",
     source: "artifacts/engineering/discovery/scale_benchmark.json",
   });
-  assert.match(rendered, /Catalog SKUs/);
+  assert.match(rendered, /Catalog listings/);
   assert.match(rendered, /17,702/);
-  assert.match(rendered, /Retrieval P95/);
   assert.match(rendered, /Single process, one machine/);
   assert.doesNotMatch(rendered, /Macro F1/);
   assert.doesNotMatch(rendered, /Python tests/);
+  // 17,702 rows are searchable. Calling them SKUs claims a merchant behind each.
+  assert.doesNotMatch(rendered, /Catalog SKUs/);
+});
+
+test("retrieval latency and full-request latency are separate, labelled figures", () => {
+  const rendered = renderSystemScale({
+    available: true,
+    catalog_listings: 17702,
+    retrieval_p50_ms: 16.652,
+    retrieval_p95_ms: 58.019,
+    retrieval_p99_ms: 73.668,
+    request_p50_ms: 37.094,
+    request_p95_ms: 75.881,
+    request_p99_ms: 91.584,
+    queries_per_second: 25.76,
+    retrieval_queries_per_second: 44.63,
+    caveat: "Single process, one machine.",
+    latency_note: "They are not interchangeable.",
+    source: "artifacts/engineering/discovery/scale_benchmark.json",
+  });
+  // Split the two blocks and check each in isolation, so a number cannot
+  // satisfy an assertion by appearing in the other section.
+  const boundary = rendered.indexOf('id="scale-request-latency"');
+  assert.ok(boundary > 0, "the two latency blocks must be separate sections");
+  const retrievalBlock = rendered.slice(0, boundary);
+  const requestBlock = rendered.slice(boundary);
+
+  assert.match(retrievalBlock, /Retrieval P50[\s\S]*?16\.652 ms/);
+  assert.match(retrievalBlock, /Retrieval P95[\s\S]*?58\.019 ms/);
+  assert.match(retrievalBlock, /Retrieval P99[\s\S]*?73\.668 ms/);
+  assert.match(requestBlock, /Request P50[\s\S]*?37\.094 ms/);
+  assert.match(requestBlock, /Request P95[\s\S]*?75\.881 ms/);
+  assert.match(requestBlock, /Request P99[\s\S]*?91\.584 ms/);
+
+  // This is the mislabel that was shipped: the full-request percentiles loaded
+  // into fields labelled "Retrieval". None of them may appear there.
+  for (const value of ["37.094", "75.881", "91.584"]) {
+    assert.ok(
+      !retrievalBlock.includes(value),
+      `full-request latency ${value} appeared under a retrieval label`,
+    );
+  }
+  assert.match(rendered, /no concurrency/);
 });
 
 test("an unrecorded benchmark reports itself missing rather than showing a stale figure", () => {
   const rendered = renderSystemScale({ available: false, reason: "No scale benchmark recorded." });
   assert.match(rendered, /No scale benchmark recorded/);
-  assert.doesNotMatch(rendered, /Catalog SKUs/);
+  assert.doesNotMatch(rendered, /Catalog listings/);
 });
 
 test("model quality is labelled advisory and never merged with authorization", () => {
@@ -519,4 +569,234 @@ test("the attack grid header declares five columns", () => {
 test("the payment-reached flag is styled distinctly for yes and no", () => {
   assert.match(css, /\.paymentflag\[data-reached="NO"\]/);
   assert.match(css, /\.paymentflag\[data-reached="YES"\]/);
+});
+
+
+/* ------------------------------------------------------------------ */
+/* The first screen: why ML exists, and what it cannot do              */
+/* ------------------------------------------------------------------ */
+
+test("the first screen explains the pipeline before any control", () => {
+  const opening = html.slice(
+    html.indexOf('class="opening"'),
+    html.indexOf('class="walkthrough"'),
+  );
+  // The four stages, in order, above the fold.
+  assert.match(opening, /HISTORICAL MARKETPLACE LISTINGS/);
+  assert.match(opening, /ML \+ RETRIEVAL/);
+  assert.match(opening, /TRUST CHECK/);
+  assert.match(opening, /PAYMENT AUTHORIZATION/);
+  const order = [
+    opening.indexOf("HISTORICAL MARKETPLACE LISTINGS"),
+    opening.indexOf("ML + RETRIEVAL"),
+    opening.indexOf("TRUST CHECK"),
+    opening.indexOf("PAYMENT AUTHORIZATION"),
+  ];
+  assert.deepEqual(order, [...order].sort((a, b) => a - b), "stages must be in order");
+});
+
+test("the first screen says outright that ML never authorizes money", () => {
+  const opening = html.slice(
+    html.indexOf('class="opening"'),
+    html.indexOf('class="walkthrough"'),
+  );
+  assert.match(
+    opening,
+    /ML helps understand the commerce universe\. It never authorizes money\./,
+  );
+  assert.match(opening, /Searchable does not mean transactable\./);
+});
+
+test("the pipeline explains why the trust check exists", () => {
+  const opening = html.slice(
+    html.indexOf('class="opening"'),
+    html.indexOf('class="walkthrough"'),
+  );
+  assert.match(opening, /Is there authoritative merchant evidence\?/);
+  assert.match(opening, /deterministic controller decides/);
+  assert.match(opening, /Advisory, every one of them/);
+});
+
+test("the pipeline count is a placeholder the runtime fills, not a literal", () => {
+  // A typed-in 17,702 keeps its value after the catalog changes.
+  assert.match(html, /data-figure-target="catalog-listings"/);
+});
+
+/* ------------------------------------------------------------------ */
+/* Historical prices are labelled as historical                        */
+/* ------------------------------------------------------------------ */
+
+test("a crawled listing's price is labelled historical, never shown bare", () => {
+  const rendered = renderDiscoveryCandidate({
+    catalog_product_id: "flipkart.abc",
+    title: "Field Notebook Set",
+    top_category: "Pens & Stationery",
+    brand: "Fieldbook",
+    price_minor: 129900,
+    currency: "INR",
+    source: "flipkart",
+    transactable: false,
+    stage: "REVIEW_REQUIRED",
+    transactability: { status: "REVIEW REQUIRED", checks: [] },
+    match: { headline: "matched", detail: "detail" },
+  });
+  assert.match(rendered, /Historical listing price/);
+  assert.match(rendered, /2015-2016 dataset snapshot/);
+  assert.match(rendered, /data-historical="true"/);
+});
+
+test("a registered product's price is not labelled historical", () => {
+  const rendered = renderDiscoveryCandidate({
+    catalog_product_id: "mandateguard.abc",
+    title: "StudyGlow Desk Lamp",
+    top_category: "Home Decor & Festive Needs",
+    price_minor: 129900,
+    currency: "INR",
+    source: "mandateguard",
+    transactable: true,
+    stage: "EVIDENCE_READY",
+    transactability: { status: "EVIDENCE READY", checks: [] },
+    match: { headline: "matched", detail: "detail" },
+  });
+  assert.match(rendered, /Merchant-published price/);
+  assert.doesNotMatch(rendered, /Historical listing price/);
+});
+
+test("the results list carries a persistent historical-price explanation", () => {
+  const rendered = renderDiscoveryResults({
+    candidates: [
+      {
+        catalog_product_id: "flipkart.abc",
+        title: "Field Notebook Set",
+        top_category: "Pens & Stationery",
+        price_minor: 129900,
+        currency: "INR",
+        source: "flipkart",
+        transactable: false,
+        stage: "REVIEW_REQUIRED",
+        transactability: { status: "REVIEW REQUIRED", checks: [] },
+        match: { headline: "matched", detail: "detail" },
+      },
+    ],
+  });
+  assert.match(
+    rendered,
+    /Marketplace prices come from the historical discovery dataset and are not live offers\./,
+  );
+  assert.match(rendered, /data-historical-note="true"/);
+});
+
+test("a listing with no published price says so rather than showing zero", () => {
+  const rendered = renderDiscoveryCandidate({
+    catalog_product_id: "flipkart.abc",
+    title: "Unpriced Thing",
+    top_category: "Automotive",
+    price_minor: null,
+    currency: "INR",
+    source: "flipkart",
+    transactable: false,
+    stage: "REVIEW_REQUIRED",
+    transactability: { status: "REVIEW REQUIRED", checks: [] },
+    match: { headline: "matched", detail: "detail" },
+  });
+  assert.match(rendered, /No published price/);
+  assert.doesNotMatch(rendered, /Historical listing price/);
+});
+
+/* ------------------------------------------------------------------ */
+/* Model quality: honest metric names, both classifier evaluations     */
+/* ------------------------------------------------------------------ */
+
+test("retrieval quality names the metric it actually measured", () => {
+  const rendered = renderModelQuality({
+    available: true,
+    classifier: {
+      macro_f1: 0.944371,
+      weighted_f1: 0.975392,
+      accuracy: 0.975581,
+      top_2_accuracy: 0.990547,
+      classes: 22,
+      family_groups: 11662,
+      train: 12140,
+      validation: 2551,
+      test: 2539,
+      row_wise: { macro_f1: 0.943553, accuracy: 0.974865, caveat: "Row-wise split." },
+    },
+    retrieval: {
+      configuration: "lexical_only_alpha_1.00__deduplicated",
+      method: "BM25 ranking, plus learned embedding-based near-duplicate suppression. Embeddings do not rerank search.",
+      recall_at_10: 0.6205,
+      recall_at_5: 0.6205,
+      mrr: 0.6851,
+      distinct_title_at_8: 0.8523,
+      queries: 44,
+    },
+    negative_results: [],
+    boundary: "Model quality is not authorization accuracy.",
+  });
+  assert.match(rendered, /DistinctTitle@8/);
+  assert.match(rendered, /unique display titles among the 8 shown/);
+  // Never claimed as a count of distinct products.
+  assert.doesNotMatch(rendered, /Distinct results/);
+  assert.doesNotMatch(rendered, /distinct products/i);
+});
+
+test("retrieval quality states that embeddings do not rerank search", () => {
+  const rendered = renderModelQuality({
+    available: true,
+    classifier: { row_wise: {} },
+    retrieval: {
+      method:
+        "BM25 ranking, plus learned embedding-based near-duplicate suppression. Embeddings do not rerank search.",
+      distinct_title_at_8: 0.8523,
+    },
+    negative_results: [],
+    boundary: "Model quality is not authorization accuracy.",
+  });
+  assert.match(rendered, /BM25 ranking/);
+  assert.match(rendered, /near-duplicate suppression/);
+  assert.match(rendered, /Embeddings do not rerank search/);
+  assert.doesNotMatch(rendered, /LSA rerank/);
+  assert.doesNotMatch(rendered, /semantic rerank/i);
+  assert.doesNotMatch(rendered, /dense-enhanced/i);
+});
+
+test("the classifier headline is the grouped split and the row-wise one is shown too", () => {
+  const rendered = renderModelQuality({
+    available: true,
+    classifier: {
+      macro_f1: 0.944371,
+      weighted_f1: 0.975392,
+      accuracy: 0.975581,
+      classes: 22,
+      family_groups: 11662,
+      train: 12140,
+      validation: 2551,
+      test: 2539,
+      row_wise: { macro_f1: 0.943553, accuracy: 0.974865 },
+    },
+    retrieval: { distinct_title_at_8: 0.85 },
+    negative_results: [],
+    boundary: "Model quality is not authorization accuracy.",
+  });
+  assert.match(rendered, /Grouped product-family hold-out/);
+  assert.match(rendered, /11,662/);
+  assert.match(rendered, /product families/);
+  assert.match(rendered, /0\.944371/);
+  // The earlier claim is still visible rather than silently replaced.
+  assert.match(rendered, /row-wise split/);
+  assert.match(rendered, /0\.943553/);
+});
+
+test("the retrieval evaluation is not described as independently preregistered", () => {
+  const rendered = renderModelQuality({
+    available: true,
+    classifier: { row_wise: {} },
+    retrieval: { queries: 44, distinct_title_at_8: 0.85 },
+    negative_results: [],
+    boundary: "Model quality is not authorization accuracy.",
+  });
+  assert.match(rendered, /committed with this engineering milestone/);
+  assert.match(rendered, /not an independently\s+preregistered evaluation/);
+  assert.match(rendered, /query_set_sha256/);
 });

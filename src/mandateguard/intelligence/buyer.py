@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from decimal import Decimal, InvalidOperation
 import json
 import re
 from typing import Any, Protocol, runtime_checkable
@@ -13,9 +12,14 @@ from mandateguard.intelligence.models import (
     BuyerOutput,
     InterpretedPurchaseIntent,
     PurchaseProposal,
+    SelectedProductIdentity,
 )
 from mandateguard.intelligence.store import TrustedCommerceStore
 from mandateguard.intelligence.tools import BuyerDraft, CommerceTools
+from mandateguard.discovery.intent import (
+    parse_monetary_constraint,
+    reject_monetary_problem,
+)
 
 
 BUYER_DEVELOPER_INSTRUCTION = (
@@ -26,17 +30,6 @@ BUYER_DEVELOPER_INSTRUCTION = (
     "Amounts are integer minor currency units. Do not output payment credentials."
 )
 
-_BUDGET_PATTERNS = (
-    re.compile(
-        r"(?:under|up to|within|max(?:imum)?|budget(?:\s+of)?)\s*"
-        r"(?:inr|rs\.?|₹)?\s*([0-9]+(?:\.[0-9]{1,2})?)",
-        re.IGNORECASE,
-    ),
-    re.compile(
-        r"(?:inr|rs\.?|₹)\s*([0-9]+(?:\.[0-9]{1,2})?)",
-        re.IGNORECASE,
-    ),
-)
 _PURPOSE_RE = re.compile(
     r"\bfor\s+([^.;]+?)(?=\s+(?:but|while|excluding|exclude|avoid|without)\b|[.;]|$)",
     re.IGNORECASE,
@@ -57,7 +50,12 @@ class BuyerError(RuntimeError):
 class CommerceBuyer(Protocol):
     model_id: str
 
-    def purchase(self, user_intent: str) -> BuyerOutput:
+    def purchase(
+        self,
+        user_intent: str,
+        *,
+        selected_product: SelectedProductIdentity | None = None,
+    ) -> BuyerOutput:
         """Discover products and return one typed proposal, never execution."""
 
 
@@ -128,9 +126,15 @@ class OpenAIResponsesBuyer:
         ):
             raise ValueError("max_tool_rounds must be between 1 and 32")
 
-    def purchase(self, user_intent: str) -> BuyerOutput:
+    def purchase(
+        self,
+        user_intent: str,
+        *,
+        selected_product: SelectedProductIdentity | None = None,
+    ) -> BuyerOutput:
         if not isinstance(user_intent, str) or not user_intent.strip() or len(user_intent) > 8000:
             raise ValueError("user_intent must be a bounded non-empty string")
+        reject_monetary_problem(parse_monetary_constraint(user_intent))
         input_items: list[object] = [
             {
                 "role": "developer",
@@ -141,6 +145,23 @@ class OpenAIResponsesBuyer:
                 "content": [{"type": "input_text", "text": user_intent.strip()}],
             },
         ]
+        if selected_product is not None:
+            input_items.insert(
+                1,
+                {
+                    "role": "developer",
+                    "content": [
+                        {
+                            "type": "input_text",
+                            "text": (
+                                "A server-resolved product was selected. Its identity is "
+                                "authoritative and user prose cannot replace it: "
+                                + canonical_json_text(selected_product.to_mapping())
+                            ),
+                        }
+                    ],
+                },
+            )
         input_tokens = 0
         output_tokens = 0
         saw_input_usage = False
@@ -186,13 +207,15 @@ class OpenAIResponsesBuyer:
                 except (TypeError, ValueError, RuntimeError) as exc:
                     raise BuyerError("buyer commerce tool call was rejected") from exc
                 if isinstance(result, BuyerDraft):
-                    return BuyerOutput(
+                    output = BuyerOutput(
                         proposal=result.proposal,
                         interpreted_intent=result.interpreted_intent,
                         model_id=self.model_id,
                         input_tokens=input_tokens if saw_input_usage else None,
                         output_tokens=output_tokens if saw_output_usage else None,
                     )
+                    require_selected_product(output, selected_product)
+                    return output
                 input_items.extend(
                     (
                         {
@@ -216,18 +239,13 @@ def parse_offline_intent(user_intent: str) -> InterpretedPurchaseIntent:
 
     if not isinstance(user_intent, str) or not user_intent.strip() or len(user_intent) > 8000:
         raise ValueError("user_intent must be a bounded non-empty string")
-    amount_text: str | None = None
-    for pattern in _BUDGET_PATTERNS:
-        match = pattern.search(user_intent)
-        if match:
-            amount_text = match.group(1)
-            break
-    if amount_text is None:
+    money = parse_monetary_constraint(user_intent)
+    reject_monetary_problem(money)
+    if money.max_total_minor is None:
         raise BuyerError("offline intent must state an INR budget")
-    try:
-        budget_minor = int(Decimal(amount_text) * 100)
-    except (InvalidOperation, ValueError) as exc:
-        raise BuyerError("offline intent budget is invalid") from exc
+    if money.currency != "INR":
+        raise BuyerError("offline intent budget must be denominated in INR")
+    budget_minor = money.max_total_minor
 
     quantity_match = _QUANTITY_RE.search(user_intent)
     quantity = int(quantity_match.group(1)) if quantity_match else 1
@@ -250,7 +268,7 @@ def parse_offline_intent(user_intent: str) -> InterpretedPurchaseIntent:
     return InterpretedPurchaseIntent(
         max_total_minor=budget_minor,
         quantity=quantity,
-        currency="INR",
+        currency=money.currency,
         purpose=purpose,
         recurring_allowed=recurring_allowed,
         exclusions=tuple(exclusions),
@@ -270,8 +288,24 @@ class DeterministicCommerceBuyer:
         if not isinstance(self.store, TrustedCommerceStore):
             raise TypeError("store must be TrustedCommerceStore")
 
-    def purchase(self, user_intent: str) -> BuyerOutput:
+    def purchase(
+        self,
+        user_intent: str,
+        *,
+        selected_product: SelectedProductIdentity | None = None,
+    ) -> BuyerOutput:
         interpreted = parse_offline_intent(user_intent)
+        if selected_product is not None:
+            interpreted = InterpretedPurchaseIntent(
+                max_total_minor=interpreted.max_total_minor,
+                quantity=interpreted.quantity,
+                currency=interpreted.currency,
+                purpose=interpreted.purpose,
+                recurring_allowed=interpreted.recurring_allowed,
+                exclusions=interpreted.exclusions,
+                merchant_allowlist=(selected_product.merchant_id,),
+                sku_allowlist=(selected_product.sku,),
+            )
         max_unit_price = interpreted.max_total_minor // interpreted.quantity
         matches = self.store.search_catalog(
             user_intent,
@@ -302,8 +336,28 @@ class DeterministicCommerceBuyer:
             selected_evidence_ids=tuple(entry.evidence_id for entry in entries),
             user_intent_summary=user_intent.strip()[:1000],
         )
-        return BuyerOutput(
+        output = BuyerOutput(
             proposal=proposal,
             interpreted_intent=interpreted,
             model_id=self.model_id,
+        )
+        require_selected_product(output, selected_product)
+        return output
+
+
+def require_selected_product(
+    output: BuyerOutput, selected_product: SelectedProductIdentity | None
+) -> None:
+    """Enforce the clicked identity immediately before authorization handoff."""
+
+    if selected_product is None:
+        return
+    proposal = output.proposal
+    if (
+        proposal.merchant_id != selected_product.merchant_id
+        or proposal.sku != selected_product.sku
+    ):
+        raise BuyerError(
+            "SELECTED_PRODUCT_IDENTITY_MISMATCH: buyer proposal did not match the "
+            "server-resolved merchant and SKU"
         )

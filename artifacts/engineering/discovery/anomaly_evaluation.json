@@ -1,16 +1,17 @@
 {
+  "advisory_boundary": "This detector is advisory. It may raise REVIEW or open an investigation. It cannot ALLOW, cannot issue a capability, cannot override the controller or a revocation, and cannot create trusted evidence.",
   "analytics_version": "discovery-proposal-anomaly-v1",
   "baseline": {
-    "average_precision": 0.994236,
+    "average_precision": 0.995533,
     "model": "deterministic weighted feature score",
-    "recall_at_5pct_fpr": 0.976667,
-    "roc_auc": 0.994194
+    "recall_at_5pct_fpr": 0.973333,
+    "roc_auc": 0.991331
   },
   "baseline_without_ml_mismatch_feature": {
-    "average_precision": 0.956142,
+    "average_precision": 0.971368,
     "model": "deterministic weighted feature score, classifier feature ablated",
     "recall_at_5pct_fpr": 0.876667,
-    "roc_auc": 0.931656
+    "roc_auc": 0.927852
   },
   "by_defect": {
     "CAPABILITY_REPLAYED": {
@@ -21,7 +22,7 @@
     "CATEGORY_LAUNDERED": {
       "cases": 37,
       "detected_above_ordinary_median": 37,
-      "mean_baseline_score": 0.083316
+      "mean_baseline_score": 0.082022
     },
     "CONSENT_REVOKED": {
       "cases": 37,
@@ -46,44 +47,52 @@
     "STALE_EVIDENCE": {
       "cases": 37,
       "detected_above_ordinary_median": 37,
-      "mean_baseline_score": 0.094817
+      "mean_baseline_score": 0.095249
     },
     "TRUSTED_EVIDENCE_REMOVED": {
       "cases": 38,
       "detected_above_ordinary_median": 38,
-      "mean_baseline_score": 0.158154
+      "mean_baseline_score": 0.158574
     }
   },
   "candidate": {
     "available": true,
-    "average_precision": 0.583138,
-    "model": "IsolationForest(n_estimators=200, fitted on ordinary rows only)",
-    "recall_at_5pct_fpr": 0.143333,
-    "roc_auc": 0.561778
+    "average_precision": 0.700082,
+    "fitted_on_ordinary_rows": 151,
+    "model": "IsolationForest(n_estimators=200), fitted on the ordinary training control and scored on disjoint held-out rows",
+    "recall_at_5pct_fpr": 0.023333,
+    "roc_auc": 0.536152,
+    "scored_rows": 449
   },
   "cases": 600,
-  "catalog_sha256": "484413db21e98e50467be5506b98c9bda759135bc66f169350acaf393bf58cf2",
+  "catalog_listings": 17702,
+  "catalog_sha256": "7ad5d4f579eca4838eabca2de755003e0b513ff4213af683b4574559421ae09f",
   "category_laundering_ablation": {
-    "cases": 337,
+    "cases": 186,
     "defective_cases": 37,
-    "roc_auc_gain_from_classifier": 0.512838,
+    "roc_auc_gain_from_classifier": 0.522492,
     "verdict": "CLASSIFIER_SIGNAL_ADDS_DETECTION_VALUE",
     "with_ml_mismatch_feature": {
-      "average_precision": 0.733157,
-      "recall_at_5pct_fpr": 0.810811,
-      "roc_auc": 0.96473
+      "average_precision": 0.770686,
+      "recall_at_5pct_fpr": 0.783784,
+      "roc_auc": 0.949664
     },
     "without_ml_mismatch_feature": {
-      "average_precision": 0.099306,
+      "average_precision": 0.168557,
       "recall_at_5pct_fpr": 0.0,
-      "roc_auc": 0.451892
+      "roc_auc": 0.427172
     }
   },
-  "circularity_note": "Seven of the eight defect classes flip a field the deterministic features already watch, so a high baseline score on those proves the features fire and nothing more. CATEGORY_LAUNDERED is the non-circular case, and category_laundering_ablation is the result that actually matters.",
+  "circularity_note": "Seven of the eight defect classes flip a field the deterministic features already watch, so a high baseline score on those proves the features fire and nothing more. CATEGORY_LAUNDERED is the non-circular case - it moves title and description only, leaving brand, category, price, merchant and every identifier untouched - and category_laundering_ablation is the result that actually matters.",
+  "controls": {
+    "note": "Disjoint by construction. Every metric in this report is scored on the ordinary evaluation control plus the defective rows; the learned candidate is fitted only on the ordinary training control.",
+    "ordinary_evaluation_control": 149,
+    "ordinary_training_control": 151
+  },
   "decision": "KEEP_DETERMINISTIC_BASELINE",
   "decision_reason": "The learned detector did not improve the frozen evaluation by more than the threshold, so it is not shipped. The deterministic analytics stands.",
   "defective_cases": 300,
-  "evaluation_set_digest": "b31f6c41973240739636ba8e9e533086b10d6f4508686100b05615d89b24dc1b",
+  "evaluation_set_digest": "7d317b983a84315aa2cbe485c4aaee0ae88e3cc3a14a710c4b8800b73194219f",
   "evaluation_version": "discovery-anomaly-eval-v1",
   "feature_names": [
     "category_listing_mismatch",
@@ -98,7 +107,9 @@
     "stale_evidence",
     "title_description_mismatch"
   ],
+  "held_out_cases": 449,
+  "held_out_defective_cases": 300,
   "material_improvement_threshold": 0.02,
-  "roc_auc_improvement": -0.432416,
+  "roc_auc_improvement": -0.455179,
   "scope_limit": "Defects are injected by this harness. A detector that finds them is not thereby shown to find fraud in production traffic."
 }

@@ -188,7 +188,7 @@ export const EVALUATION_EVIDENCE = {
 
 /** Engineering quality only. Updated when the suites change; a test count is
     never presented as scale, model quality, or authorization evidence. */
-export const TEST_TOTALS = { python: 873, ui: 74 };
+export const TEST_TOTALS = { python: 1061, ui: 87 };
 
 export class SubmissionLock {
   #locked = false;
@@ -617,11 +617,41 @@ function anomalyRows(anomaly) {
     .join("");
 }
 
+//: Every price in the crawled catalog was captured between December 2015 and
+//: June 2016. Rendering one bare, next to a buy button, invites the reader to
+//: take it as a live offer, so it never appears without this label.
+export const HISTORICAL_PRICE_LABEL = "Historical listing price";
+export const HISTORICAL_PRICE_PERIOD = "2015-2016 dataset snapshot";
+export const HISTORICAL_PRICE_EXPLANATION =
+  "Marketplace prices come from the historical discovery dataset and are not live offers.";
+
+export function renderListingPrice(candidate) {
+  const registered = candidate.source === "mandateguard";
+  if (candidate.price_minor === null || candidate.price_minor === undefined) {
+    return `
+      <p class="listing__price">
+        <span class="listing__pricevalue listing__pricevalue--absent">No published price</span>
+      </p>`;
+  }
+  const amount = money(candidate.price_minor, candidate.currency);
+  if (registered) {
+    // A registered product's price comes from merchant-published terms, not
+    // from the 2015-2016 crawl, so it is not labelled historical.
+    return `
+      <p class="listing__price">
+        <span class="listing__pricelabel">Merchant-published price</span>
+        <span class="listing__pricevalue">${escapeHtml(amount)}</span>
+      </p>`;
+  }
+  return `
+    <p class="listing__price" data-historical="true">
+      <span class="listing__pricelabel">${escapeHtml(HISTORICAL_PRICE_LABEL)}</span>
+      <span class="listing__pricevalue">${escapeHtml(amount)}</span>
+      <span class="listing__pricenote">${escapeHtml(HISTORICAL_PRICE_PERIOD)}</span>
+    </p>`;
+}
+
 export function renderDiscoveryCandidate(candidate, { selected = false } = {}) {
-  const price =
-    candidate.price_minor === null || candidate.price_minor === undefined
-      ? "No published price"
-      : money(candidate.price_minor, candidate.currency);
   const mismatch = candidate.classification?.mismatch;
   const registered = candidate.source === "mandateguard";
   return `
@@ -637,8 +667,9 @@ export function renderDiscoveryCandidate(candidate, { selected = false } = {}) {
             <span class="listing__stage">${escapeHtml(humanize(candidate.stage))}</span>
           </p>
           <h3 class="listing__name">${escapeHtml(candidate.title)}</h3>
+          ${renderListingPrice(candidate)}
           <p class="listing__meta">
-            ${escapeHtml(price)} &middot; ${escapeHtml(candidate.top_category)}
+            ${escapeHtml(candidate.top_category)}
             ${candidate.brand ? ` &middot; ${escapeHtml(candidate.brand)}` : ""}
           </p>
         </div>
@@ -705,7 +736,16 @@ export function renderDiscoveryResults(discovery) {
            nothing like it. Neither is a reason to relax the constraint.</p>
       </div>`;
   }
-  return candidates.map((item) => renderDiscoveryCandidate(item)).join("");
+  // Persistent, above the results, on every render. Not a tooltip, not tucked
+  // into provenance: a reader who never opens a disclosure still sees it.
+  const historicalNote = candidates.some((item) => item.source !== "mandateguard")
+    ? `<p class="listing-note" data-historical-note="true">
+         ${escapeHtml(HISTORICAL_PRICE_EXPLANATION)}
+       </p>`
+    : "";
+  return (
+    historicalNote + candidates.map((item) => renderDiscoveryCandidate(item)).join("")
+  );
 }
 
 export function discoverySummaryLine(discovery) {
@@ -714,7 +754,7 @@ export function discoverySummaryLine(discovery) {
   const summary = discovery.summary || {};
   const total = Number(retrieval.catalog_listings || 0).toLocaleString("en-IN");
   return (
-    `${total} listings searched in ${Math.round(retrieval.retrieval_ms ?? 0)} ms · ` +
+    `${total} catalog listings searched in ${Math.round(retrieval.retrieval_ms ?? 0)} ms · ` +
     `${summary.evidence_ready ?? 0} of ${summary.listings ?? 0} shown are transactable today`
   );
 }
@@ -1680,23 +1720,70 @@ export function renderSystemScale(scale) {
     )}</p>`;
   }
   const rows = [
-    figureRow("Catalog SKUs", Number(scale.catalog_listings || 0).toLocaleString("en-IN")),
+    // "Catalog listings", not "SKUs". 17,702 rows are searchable; only the
+    // separately registered merchant products have a merchant SKU behind them.
+    figureRow(
+      "Catalog listings",
+      Number(scale.catalog_listings || 0).toLocaleString("en-IN"),
+      "historical marketplace listings, searchable",
+    ),
     figureRow("Categories", scale.categories),
     figureRow("Index size", megabytes(scale.index_bytes), "lexical + embedding, on disk"),
     figureRow("Catalog size", megabytes(scale.catalog_bytes), "compressed, committed"),
     figureRow("Cold load", `${Number(scale.cold_load_seconds || 0).toFixed(2)} s`),
     figureRow("Resident memory", `${scale.resident_memory_mb ?? "n/a"} MB`),
-    figureRow("Retrieval P50", `${scale.p50_ms ?? "n/a"} ms`),
-    figureRow("Retrieval P95", `${scale.p95_ms ?? "n/a"} ms`),
-    figureRow("Retrieval P99", `${scale.p99_ms ?? "n/a"} ms`),
-    figureRow("Queries / second", scale.queries_per_second, "single process"),
     figureRow("Queries executed", Number(scale.queries_executed || 0).toLocaleString("en-IN")),
+  ].join("");
+  // Two different measurements, two different labels. Retrieval is the
+  // BM25 + filters + duplicate-suppression call. The request is that plus intent
+  // parsing, classification, mismatch, anomaly and transactability per candidate.
+  const retrievalRows = [
+    figureRow("Retrieval P50", `${scale.retrieval_p50_ms ?? "n/a"} ms`),
+    figureRow("Retrieval P95", `${scale.retrieval_p95_ms ?? "n/a"} ms`),
+    figureRow("Retrieval P99", `${scale.retrieval_p99_ms ?? "n/a"} ms`),
+    figureRow(
+      "Retrieval / second",
+      scale.retrieval_queries_per_second,
+      "single process, no concurrency",
+    ),
+  ].join("");
+  const requestRows = [
+    figureRow("Request P50", `${scale.request_p50_ms ?? "n/a"} ms`),
+    figureRow("Request P95", `${scale.request_p95_ms ?? "n/a"} ms`),
+    figureRow("Request P99", `${scale.request_p99_ms ?? "n/a"} ms`),
+    figureRow(
+      "Requests / second",
+      scale.queries_per_second,
+      "single process, no concurrency",
+    ),
   ].join("");
   return `
     <dl class="measured__grid measured__grid--wide">${rows}</dl>
+    <div class="quality">
+      <section class="quality__col" aria-labelledby="scale-retrieval-latency">
+        <h4 class="quality__heading" id="scale-retrieval-latency">Retrieval latency</h4>
+        <dl class="measured__grid">${retrievalRows}</dl>
+        <p class="quality__split">The retrieval call alone.</p>
+      </section>
+      <section class="quality__col" aria-labelledby="scale-request-latency">
+        <h4 class="quality__heading" id="scale-request-latency">Full discovery request</h4>
+        <dl class="measured__grid">${requestRows}</dl>
+        <p class="quality__split">
+          Retrieval plus intent parsing, classification, mismatch, anomaly and
+          transactability for every candidate.
+        </p>
+      </section>
+    </div>
+    <p class="measured__caveat">
+      Single process · one machine · no concurrency · no network.
+      ${escapeHtml(scale.latency_note || "")}
+    </p>
     <p class="measured__caveat">${escapeHtml(scale.caveat || "")}</p>
     <dl class="measured__source">
       <div><dt>Source</dt><dd><code>${escapeHtml(scale.source)}</code></dd></div>
+      <div><dt>Measured on</dt><dd><code>${escapeHtml(
+        scale.environment?.platform || "n/a",
+      )}</code></dd></div>
     </dl>`;
 }
 
@@ -1729,11 +1816,22 @@ export function renderModelQuality(quality) {
           ${figureRow("Top-2 accuracy", classifier.top_2_accuracy)}
         </dl>
         <p class="quality__split">
+          Grouped product-family hold-out ·
           ${escapeHtml(classifier.classes)} classes ·
+          ${escapeHtml(Number(classifier.family_groups || 0).toLocaleString("en-IN"))}
+          product families ·
           train ${escapeHtml(Number(classifier.train || 0).toLocaleString("en-IN"))} ·
           validation ${escapeHtml(Number(classifier.validation || 0).toLocaleString("en-IN"))} ·
           test ${escapeHtml(Number(classifier.test || 0).toLocaleString("en-IN"))},
           frozen before the test set was scored.
+        </p>
+        <p class="quality__split">
+          Whole product families sit on one side of the split, so no test listing has a
+          near-identical twin in training. The earlier row-wise split, which did not
+          guarantee that, scored macro F1
+          ${escapeHtml(classifier.row_wise?.macro_f1 ?? "n/a")} ·
+          accuracy ${escapeHtml(classifier.row_wise?.accuracy ?? "n/a")}. Both are
+          reported; the grouped number is the one quoted.
         </p>
         <p class="authority-alert">Advisory. This model cannot allow a payment.</p>
       </section>
@@ -1743,12 +1841,21 @@ export function renderModelQuality(quality) {
           ${figureRow("Recall@10", retrieval.recall_at_10)}
           ${figureRow("Recall@5", retrieval.recall_at_5)}
           ${figureRow("MRR", retrieval.mrr)}
-          ${figureRow("Distinct results", retrieval.distinct_title_fraction)}
+          ${figureRow(
+            "DistinctTitle@8",
+            retrieval.distinct_title_at_8,
+            "unique display titles among the 8 shown",
+          )}
         </dl>
         <p class="quality__split">
-          ${escapeHtml(retrieval.queries)} hand-authored queries, relevance defined before
-          measurement. Configuration: <code>${escapeHtml(retrieval.configuration || "n/a")}</code>.
+          ${escapeHtml(retrieval.queries)} hand-authored queries, a fixed evaluation set
+          committed with this engineering milestone. Its digest is recorded in the report
+          (<code>query_set_sha256</code>), so a later change to the questions is visible.
+          The set and these results landed in one commit, so this is not an independently
+          preregistered evaluation and is not described as one.
+          Configuration: <code>${escapeHtml(retrieval.configuration || "n/a")}</code>.
         </p>
+        <p class="quality__split">${escapeHtml(retrieval.method || "")}</p>
         <p class="authority-alert">${escapeHtml(quality.boundary || "")}</p>
       </section>
     </div>
@@ -2289,8 +2396,11 @@ function init() {
       node.dataset.selected = node.dataset.product === catalogProductId ? "true" : "false";
     });
     paintJourney(null);
-    if (selection.transactable && selection.authorization_intent) {
-      await authorize(selection.authorization_intent);
+    if (selection.transactable && selection.product_identity) {
+      // Send only the selected catalog id. The server repeats the search and
+      // resolves the exact registered merchant/SKU; browser text is never the
+      // authority for product identity.
+      await authorize(intent, catalogProductId);
     } else {
       elements.runState.textContent = selection.status;
       elements.resultRegion.hidden = true;
@@ -2299,7 +2409,7 @@ function init() {
   };
 
   /* ---------------- stages 6-9: the authorization controller ---------------- */
-  const authorize = async (intent) => {
+  const authorize = async (intent, selectedCatalogProductId = null) => {
     if (!submitLock.acquire()) return;
     showError("");
     setBusy(true, "VERIFYING");
@@ -2309,6 +2419,7 @@ function init() {
         mode: selectedMode(),
         preset_id: null,
         request_id: createRequestId(),
+        selected_catalog_product_id: selectedCatalogProductId,
       });
       currentRunId = snapshot.run_id;
       await pollRun(snapshot);
@@ -2397,6 +2508,18 @@ function init() {
     }, 1500);
   }
 
+  /* The above-the-fold pipeline count is read from the loaded catalog, not
+     typed into the markup. A literal is a number that keeps its value after the
+     thing it described has changed. */
+  const paintPipelineCount = (payload) => {
+    const node = document.querySelector('[data-figure-target="catalog-listings"]');
+    if (!node) return;
+    const listings = payload?.discovery?.catalog?.listings;
+    node.textContent = Number.isFinite(Number(listings))
+      ? Number(listings).toLocaleString("en-IN")
+      : "—";
+  };
+
   fetchJson("/api/config")
     .then((payload) => {
       config = payload;
@@ -2408,6 +2531,7 @@ function init() {
       elements.modelQuality.innerHTML = renderModelQuality(config.model_quality);
       elements.engineering.innerHTML = renderEngineeringQuality();
       elements.catalogProvenance.innerHTML = renderCatalogProvenance(config.discovery);
+      paintPipelineCount(config);
       elements.research.innerHTML = renderResearch(config.research);
       elements.recovery.innerHTML = renderRecovery(config.failure_recovery);
       observeFigures(document.querySelector("#view-evaluation"));

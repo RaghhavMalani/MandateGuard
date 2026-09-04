@@ -40,7 +40,16 @@ from mandateguard.discovery.index.lexical import (
     load_lexical_index,
     write_lexical_index,
 )
-from mandateguard.discovery.intent import PARSER_VERSION, parse_intent
+from mandateguard.discovery.intent import (
+    AMBIGUOUS_MONETARY_CONSTRAINT,
+    CONFLICTING_MONETARY_CONSTRAINT,
+    INVALID_MONETARY_CONSTRAINT,
+    MonetaryConstraintError,
+    PARSER_VERSION,
+    parse_intent,
+    parse_monetary_constraint,
+    reject_monetary_problem,
+)
 
 from tests.discovery_factories import build_catalog, build_product
 
@@ -241,10 +250,19 @@ def test_an_absent_ceiling_is_reported_rather_than_defaulted() -> None:
     assert "No spending ceiling was stated" in " ".join(parsed.plain_english())
 
 
-def test_a_bare_amount_is_read_as_a_ceiling_and_the_inference_is_declared() -> None:
+def test_a_bare_amount_is_not_promoted_to_a_ceiling() -> None:
+    """A price with no comparator is an observation, not a budget.
+
+    The previous parser read "headphones ₹4000" as a ₹4,000 ceiling and noted
+    the inference. That is a guess about how much the user is willing to spend,
+    made from a number that may just as easily have been a price they saw. The
+    parser now refuses it and says which kind of refusal it is.
+    """
+
     parsed = parse_intent("headphones ₹4000")
-    assert parsed.max_total_minor == 400_000
-    assert "PRICE_CEILING_INFERRED_FROM_BARE_AMOUNT" in parsed.unresolved
+    assert parsed.max_total_minor is None
+    assert parsed.parse_problems == (AMBIGUOUS_MONETARY_CONSTRAINT,)
+    assert "PRICE_CEILING_INFERRED_FROM_BARE_AMOUNT" not in parsed.unresolved
 
 
 def test_exclusions_and_recurrence_are_extracted_from_ordinary_sentences() -> None:
@@ -417,3 +435,129 @@ def test_retrieval_without_an_embedding_index_still_works(tmp_path: Path) -> Non
     outcome = retriever.retrieve(query="lamp", top_k=3)
     assert outcome.listings
     assert outcome.dense_available is False
+
+
+# --------------------------------------------------------------------------
+# Monetary constraints must fail closed
+#
+# A malformed money phrase has exactly one safe reading: refuse it. The failure
+# mode this guards is specific and was live - "under -₹4000" losing its sign,
+# becoming a ₹4,000 budget, and authorizing an order the user never described.
+# --------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "under -₹4000",
+        "under -Rs 4000",
+        "under -4000",
+        "₹-4000",
+        "Rs -4000",
+        "budget of -4000",
+        "at most -₹ 4000",
+    ],
+)
+def test_a_negative_amount_never_becomes_a_positive_budget(text: str) -> None:
+    result = parse_monetary_constraint(text)
+    assert result.problem == INVALID_MONETARY_CONSTRAINT
+    assert result.max_total_minor is None
+    # The specific regression: the magnitude must not survive the sign.
+    assert result.max_total_minor != 400_000
+
+
+@pytest.mark.parametrize("text", ["under ₹0", "under 0", "under Rs 0", "budget of 0"])
+def test_a_zero_ceiling_is_rejected_rather_than_treated_as_absent(text: str) -> None:
+    result = parse_monetary_constraint(text)
+    assert result.problem == INVALID_MONETARY_CONSTRAINT
+    assert result.max_total_minor is None
+
+
+@pytest.mark.parametrize("text", ["under 4e3", "under 4E3", "under 1.2e4"])
+def test_scientific_notation_is_refused_not_partially_matched(text: str) -> None:
+    assert parse_monetary_constraint(text).problem == INVALID_MONETARY_CONSTRAINT
+
+
+@pytest.mark.parametrize("text", ["under 4.000", "under Rs 4.000", "under 1.234"])
+def test_ambiguous_dotted_thousands_are_refused(text: str) -> None:
+    """"4.000" is four in one locale and four thousand in another."""
+
+    assert parse_monetary_constraint(text).problem == AMBIGUOUS_MONETARY_CONSTRAINT
+
+
+@pytest.mark.parametrize(
+    "text",
+    ["4000 INR", "headphones ₹4000", "Rs 4000", "₹4,000 headphones"],
+)
+def test_a_currency_amount_without_a_comparator_is_ambiguous(text: str) -> None:
+    assert parse_monetary_constraint(text).problem == AMBIGUOUS_MONETARY_CONSTRAINT
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "under ₹4000 and ₹5000",
+        "under 4000 and USD 50",
+        "under Rs 4000 but no more than Rs 3000",
+        "under $50 and ₹4000",
+    ],
+)
+def test_two_money_clauses_are_conflicting_not_merged(text: str) -> None:
+    result = parse_monetary_constraint(text)
+    assert result.problem == CONFLICTING_MONETARY_CONSTRAINT
+    assert result.max_total_minor is None
+
+
+def test_an_amount_never_borrows_a_currency_from_another_clause() -> None:
+    """The amount and the currency must come from the same phrase."""
+
+    result = parse_monetary_constraint("under 4000 and USD 50")
+    assert result.max_total_minor is None
+    assert result.problem == CONFLICTING_MONETARY_CONSTRAINT
+
+
+@pytest.mark.parametrize(
+    ("text", "expected_minor", "expected_currency"),
+    [
+        ("from ₹2000 to ₹4000", 400_000, "INR"),
+        ("₹4000 max", 400_000, "INR"),
+        ("4,000 max", 400_000, "INR"),
+        ("under Rs 4000", 400_000, "INR"),
+        ("phone up to 25k", 2_500_000, "INR"),
+        ("a laptop under 1.2 lakh", 12_000_000, "INR"),
+        ("under $50", 5_000, "USD"),
+    ],
+)
+def test_well_formed_constraints_still_parse(
+    text: str, expected_minor: int, expected_currency: str
+) -> None:
+    result = parse_monetary_constraint(text)
+    assert result.problem is None
+    assert result.max_total_minor == expected_minor
+    assert result.currency == expected_currency
+
+
+def test_no_stated_budget_is_neither_a_problem_nor_a_ceiling() -> None:
+    result = parse_monetary_constraint("buy a desk lamp, no subscriptions")
+    assert result.problem is None
+    assert result.max_total_minor is None
+
+
+def test_a_rejected_constraint_stops_discovery_before_retrieval() -> None:
+    """reject_monetary_problem is the choke point both halves call."""
+
+    with pytest.raises(MonetaryConstraintError) as raised:
+        reject_monetary_problem(parse_monetary_constraint("under -₹4000"))
+    assert raised.value.code == INVALID_MONETARY_CONSTRAINT
+    # The message a visitor sees names no internals and no filesystem path.
+    assert "\\" not in raised.value.public_message
+    assert "/" not in raised.value.public_message
+
+
+def test_a_parsed_intent_carrying_a_money_problem_says_so_in_plain_english() -> None:
+    parsed = parse_intent("Buy a lamp under -₹4000")
+    assert parsed.parse_problems == (INVALID_MONETARY_CONSTRAINT,)
+    assert parsed.max_total_minor is None
+    spoken = " ".join(parsed.plain_english())
+    assert "invalid or ambiguous" in spoken
+    assert "authorization is blocked" in spoken

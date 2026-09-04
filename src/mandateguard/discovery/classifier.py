@@ -24,6 +24,7 @@ from mandateguard.discovery.index.artifacts import (
     pack_string_table,
     read_artifact,
     unpack_string_table,
+    validate_catalog_binding,
     write_artifact,
 )
 from mandateguard.discovery.trust import AdvisorySignal
@@ -94,6 +95,8 @@ class CategoryClassifier:
     coefficient_scales: array
     intercepts: array
     dimensions: int
+    document_count: int
+    catalog_sha256: str
     artifact_bytes: int
     metrics: Mapping[str, Any]
 
@@ -183,6 +186,7 @@ def write_classifier(
     coefficients: Sequence[Sequence[float]],
     intercepts: Sequence[float],
     catalog_sha256: str,
+    document_count: int,
     metrics: Mapping[str, Any],
     trainer: Mapping[str, Any],
 ) -> tuple[int, str]:
@@ -198,6 +202,7 @@ def write_classifier(
         "model_id": model_id,
         "analyzer_version": ANALYZER_VERSION,
         "catalog_sha256": catalog_sha256,
+        "document_count": document_count,
         "class_count": len(classes),
         "vocabulary_size": len(terms),
         "quantization": "int8-symmetric-per-class",
@@ -218,12 +223,34 @@ def write_classifier(
     return write_artifact(path, header, sections)
 
 
-def load_classifier(path: Path) -> CategoryClassifier:
+def load_classifier(
+    path: Path,
+    *,
+    expected_catalog_sha256: str | None = None,
+    expected_document_count: int | None = None,
+) -> CategoryClassifier:
     artifact = read_artifact(path)
+    expected_sections = {
+        "terms",
+        "term_offsets",
+        "classes",
+        "class_offsets",
+        "idf",
+        "coefficients",
+        "coefficient_scales",
+        "intercepts",
+    }
+    if set(artifact.sections) != expected_sections:
+        raise ArtifactError("classifier sections do not match its schema")
     if artifact.require("kind") != MODEL_KIND:
         raise ArtifactError(f"expected {MODEL_KIND}, found {artifact.header.get('kind')!r}")
     if artifact.require("analyzer_version") != ANALYZER_VERSION:
         raise ArtifactError("classifier was built by a different analyzer version")
+    catalog_sha256, document_count = validate_catalog_binding(
+        artifact,
+        expected_catalog_sha256=expected_catalog_sha256,
+        expected_document_count=expected_document_count,
+    )
     terms = tuple(
         unpack_string_table(artifact.section("terms"), artifact.section("term_offsets"))
     )
@@ -233,11 +260,16 @@ def load_classifier(path: Path) -> CategoryClassifier:
         )
     )
     idf = array("f")
-    idf.frombytes(artifact.section("idf"))
+    raw_idf = artifact.section("idf")
+    raw_scales = artifact.section("coefficient_scales")
+    raw_intercepts = artifact.section("intercepts")
+    if len(raw_idf) % 4 or len(raw_scales) % 4 or len(raw_intercepts) % 4:
+        raise ArtifactError("classifier floating-point table is truncated")
+    idf.frombytes(raw_idf)
     scales = array("f")
-    scales.frombytes(artifact.section("coefficient_scales"))
+    scales.frombytes(raw_scales)
     intercepts = array("f")
-    intercepts.frombytes(artifact.section("intercepts"))
+    intercepts.frombytes(raw_intercepts)
     coefficients = artifact.section("coefficients")
     if len(idf) != len(terms):
         raise ArtifactError("classifier idf table does not match its vocabulary")
@@ -245,6 +277,10 @@ def load_classifier(path: Path) -> CategoryClassifier:
         raise ArtifactError("classifier coefficient table has an unexpected size")
     if len(scales) != len(classes) or len(intercepts) != len(classes):
         raise ArtifactError("classifier per-class tables disagree in length")
+    if int(artifact.require("class_count")) != len(classes):
+        raise ArtifactError("classifier class count does not match its table")
+    if int(artifact.require("vocabulary_size")) != len(terms):
+        raise ArtifactError("classifier vocabulary count does not match its table")
     metrics = artifact.header.get("metrics")
     return CategoryClassifier(
         model_id=str(artifact.require("model_id")),
@@ -256,6 +292,8 @@ def load_classifier(path: Path) -> CategoryClassifier:
         coefficient_scales=scales,
         intercepts=intercepts,
         dimensions=len(terms),
+        document_count=document_count,
+        catalog_sha256=catalog_sha256,
         artifact_bytes=Path(path).stat().st_size,
         metrics=dict(metrics) if isinstance(metrics, Mapping) else {},
     )

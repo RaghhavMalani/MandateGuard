@@ -35,10 +35,36 @@ imports the authorization or execution path.
 | Archive SHA-256 | `54a91fcd0b3d1923e3adb52c27e4dde557a7cd948dba066e3cb5bca542da1b9f` |
 | Member CSV SHA-256 | `56f8f699c9e847356666c2eab3c3ab1244340f6a98ad08e39ea2199ebe993ad1` |
 
+**The licence is not asserted here.** It is taken from Kaggle's public,
+unauthenticated dataset listing API, whose response is preserved verbatim in
+[`data/provenance/flipkart-products/kaggle-metadata.json`](../data/provenance/flipkart-products/kaggle-metadata.json)
+together with the digests of the archive actually imported. Upstream reports
+`totalBytes` 5,765,116 for this dataset; the archive retrieved here is exactly
+that size, and the snapshot records the match. Reproduce with:
+
+```bash
+curl 'https://www.kaggle.com/api/v1/datasets/list?search=flipkart-products'
+```
+
 **Attribution.** Flipkart Products dataset by PromptCloud, published on Kaggle
 under CC BY-SA 4.0. Redistributed here in normalized form under the same
 licence. The normalized catalog in `data/processed/` is a derivative work and
 carries the same terms.
+
+Committed provenance evidence lives in
+[`data/provenance/flipkart-products/`](../data/provenance/flipkart-products/):
+
+| File | What it is |
+| --- | --- |
+| `SOURCE.md` | Dataset identity, retrieval date, digests, upstream row count, exact licence identifier |
+| `kaggle-metadata.json` | The upstream API response, verbatim, plus local digest verification |
+| `LICENSE_NOTICE.md` | The CC BY-SA 4.0 attribution and share-alike notice for the derivative |
+| `TRANSFORMATIONS.md` | Every change made to the upstream work, rule by rule |
+
+That directory ships inside the public container image alongside
+`data/processed/`, so the attribution travels with the derived bytes rather than
+living only in this repository. This project claims **no rights in the upstream
+data** beyond those CC BY-SA 4.0 grants.
 
 The raw archive is **not committed**. It lands in `data/import/`, which is
 git-ignored, and is reproducible with one command. What the repository carries

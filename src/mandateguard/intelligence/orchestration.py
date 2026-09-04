@@ -32,7 +32,7 @@ from mandateguard.execution.mandate_state import (
     MandateStateRegistry,
     MandateStatus,
 )
-from mandateguard.intelligence.buyer import CommerceBuyer
+from mandateguard.intelligence.buyer import CommerceBuyer, require_selected_product
 from mandateguard.intelligence.models import (
     AgenticCheckoutTrace,
     BuyerOutput,
@@ -42,6 +42,7 @@ from mandateguard.intelligence.models import (
     PurchaseProposal,
     RetrievalResult,
     RetrievalSource,
+    SelectedProductIdentity,
 )
 from mandateguard.intelligence.retrieval.hybrid import (
     DEFAULT_ALPHA,
@@ -482,6 +483,7 @@ def run_agentic_checkout(
     decision_nonce: str | None = None,
     mandate_version: int | None = None,
     mandate_identity_seed: str,
+    selected_product: SelectedProductIdentity | None = None,
 ) -> AgenticCheckoutResult:
     """Run one vertical slice. Payment I/O is opt-in and ALLOW-capability gated.
 
@@ -507,6 +509,10 @@ def run_agentic_checkout(
         raise TypeError("semantic_verifier must be SemanticVerifier")
     if not isinstance(defer_execution, bool):
         raise TypeError("defer_execution must be boolean")
+    if selected_product is not None and not isinstance(
+        selected_product, SelectedProductIdentity
+    ):
+        raise TypeError("selected_product must be SelectedProductIdentity or None")
     if defer_execution and not execute:
         raise ValueError("defer_execution requires execute=True")
     if mandate_version is not None and (
@@ -520,7 +526,12 @@ def run_agentic_checkout(
         raise ValueError("evaluated_at must be timezone-aware")
     total_started = perf_counter()
     buyer_started = perf_counter()
-    buyer_output = buyer.purchase(user_intent.strip())
+    buyer_output = (
+        buyer.purchase(user_intent.strip(), selected_product=selected_product)
+        if selected_product is not None
+        else buyer.purchase(user_intent.strip())
+    )
+    require_selected_product(buyer_output, selected_product)
     buyer_latency_ms = (perf_counter() - buyer_started) * 1000.0
 
     proposal = buyer_output.proposal

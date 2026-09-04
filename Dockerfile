@@ -33,6 +33,17 @@ COPY scripts/run_commerce_lab.py /app/scripts/run_commerce_lab.py
 COPY data/processed/ /app/data/processed/
 COPY data/models/ /app/data/models/
 
+# Dataset attribution. The normalized catalog is a CC BY-SA 4.0 derivative, so
+# the licence and provenance travel with the bytes rather than living only in
+# the repository.
+COPY data/provenance/ /app/data/provenance/
+
+# The measured reports SYSTEM SCALE and MODEL QUALITY render. Without these the
+# interface advertises measurements the container cannot load, which is worse
+# than showing no numbers at all. .dockerignore allowlists exactly these three
+# files out of artifacts/, plus data/models/training_report.json above.
+COPY artifacts/engineering/discovery/ /app/artifacts/engineering/discovery/
+
 # Non-root execution with a writable scratch directory for the temporary
 # SQLite semantic cache, execution ledger, and recovery audit.
 RUN useradd --create-home --uid 10001 mandateguard \

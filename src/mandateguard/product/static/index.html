@@ -81,7 +81,12 @@
       <!-- ============================ OBSERVE ============================ -->
       <section id="view-observe" class="view" role="tabpanel" aria-labelledby="tab-observe" tabindex="-1">
 
-        <!-- ---------- 1. What is the problem? ---------- -->
+        <!-- ---------- 1. What is the problem, and where does ML sit? ----------
+             Everything in this section is above the fold on a 900px viewport. The
+             reviewer's finding was that the first screen explained the verdict
+             but not why a machine-learning layer exists, why it cannot move
+             money, or why a searchable listing is not a buyable one. Those three
+             answers are now on the first screen, next to the problem. -->
         <section class="opening" aria-labelledby="opening-title">
           <p class="opening__eyebrow" data-reveal>THE PROBLEM</p>
           <h1 class="opening__title" id="opening-title" data-reveal>
@@ -89,15 +94,43 @@
             <em>Deciding is not the same as being allowed to pay.</em>
           </h1>
           <p class="opening__body" data-reveal>
-            Give an agent a budget and it will find you a product. It will also, sooner or later,
-            find you a subscription you said you didn&rsquo;t want, at a price that moved after you
-            agreed to it, from a seller nobody can name. A model that is usually right is still a
-            model, and &ldquo;usually&rdquo; is the wrong guarantee for money leaving an account.
+            Give an agent a budget and it will find you a product &mdash; and, sooner or later, a
+            subscription you said you didn&rsquo;t want, at a price that moved after you agreed to
+            it, from a seller nobody can name.
+            <strong>MandateGuard sits between the AI buyer and payment execution</strong>, and
+            nothing the agent decides reaches a payment provider until MandateGuard has
+            independently checked it against what you actually asked for.
           </p>
-          <p class="opening__body" data-reveal>
-            <strong>MandateGuard sits between the AI buyer and payment execution.</strong> Nothing
-            the agent decides reaches a payment provider until MandateGuard has independently
-            checked it against what you actually asked for.
+
+          <!-- The compact pipeline. Four stages, and the boundary between the
+               two that guess and the two that decide. -->
+          <ol class="pipeline" aria-label="How a purchase moves through the system">
+            <li class="pipeline__stage" data-role="corpus">
+              <p class="pipeline__count" data-figure-target="catalog-listings">17,702</p>
+              <p class="pipeline__what">HISTORICAL MARKETPLACE LISTINGS</p>
+              <p class="pipeline__why">A 2015&ndash;2016 public dataset. Searchable, and nothing more.</p>
+            </li>
+            <li class="pipeline__stage" data-role="ml">
+              <p class="pipeline__label">ML + RETRIEVAL</p>
+              <p class="pipeline__what">Understands what products <em>might</em> match</p>
+              <p class="pipeline__why">BM25 over a frozen index, a category classifier, duplicate
+                 suppression. Advisory, every one of them.</p>
+            </li>
+            <li class="pipeline__stage" data-role="trust">
+              <p class="pipeline__label">TRUST CHECK</p>
+              <p class="pipeline__what">Is there authoritative merchant evidence?</p>
+              <p class="pipeline__why">Exact merchant and SKU, or nothing. 8 of the 17,702 pass.</p>
+            </li>
+            <li class="pipeline__stage" data-role="authorize">
+              <p class="pipeline__label">PAYMENT AUTHORIZATION</p>
+              <p class="pipeline__what">A deterministic controller decides</p>
+              <p class="pipeline__why">ALLOW, BLOCK, or REVIEW. No score reaches this stage.</p>
+            </li>
+          </ol>
+
+          <p class="opening__thesis" data-reveal>
+            <strong>ML helps understand the commerce universe. It never authorizes money.</strong>
+            <span>Searchable does not mean transactable.</span>
           </p>
         </section>
 
