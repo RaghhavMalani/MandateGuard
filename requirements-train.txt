@@ -13,3 +13,6 @@
 #   python scripts/run_discovery_scale_benchmark.py   # needs none of these
 scikit-learn>=1.8,<2
 numpy>=2,<3
+onnxruntime>=1.23,<2
+tokenizers>=0.22,<1
+huggingface-hub>=0.34,<2
