@@ -1,0 +1,3699 @@
+{
+  "schema_version": "semantic-retrieval-eval-v2",
+  "catalog_sha256": "7ad5d4f579eca4838eabca2de755003e0b513ff4213af683b4574559421ae09f",
+  "authored_before_model_evaluation": true,
+  "outcomes_included": false,
+  "relevance_scale": "binary predicate over every catalog document",
+  "queries": [
+    {
+      "query_id": "SV2-L001-HEADPHONES",
+      "text": "wired headphones under Rs 5000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-001",
+      "note": "Headphones or earphones within budget.",
+      "hard_filters": {
+        "max_price_minor": 500000
+      },
+      "relevance": {
+        "require_title_any": [
+          "headphone",
+          "earphone",
+          "headset"
+        ],
+        "require_any_terms": [
+          "headphone",
+          "earphone",
+          "headset"
+        ],
+        "max_price_minor": 500000
+      }
+    },
+    {
+      "query_id": "SV2-P001-HEADPHONES",
+      "text": "I want to listen privately on the train without spending more than five thousand",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-001",
+      "note": "Headphones or earphones within budget.",
+      "hard_filters": {
+        "max_price_minor": 500000
+      },
+      "relevance": {
+        "require_title_any": [
+          "headphone",
+          "earphone",
+          "headset"
+        ],
+        "require_any_terms": [
+          "headphone",
+          "earphone",
+          "headset"
+        ],
+        "max_price_minor": 500000
+      }
+    },
+    {
+      "query_id": "SV2-L002-BRACELET",
+      "text": "silver bracelet for women under Rs 2000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-002",
+      "note": "Silver bracelet listings.",
+      "hard_filters": {
+        "categories": [
+          "Jewellery"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "bracelet",
+          "bangle"
+        ],
+        "categories": [
+          "Jewellery"
+        ],
+        "require_all_terms": [
+          "silver"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-P002-BRACELET",
+      "text": "a silver-coloured gift she can wear around her wrist for less than two thousand",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-002",
+      "note": "Silver bracelet listings.",
+      "hard_filters": {
+        "categories": [
+          "Jewellery"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "bracelet",
+          "bangle"
+        ],
+        "categories": [
+          "Jewellery"
+        ],
+        "require_all_terms": [
+          "silver"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-L003-CAR_PHONE_HOLDER",
+      "text": "car mobile phone holder under Rs 500",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-003",
+      "note": "Car phone mounts and holders.",
+      "hard_filters": {
+        "categories": [
+          "Automotive"
+        ],
+        "max_price_minor": 50000
+      },
+      "relevance": {
+        "require_title_any": [
+          "mount",
+          "holder",
+          "cradle"
+        ],
+        "categories": [
+          "Automotive"
+        ],
+        "require_any_terms": [
+          "phone",
+          "mobile"
+        ],
+        "max_price_minor": 50000
+      }
+    },
+    {
+      "query_id": "SV2-P003-CAR_PHONE_HOLDER",
+      "text": "something that keeps my phone steady while I am driving and costs at most five hundred",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-003",
+      "note": "Car phone mounts and holders.",
+      "hard_filters": {
+        "categories": [
+          "Automotive"
+        ],
+        "max_price_minor": 50000
+      },
+      "relevance": {
+        "require_title_any": [
+          "mount",
+          "holder",
+          "cradle"
+        ],
+        "categories": [
+          "Automotive"
+        ],
+        "require_any_terms": [
+          "phone",
+          "mobile"
+        ],
+        "max_price_minor": 50000
+      }
+    },
+    {
+      "query_id": "SV2-L004-KURTA",
+      "text": "women's printed kurta under Rs 800",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-004",
+      "note": "Kurta and kurti listings.",
+      "hard_filters": {
+        "categories": [
+          "Clothing",
+          "Uncategorized"
+        ],
+        "max_price_minor": 80000
+      },
+      "relevance": {
+        "require_title_any": [
+          "kurta",
+          "kurti"
+        ],
+        "categories": [
+          "Clothing",
+          "Uncategorized"
+        ],
+        "max_price_minor": 80000
+      }
+    },
+    {
+      "query_id": "SV2-P004-KURTA",
+      "text": "an inexpensive traditional tunic for her to wear to a family lunch",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-004",
+      "note": "Kurta and kurti listings.",
+      "hard_filters": {
+        "categories": [
+          "Clothing",
+          "Uncategorized"
+        ],
+        "max_price_minor": 80000
+      },
+      "relevance": {
+        "require_title_any": [
+          "kurta",
+          "kurti"
+        ],
+        "categories": [
+          "Clothing",
+          "Uncategorized"
+        ],
+        "max_price_minor": 80000
+      }
+    },
+    {
+      "query_id": "SV2-L005-MENS_WATCH",
+      "text": "analog wrist watch for men under Rs 3000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-005",
+      "note": "Men's watches.",
+      "hard_filters": {
+        "categories": [
+          "Watches"
+        ],
+        "max_price_minor": 300000
+      },
+      "relevance": {
+        "require_title_any": [
+          "watch"
+        ],
+        "categories": [
+          "Watches"
+        ],
+        "require_any_terms": [
+          "men",
+          "boys"
+        ],
+        "max_price_minor": 300000
+      }
+    },
+    {
+      "query_id": "SV2-P005-MENS_WATCH",
+      "text": "a present that lets him check the time without taking out his phone, below three thousand",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-005",
+      "note": "Men's watches.",
+      "hard_filters": {
+        "categories": [
+          "Watches"
+        ],
+        "max_price_minor": 300000
+      },
+      "relevance": {
+        "require_title_any": [
+          "watch"
+        ],
+        "categories": [
+          "Watches"
+        ],
+        "require_any_terms": [
+          "men",
+          "boys"
+        ],
+        "max_price_minor": 300000
+      }
+    },
+    {
+      "query_id": "SV2-L006-RUNNING_SHOES",
+      "text": "men's running shoes under Rs 3000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-006",
+      "note": "Men's running or sports shoes.",
+      "hard_filters": {
+        "categories": [
+          "Footwear"
+        ],
+        "max_price_minor": 300000
+      },
+      "relevance": {
+        "require_title_any": [
+          "running",
+          "sports"
+        ],
+        "categories": [
+          "Footwear"
+        ],
+        "require_any_terms": [
+          "shoe"
+        ],
+        "max_price_minor": 300000
+      }
+    },
+    {
+      "query_id": "SV2-P006-RUNNING_SHOES",
+      "text": "footwear for morning jogs for him without going above three thousand",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-006",
+      "note": "Men's running or sports shoes.",
+      "hard_filters": {
+        "categories": [
+          "Footwear"
+        ],
+        "max_price_minor": 300000
+      },
+      "relevance": {
+        "require_title_any": [
+          "running",
+          "sports"
+        ],
+        "categories": [
+          "Footwear"
+        ],
+        "require_any_terms": [
+          "shoe"
+        ],
+        "max_price_minor": 300000
+      }
+    },
+    {
+      "query_id": "SV2-L007-SCHOOL_BACKPACK",
+      "text": "school backpack under Rs 1500",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-007",
+      "note": "School bags and backpacks.",
+      "hard_filters": {
+        "categories": [
+          "Bags, Wallets & Belts",
+          "Toys & School Supplies",
+          "Uncategorized"
+        ],
+        "max_price_minor": 150000
+      },
+      "relevance": {
+        "require_title_any": [
+          "backpack",
+          "school bag"
+        ],
+        "categories": [
+          "Bags, Wallets & Belts",
+          "Toys & School Supplies",
+          "Uncategorized"
+        ],
+        "max_price_minor": 150000
+      }
+    },
+    {
+      "query_id": "SV2-P007-SCHOOL_BACKPACK",
+      "text": "my child starts school next month and needs to carry books for under fifteen hundred",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-007",
+      "note": "School bags and backpacks.",
+      "hard_filters": {
+        "categories": [
+          "Bags, Wallets & Belts",
+          "Toys & School Supplies",
+          "Uncategorized"
+        ],
+        "max_price_minor": 150000
+      },
+      "relevance": {
+        "require_title_any": [
+          "backpack",
+          "school bag"
+        ],
+        "categories": [
+          "Bags, Wallets & Belts",
+          "Toys & School Supplies",
+          "Uncategorized"
+        ],
+        "max_price_minor": 150000
+      }
+    },
+    {
+      "query_id": "SV2-L008-WALL_CLOCK",
+      "text": "decorative wall clock under Rs 1500",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-008",
+      "note": "Wall clocks.",
+      "hard_filters": {
+        "categories": [
+          "Home Decor & Festive Needs"
+        ],
+        "max_price_minor": 150000
+      },
+      "relevance": {
+        "require_title_any": [
+          "wall clock"
+        ],
+        "categories": [
+          "Home Decor & Festive Needs"
+        ],
+        "max_price_minor": 150000
+      }
+    },
+    {
+      "query_id": "SV2-P008-WALL_CLOCK",
+      "text": "I keep losing track of time in the living room and have fifteen hundred to spend",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-008",
+      "note": "Wall clocks.",
+      "hard_filters": {
+        "categories": [
+          "Home Decor & Festive Needs"
+        ],
+        "max_price_minor": 150000
+      },
+      "relevance": {
+        "require_title_any": [
+          "wall clock"
+        ],
+        "categories": [
+          "Home Decor & Festive Needs"
+        ],
+        "max_price_minor": 150000
+      }
+    },
+    {
+      "query_id": "SV2-L009-BEDSHEET",
+      "text": "cotton double bedsheet under Rs 2000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-009",
+      "note": "Double bed sheets.",
+      "hard_filters": {
+        "categories": [
+          "Home Furnishing"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "bedsheet",
+          "bed sheet"
+        ],
+        "categories": [
+          "Home Furnishing"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-P009-BEDSHEET",
+      "text": "fresh fabric to cover a double bed, capped at two thousand",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-009",
+      "note": "Double bed sheets.",
+      "hard_filters": {
+        "categories": [
+          "Home Furnishing"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "bedsheet",
+          "bed sheet"
+        ],
+        "categories": [
+          "Home Furnishing"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-L010-PHONE_CASE",
+      "text": "mobile phone case under Rs 500",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-010",
+      "note": "Phone cases and covers.",
+      "hard_filters": {
+        "categories": [
+          "Mobiles & Accessories"
+        ],
+        "max_price_minor": 50000
+      },
+      "relevance": {
+        "require_title_any": [
+          "cover",
+          "case"
+        ],
+        "categories": [
+          "Mobiles & Accessories"
+        ],
+        "max_price_minor": 50000
+      }
+    },
+    {
+      "query_id": "SV2-P010-PHONE_CASE",
+      "text": "protect my handset from scratches and drops for no more than five hundred",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-010",
+      "note": "Phone cases and covers.",
+      "hard_filters": {
+        "categories": [
+          "Mobiles & Accessories"
+        ],
+        "max_price_minor": 50000
+      },
+      "relevance": {
+        "require_title_any": [
+          "cover",
+          "case"
+        ],
+        "categories": [
+          "Mobiles & Accessories"
+        ],
+        "max_price_minor": 50000
+      }
+    },
+    {
+      "query_id": "SV2-L011-EARRINGS",
+      "text": "gold plated earrings under Rs 1000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-011",
+      "note": "Earrings, studs, and jhumki.",
+      "hard_filters": {
+        "categories": [
+          "Jewellery"
+        ],
+        "max_price_minor": 100000
+      },
+      "relevance": {
+        "require_title_any": [
+          "earring",
+          "jhumki",
+          "stud"
+        ],
+        "categories": [
+          "Jewellery"
+        ],
+        "max_price_minor": 100000
+      }
+    },
+    {
+      "query_id": "SV2-P011-EARRINGS",
+      "text": "a small gold-coloured jewellery gift worn on the ears below one thousand",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-011",
+      "note": "Earrings, studs, and jhumki.",
+      "hard_filters": {
+        "categories": [
+          "Jewellery"
+        ],
+        "max_price_minor": 100000
+      },
+      "relevance": {
+        "require_title_any": [
+          "earring",
+          "jhumki",
+          "stud"
+        ],
+        "categories": [
+          "Jewellery"
+        ],
+        "max_price_minor": 100000
+      }
+    },
+    {
+      "query_id": "SV2-L012-MENS_TSHIRT",
+      "text": "men's round neck t-shirt under Rs 700",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-012",
+      "note": "Men's T-shirts.",
+      "hard_filters": {
+        "categories": [
+          "Clothing",
+          "Uncategorized"
+        ],
+        "max_price_minor": 70000
+      },
+      "relevance": {
+        "require_title_any": [
+          "t-shirt",
+          "tshirt"
+        ],
+        "categories": [
+          "Clothing",
+          "Uncategorized"
+        ],
+        "require_any_terms": [
+          "men",
+          "boys"
+        ],
+        "max_price_minor": 70000
+      }
+    },
+    {
+      "query_id": "SV2-P012-MENS_TSHIRT",
+      "text": "a casual top for him to wear on weekends costing at most seven hundred",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-012",
+      "note": "Men's T-shirts.",
+      "hard_filters": {
+        "categories": [
+          "Clothing",
+          "Uncategorized"
+        ],
+        "max_price_minor": 70000
+      },
+      "relevance": {
+        "require_title_any": [
+          "t-shirt",
+          "tshirt"
+        ],
+        "categories": [
+          "Clothing",
+          "Uncategorized"
+        ],
+        "require_any_terms": [
+          "men",
+          "boys"
+        ],
+        "max_price_minor": 70000
+      }
+    },
+    {
+      "query_id": "SV2-L013-CUSHION_COVER",
+      "text": "printed cushion cover under Rs 900",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-013",
+      "note": "Cushion covers.",
+      "hard_filters": {
+        "categories": [
+          "Home Furnishing",
+          "Home Decor & Festive Needs"
+        ],
+        "max_price_minor": 90000
+      },
+      "relevance": {
+        "require_title_any": [
+          "cushion"
+        ],
+        "categories": [
+          "Home Furnishing",
+          "Home Decor & Festive Needs"
+        ],
+        "max_price_minor": 90000
+      }
+    },
+    {
+      "query_id": "SV2-P013-CUSHION_COVER",
+      "text": "our sofa looks tired and I want to freshen its pillows cheaply",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-013",
+      "note": "Cushion covers.",
+      "hard_filters": {
+        "categories": [
+          "Home Furnishing",
+          "Home Decor & Festive Needs"
+        ],
+        "max_price_minor": 90000
+      },
+      "relevance": {
+        "require_title_any": [
+          "cushion"
+        ],
+        "categories": [
+          "Home Furnishing",
+          "Home Decor & Festive Needs"
+        ],
+        "max_price_minor": 90000
+      }
+    },
+    {
+      "query_id": "SV2-L014-SUNGLASSES",
+      "text": "aviator sunglasses under Rs 2000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-014",
+      "note": "Sunglasses.",
+      "hard_filters": {
+        "categories": [
+          "Sunglasses",
+          "Uncategorized"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "sunglass"
+        ],
+        "categories": [
+          "Sunglasses",
+          "Uncategorized"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-P014-SUNGLASSES",
+      "text": "something for my eyes because afternoon sunlight is too bright, below two thousand",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-014",
+      "note": "Sunglasses.",
+      "hard_filters": {
+        "categories": [
+          "Sunglasses",
+          "Uncategorized"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "sunglass"
+        ],
+        "categories": [
+          "Sunglasses",
+          "Uncategorized"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-L015-LAPTOP_BAG",
+      "text": "laptop backpack under Rs 2000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-015",
+      "note": "Laptop bags, backpacks, and sleeves.",
+      "hard_filters": {
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "bag",
+          "backpack",
+          "sleeve"
+        ],
+        "require_all_terms": [
+          "laptop"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-P015-LAPTOP_BAG",
+      "text": "something to carry my computer safely to the office for less than two thousand",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-015",
+      "note": "Laptop bags, backpacks, and sleeves.",
+      "hard_filters": {
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "bag",
+          "backpack",
+          "sleeve"
+        ],
+        "require_all_terms": [
+          "laptop"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-L016-KITCHEN_KNIFE",
+      "text": "stainless steel kitchen knife under Rs 1000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-016",
+      "note": "Kitchen knives.",
+      "hard_filters": {
+        "categories": [
+          "Kitchen & Dining"
+        ],
+        "max_price_minor": 100000
+      },
+      "relevance": {
+        "require_title_any": [
+          "knife",
+          "knives"
+        ],
+        "categories": [
+          "Kitchen & Dining"
+        ],
+        "max_price_minor": 100000
+      }
+    },
+    {
+      "query_id": "SV2-P016-KITCHEN_KNIFE",
+      "text": "a sharp kitchen tool for chopping vegetables under one thousand",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-016",
+      "note": "Kitchen knives.",
+      "hard_filters": {
+        "categories": [
+          "Kitchen & Dining"
+        ],
+        "max_price_minor": 100000
+      },
+      "relevance": {
+        "require_title_any": [
+          "knife",
+          "knives"
+        ],
+        "categories": [
+          "Kitchen & Dining"
+        ],
+        "max_price_minor": 100000
+      }
+    },
+    {
+      "query_id": "SV2-L017-CRICKET_BAT",
+      "text": "cricket bat under Rs 3000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-017",
+      "note": "Cricket bats.",
+      "hard_filters": {
+        "categories": [
+          "Sports & Fitness",
+          "Toys & School Supplies"
+        ],
+        "max_price_minor": 300000
+      },
+      "relevance": {
+        "require_title_any": [
+          "bat"
+        ],
+        "categories": [
+          "Sports & Fitness",
+          "Toys & School Supplies"
+        ],
+        "require_all_terms": [
+          "cricket"
+        ],
+        "max_price_minor": 300000
+      }
+    },
+    {
+      "query_id": "SV2-P017-CRICKET_BAT",
+      "text": "the main piece of equipment needed to score runs, within three thousand",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-017",
+      "note": "Cricket bats.",
+      "hard_filters": {
+        "categories": [
+          "Sports & Fitness",
+          "Toys & School Supplies"
+        ],
+        "max_price_minor": 300000
+      },
+      "relevance": {
+        "require_title_any": [
+          "bat"
+        ],
+        "categories": [
+          "Sports & Fitness",
+          "Toys & School Supplies"
+        ],
+        "require_all_terms": [
+          "cricket"
+        ],
+        "max_price_minor": 300000
+      }
+    },
+    {
+      "query_id": "SV2-L018-YOGA_MAT",
+      "text": "yoga mat under Rs 2000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-018",
+      "note": "Yoga mats.",
+      "hard_filters": {
+        "categories": [
+          "Sports & Fitness"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "mat"
+        ],
+        "categories": [
+          "Sports & Fitness"
+        ],
+        "require_all_terms": [
+          "yoga"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-P018-YOGA_MAT",
+      "text": "I need padding to stretch and exercise on the floor at home",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-018",
+      "note": "Yoga mats.",
+      "hard_filters": {
+        "categories": [
+          "Sports & Fitness"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "mat"
+        ],
+        "categories": [
+          "Sports & Fitness"
+        ],
+        "require_all_terms": [
+          "yoga"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-L019-POWER_BANK",
+      "text": "mobile power bank under Rs 2000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-019",
+      "note": "Portable battery packs.",
+      "hard_filters": {
+        "categories": [
+          "Mobiles & Accessories",
+          "Computers",
+          "Uncategorized"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "power bank",
+          "powerbank",
+          "mah"
+        ],
+        "categories": [
+          "Mobiles & Accessories",
+          "Computers",
+          "Uncategorized"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-P019-POWER_BANK",
+      "text": "my phone dies halfway through the day while travelling and I have two thousand",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-019",
+      "note": "Portable battery packs.",
+      "hard_filters": {
+        "categories": [
+          "Mobiles & Accessories",
+          "Computers",
+          "Uncategorized"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "power bank",
+          "powerbank",
+          "mah"
+        ],
+        "categories": [
+          "Mobiles & Accessories",
+          "Computers",
+          "Uncategorized"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-L020-SCREWDRIVER",
+      "text": "screwdriver bit set under Rs 1000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-020",
+      "note": "Screwdrivers and driver bit sets.",
+      "hard_filters": {
+        "categories": [
+          "Tools & Hardware"
+        ],
+        "max_price_minor": 100000
+      },
+      "relevance": {
+        "require_title_any": [
+          "screwdriver"
+        ],
+        "categories": [
+          "Tools & Hardware"
+        ],
+        "max_price_minor": 100000
+      }
+    },
+    {
+      "query_id": "SV2-P020-SCREWDRIVER",
+      "text": "a compact hand tool set for tightening loose screws below one thousand",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-020",
+      "note": "Screwdrivers and driver bit sets.",
+      "hard_filters": {
+        "categories": [
+          "Tools & Hardware"
+        ],
+        "max_price_minor": 100000
+      },
+      "relevance": {
+        "require_title_any": [
+          "screwdriver"
+        ],
+        "categories": [
+          "Tools & Hardware"
+        ],
+        "max_price_minor": 100000
+      }
+    },
+    {
+      "query_id": "SV2-L021-SAREE",
+      "text": "printed silk saree under Rs 2000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-021",
+      "note": "Saree and sari listings.",
+      "hard_filters": {
+        "categories": [
+          "Clothing",
+          "Uncategorized"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "saree",
+          "sari"
+        ],
+        "categories": [
+          "Clothing",
+          "Uncategorized"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-P021-SAREE",
+      "text": "traditional draped clothing for a family wedding within two thousand",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-021",
+      "note": "Saree and sari listings.",
+      "hard_filters": {
+        "categories": [
+          "Clothing",
+          "Uncategorized"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "saree",
+          "sari"
+        ],
+        "categories": [
+          "Clothing",
+          "Uncategorized"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-L022-PET_SHAMPOO",
+      "text": "dog shampoo under Rs 500",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-022",
+      "note": "Dog and pet shampoo.",
+      "hard_filters": {
+        "categories": [
+          "Pet Supplies"
+        ],
+        "max_price_minor": 50000
+      },
+      "relevance": {
+        "require_title_any": [
+          "shampoo"
+        ],
+        "categories": [
+          "Pet Supplies"
+        ],
+        "require_any_terms": [
+          "dog",
+          "pet"
+        ],
+        "max_price_minor": 50000
+      }
+    },
+    {
+      "query_id": "SV2-P022-PET_SHAMPOO",
+      "text": "my puppy needs a bath and I can spend five hundred",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-022",
+      "note": "Dog and pet shampoo.",
+      "hard_filters": {
+        "categories": [
+          "Pet Supplies"
+        ],
+        "max_price_minor": 50000
+      },
+      "relevance": {
+        "require_title_any": [
+          "shampoo"
+        ],
+        "categories": [
+          "Pet Supplies"
+        ],
+        "require_any_terms": [
+          "dog",
+          "pet"
+        ],
+        "max_price_minor": 50000
+      }
+    },
+    {
+      "query_id": "SV2-L023-PEN_SET",
+      "text": "ball pen set under Rs 200",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-023",
+      "note": "Pens excluding pencil boxes.",
+      "hard_filters": {
+        "categories": [
+          "Pens & Stationery"
+        ],
+        "exclude_terms": [
+          "pencil box"
+        ],
+        "max_price_minor": 20000
+      },
+      "relevance": {
+        "require_title_any": [
+          "pen"
+        ],
+        "categories": [
+          "Pens & Stationery"
+        ],
+        "exclude_terms": [
+          "pencil box"
+        ],
+        "max_price_minor": 20000
+      }
+    },
+    {
+      "query_id": "SV2-P023-PEN_SET",
+      "text": "inexpensive writing tools for taking notes, no pencils",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-023",
+      "note": "Pens excluding pencil boxes.",
+      "hard_filters": {
+        "categories": [
+          "Pens & Stationery"
+        ],
+        "exclude_terms": [
+          "pencil box"
+        ],
+        "max_price_minor": 20000
+      },
+      "relevance": {
+        "require_title_any": [
+          "pen"
+        ],
+        "categories": [
+          "Pens & Stationery"
+        ],
+        "exclude_terms": [
+          "pencil box"
+        ],
+        "max_price_minor": 20000
+      }
+    },
+    {
+      "query_id": "SV2-L024-DIAPER",
+      "text": "baby cloth diaper under Rs 1000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-024",
+      "note": "Baby diapers and nappies.",
+      "hard_filters": {
+        "categories": [
+          "Baby Care"
+        ],
+        "max_price_minor": 100000
+      },
+      "relevance": {
+        "require_title_any": [
+          "diaper",
+          "nappy"
+        ],
+        "categories": [
+          "Baby Care"
+        ],
+        "max_price_minor": 100000
+      }
+    },
+    {
+      "query_id": "SV2-P024-DIAPER",
+      "text": "reusable absorbent clothing for a baby for less than one thousand",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-024",
+      "note": "Baby diapers and nappies.",
+      "hard_filters": {
+        "categories": [
+          "Baby Care"
+        ],
+        "max_price_minor": 100000
+      },
+      "relevance": {
+        "require_title_any": [
+          "diaper",
+          "nappy"
+        ],
+        "categories": [
+          "Baby Care"
+        ],
+        "max_price_minor": 100000
+      }
+    },
+    {
+      "query_id": "SV2-L025-READING_LAMP",
+      "text": "study table lamp under Rs 2000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-025",
+      "note": "Desk lamps and reading lights, excluding decorative rice lights.",
+      "hard_filters": {
+        "categories": [
+          "Home Decor & Festive Needs",
+          "Home Improvement",
+          "Computers",
+          "Uncategorized"
+        ],
+        "exclude_terms": [
+          "rice light"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "lamp",
+          "reading light"
+        ],
+        "categories": [
+          "Home Decor & Festive Needs",
+          "Home Improvement",
+          "Computers",
+          "Uncategorized"
+        ],
+        "exclude_terms": [
+          "rice light"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-P025-READING_LAMP",
+      "text": "I need something so I can keep reading after my roommate sleeps",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-025",
+      "note": "Desk lamps and reading lights, excluding decorative rice lights.",
+      "hard_filters": {
+        "categories": [
+          "Home Decor & Festive Needs",
+          "Home Improvement",
+          "Computers",
+          "Uncategorized"
+        ],
+        "exclude_terms": [
+          "rice light"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "lamp",
+          "reading light"
+        ],
+        "categories": [
+          "Home Decor & Festive Needs",
+          "Home Improvement",
+          "Computers",
+          "Uncategorized"
+        ],
+        "exclude_terms": [
+          "rice light"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-L026-KEYBOARD",
+      "text": "USB wired keyboard under Rs 2000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-026",
+      "note": "Computer keyboards.",
+      "hard_filters": {
+        "categories": [
+          "Computers"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "keyboard"
+        ],
+        "categories": [
+          "Computers"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-P026-KEYBOARD",
+      "text": "keys I can plug into my computer for typing, below two thousand",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-026",
+      "note": "Computer keyboards.",
+      "hard_filters": {
+        "categories": [
+          "Computers"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "keyboard"
+        ],
+        "categories": [
+          "Computers"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-L027-WATER_BOTTLE",
+      "text": "stainless steel water bottle under Rs 500",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-027",
+      "note": "Water bottles.",
+      "hard_filters": {
+        "categories": [
+          "Kitchen & Dining",
+          "Sports & Fitness",
+          "Home Furnishing"
+        ],
+        "max_price_minor": 50000
+      },
+      "relevance": {
+        "require_title_any": [
+          "bottle"
+        ],
+        "categories": [
+          "Kitchen & Dining",
+          "Sports & Fitness",
+          "Home Furnishing"
+        ],
+        "max_price_minor": 50000
+      }
+    },
+    {
+      "query_id": "SV2-P027-WATER_BOTTLE",
+      "text": "a reusable container to carry drinking water for five hundred or less",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-027",
+      "note": "Water bottles.",
+      "hard_filters": {
+        "categories": [
+          "Kitchen & Dining",
+          "Sports & Fitness",
+          "Home Furnishing"
+        ],
+        "max_price_minor": 50000
+      },
+      "relevance": {
+        "require_title_any": [
+          "bottle"
+        ],
+        "categories": [
+          "Kitchen & Dining",
+          "Sports & Fitness",
+          "Home Furnishing"
+        ],
+        "max_price_minor": 50000
+      }
+    },
+    {
+      "query_id": "SV2-L028-BLUETOOTH_SPEAKER",
+      "text": "Bluetooth wireless speaker under Rs 3000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-028",
+      "note": "Bluetooth speakers and audio receivers.",
+      "hard_filters": {
+        "max_price_minor": 300000
+      },
+      "relevance": {
+        "require_title_any": [
+          "speaker",
+          "receiver"
+        ],
+        "require_all_terms": [
+          "bluetooth"
+        ],
+        "max_price_minor": 300000
+      }
+    },
+    {
+      "query_id": "SV2-P028-BLUETOOTH_SPEAKER",
+      "text": "portable audio I can play aloud from my phone without a cable",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-028",
+      "note": "Bluetooth speakers and audio receivers.",
+      "hard_filters": {
+        "max_price_minor": 300000
+      },
+      "relevance": {
+        "require_title_any": [
+          "speaker",
+          "receiver"
+        ],
+        "require_all_terms": [
+          "bluetooth"
+        ],
+        "max_price_minor": 300000
+      }
+    },
+    {
+      "query_id": "SV2-L029-UMBRELLA",
+      "text": "rain umbrella under Rs 1000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-029",
+      "note": "Umbrellas.",
+      "hard_filters": {
+        "max_price_minor": 100000
+      },
+      "relevance": {
+        "require_title_any": [
+          "umbrella"
+        ],
+        "max_price_minor": 100000
+      }
+    },
+    {
+      "query_id": "SV2-P029-UMBRELLA",
+      "text": "something handheld to keep me dry walking home in the monsoon",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-029",
+      "note": "Umbrellas.",
+      "hard_filters": {
+        "max_price_minor": 100000
+      },
+      "relevance": {
+        "require_title_any": [
+          "umbrella"
+        ],
+        "max_price_minor": 100000
+      }
+    },
+    {
+      "query_id": "SV2-L030-CAR_FLOOR_MAT",
+      "text": "car floor mat set under Rs 2000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-030",
+      "note": "Automotive floor mats.",
+      "hard_filters": {
+        "categories": [
+          "Automotive"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "mat"
+        ],
+        "categories": [
+          "Automotive"
+        ],
+        "require_any_terms": [
+          "car",
+          "auto",
+          "vehicle"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-P030-CAR_FLOOR_MAT",
+      "text": "protect the carpet under everyone's feet in my vehicle",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-030",
+      "note": "Automotive floor mats.",
+      "hard_filters": {
+        "categories": [
+          "Automotive"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "mat"
+        ],
+        "categories": [
+          "Automotive"
+        ],
+        "require_any_terms": [
+          "car",
+          "auto",
+          "vehicle"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-L031-LAPTOP_COOLER",
+      "text": "laptop cooling fan under Rs 2000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-031",
+      "note": "USB fans explicitly associated with laptops or cooling.",
+      "hard_filters": {
+        "categories": [
+          "Computers",
+          "Home Improvement",
+          "Uncategorized"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "fan",
+          "cooler"
+        ],
+        "categories": [
+          "Computers",
+          "Home Improvement",
+          "Uncategorized"
+        ],
+        "require_any_terms": [
+          "laptop",
+          "cooling"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-P031-LAPTOP_COOLER",
+      "text": "something to keep my laptop cool while gaming",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-031",
+      "note": "USB fans explicitly associated with laptops or cooling.",
+      "hard_filters": {
+        "categories": [
+          "Computers",
+          "Home Improvement",
+          "Uncategorized"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "fan",
+          "cooler"
+        ],
+        "categories": [
+          "Computers",
+          "Home Improvement",
+          "Uncategorized"
+        ],
+        "require_any_terms": [
+          "laptop",
+          "cooling"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-L032-WORKOUT_AUDIO",
+      "text": "wireless headphones for workouts under Rs 4000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-032",
+      "note": "Wireless personal audio within budget.",
+      "hard_filters": {
+        "max_price_minor": 400000
+      },
+      "relevance": {
+        "require_title_any": [
+          "headphone",
+          "earphone",
+          "headset"
+        ],
+        "require_any_terms": [
+          "wireless",
+          "bluetooth"
+        ],
+        "max_price_minor": 400000
+      }
+    },
+    {
+      "query_id": "SV2-P032-WORKOUT_AUDIO",
+      "text": "I want audio gear for workouts without spending more than four thousand",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-032",
+      "note": "Wireless personal audio within budget.",
+      "hard_filters": {
+        "max_price_minor": 400000
+      },
+      "relevance": {
+        "require_title_any": [
+          "headphone",
+          "earphone",
+          "headset"
+        ],
+        "require_any_terms": [
+          "wireless",
+          "bluetooth"
+        ],
+        "max_price_minor": 400000
+      }
+    },
+    {
+      "query_id": "SV2-L033-PHOTO_GIFT",
+      "text": "camera accessory gift under Rs 3000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-033",
+      "note": "Camera accessories suitable for a beginner.",
+      "hard_filters": {
+        "categories": [
+          "Cameras & Accessories"
+        ],
+        "max_price_minor": 300000
+      },
+      "relevance": {
+        "require_title_any": [
+          "lens",
+          "camera",
+          "tripod",
+          "filter",
+          "hood",
+          "flash",
+          "memory card"
+        ],
+        "categories": [
+          "Cameras & Accessories"
+        ],
+        "max_price_minor": 300000
+      }
+    },
+    {
+      "query_id": "SV2-P033-PHOTO_GIFT",
+      "text": "gift for someone learning photography",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-033",
+      "note": "Camera accessories suitable for a beginner.",
+      "hard_filters": {
+        "categories": [
+          "Cameras & Accessories"
+        ],
+        "max_price_minor": 300000
+      },
+      "relevance": {
+        "require_title_any": [
+          "lens",
+          "camera",
+          "tripod",
+          "filter",
+          "hood",
+          "flash",
+          "memory card"
+        ],
+        "categories": [
+          "Cameras & Accessories"
+        ],
+        "max_price_minor": 300000
+      }
+    },
+    {
+      "query_id": "SV2-L034-CAMERA_LENS",
+      "text": "camera lens under Rs 10000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-034",
+      "note": "Camera lenses and lens attachments.",
+      "hard_filters": {
+        "categories": [
+          "Cameras & Accessories"
+        ],
+        "max_price_minor": 1000000
+      },
+      "relevance": {
+        "require_title_any": [
+          "lens"
+        ],
+        "categories": [
+          "Cameras & Accessories"
+        ],
+        "max_price_minor": 1000000
+      }
+    },
+    {
+      "query_id": "SV2-P034-CAMERA_LENS",
+      "text": "glass for changing what a camera can see without buying a new body",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-034",
+      "note": "Camera lenses and lens attachments.",
+      "hard_filters": {
+        "categories": [
+          "Cameras & Accessories"
+        ],
+        "max_price_minor": 1000000
+      },
+      "relevance": {
+        "require_title_any": [
+          "lens"
+        ],
+        "categories": [
+          "Cameras & Accessories"
+        ],
+        "max_price_minor": 1000000
+      }
+    },
+    {
+      "query_id": "SV2-L035-COMPUTER_MOUSE",
+      "text": "wireless computer mouse under Rs 1500",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-035",
+      "note": "Computer mice.",
+      "hard_filters": {
+        "categories": [
+          "Computers"
+        ],
+        "max_price_minor": 150000
+      },
+      "relevance": {
+        "require_title_any": [
+          "mouse"
+        ],
+        "categories": [
+          "Computers"
+        ],
+        "max_price_minor": 150000
+      }
+    },
+    {
+      "query_id": "SV2-P035-COMPUTER_MOUSE",
+      "text": "a cordless pointing device for my laptop within fifteen hundred",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-035",
+      "note": "Computer mice.",
+      "hard_filters": {
+        "categories": [
+          "Computers"
+        ],
+        "max_price_minor": 150000
+      },
+      "relevance": {
+        "require_title_any": [
+          "mouse"
+        ],
+        "categories": [
+          "Computers"
+        ],
+        "max_price_minor": 150000
+      }
+    },
+    {
+      "query_id": "SV2-L036-BIKE_HELMET",
+      "text": "motorcycle helmet under Rs 3000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-036",
+      "note": "Riding helmets.",
+      "hard_filters": {
+        "categories": [
+          "Automotive",
+          "Sports & Fitness"
+        ],
+        "max_price_minor": 300000
+      },
+      "relevance": {
+        "require_title_any": [
+          "helmet"
+        ],
+        "categories": [
+          "Automotive",
+          "Sports & Fitness"
+        ],
+        "max_price_minor": 300000
+      }
+    },
+    {
+      "query_id": "SV2-P036-BIKE_HELMET",
+      "text": "protective headgear for riding my bike below three thousand",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-036",
+      "note": "Riding helmets.",
+      "hard_filters": {
+        "categories": [
+          "Automotive",
+          "Sports & Fitness"
+        ],
+        "max_price_minor": 300000
+      },
+      "relevance": {
+        "require_title_any": [
+          "helmet"
+        ],
+        "categories": [
+          "Automotive",
+          "Sports & Fitness"
+        ],
+        "max_price_minor": 300000
+      }
+    },
+    {
+      "query_id": "SV2-L037-WALLET",
+      "text": "men's leather wallet under Rs 1500",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-037",
+      "note": "Men's wallets.",
+      "hard_filters": {
+        "categories": [
+          "Bags, Wallets & Belts"
+        ],
+        "max_price_minor": 150000
+      },
+      "relevance": {
+        "require_title_any": [
+          "wallet"
+        ],
+        "categories": [
+          "Bags, Wallets & Belts"
+        ],
+        "max_price_minor": 150000
+      }
+    },
+    {
+      "query_id": "SV2-P037-WALLET",
+      "text": "a pocket-sized place for his cash and cards costing under fifteen hundred",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-037",
+      "note": "Men's wallets.",
+      "hard_filters": {
+        "categories": [
+          "Bags, Wallets & Belts"
+        ],
+        "max_price_minor": 150000
+      },
+      "relevance": {
+        "require_title_any": [
+          "wallet"
+        ],
+        "categories": [
+          "Bags, Wallets & Belts"
+        ],
+        "max_price_minor": 150000
+      }
+    },
+    {
+      "query_id": "SV2-L038-PERFUME",
+      "text": "women's perfume under Rs 2000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-038",
+      "note": "Perfume and eau de parfum.",
+      "hard_filters": {
+        "categories": [
+          "Beauty and Personal Care"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "perfume",
+          "parfum"
+        ],
+        "categories": [
+          "Beauty and Personal Care"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-P038-PERFUME",
+      "text": "a fragrant gift she can wear for less than two thousand",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-038",
+      "note": "Perfume and eau de parfum.",
+      "hard_filters": {
+        "categories": [
+          "Beauty and Personal Care"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "perfume",
+          "parfum"
+        ],
+        "categories": [
+          "Beauty and Personal Care"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-L039-LIPSTICK",
+      "text": "matte lipstick under Rs 1000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-039",
+      "note": "Matte lip colour.",
+      "hard_filters": {
+        "categories": [
+          "Beauty and Personal Care"
+        ],
+        "max_price_minor": 100000
+      },
+      "relevance": {
+        "require_title_any": [
+          "lipstick",
+          "lip color",
+          "lip colour"
+        ],
+        "categories": [
+          "Beauty and Personal Care"
+        ],
+        "max_price_minor": 100000
+      }
+    },
+    {
+      "query_id": "SV2-P039-LIPSTICK",
+      "text": "colour for her lips with a non-shiny finish below one thousand",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-039",
+      "note": "Matte lip colour.",
+      "hard_filters": {
+        "categories": [
+          "Beauty and Personal Care"
+        ],
+        "max_price_minor": 100000
+      },
+      "relevance": {
+        "require_title_any": [
+          "lipstick",
+          "lip color",
+          "lip colour"
+        ],
+        "categories": [
+          "Beauty and Personal Care"
+        ],
+        "max_price_minor": 100000
+      }
+    },
+    {
+      "query_id": "SV2-L040-HAIR_DRYER",
+      "text": "hair dryer under Rs 2000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-040",
+      "note": "Hair dryers.",
+      "hard_filters": {
+        "categories": [
+          "Health & Personal Care Appliances",
+          "Beauty and Personal Care"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "hair dryer",
+          "hair drier"
+        ],
+        "categories": [
+          "Health & Personal Care Appliances",
+          "Beauty and Personal Care"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-P040-HAIR_DRYER",
+      "text": "an electric appliance to dry wet hair quickly at home",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-040",
+      "note": "Hair dryers.",
+      "hard_filters": {
+        "categories": [
+          "Health & Personal Care Appliances",
+          "Beauty and Personal Care"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "hair dryer",
+          "hair drier"
+        ],
+        "categories": [
+          "Health & Personal Care Appliances",
+          "Beauty and Personal Care"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-L041-MIXER_GRINDER",
+      "text": "kitchen mixer grinder under Rs 5000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-041",
+      "note": "Mixer-grinders.",
+      "hard_filters": {
+        "categories": [
+          "Kitchen & Dining",
+          "Home Improvement"
+        ],
+        "max_price_minor": 500000
+      },
+      "relevance": {
+        "require_title_any": [
+          "mixer",
+          "grinder"
+        ],
+        "categories": [
+          "Kitchen & Dining",
+          "Home Improvement"
+        ],
+        "max_price_minor": 500000
+      }
+    },
+    {
+      "query_id": "SV2-P041-MIXER_GRINDER",
+      "text": "an appliance to blend spices and make chutney within five thousand",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-041",
+      "note": "Mixer-grinders.",
+      "hard_filters": {
+        "categories": [
+          "Kitchen & Dining",
+          "Home Improvement"
+        ],
+        "max_price_minor": 500000
+      },
+      "relevance": {
+        "require_title_any": [
+          "mixer",
+          "grinder"
+        ],
+        "categories": [
+          "Kitchen & Dining",
+          "Home Improvement"
+        ],
+        "max_price_minor": 500000
+      }
+    },
+    {
+      "query_id": "SV2-L042-CURTAINS",
+      "text": "window curtains under Rs 2000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-042",
+      "note": "Window curtains.",
+      "hard_filters": {
+        "categories": [
+          "Home Furnishing"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "curtain"
+        ],
+        "categories": [
+          "Home Furnishing"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-P042-CURTAINS",
+      "text": "fabric panels to block light coming through my windows",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-042",
+      "note": "Window curtains.",
+      "hard_filters": {
+        "categories": [
+          "Home Furnishing"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "curtain"
+        ],
+        "categories": [
+          "Home Furnishing"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-L043-OFFICE_CHAIR",
+      "text": "office chair under Rs 10000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-043",
+      "note": "Office and desk chairs.",
+      "hard_filters": {
+        "categories": [
+          "Furniture"
+        ],
+        "max_price_minor": 1000000
+      },
+      "relevance": {
+        "require_title_any": [
+          "chair"
+        ],
+        "categories": [
+          "Furniture"
+        ],
+        "max_price_minor": 1000000
+      }
+    },
+    {
+      "query_id": "SV2-P043-OFFICE_CHAIR",
+      "text": "a seat with back support for working at a desk all day",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-043",
+      "note": "Office and desk chairs.",
+      "hard_filters": {
+        "categories": [
+          "Furniture"
+        ],
+        "max_price_minor": 1000000
+      },
+      "relevance": {
+        "require_title_any": [
+          "chair"
+        ],
+        "categories": [
+          "Furniture"
+        ],
+        "max_price_minor": 1000000
+      }
+    },
+    {
+      "query_id": "SV2-L044-WIFI_ROUTER",
+      "text": "wireless Wi-Fi router under Rs 3000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-044",
+      "note": "Network routers.",
+      "hard_filters": {
+        "categories": [
+          "Computers"
+        ],
+        "max_price_minor": 300000
+      },
+      "relevance": {
+        "require_title_any": [
+          "router"
+        ],
+        "categories": [
+          "Computers"
+        ],
+        "max_price_minor": 300000
+      }
+    },
+    {
+      "query_id": "SV2-P044-WIFI_ROUTER",
+      "text": "a box to share my internet connection around the house",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-044",
+      "note": "Network routers.",
+      "hard_filters": {
+        "categories": [
+          "Computers"
+        ],
+        "max_price_minor": 300000
+      },
+      "relevance": {
+        "require_title_any": [
+          "router"
+        ],
+        "categories": [
+          "Computers"
+        ],
+        "max_price_minor": 300000
+      }
+    },
+    {
+      "query_id": "SV2-L045-PRINTER",
+      "text": "home inkjet printer under Rs 10000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-045",
+      "note": "Computer printers.",
+      "hard_filters": {
+        "categories": [
+          "Computers"
+        ],
+        "max_price_minor": 1000000
+      },
+      "relevance": {
+        "require_title_any": [
+          "printer"
+        ],
+        "categories": [
+          "Computers"
+        ],
+        "max_price_minor": 1000000
+      }
+    },
+    {
+      "query_id": "SV2-P045-PRINTER",
+      "text": "a machine for putting documents from my computer onto paper",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-045",
+      "note": "Computer printers.",
+      "hard_filters": {
+        "categories": [
+          "Computers"
+        ],
+        "max_price_minor": 1000000
+      },
+      "relevance": {
+        "require_title_any": [
+          "printer"
+        ],
+        "categories": [
+          "Computers"
+        ],
+        "max_price_minor": 1000000
+      }
+    },
+    {
+      "query_id": "SV2-L046-NOTEBOOK",
+      "text": "ruled notebook under Rs 500",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-046",
+      "note": "Paper notebooks.",
+      "hard_filters": {
+        "categories": [
+          "Pens & Stationery",
+          "Toys & School Supplies"
+        ],
+        "max_price_minor": 50000
+      },
+      "relevance": {
+        "require_title_any": [
+          "notebook",
+          "note book"
+        ],
+        "categories": [
+          "Pens & Stationery",
+          "Toys & School Supplies"
+        ],
+        "max_price_minor": 50000
+      }
+    },
+    {
+      "query_id": "SV2-P046-NOTEBOOK",
+      "text": "bound paper for handwritten class notes below five hundred",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-046",
+      "note": "Paper notebooks.",
+      "hard_filters": {
+        "categories": [
+          "Pens & Stationery",
+          "Toys & School Supplies"
+        ],
+        "max_price_minor": 50000
+      },
+      "relevance": {
+        "require_title_any": [
+          "notebook",
+          "note book"
+        ],
+        "categories": [
+          "Pens & Stationery",
+          "Toys & School Supplies"
+        ],
+        "max_price_minor": 50000
+      }
+    },
+    {
+      "query_id": "SV2-L047-FOOTBALL_SHOES",
+      "text": "football shoes under Rs 2000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-047",
+      "note": "Football footwear.",
+      "hard_filters": {
+        "categories": [
+          "Footwear"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "football"
+        ],
+        "categories": [
+          "Footwear"
+        ],
+        "require_all_terms": [
+          "shoe"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-P047-FOOTBALL_SHOES",
+      "text": "boots with grip for a weekend kickabout with friends",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-047",
+      "note": "Football footwear.",
+      "hard_filters": {
+        "categories": [
+          "Footwear"
+        ],
+        "max_price_minor": 200000
+      },
+      "relevance": {
+        "require_title_any": [
+          "football"
+        ],
+        "categories": [
+          "Footwear"
+        ],
+        "require_all_terms": [
+          "shoe"
+        ],
+        "max_price_minor": 200000
+      }
+    },
+    {
+      "query_id": "SV2-L048-GARDEN_PLANTER",
+      "text": "self-watering garden planter under Rs 1000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-048",
+      "note": "Self-watering plant containers.",
+      "hard_filters": {
+        "categories": [
+          "Tools & Hardware"
+        ],
+        "max_price_minor": 100000
+      },
+      "relevance": {
+        "require_title_any": [
+          "planter",
+          "plant container"
+        ],
+        "categories": [
+          "Tools & Hardware"
+        ],
+        "require_any_terms": [
+          "self watering",
+          "self-watering"
+        ],
+        "max_price_minor": 100000
+      }
+    },
+    {
+      "query_id": "SV2-P048-GARDEN_PLANTER",
+      "text": "a container that gives my plant water gradually while I am away",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-048",
+      "note": "Self-watering plant containers.",
+      "hard_filters": {
+        "categories": [
+          "Tools & Hardware"
+        ],
+        "max_price_minor": 100000
+      },
+      "relevance": {
+        "require_title_any": [
+          "planter",
+          "plant container"
+        ],
+        "categories": [
+          "Tools & Hardware"
+        ],
+        "require_any_terms": [
+          "self watering",
+          "self-watering"
+        ],
+        "max_price_minor": 100000
+      }
+    },
+    {
+      "query_id": "SV2-L049-PHONE_CHARGER",
+      "text": "mobile phone charger under Rs 1000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-049",
+      "note": "Phone chargers and charging adapters.",
+      "hard_filters": {
+        "categories": [
+          "Mobiles & Accessories",
+          "Computers"
+        ],
+        "max_price_minor": 100000
+      },
+      "relevance": {
+        "require_title_any": [
+          "charger",
+          "charging"
+        ],
+        "categories": [
+          "Mobiles & Accessories",
+          "Computers"
+        ],
+        "max_price_minor": 100000
+      }
+    },
+    {
+      "query_id": "SV2-P049-PHONE_CHARGER",
+      "text": "a plug and cable to refill my handset battery",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-049",
+      "note": "Phone chargers and charging adapters.",
+      "hard_filters": {
+        "categories": [
+          "Mobiles & Accessories",
+          "Computers"
+        ],
+        "max_price_minor": 100000
+      },
+      "relevance": {
+        "require_title_any": [
+          "charger",
+          "charging"
+        ],
+        "categories": [
+          "Mobiles & Accessories",
+          "Computers"
+        ],
+        "max_price_minor": 100000
+      }
+    },
+    {
+      "query_id": "SV2-L050-RAINCOAT",
+      "text": "waterproof raincoat under Rs 1500",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-050",
+      "note": "Raincoats.",
+      "hard_filters": {
+        "categories": [
+          "Clothing",
+          "Automotive"
+        ],
+        "max_price_minor": 150000
+      },
+      "relevance": {
+        "require_title_any": [
+          "raincoat",
+          "rain coat"
+        ],
+        "categories": [
+          "Clothing",
+          "Automotive"
+        ],
+        "max_price_minor": 150000
+      }
+    },
+    {
+      "query_id": "SV2-P050-RAINCOAT",
+      "text": "clothing that keeps my body dry on a wet commute",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-050",
+      "note": "Raincoats.",
+      "hard_filters": {
+        "categories": [
+          "Clothing",
+          "Automotive"
+        ],
+        "max_price_minor": 150000
+      },
+      "relevance": {
+        "require_title_any": [
+          "raincoat",
+          "rain coat"
+        ],
+        "categories": [
+          "Clothing",
+          "Automotive"
+        ],
+        "max_price_minor": 150000
+      }
+    },
+    {
+      "query_id": "SV2-L051-PILLOW",
+      "text": "sleeping pillow under Rs 1500",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-051",
+      "note": "Bed pillows.",
+      "hard_filters": {
+        "categories": [
+          "Home Furnishing"
+        ],
+        "max_price_minor": 150000
+      },
+      "relevance": {
+        "require_title_any": [
+          "pillow"
+        ],
+        "categories": [
+          "Home Furnishing"
+        ],
+        "max_price_minor": 150000
+      }
+    },
+    {
+      "query_id": "SV2-P051-PILLOW",
+      "text": "soft support for my head in bed within fifteen hundred",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-051",
+      "note": "Bed pillows.",
+      "hard_filters": {
+        "categories": [
+          "Home Furnishing"
+        ],
+        "max_price_minor": 150000
+      },
+      "relevance": {
+        "require_title_any": [
+          "pillow"
+        ],
+        "categories": [
+          "Home Furnishing"
+        ],
+        "max_price_minor": 150000
+      }
+    },
+    {
+      "query_id": "SV2-L052-COOKWARE",
+      "text": "non-stick cookware set under Rs 5000",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-052",
+      "note": "Non-stick cookware.",
+      "hard_filters": {
+        "categories": [
+          "Kitchen & Dining"
+        ],
+        "max_price_minor": 500000
+      },
+      "relevance": {
+        "require_title_any": [
+          "cookware",
+          "pan",
+          "kadai"
+        ],
+        "categories": [
+          "Kitchen & Dining"
+        ],
+        "require_any_terms": [
+          "non-stick",
+          "non stick"
+        ],
+        "max_price_minor": 500000
+      }
+    },
+    {
+      "query_id": "SV2-P052-COOKWARE",
+      "text": "pots and pans that food will not cling to, below five thousand",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "budget-constrained"
+      ],
+      "pair_id": "SV2-PAIR-052",
+      "note": "Non-stick cookware.",
+      "hard_filters": {
+        "categories": [
+          "Kitchen & Dining"
+        ],
+        "max_price_minor": 500000
+      },
+      "relevance": {
+        "require_title_any": [
+          "cookware",
+          "pan",
+          "kadai"
+        ],
+        "categories": [
+          "Kitchen & Dining"
+        ],
+        "require_any_terms": [
+          "non-stick",
+          "non stick"
+        ],
+        "max_price_minor": 500000
+      }
+    },
+    {
+      "query_id": "SV2-L053-VOYLLA_NECKLACE",
+      "text": "Voylla necklace",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "brand-constrained"
+      ],
+      "pair_id": "SV2-PAIR-053",
+      "note": "Brand-constrained Voylla necklaces.",
+      "hard_filters": {
+        "categories": [
+          "Jewellery"
+        ],
+        "brands": [
+          "Voylla"
+        ]
+      },
+      "relevance": {
+        "require_title_any": [
+          "necklace"
+        ],
+        "categories": [
+          "Jewellery"
+        ],
+        "brands": [
+          "Voylla"
+        ]
+      }
+    },
+    {
+      "query_id": "SV2-P053-VOYLLA_NECKLACE",
+      "text": "neck jewellery made by Voylla",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "brand-constrained"
+      ],
+      "pair_id": "SV2-PAIR-053",
+      "note": "Brand-constrained Voylla necklaces.",
+      "hard_filters": {
+        "categories": [
+          "Jewellery"
+        ],
+        "brands": [
+          "Voylla"
+        ]
+      },
+      "relevance": {
+        "require_title_any": [
+          "necklace"
+        ],
+        "categories": [
+          "Jewellery"
+        ],
+        "brands": [
+          "Voylla"
+        ]
+      }
+    },
+    {
+      "query_id": "SV2-L054-ALLURE_CAR_MAT",
+      "text": "Allure Auto car mat",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "brand-constrained"
+      ],
+      "pair_id": "SV2-PAIR-054",
+      "note": "Brand-constrained Allure Auto car mats.",
+      "hard_filters": {
+        "categories": [
+          "Automotive"
+        ],
+        "brands": [
+          "Allure Auto"
+        ]
+      },
+      "relevance": {
+        "require_title_any": [
+          "mat"
+        ],
+        "categories": [
+          "Automotive"
+        ],
+        "brands": [
+          "Allure Auto"
+        ]
+      }
+    },
+    {
+      "query_id": "SV2-P054-ALLURE_CAR_MAT",
+      "text": "floor protection for a vehicle made by Allure Auto",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "brand-constrained"
+      ],
+      "pair_id": "SV2-PAIR-054",
+      "note": "Brand-constrained Allure Auto car mats.",
+      "hard_filters": {
+        "categories": [
+          "Automotive"
+        ],
+        "brands": [
+          "Allure Auto"
+        ]
+      },
+      "relevance": {
+        "require_title_any": [
+          "mat"
+        ],
+        "categories": [
+          "Automotive"
+        ],
+        "brands": [
+          "Allure Auto"
+        ]
+      }
+    },
+    {
+      "query_id": "SV2-L055-DAILYOBJECTS_COVER",
+      "text": "DailyObjects tablet cover",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "brand-constrained"
+      ],
+      "pair_id": "SV2-PAIR-055",
+      "note": "Brand-constrained DailyObjects covers.",
+      "hard_filters": {
+        "categories": [
+          "Mobiles & Accessories"
+        ],
+        "brands": [
+          "DailyObjects"
+        ]
+      },
+      "relevance": {
+        "require_title_any": [
+          "cover",
+          "case"
+        ],
+        "categories": [
+          "Mobiles & Accessories"
+        ],
+        "brands": [
+          "DailyObjects"
+        ]
+      }
+    },
+    {
+      "query_id": "SV2-P055-DAILYOBJECTS_COVER",
+      "text": "protection for an iPad made by DailyObjects",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "brand-constrained"
+      ],
+      "pair_id": "SV2-PAIR-055",
+      "note": "Brand-constrained DailyObjects covers.",
+      "hard_filters": {
+        "categories": [
+          "Mobiles & Accessories"
+        ],
+        "brands": [
+          "DailyObjects"
+        ]
+      },
+      "relevance": {
+        "require_title_any": [
+          "cover",
+          "case"
+        ],
+        "categories": [
+          "Mobiles & Accessories"
+        ],
+        "brands": [
+          "DailyObjects"
+        ]
+      }
+    },
+    {
+      "query_id": "SV2-L056-JJC_LENS_HOOD",
+      "text": "JJC lens hood",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "brand-constrained"
+      ],
+      "pair_id": "SV2-PAIR-056",
+      "note": "Brand-constrained JJC lens hoods.",
+      "hard_filters": {
+        "categories": [
+          "Cameras & Accessories"
+        ],
+        "brands": [
+          "JJC"
+        ]
+      },
+      "relevance": {
+        "require_title_any": [
+          "lens hood",
+          "hood"
+        ],
+        "categories": [
+          "Cameras & Accessories"
+        ],
+        "brands": [
+          "JJC"
+        ]
+      }
+    },
+    {
+      "query_id": "SV2-P056-JJC_LENS_HOOD",
+      "text": "a JJC attachment that shades camera glass",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "brand-constrained"
+      ],
+      "pair_id": "SV2-PAIR-056",
+      "note": "Brand-constrained JJC lens hoods.",
+      "hard_filters": {
+        "categories": [
+          "Cameras & Accessories"
+        ],
+        "brands": [
+          "JJC"
+        ]
+      },
+      "relevance": {
+        "require_title_any": [
+          "lens hood",
+          "hood"
+        ],
+        "categories": [
+          "Cameras & Accessories"
+        ],
+        "brands": [
+          "JJC"
+        ]
+      }
+    },
+    {
+      "query_id": "SV2-L057-LAPGUARD_BATTERY",
+      "text": "Lapguard laptop battery",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "brand-constrained"
+      ],
+      "pair_id": "SV2-PAIR-057",
+      "note": "Brand-constrained Lapguard batteries.",
+      "hard_filters": {
+        "categories": [
+          "Computers"
+        ],
+        "brands": [
+          "Lapguard"
+        ]
+      },
+      "relevance": {
+        "require_title_any": [
+          "battery"
+        ],
+        "categories": [
+          "Computers"
+        ],
+        "brands": [
+          "Lapguard"
+        ]
+      }
+    },
+    {
+      "query_id": "SV2-P057-LAPGUARD_BATTERY",
+      "text": "a replacement notebook-computer power pack from Lapguard",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "brand-constrained"
+      ],
+      "pair_id": "SV2-PAIR-057",
+      "note": "Brand-constrained Lapguard batteries.",
+      "hard_filters": {
+        "categories": [
+          "Computers"
+        ],
+        "brands": [
+          "Lapguard"
+        ]
+      },
+      "relevance": {
+        "require_title_any": [
+          "battery"
+        ],
+        "categories": [
+          "Computers"
+        ],
+        "brands": [
+          "Lapguard"
+        ]
+      }
+    },
+    {
+      "query_id": "SV2-L058-SPEEDWAV_SHADE",
+      "text": "Speedwav car sun shade",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "brand-constrained"
+      ],
+      "pair_id": "SV2-PAIR-058",
+      "note": "Brand-constrained Speedwav sun shades.",
+      "hard_filters": {
+        "categories": [
+          "Automotive"
+        ],
+        "brands": [
+          "Speedwav"
+        ]
+      },
+      "relevance": {
+        "require_title_any": [
+          "sun shade",
+          "sunshade"
+        ],
+        "categories": [
+          "Automotive"
+        ],
+        "brands": [
+          "Speedwav"
+        ]
+      }
+    },
+    {
+      "query_id": "SV2-P058-SPEEDWAV_SHADE",
+      "text": "a Speedwav screen to reduce sunlight entering a vehicle",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "brand-constrained"
+      ],
+      "pair_id": "SV2-PAIR-058",
+      "note": "Brand-constrained Speedwav sun shades.",
+      "hard_filters": {
+        "categories": [
+          "Automotive"
+        ],
+        "brands": [
+          "Speedwav"
+        ]
+      },
+      "relevance": {
+        "require_title_any": [
+          "sun shade",
+          "sunshade"
+        ],
+        "categories": [
+          "Automotive"
+        ],
+        "brands": [
+          "Speedwav"
+        ]
+      }
+    },
+    {
+      "query_id": "SV2-L059-RAYMOND_SHIRT",
+      "text": "Raymond men's formal shirt",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "brand-constrained"
+      ],
+      "pair_id": "SV2-PAIR-059",
+      "note": "Brand-constrained Raymond shirts.",
+      "hard_filters": {
+        "categories": [
+          "Clothing"
+        ],
+        "brands": [
+          "Raymond"
+        ]
+      },
+      "relevance": {
+        "require_title_any": [
+          "shirt"
+        ],
+        "categories": [
+          "Clothing"
+        ],
+        "brands": [
+          "Raymond"
+        ]
+      }
+    },
+    {
+      "query_id": "SV2-P059-RAYMOND_SHIRT",
+      "text": "office clothing for him made by Raymond",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "brand-constrained"
+      ],
+      "pair_id": "SV2-PAIR-059",
+      "note": "Brand-constrained Raymond shirts.",
+      "hard_filters": {
+        "categories": [
+          "Clothing"
+        ],
+        "brands": [
+          "Raymond"
+        ]
+      },
+      "relevance": {
+        "require_title_any": [
+          "shirt"
+        ],
+        "categories": [
+          "Clothing"
+        ],
+        "brands": [
+          "Raymond"
+        ]
+      }
+    },
+    {
+      "query_id": "SV2-L060-DURIAN_SOFA",
+      "text": "Durian leather sofa",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "brand-constrained"
+      ],
+      "pair_id": "SV2-PAIR-060",
+      "note": "Brand-constrained Durian sofas.",
+      "hard_filters": {
+        "categories": [
+          "Furniture"
+        ],
+        "brands": [
+          "Durian"
+        ]
+      },
+      "relevance": {
+        "require_title_any": [
+          "sofa"
+        ],
+        "categories": [
+          "Furniture"
+        ],
+        "brands": [
+          "Durian"
+        ]
+      }
+    },
+    {
+      "query_id": "SV2-P060-DURIAN_SOFA",
+      "text": "a leather-covered couch made by Durian",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "brand-constrained"
+      ],
+      "pair_id": "SV2-PAIR-060",
+      "note": "Brand-constrained Durian sofas.",
+      "hard_filters": {
+        "categories": [
+          "Furniture"
+        ],
+        "brands": [
+          "Durian"
+        ]
+      },
+      "relevance": {
+        "require_title_any": [
+          "sofa"
+        ],
+        "categories": [
+          "Furniture"
+        ],
+        "brands": [
+          "Durian"
+        ]
+      }
+    },
+    {
+      "query_id": "SV2-L061-WALLMANTRA_STICKER",
+      "text": "Wallmantra wall sticker",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "brand-constrained"
+      ],
+      "pair_id": "SV2-PAIR-061",
+      "note": "Brand-constrained Wallmantra stickers.",
+      "hard_filters": {
+        "categories": [
+          "Home Decor & Festive Needs"
+        ],
+        "brands": [
+          "Wallmantra"
+        ]
+      },
+      "relevance": {
+        "require_title_any": [
+          "sticker"
+        ],
+        "categories": [
+          "Home Decor & Festive Needs"
+        ],
+        "brands": [
+          "Wallmantra"
+        ]
+      }
+    },
+    {
+      "query_id": "SV2-P061-WALLMANTRA_STICKER",
+      "text": "a decorative vinyl graphic from Wallmantra",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "brand-constrained"
+      ],
+      "pair_id": "SV2-PAIR-061",
+      "note": "Brand-constrained Wallmantra stickers.",
+      "hard_filters": {
+        "categories": [
+          "Home Decor & Festive Needs"
+        ],
+        "brands": [
+          "Wallmantra"
+        ]
+      },
+      "relevance": {
+        "require_title_any": [
+          "sticker"
+        ],
+        "categories": [
+          "Home Decor & Festive Needs"
+        ],
+        "brands": [
+          "Wallmantra"
+        ]
+      }
+    },
+    {
+      "query_id": "SV2-L062-KARATCRAFT_RING",
+      "text": "Karatcraft diamond ring",
+      "intent_class": "literal",
+      "groups": [
+        "literal",
+        "category",
+        "brand-constrained"
+      ],
+      "pair_id": "SV2-PAIR-062",
+      "note": "Brand-constrained Karatcraft rings.",
+      "hard_filters": {
+        "categories": [
+          "Jewellery"
+        ],
+        "brands": [
+          "Karatcraft"
+        ]
+      },
+      "relevance": {
+        "require_title_any": [
+          "ring"
+        ],
+        "categories": [
+          "Jewellery"
+        ],
+        "brands": [
+          "Karatcraft"
+        ]
+      }
+    },
+    {
+      "query_id": "SV2-P062-KARATCRAFT_RING",
+      "text": "a diamond finger band made by Karatcraft",
+      "intent_class": "paraphrase",
+      "groups": [
+        "paraphrase",
+        "category",
+        "brand-constrained"
+      ],
+      "pair_id": "SV2-PAIR-062",
+      "note": "Brand-constrained Karatcraft rings.",
+      "hard_filters": {
+        "categories": [
+          "Jewellery"
+        ],
+        "brands": [
+          "Karatcraft"
+        ]
+      },
+      "relevance": {
+        "require_title_any": [
+          "ring"
+        ],
+        "categories": [
+          "Jewellery"
+        ],
+        "brands": [
+          "Karatcraft"
+        ]
+      }
+    }
+  ]
+}

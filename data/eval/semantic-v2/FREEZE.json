@@ -1,0 +1,53 @@
+{
+  "schema_version": "semantic-v2-freeze-v1",
+  "status": "FROZEN_BEFORE_MEASUREMENT",
+  "base_commit": "a72ec972714ef4af8319ad015916641e13cd36c9",
+  "catalog_sha256": "7ad5d4f579eca4838eabca2de755003e0b513ff4213af683b4574559421ae09f",
+  "query_artifact": "data/eval/semantic-v2/queries.json",
+  "query_artifact_sha256": "621c6766bc1d6bfe829d1d7d5b0698065fc2f2dc2fa54273d541aacf49ef0271",
+  "query_count": 124,
+  "query_pair_count": 62,
+  "literal_count": 62,
+  "paraphrase_count": 62,
+  "generator": "scripts/freeze_semantic_v2.py",
+  "generator_sha256": "a2edb4ab7e2bcec305c25a07312ee74eaffbd1ea006e26041e72d48705118a81",
+  "candidate_cutoff": {
+    "bm25": 100,
+    "dense": 100,
+    "final": 10
+  },
+  "fusion_candidates": [
+    "bm25",
+    "dense",
+    "rrf",
+    "weighted_fusion"
+  ],
+  "metrics": [
+    "recall_at_1",
+    "recall_at_5",
+    "recall_at_10",
+    "mrr",
+    "ndcg_at_10"
+  ],
+  "report_slices": [
+    "all",
+    "literal",
+    "paraphrase",
+    "category",
+    "brand-constrained",
+    "budget-constrained"
+  ],
+  "model_selection_rule": {
+    "primary": "highest paraphrase recall_at_10 on this frozen query set",
+    "tie_breakers": [
+      "all ndcg_at_10",
+      "full discovery p95 latency",
+      "resident memory",
+      "artifact bytes"
+    ],
+    "adoption_gate": "enable dense retrieval only for a material frozen-evaluation improvement without unacceptable measured runtime cost",
+    "no_repeated_test_tuning": true
+  },
+  "outcomes_included": false,
+  "freeze_payload_sha256": "ac5c773088eecea5a98526d7b985f6ee007047cc71a1ab2748186113c08b5413"
+}
