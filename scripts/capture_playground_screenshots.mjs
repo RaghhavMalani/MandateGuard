@@ -6,9 +6,10 @@
  *
  * Uses the locally installed Chrome channel rather than a downloaded browser
  * bundle, so it works on a machine that has not run `playwright install`.
- * Every screen is driven the way a person would drive it: type, search, click a
- * candidate, read the verdict. Nothing is stubbed, so a screenshot that shows
- * ALLOW is a screenshot of the controller having answered ALLOW.
+ * Every screen is driven the way a person would drive it: type, search, select
+ * a product, ask for authorization, read the decision. Nothing is stubbed, so a
+ * screenshot that shows ALLOW is a screenshot of the controller having answered
+ * ALLOW.
  */
 
 import { mkdir } from "node:fs/promises";
@@ -36,11 +37,24 @@ async function shot(page, name) {
   process.stdout.write(`  ${name}.png\n`);
 }
 
-async function scrollRegion(page, selector) {
-  await page.evaluate((target) => {
-    document.querySelector(target)?.scrollIntoView();
-    window.scrollBy(0, -130);
-  }, selector);
+/**
+ * Put a region at the top of the shot.
+ *
+ * The stylesheet sets `scroll-behavior: smooth`, so an animated scroll would
+ * still be in flight when the screenshot is taken. These jumps are instant and
+ * absolute for that reason.
+ */
+async function scrollRegion(page, selector, offset = -110) {
+  await page.evaluate(
+    ([target, delta]) => {
+      const node = document.querySelector(target);
+      if (!node) return;
+      const top = node.getBoundingClientRect().top + window.scrollY + delta;
+      window.scrollTo({ top: Math.max(0, top), behavior: "instant" });
+    },
+    [selector, offset],
+  );
+  await page.waitForTimeout(250);
 }
 
 async function search(page, intent) {
@@ -50,26 +64,34 @@ async function search(page, intent) {
 }
 
 /**
- * Click a candidate, optionally one whose billing model the merchant left
+ * Select a candidate, optionally one whose billing model the merchant left
  * undeclared. Selecting by what the evidence says is the point: the screenshot
  * has to show the controller answering for a listing whose paperwork is
  * genuinely incomplete, not one picked because it produced the wanted verdict.
  */
-async function chooseCandidate(page, { billingTone } = {}) {
+async function selectCandidate(page, { billingTone } = {}) {
   if (billingTone) {
     const button = await page.$(
       `.pgcard:has(.readiness__row[data-field="billing_model"][data-tone="${billingTone}"]) [data-authorize]`,
     );
     if (button) {
       await button.click();
-      return;
+    } else {
+      process.stdout.write(`  ! no candidate with billing tone ${billingTone}\n`);
+      await page.click(".pgcard [data-authorize]");
     }
-    process.stdout.write(`  ! no candidate with billing tone ${billingTone}\n`);
+  } else {
+    await page.click(".pgcard [data-authorize]");
   }
-  await page.click(".pgcard [data-authorize]");
+  await page.waitForSelector('.pgchecks[data-checked="false"]', { timeout: 15000 });
 }
 
-async function waitForVerdict(page) {
+async function askAuthorization(page) {
+  await page.click("[data-check-authorization]");
+  return waitForDecision(page);
+}
+
+async function waitForDecision(page) {
   await page.waitForSelector(".pgverdict__word", { timeout: 30000 });
   await page.waitForFunction(
     () => {
@@ -81,72 +103,85 @@ async function waitForVerdict(page) {
   return page.$eval(".pgverdict__word", (node) => node.textContent.trim());
 }
 
+async function freshPage(browser, viewport = VIEWPORT) {
+  const context = await browser.newContext({ viewport });
+  const page = await context.newPage();
+  await page.goto(BASE, { waitUntil: "networkidle" });
+  return { context, page };
+}
+
 async function main() {
   await mkdir(OUT, { recursive: true });
   const browser = await chromium.launch({ channel: "chrome" });
 
-  // -- Playground initial ------------------------------------------------
-  let context = await browser.newContext({ viewport: VIEWPORT });
-  let page = await context.newPage();
-  await page.goto(BASE, { waitUntil: "networkidle" });
+  // -- 1. Playground initial --------------------------------------------
+  let { context, page } = await freshPage(browser);
   await shot(page, "playground-initial");
 
-  // -- Custom search -----------------------------------------------------
+  // -- 2. Search results -------------------------------------------------
   await search(page, "Buy wireless headphones under INR 5,000. No subscriptions.");
-  await scrollRegion(page, "#pg-results-region");
+  await scrollRegion(page, "#pg-candidates", -150);
   await shot(page, "playground-custom-search");
 
-  // -- ALLOW -------------------------------------------------------------
-  await chooseCandidate(page, { billingTone: "ok" });
-  let verdict = await waitForVerdict(page);
-  await scrollRegion(page, "#pg-outcome-region");
+  // -- 3. Selected product, before authorization -------------------------
+  await selectCandidate(page, { billingTone: "present" });
+  // Framed on the comparison so the shot carries both halves of the state:
+  // what was allowed against what was proposed, and authorization not yet run.
+  await scrollRegion(page, "#pg-compare", -140);
+  await shot(page, "playground-selected");
+
+  // -- 4. ALLOW ----------------------------------------------------------
+  let verdict = await askAuthorization(page);
+  await scrollRegion(page, "#pg-outcome-region", -150);
   await shot(page, "playground-allow");
   if (verdict !== "ALLOW") throw new Error(`expected ALLOW, saw ${verdict}`);
 
-  // -- REVIEW: deterministic undeclared-billing scenario -----------------
+  // -- 5. REVIEW: deterministic undeclared-billing scenario ---------------
   await context.close();
-  context = await browser.newContext({ viewport: VIEWPORT });
-  page = await context.newPage();
-  await page.goto(BASE, { waitUntil: "networkidle" });
+  ({ context, page } = await freshPage(browser));
   await page.click('[data-scenario="billing-undeclared"]');
-  verdict = await waitForVerdict(page);
-  await scrollRegion(page, "#pg-outcome-region");
+  verdict = await waitForDecision(page);
+  await scrollRegion(page, "#pg-outcome-region", -150);
   await shot(page, "playground-review");
   if (verdict !== "REVIEW") throw new Error(`expected REVIEW, saw ${verdict}`);
-  process.stdout.write(`  review screen verdict: ${verdict}\n`);
 
-  // -- BLOCK: the prohibited-content journey -----------------------------
+  // -- 6. BLOCK: the prohibited-content journey --------------------------
   await context.close();
-  context = await browser.newContext({ viewport: VIEWPORT });
-  page = await context.newPage();
-  await page.goto(BASE, { waitUntil: "networkidle" });
+  ({ context, page } = await freshPage(browser));
   await page.click('[data-scenario="prohibited-content"]');
-  verdict = await waitForVerdict(page);
-  await scrollRegion(page, "#pg-outcome-region");
+  verdict = await waitForDecision(page);
+  await scrollRegion(page, "#pg-outcome-region", -150);
   await shot(page, "playground-block");
   if (verdict !== "BLOCK") throw new Error(`expected BLOCK, saw ${verdict}`);
-  process.stdout.write(`  block screen verdict: ${verdict}\n`);
 
-  // -- Revocation --------------------------------------------------------
+  // -- 7. Price mutation rejected at the execution gate ------------------
   await context.close();
-  context = await browser.newContext({ viewport: VIEWPORT });
-  page = await context.newPage();
-  await page.goto(BASE, { waitUntil: "networkidle" });
+  ({ context, page } = await freshPage(browser));
+  await page.click('[data-scenario="price-mutation"]');
+  verdict = await waitForDecision(page);
+  if (verdict !== "ALLOW") throw new Error(`expected ALLOW before mutation, saw ${verdict}`);
+  await page.waitForSelector("#pg-mutate-price", { timeout: 20000 });
+  await page.click("#pg-mutate-price");
+  await page.waitForSelector(".pggate__binding", { timeout: 20000 });
+  await scrollRegion(page, "#pg-execution-region");
+  await shot(page, "playground-price-mutation");
+
+  // -- 8. Revocation -----------------------------------------------------
+  await context.close();
+  ({ context, page } = await freshPage(browser));
   await page.click('[data-scenario="revoked-after-allow"]');
-  await waitForVerdict(page);
+  await waitForDecision(page);
   await page.waitForSelector("#pg-revoke", { timeout: 20000 });
   await page.click("#pg-revoke");
   await page.waitForTimeout(900);
   await page.click("#pg-execute");
   await page.waitForTimeout(1400);
-  await scrollRegion(page, "#pg-outcome-region");
+  await scrollRegion(page, "#pg-execution-region");
   await shot(page, "playground-revocation");
 
-  // -- Marketplace readiness --------------------------------------------
+  // -- 9. Marketplace readiness -----------------------------------------
   await context.close();
-  context = await browser.newContext({ viewport: VIEWPORT });
-  page = await context.newPage();
-  await page.goto(`${BASE}#observe`, { waitUntil: "networkidle" });
+  ({ context, page } = await freshPage(browser));
   await page.click("#tab-observe");
   await page.waitForTimeout(400);
   await page.fill("#purchase-intent", "Buy a study lamp under INR 2,000. No subscriptions.");
@@ -157,19 +192,23 @@ async function main() {
   await page.evaluate(() => window.scrollBy(0, -130));
   await shot(page, "marketplace-readiness");
 
-  // -- Scale lab ---------------------------------------------------------
+  // -- 10. Scale lab -----------------------------------------------------
   await page.click("#tab-scale");
   await page.waitForTimeout(500);
   await page.evaluate(() => window.scrollTo(0, 0));
   await shot(page, "scale-lab");
 
-  // -- Mobile ------------------------------------------------------------
+  // -- 11. Mobile --------------------------------------------------------
   await context.close();
-  context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  context = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    isMobile: true,
+    hasTouch: true,
+  });
   page = await context.newPage();
   await page.goto(BASE, { waitUntil: "networkidle" });
   await search(page, "desk lamp under 2000");
-  await scrollRegion(page, "#pg-results-region");
+  await scrollRegion(page, "#pg-candidates", -60);
   await shot(page, "playground-mobile");
 
   await context.close();

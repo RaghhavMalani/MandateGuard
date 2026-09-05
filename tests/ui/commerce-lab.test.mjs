@@ -1023,21 +1023,21 @@ test("Playground is the primary tab and explains the sandbox before controls", (
 });
 
 
-test("Playground rail has the complete authorization journey and never infers a verdict", () => {
+test("Playground rail walks the product story and never infers a verdict", () => {
   assert.deepEqual(
     PLAYGROUND_RAIL.map((stage) => stage.id),
-    ["INTENT", "SEARCH", "CANDIDATES", "SELECT", "EVIDENCE", "MANDATEGUARD", "DECISION", "PAYMENT"],
+    ["MANDATE", "SELECTION", "MANDATEGUARD", "EXECUTION"],
   );
   const deciding = railStates({
     intent: "lamp",
     candidates: [sandboxCandidate],
     selected: sandboxCandidate,
-    evidence: [{ evidence_id: "one" }],
     snapshot: { state: "RUNNING" },
   });
+  assert.equal(deciding.MANDATE, "done");
+  assert.equal(deciding.SELECTION, "done");
   assert.equal(deciding.MANDATEGUARD, "active");
-  assert.equal(deciding.DECISION, "waiting");
-  assert.equal(deciding.PAYMENT, "waiting");
+  assert.equal(deciding.EXECUTION, "waiting");
 });
 
 
@@ -1047,22 +1047,18 @@ test("each sandbox result names only the actual retrieval signals and readiness 
   assert.match(html, /₹1,599/);
   assert.match(html, /Brightleaf Lighting \(Synthetic\)/);
   assert.match(html, /Desk lamps/);
-  for (const label of [
-    "Key terms",
-    "Budget",
-    "Brand",
-    "Category match",
-  ]) {
+  for (const label of ["Key terms", "Budget", "Category match"]) {
     assert.match(html, new RegExp(label));
   }
   assert.doesNotMatch(html, /Semantic similarity/);
   assert.match(html, /<dt>Category match<\/dt><dd>Desk lamps<\/dd>/);
   assert.match(html, /phrase “study lamp”/);
+  // The evidence matrix is still published in full, one disclosure away.
   assert.match(html, /Merchant identity/);
   assert.match(html, /SKU evidence/);
   assert.match(html, /Billing model/);
   assert.match(html, /Evidence version/);
-  assert.match(html, /CHECK AUTHORIZATION/);
+  assert.match(html, /SELECT PRODUCT/);
 });
 
 
@@ -1089,7 +1085,7 @@ test("an empty sandbox search shows closest candidates and the excluding constra
 
 test("Playground verdict and execution claims stay literal", () => {
   for (const [decision, headline] of [
-    ["ALLOW", "Your mandate permits this purchase."],
+    ["ALLOW", "This purchase matches your mandate. Payment execution may proceed."],
     ["BLOCK", "MandateGuard stopped this before payment."],
     ["REVIEW", "MandateGuard refused to guess."],
   ]) {

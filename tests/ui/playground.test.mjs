@@ -4,8 +4,15 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 import {
+  CHECK_GROUPS,
   PLAYGROUND_RAIL,
+  barBucket,
+  checkGroupStatus,
+  determiningReasons,
   escapeHtml,
+  evidenceSummary,
+  missingEvidence,
+  progressBucket,
   railProgress,
   railStates,
   renderChosenProduct,
@@ -24,6 +31,8 @@ import {
   renderPlaygroundRail,
   renderPlaygroundVerdict,
   renderPlaygroundWhy,
+  renderMandateComparison,
+  renderMandateGuardChecks,
   renderExecutionLab,
   renderRecurringProof,
   renderReadiness,
@@ -116,19 +125,57 @@ test("the sandbox is declared before the input, not after it", () => {
   assert.ok(explanation < input, "the sandbox notice must precede the instruction field");
 });
 
-test("a first-time reader gets the whole idea before any technical detail", () => {
-  const primer = HTML.indexOf("pg-primer");
-  const rail = HTML.indexOf("pg-rail-region");
-  assert.ok(primer > 0 && primer < rail);
+test("the first viewport states the claim, the rail, and the three answers", () => {
+  const hero = HTML.indexOf("pg-hero");
+  const console_ = HTML.indexOf('id="pg-console"');
+  const results = HTML.indexOf("pg-results-region");
+  assert.ok(hero > 0 && hero < console_ && console_ < results);
   for (const line of [
-    "An AI agent can choose what to buy",
-    "Choosing is not permission to spend",
-    "execution may proceed",
-    "the request breaks your mandate",
-    "the evidence is missing or contradicts itself",
-    "it never authorizes payment",
+    "AI can choose what to buy",
+    "It shouldn&rsquo;t decide what it&rsquo;s allowed to pay for",
+    "MandateGuard verifies user constraints, trusted merchant evidence, and current",
+    "consent before payment execution",
+    "AI BUYER",
+    "MANDATEGUARD",
+    "PAYMENT",
+    "matches mandate",
+    "violates mandate",
+    "insufficient trusted evidence",
+    "TRY IT YOURSELF",
   ]) {
-    assert.ok(HTML.includes(line), `missing primer line: ${line}`);
+    assert.ok(HTML.includes(line), `missing opening line: ${line}`);
+  }
+});
+
+test("the page asks its five questions in order", () => {
+  const order = [
+    "STEP 1 &mdash; WHAT DID YOU ASK THE AI TO BUY?",
+    "STEP 2 &mdash; WHAT THE AI FOUND",
+    "STEP 3 &mdash; MANDATEGUARD",
+    "STEP 5 &mdash; EXECUTION",
+  ];
+  let cursor = HTML.indexOf("pg-hero");
+  for (const step of order) {
+    const index = HTML.indexOf(step);
+    assert.ok(index > cursor, `step out of order: ${step}`);
+    cursor = index;
+  }
+  // The decision sits between MandateGuard and execution.
+  const checks = HTML.indexOf('id="pg-checks"');
+  const verdict = HTML.indexOf('id="pg-verdict"');
+  const execution = HTML.indexOf('id="pg-execution-region"');
+  assert.ok(checks < verdict && verdict < execution);
+});
+
+test("research surfaces are demoted behind the product surfaces", () => {
+  const primary = HTML.indexOf('class="mainnav__group" role="presentation"');
+  const secondary = HTML.indexOf("mainnav__group--secondary");
+  assert.ok(primary > 0 && secondary > primary);
+  for (const view of ["playground", "observe", "attack", "scale"]) {
+    assert.ok(HTML.indexOf(`data-view="${view}"`) < secondary, `${view} must stay primary`);
+  }
+  for (const view of ["evidence", "evaluation"]) {
+    assert.ok(HTML.indexOf(`data-view="${view}"`) > secondary, `${view} must be secondary`);
   }
 });
 
@@ -149,9 +196,12 @@ test("every Playground panel the script writes into exists in the markup", () =>
     "pg-nomatch",
     "pg-chosen-region",
     "pg-chosen-panel",
+    "pg-compare",
+    "pg-checks",
     "pg-outcome-region",
     "pg-verdict",
     "pg-why",
+    "pg-execution-region",
     "pg-execution",
     "pg-followups",
     "pg-scenario-grid",
@@ -169,11 +219,18 @@ test("every Playground panel the script writes into exists in the markup", () =>
 /* The live rail                                                       */
 /* ------------------------------------------------------------------ */
 
+test("the rail is the four questions a reader is actually holding", () => {
+  assert.deepEqual(
+    PLAYGROUND_RAIL.map((step) => step.id),
+    ["MANDATE", "SELECTION", "MANDATEGUARD", "EXECUTION"],
+  );
+});
+
 test("the rail is waiting before anything has been asked", () => {
   const states = railStates({});
-  assert.equal(states.INTENT, "waiting");
-  assert.equal(states.DECISION, "waiting");
-  assert.equal(states.PAYMENT, "waiting");
+  assert.equal(states.MANDATE, "waiting");
+  assert.equal(states.MANDATEGUARD, "waiting");
+  assert.equal(states.EXECUTION, "waiting");
   assert.equal(railProgress({}), 0);
 });
 
@@ -182,15 +239,13 @@ test("the rail advances only as far as the run actually got", () => {
     intent: "headphones under 5000",
     candidates: [CANDIDATE],
     selected: CANDIDATE,
-    evidence: [{}, {}, {}],
     snapshot: { state: "RUNNING", result: null },
   });
-  assert.equal(states.INTENT, "done");
-  assert.equal(states.CANDIDATES, "done");
+  assert.equal(states.MANDATE, "done");
+  assert.equal(states.SELECTION, "done");
   assert.equal(states.MANDATEGUARD, "active");
   // No verdict yet, so the rail must not show one.
-  assert.equal(states.DECISION, "waiting");
-  assert.equal(states.PAYMENT, "waiting");
+  assert.equal(states.EXECUTION, "waiting");
 });
 
 test("the rail reads the decision from the run and never infers it", () => {
@@ -199,34 +254,32 @@ test("the rail reads the decision from the run and never infers it", () => {
       intent: "x",
       candidates: [CANDIDATE],
       selected: CANDIDATE,
-      evidence: [{}],
       snapshot: {
         state: "COMPLETE",
         result: { decision, execution: { status: decision === "ALLOW" ? "ORDER_CREATED" : "NOT_CALLED" } },
       },
     });
-    assert.equal(states.DECISION, decision.toLowerCase());
-    assert.equal(states.PAYMENT, decision === "ALLOW" ? "done" : "stopped");
+    assert.equal(states.MANDATEGUARD, decision.toLowerCase());
+    assert.equal(states.EXECUTION, decision === "ALLOW" ? "done" : "stopped");
   }
 });
 
-test("a BLOCK never lights the payment stage", () => {
+test("a BLOCK never lights the execution stage", () => {
   const html = renderPlaygroundRail({
     intent: "x",
     candidates: [CANDIDATE],
     selected: CANDIDATE,
-    evidence: [{}],
     snapshot: {
       state: "COMPLETE",
       result: { decision: "BLOCK", execution: { status: "NOT_CALLED", razorpay_calls: 0 } },
     },
   });
-  assert.match(html, /data-stage="PAYMENT" *>|data-state="stopped"/);
+  assert.match(html, /data-stage="EXECUTION" data-state="stopped"|data-state="stopped" data-stage="EXECUTION"/);
   assert.match(html, /Not reached/);
   assert.doesNotMatch(html, /Simulated offline order created/);
 });
 
-test("the rail names all eight stages in order", () => {
+test("the rail names all four steps in order", () => {
   const html = renderPlaygroundRail({ intent: "x" });
   let cursor = -1;
   for (const stage of PLAYGROUND_RAIL) {
@@ -240,38 +293,93 @@ test("the rail names all eight stages in order", () => {
 /* Candidates and readiness                                            */
 /* ------------------------------------------------------------------ */
 
-test("readiness rows are addressable and toned by what the evidence says", () => {
-  const html = renderReadiness({
-    merchant_identity: "DECLARED",
-    billing_model: "NOT_DECLARED",
-    content_classification: "CONFLICTED",
-    evidence_version: "CURRENT",
-  });
-  assert.match(html, /data-field="merchant_identity" data-tone="ok"/);
+const READINESS = {
+  merchant_identity: "DECLARED",
+  billing_model: "NOT_DECLARED",
+  content_classification: "CONFLICTED",
+  evidence_version: "CURRENT",
+};
+
+test("evidence rows are addressable and neutrally worded", () => {
+  const html = renderReadiness(READINESS);
+  assert.match(html, /data-field="merchant_identity" data-tone="present"/);
   assert.match(html, /data-field="billing_model" data-tone="missing"/);
   assert.match(html, /data-field="content_classification" data-tone="conflict"/);
-  assert.match(html, /VERIFIED/);
-  assert.match(html, /NOT DECLARED/);
-  assert.match(html, /CONFLICTED/);
+  assert.match(html, /AVAILABLE/);
+  assert.match(html, /MISSING/);
+  assert.match(html, /CONFLICT/);
+  assert.match(html, /CURRENT/);
 });
 
-test("a candidate shows product, price, merchant, category and why it was found", () => {
+test("evidence never borrows the vocabulary of a decision", () => {
+  const html = renderReadiness(READINESS);
+  for (const word of ["VERIFIED", "PASS", "FAIL", "ALLOW", "BLOCK", "REVIEW", "AUTHORIZED"]) {
+    assert.ok(!html.includes(word), `evidence must not say ${word}`);
+  }
+});
+
+test("the evidence summary is completeness, and says so in one neutral word", () => {
+  assert.equal(evidenceSummary(CANDIDATE.readiness).state, "AVAILABLE");
+  const incomplete = evidenceSummary({ ...CANDIDATE.readiness, billing_model: "NOT_DECLARED" });
+  assert.equal(incomplete.state, "INCOMPLETE");
+  assert.deepEqual(incomplete.missing, ["Billing model"]);
+  assert.equal(
+    evidenceSummary({ ...CANDIDATE.readiness, content_classification: "CONFLICTED" }).state,
+    "CONFLICT",
+  );
+  assert.equal(evidenceSummary(null), null);
+});
+
+test("a selection card shows product, price, merchant, category and why it was found", () => {
   const html = renderPlaygroundCandidate(CANDIDATE);
   assert.match(html, /Kestrel Wireless Headphones M60/);
   assert.match(html, /899/);
   assert.match(html, /Relay Audio \(Synthetic\)/);
   assert.match(html, /Headphones/);
-  assert.match(html, /WHY THE AGENT FOUND IT/);
-  assert.match(html, /AGENT READINESS/);
-  assert.match(html, /CHECK AUTHORIZATION/);
+  assert.match(html, /WHY FOUND/);
+  assert.match(html, /SELECT PRODUCT/);
 });
 
-test("hashes and identifiers stay behind a disclosure rather than on the card", () => {
+test("a card offers selection, never authorization", () => {
+  const html = renderPlaygroundCandidate(CANDIDATE);
+  assert.match(html, /TRUSTED EVIDENCE[\s\S]*?AVAILABLE/);
+  assert.match(html, /AUTHORIZATION[\s\S]*?NOT YET CHECKED/);
+  // Evidence must never be presented as a verdict on the purchase.
+  assert.doesNotMatch(html, /ALLOW|BLOCK|REVIEW/);
+  assert.doesNotMatch(html, /CHECK AUTHORIZATION/);
+});
+
+test("hashes, identifiers and the evidence matrix stay behind a disclosure", () => {
   const html = renderPlaygroundCandidate(CANDIDATE);
   const summaryIndex = html.indexOf("Technical detail");
   assert.ok(summaryIndex > 0);
-  assert.ok(html.indexOf("audio-headphones-026") > summaryIndex);
-  assert.ok(html.indexOf("sandbox-relay-audio") > summaryIndex);
+  for (const hidden of [
+    "audio-headphones-026",
+    "sandbox-relay-audio",
+    "v1",
+    "2026-09-01T00:00:00Z",
+    "SETTLED_ONCE",
+    "PUBLISHED MERCHANT EVIDENCE",
+  ]) {
+    assert.ok(html.indexOf(hidden) > summaryIndex, `${hidden} must be collapsed`);
+  }
+});
+
+test("the grid narrows to the chosen listing once one is chosen", () => {
+  const payload = {
+    candidates: [CANDIDATE, { ...CANDIDATE, catalog_product_id: "sandbox.other", name: "Other" }],
+  };
+  const collapsed = renderPlaygroundCandidates(payload, CANDIDATE.catalog_product_id, {
+    collapsed: true,
+  });
+  assert.match(collapsed, /Kestrel Wireless Headphones M60/);
+  assert.doesNotMatch(collapsed, /Other/);
+  assert.match(collapsed, /id="pg-show-all"/);
+  assert.match(collapsed, /SHOW ALL 2 RESULTS/);
+  // Nothing is destroyed: asking for them all brings them back.
+  const expanded = renderPlaygroundCandidates(payload, CANDIDATE.catalog_product_id);
+  assert.match(expanded, /Other/);
+  assert.doesNotMatch(expanded, /id="pg-show-all"/);
 });
 
 test("a renewing listing is flagged on the card before it is chosen", () => {
@@ -290,14 +398,9 @@ test("candidate rendering escapes anything a merchant record could contain", () 
   assert.match(html, /&lt;img src=x/);
 });
 
-test("why-found names each of the signals that put a listing on the page", () => {
+test("why-found names the three signals that put a listing on the page", () => {
   const html = renderWhyFound(CANDIDATE.why_found);
-  for (const label of [
-    "Key terms",
-    "Budget",
-    "Brand",
-    "Category match",
-  ]) {
+  for (const label of ["Budget", "Key terms", "Category match"]) {
     assert.ok(html.includes(label), `missing signal: ${label}`);
   }
   assert.match(html, /wireless, headphones/);
@@ -318,7 +421,7 @@ test("why-found admits when a signal is absent rather than inventing one", () =>
   const html = renderWhyFound({ within_budget: true, matched_terms: [] });
   assert.match(html, /related listing text/);
   assert.match(html, /no direct term match/);
-  assert.match(html, /not specified/);
+  assert.match(html, /no limit stated yet/);
 });
 
 test("candidate list marks the chosen one", () => {
@@ -417,24 +520,158 @@ test("an absent category gets an honest no-direct-match with labelled alternativ
 /* Chosen product and its evidence                                     */
 /* ------------------------------------------------------------------ */
 
+const SELECTION = {
+  product: CANDIDATE,
+  readiness: CANDIDATE.readiness,
+  notice: "SIMULATED MERCHANT SANDBOX. No real money moves.",
+  mandate: {
+    raw_text: "Buy wireless headphones under INR 5,000. No subscriptions.",
+    search_text: "wireless headphones",
+    max_total_minor: 500000,
+    currency: "INR",
+    quantity: 1,
+    recurring_allowed: false,
+    recurrence_stated: true,
+    exclusions: ["subscriptions"],
+    brand_hints: [],
+  },
+  trusted_evidence: [
+    {
+      evidence_id: "sbev-audio-headphones-026-terms-v1",
+      source_kind: "product_terms",
+      scope: "PRODUCT",
+      text: "Billing model: one-time purchase, settled once at checkout.",
+    },
+  ],
+};
+
 test("the chosen product shows the merchant's evidence text before the verdict", () => {
-  const html = renderChosenProduct({
-    product: CANDIDATE,
-    readiness: CANDIDATE.readiness,
-    notice: "SIMULATED MERCHANT SANDBOX. No real money moves.",
-    trusted_evidence: [
-      {
-        evidence_id: "sbev-audio-headphones-026-terms-v1",
-        source_kind: "product_terms",
-        scope: "PRODUCT",
-        text: "Billing model: one-time purchase, settled once at checkout.",
-      },
-    ],
-  });
+  const html = renderChosenProduct(SELECTION);
   assert.match(html, /Billing model: one-time purchase/);
   assert.match(html, /sbev-audio-headphones-026-terms-v1/);
   assert.match(html, /Product terms/);
   assert.match(html, /SIMULATED MERCHANT SANDBOX/);
+  assert.match(html, /PRODUCT SELECTED/);
+  assert.match(html, /TRUSTED EVIDENCE[\s\S]*?AVAILABLE/);
+});
+
+/* ------------------------------------------------------------------ */
+/* The authorization workspace                                         */
+/* ------------------------------------------------------------------ */
+
+test("the workspace puts what you allowed beside what the agent proposed", () => {
+  const html = renderMandateComparison({ playground_selection: SELECTION });
+  assert.match(html, /WHAT YOU ALLOWED/);
+  assert.match(html, /WHAT THE AGENT PROPOSED/);
+  for (const row of [
+    "Product / category",
+    "Maximum spend",
+    "Actual price",
+    "Billing requirement",
+    "Billing evidence",
+    "Brand restriction",
+    "Merchant",
+    "Important exclusions",
+  ]) {
+    assert.ok(html.includes(row), `missing comparison row: ${row}`);
+  }
+  assert.match(html, /₹5,000/);
+  assert.match(html, /₹899/);
+  assert.match(html, /One-time payment only/);
+  assert.match(html, /ONE_TIME/);
+  assert.match(html, /subscriptions/);
+});
+
+test("the comparison reaches no conclusion of its own", () => {
+  const html = renderMandateComparison({ playground_selection: SELECTION });
+  // "WHAT YOU ALLOWED" is a column heading; a bare verdict word is not.
+  for (const word of ["PASS", "FAIL", "ALLOW", "BLOCK", "REVIEW", "VERIFIED"]) {
+    assert.doesNotMatch(
+      html,
+      new RegExp(`\\\\b${word}\\\\b`),
+      `the comparison must not say ${word}`,
+    );
+  }
+});
+
+test("choosing a product announces that authorization has not happened", () => {
+  const html = renderMandateGuardChecks({ playground_selection: SELECTION });
+  assert.match(html, /data-checked="false"/);
+  assert.match(html, /AUTHORIZATION/);
+  assert.match(html, /NOT YET CHECKED/);
+  for (const group of CHECK_GROUPS) {
+    assert.ok(html.includes(group.label), `missing check: ${group.label}`);
+  }
+  // Every row is pending, and the only thing on offer is asking.
+  assert.equal(
+    (html.match(/class="pgchecks__status">NOT YET CHECKED</g) || []).length,
+    CHECK_GROUPS.length,
+  );
+  assert.match(html, /class="pgchecks__pending">NOT YET CHECKED</);
+  assert.doesNotMatch(html, /\bPASS\b|\bFAIL\b|\bALLOW\b|\bBLOCK\b|\bREVIEW\b/);
+  assert.match(html, /data-check-authorization="sandbox\.0123456789abcdef01234567"/);
+  assert.match(html, /CHECK AUTHORIZATION/);
+});
+
+test("the seven checks are the seven a person would ask about", () => {
+  assert.deepEqual(
+    CHECK_GROUPS.map((group) => group.label),
+    [
+      "Budget",
+      "Product identity",
+      "Merchant identity",
+      "SKU evidence",
+      "Billing terms",
+      "Exclusions",
+      "Consent",
+    ],
+  );
+});
+
+test("a check group is only as good as its worst recorded family", () => {
+  const budget = CHECK_GROUPS[0];
+  const pass = [{ family: "B6", status: "PASS" }, { family: "B7", status: "PASS" }];
+  assert.equal(checkGroupStatus(budget, { tierB: pass }), "PASS");
+  assert.equal(
+    checkGroupStatus(budget, { tierB: [{ family: "B6", status: "FAIL" }, ...pass] }),
+    "FAIL",
+  );
+  assert.equal(
+    checkGroupStatus(budget, { tierA: [{ family: "A1", status: "NOT_EVALUABLE" }], tierB: pass }),
+    "UNKNOWN",
+  );
+  // A group with nothing recorded for it never reports success.
+  assert.equal(checkGroupStatus(budget, {}), "UNKNOWN");
+});
+
+test("an abstained semantic constraint is UNKNOWN, never a pass", () => {
+  const exclusions = CHECK_GROUPS.find((group) => group.id === "exclusions");
+  assert.equal(checkGroupStatus(exclusions, { semantic: [{ status: "PASS" }] }), "PASS");
+  assert.equal(checkGroupStatus(exclusions, { semantic: [{ status: "ABSTAIN" }] }), "UNKNOWN");
+  assert.equal(checkGroupStatus(exclusions, { semantic: [{ status: "VIOLATION" }] }), "FAIL");
+  // Nothing was stated, so nothing is claimed either way.
+  assert.equal(checkGroupStatus(exclusions, { semantic: [] }), "NONE STATED");
+});
+
+test("tier language is collapsed, not deleted", () => {
+  const html = renderMandateGuardChecks({
+    result: {
+      authorization: {
+        deterministic: {
+          tier_a: [{ family: "A3", label: "Merchant binding", status: "PASS" }],
+          tier_b: [{ family: "B6", label: "Price ceiling", status: "FAIL" }],
+        },
+        semantic: { checks: [{ constraint_id: "exclusion.1", constraint: "No gambling", status: "PASS" }] },
+      },
+    },
+  });
+  const summary = html.indexOf("Constraint families");
+  assert.ok(summary > 0);
+  assert.ok(html.indexOf("Merchant binding") > summary);
+  assert.ok(html.indexOf("Price ceiling") > summary);
+  assert.ok(html.indexOf(">A3<") > summary);
+  assert.match(html, /data-check="merchant" data-status="PASS"/);
+  assert.match(html, /data-check="budget" data-status="FAIL"/);
 });
 
 /* ------------------------------------------------------------------ */
@@ -443,7 +680,7 @@ test("the chosen product shows the merchant's evidence text before the verdict",
 
 test("each verdict gets its own headline and its own surface", () => {
   const cases = {
-    ALLOW: "Your mandate permits this purchase.",
+    ALLOW: "This purchase matches your mandate. Payment execution may proceed.",
     BLOCK: "MandateGuard stopped this before payment.",
     REVIEW: "MandateGuard refused to guess.",
   };
@@ -453,12 +690,181 @@ test("each verdict gets its own headline and its own surface", () => {
       explanation: { headline },
     });
     assert.match(html, new RegExp(`data-decision="${decision}"`));
-    assert.match(html, new RegExp(decision));
+    assert.match(html, /FINAL DECISION/);
+    assert.match(html, new RegExp(`pgverdict__word">${decision}<`));
     assert.ok(html.includes(headline));
   }
 });
 
-test("the why panel names the failed constraint and the provider-call count", () => {
+test("the decision copy survives a follow-up answer that carries no narration", () => {
+  // `/execute` and `/mutate` reply with the run and no explanation. The word
+  // and its sentence must still be right rather than blank.
+  for (const [decision, copy] of [
+    ["ALLOW", "This purchase matches your mandate. Payment execution may proceed."],
+    ["BLOCK", "MandateGuard stopped this before payment."],
+    ["REVIEW", "MandateGuard refused to guess."],
+  ]) {
+    const html = renderPlaygroundVerdict({ result: { decision } });
+    assert.ok(html.includes(copy), `missing fallback copy for ${decision}`);
+  }
+});
+
+test("a BLOCK on the ceiling shows the limit against the price", () => {
+  const html = renderPlaygroundVerdict({
+    result: {
+      decision: "BLOCK",
+      buyer: { price_minor: 799900, currency: "INR" },
+      execution: { status: "NOT_CALLED", razorpay_calls: 0, external_network_calls: 0 },
+    },
+    playground_selection: { mandate: { max_total_minor: 200000 } },
+    explanation: {
+      headline: "MandateGuard stopped this before payment.",
+      why: [
+        "INR 7,999.00 > INR 2,000.00 stated limit",
+        "Price ceiling: declared order total exceeds the mandate ceiling",
+      ],
+      failed_constraints: ["B6"],
+      failed_constraint_labels: ["Price ceiling"],
+      provider_calls: 0,
+      external_network_calls: 0,
+    },
+  });
+  assert.match(html, /YOUR LIMIT/);
+  assert.match(html, /₹2,000/);
+  assert.match(html, /PROPOSED PRICE/);
+  assert.match(html, /₹7,999/);
+  assert.match(html, /FAILED/);
+  assert.match(html, /Price ceiling/);
+  assert.match(html, /Provider calls: 0/);
+});
+
+test("a BLOCK that is not about money does not invent a price comparison", () => {
+  const html = renderPlaygroundVerdict({
+    result: {
+      decision: "BLOCK",
+      buyer: { price_minor: 100000, currency: "INR" },
+      execution: { status: "NOT_CALLED" },
+    },
+    playground_selection: { mandate: { max_total_minor: 500000 } },
+    explanation: {
+      headline: "MandateGuard stopped this before payment.",
+      failed_constraints: ["exclusion.1"],
+      failed_constraint_labels: ["Excluded product characteristic: gambling."],
+      why: ["VIOLATION: Excluded product characteristic: gambling. — evidence records it"],
+      provider_calls: 0,
+    },
+  });
+  assert.doesNotMatch(html, /YOUR LIMIT/);
+  assert.match(html, /gambling/);
+});
+
+test("a REVIEW names the evidence it is waiting for rather than leaving it to be inferred", () => {
+  const snapshot = {
+    result: {
+      decision: "REVIEW",
+      buyer: { price_minor: 149900, currency: "INR" },
+      execution: { status: "NOT_CALLED", razorpay_calls: 0, external_network_calls: 0 },
+      authorization: {
+        semantic: {
+          checks: [
+            {
+              constraint_id: "exclusion.1",
+              constraint: "Excluded characteristic: subscriptions.",
+              status: "ABSTAIN",
+            },
+          ],
+        },
+      },
+    },
+    playground_selection: {
+      readiness: {
+        ...CANDIDATE.readiness,
+        billing_model: "NOT_DECLARED",
+        intended_use: "NOT_DECLARED",
+      },
+    },
+    explanation: {
+      headline: "MandateGuard refused to guess.",
+      why: ["ABSTAIN: Excluded characteristic: subscriptions. — trusted evidence is insufficient"],
+      failed_constraints: ["exclusion.1"],
+      failed_constraint_labels: ["Excluded characteristic: subscriptions."],
+      provider_calls: 0,
+      external_network_calls: 0,
+    },
+  };
+  // The merchant fields come first: they are the ones a merchant can publish.
+  assert.deepEqual(missingEvidence(snapshot), ["Billing model", "Intended use"]);
+  // When the paperwork is complete and the verifier still abstained, the
+  // constraint it abstained on is what is missing.
+  assert.deepEqual(
+    missingEvidence({
+      ...snapshot,
+      playground_selection: { readiness: CANDIDATE.readiness },
+    }),
+    ["Excluded characteristic: subscriptions."],
+  );
+  const html = renderPlaygroundVerdict(snapshot);
+  assert.match(html, /MandateGuard needs more trusted evidence\./);
+  assert.match(html, /MISSING/);
+  assert.match(html, /Billing model/);
+  assert.match(html, /Intended use/);
+  assert.match(html, /Payment not reached\./);
+  assert.match(html, /Provider calls: 0/);
+  // A REVIEW is not a failure: nothing broke, the evidence ran out.
+  assert.match(html, /UNRESOLVED/);
+  assert.doesNotMatch(html, /pgverdict__k">FAILED</);
+});
+
+test("an ALLOW says a capability was issued and offers the next step", () => {
+  const html = renderPlaygroundVerdict({
+    result: {
+      decision: "ALLOW",
+      buyer: { price_minor: 219900, currency: "INR" },
+      execution: { status: "AUTHORIZED", razorpay_calls: 0, external_network_calls: 0 },
+    },
+    explanation: {
+      headline: "This purchase matches your mandate. Payment execution may proceed.",
+      why: [
+        "INR 2,199.00 <= INR 5,000.00 stated limit",
+        "Merchant identity and SKU evidence verified",
+        "Consent ACTIVE at the moment of decision",
+      ],
+      failed_constraints: [],
+      failed_constraint_labels: [],
+      provider_calls: 0,
+      external_network_calls: 0,
+    },
+  });
+  assert.match(html, /WHY/);
+  assert.match(html, /2,199\.00 &lt;= INR 5,000\.00/);
+  assert.match(html, /CAPABILITY ISSUED/);
+  assert.match(html, /id="pg-continue"/);
+  assert.match(html, /CONTINUE TO EXECUTION/);
+});
+
+test("no capability is claimed when none was issued", () => {
+  const html = renderPlaygroundVerdict({
+    result: { decision: "REVIEW", execution: { status: "NOT_CALLED" } },
+    explanation: { headline: "MandateGuard refused to guess." },
+  });
+  assert.doesNotMatch(html, /CAPABILITY ISSUED/);
+  assert.doesNotMatch(html, /CONTINUE TO EXECUTION/);
+});
+
+test("the determining reasons are the recorded failures, not the whole record", () => {
+  assert.deepEqual(
+    determiningReasons({
+      why: ["INR 100 <= INR 500 stated limit", "Price ceiling: over budget", "something else"],
+      failed_constraint_labels: ["Price ceiling"],
+    }),
+    ["Price ceiling: over budget"],
+  );
+  // An ALLOW has no failures, so the run's own opening lines stand.
+  assert.deepEqual(determiningReasons({ why: ["a", "b", "c", "d", "e"] }), ["a", "b", "c", "d"]);
+  assert.deepEqual(determiningReasons(null), []);
+});
+
+test("the full reason record is kept, and kept out of the way", () => {
   const html = renderPlaygroundWhy({
     explanation: {
       why: ["INR 7,999.00 > INR 4,000.00 stated limit"],
@@ -468,6 +874,8 @@ test("the why panel names the failed constraint and the provider-call count", ()
       controller: "EXISTING_FROZEN_MANDATEGUARD_CONTROLLER",
     },
   });
+  assert.match(html, /^\s*<details/);
+  assert.match(html, /Full reason record/);
   assert.match(html, /FAILED CONSTRAINT/);
   assert.match(html, /<code>B6<\/code>/);
   assert.match(html, /PROVIDER CALLS/);
@@ -554,9 +962,67 @@ test("a price mutation shows both transactions and all execution-gate checks", (
   assert.match(html, /₹7,999/);
   assert.match(html, /VALID SIGNATURE/);
   assert.match(html, /TRANSACTION_HASH_MISMATCH/);
-  for (const label of ["SIGNED?", "EXPIRED?", "MANDATE ACTIVE?", "TRANSACTION MATCHES?", "PROVIDER REACHED?"]) {
-    assert.ok(html.includes(label));
+  assert.match(html, /REJECTED BEFORE NETWORK/);
+  assert.match(html, /EXTERNAL CALLS/);
+  for (const label of [
+    "SIGNATURE VALID",
+    "EXPIRED",
+    "CONSENT ACTIVE",
+    "TRANSACTION MATCH",
+    "PROVIDER REACHED",
+  ]) {
+    assert.ok(html.includes(label), `missing gate condition: ${label}`);
   }
+});
+
+test("the merchant row appears only when a capability recorded a merchant binding", () => {
+  const lab = {
+    mutation: "MERCHANT",
+    authorized: { price_minor: 349900, sku: "h-042", merchant_id: "merchant-a" },
+    attempted: { price_minor: 349900, sku: "h-042", merchant_id: "merchant-b" },
+    reason: "MERCHANT_MISMATCH",
+    provider_additional_calls: 0,
+    checks: {
+      signed: true,
+      expired: false,
+      mandate_active: true,
+      transaction_matches: false,
+      provider_reached: false,
+    },
+  };
+  const withCapability = renderExecutionLab({
+    result: { buyer: { currency: "INR" }, execution: { lab, capability: { merchant_bound: false } } },
+  });
+  assert.match(withCapability, /MERCHANT MATCH/);
+  const without = renderExecutionLab({ result: { buyer: { currency: "INR" }, execution: { lab } } });
+  assert.doesNotMatch(without, /MERCHANT MATCH/);
+});
+
+test("an authorized run names the exact transaction the capability covers", () => {
+  const html = renderPlaygroundExecution({
+    result: {
+      buyer: {
+        merchant: "sandbox-relay-audio",
+        sku: "audio-headphones-026",
+        price_minor: 219900,
+        currency: "INR",
+      },
+      execution: {
+        status: "AUTHORIZED",
+        capability: { signature_verified: true },
+        consent: { status: "ACTIVE" },
+        razorpay_calls: 0,
+        external_network_calls: 0,
+      },
+    },
+  });
+  assert.match(html, /AUTHORIZED TRANSACTION/);
+  assert.match(html, /sandbox-relay-audio/);
+  assert.match(html, /audio-headphones-026/);
+  assert.match(html, /₹2,199/);
+  assert.match(html, /CAPABILITY/);
+  assert.match(html, /CONSENT/);
+  assert.match(html, /ACTIVE/);
 });
 
 test("the recurring scenario compares the mandate to trusted merchant billing evidence", () => {
@@ -583,6 +1049,16 @@ test("follow-ups are offered only when the run supports them", () => {
   assert.match(authorized, /id="pg-mutate-price"/);
   assert.match(authorized, /id="pg-mutate-sku"/);
   assert.match(authorized, /id="pg-mutate-merchant"/);
+  for (const label of [
+    ">EXECUTE<",
+    ">MUTATE PRICE<",
+    ">SWAP SKU<",
+    ">CHANGE MERCHANT<",
+    ">REPLAY CAPABILITY<",
+    ">REVOKE CONSENT<",
+  ]) {
+    assert.ok(authorized.includes(label), `missing execution-lab action: ${label}`);
+  }
 
   const executed = renderPlaygroundFollowUps({
     result: { decision: "ALLOW", execution: { status: "ORDER_CREATED" } },
@@ -649,7 +1125,7 @@ test("the top judge strip exposes seven human-labelled real scenarios", () => {
   assert.match(html, /data-scenario="safe-purchase"/);
   assert.match(html, /data-scenario="price-mutation"/);
   assert.match(HTML, /id="pg-judge-strip"/);
-  assert.match(HTML, /Try MandateGuard/i);
+  assert.match(HTML, /Or run a prepared journey/i);
 });
 
 test("try-these prompts are human sentences, not test-case names", () => {
@@ -823,10 +1299,22 @@ test("reduced motion is honoured for the Playground as well", () => {
 
 test("the Playground reflows to a single column on a phone", () => {
   const mobile = CSS.slice(CSS.lastIndexOf("@media (max-width: 720px)"));
-  for (const selector of [".pg-candidates", ".pg-scenario-grid", ".gapfig__row", ".scaleworlds__row"]) {
+  for (const selector of [
+    ".pg-candidates",
+    ".pg-scenario-grid",
+    ".gapfig__row",
+    ".scaleworlds__row",
+    ".rail__list",
+    ".pgcompare__row",
+    ".pg-flow",
+  ]) {
     assert.ok(mobile.includes(selector), `no mobile rule for ${selector}`);
   }
   assert.match(mobile, /grid-template-columns: 1fr/);
+  // Stacked, the comparison has to relabel its own columns or the two values
+  // become indistinguishable.
+  assert.match(mobile, /YOU ALLOWED/);
+  assert.match(mobile, /AGENT PROPOSED/);
 });
 
 test("no Playground surface reaches outside the origin", () => {
@@ -895,19 +1383,19 @@ test("a fully covered instruction renders no clarification panel at all", () => 
   assert.equal(renderClarificationRequired(null), "");
 });
 
-test("authorization is not offerable while a requirement is unresolved", () => {
+test("selection is not offerable while a requirement is unresolved", () => {
   const html = renderPlaygroundCandidates(UNRESOLVED_SEARCH);
   assert.match(html, /disabled/);
   assert.match(html, /CLARIFY YOUR REQUIREMENT FIRST/);
-  assert.doesNotMatch(html, /CHECK AUTHORIZATION/);
+  assert.doesNotMatch(html, /SELECT PRODUCT/);
 });
 
-test("authorization stays offerable when every requirement resolved", () => {
+test("selection stays offerable when every requirement resolved", () => {
   const html = renderPlaygroundCandidates({
     candidates: [CANDIDATE],
     clarification_required: false,
   });
-  assert.match(html, /CHECK AUTHORIZATION/);
+  assert.match(html, /SELECT PRODUCT/);
   assert.doesNotMatch(html, /disabled/);
 });
 
@@ -931,4 +1419,169 @@ test("the Playground markup and stylesheet carry the clarification region", () =
   assert.match(HTML, /id="pg-clarify-panel"/);
   assert.match(CSS, /\.pgclarify\b/);
   assert.match(CSS, /\.pgcard__go:disabled/);
+});
+
+
+/* ------------------------------------------------------------------ */
+/* Content Security Policy                                             */
+/*                                                                     */
+/* The product is served under `style-src 'self'`. A style attribute -  */
+/* written into a template, set with setAttribute, or assigned through  */
+/* el.style - is refused by the browser and reported as a violation on  */
+/* every load. The policy is not negotiable, so the presentation has to */
+/* travel as classes and data attributes instead.                       */
+/* ------------------------------------------------------------------ */
+
+const APP_JS = readFileSync(
+  fileURLToPath(new URL("../../src/mandateguard/product/static/app.js", import.meta.url)),
+  "utf8",
+);
+
+test("no rendered markup carries a style attribute", () => {
+  for (const [name, source] of [
+    ["app.js", APP_JS],
+    ["index.html", HTML],
+  ]) {
+    assert.ok(!/\sstyle\s*=\s*["']/.test(source), `${name} must not emit a style attribute`);
+  }
+});
+
+test("no script path mutates style at runtime", () => {
+  for (const pattern of [
+    /\.style\.setProperty\s*\(/,
+    /\.style\.[A-Za-z]/,
+    /\.cssText\s*=/,
+    /setAttribute\s*\(\s*["']style["']/,
+    /insertRule\s*\(/,
+  ]) {
+    assert.ok(!pattern.test(APP_JS), `app.js must not use ${pattern}`);
+  }
+});
+
+test("no stylesheet or script is fetched from off-origin", () => {
+  assert.ok(!/<link[^>]+href="https?:/.test(HTML));
+  assert.ok(!/<script[^>]+src="https?:/.test(HTML));
+  assert.ok(!/@import/.test(CSS));
+  // Inline <style> and <script> blocks are refused by the same policy.
+  assert.ok(!/<style[\s>]/.test(HTML), "index.html must not carry an inline stylesheet");
+  assert.ok(
+    !/<script(?![^>]*\ssrc=)[^>]*>/.test(HTML),
+    "index.html must not carry an inline script",
+  );
+});
+
+test("proportional widths come from a finite ladder the stylesheet owns", () => {
+  // Every value the renderer can produce must have a rule waiting for it.
+  const produced = new Set();
+  for (let value = 0; value <= 1000; value += 7) produced.add(barBucket(value, 1000));
+  produced.add(barBucket(0, 1));
+  produced.add(barBucket(9e9, 1));
+  for (const bucket of produced) {
+    assert.ok(
+      CSS.includes(`.gapfig__bar[data-bar="${bucket}"]`),
+      `no width rule for data-bar="${bucket}"`,
+    );
+  }
+  assert.equal(barBucket(17702, 17702), "100");
+  assert.equal(barBucket(0, 17702), "5");
+});
+
+test("progress is one of five states, never a computed length", () => {
+  const seen = new Set();
+  for (let step = 0; step <= 20; step += 1) seen.add(progressBucket(step / 20));
+  assert.deepEqual([...seen].sort(), ["0", "100", "25", "50", "75"]);
+  assert.equal(progressBucket(undefined), "0");
+  assert.equal(progressBucket(-3), "0");
+  assert.equal(progressBucket(9), "100");
+});
+
+test("the gap figure renders widths without a style attribute", () => {
+  const html = renderGapFigure({ marketplace: 17702, sandbox: 3960 });
+  assert.ok(!/style\s*=/.test(html));
+  assert.match(html, /data-bar="100"/);
+  assert.match(html, /data-bar="20"/);
+});
+
+/* ------------------------------------------------------------------ */
+/* One dominant decision colour                                        */
+/* ------------------------------------------------------------------ */
+
+/** Every declaration block whose selector list mentions `fragment`. */
+function blocksFor(fragment) {
+  const blocks = [];
+  for (const match of CSS.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    if (match[1].includes(fragment)) blocks.push(match[2]);
+  }
+  return blocks.join("\n");
+}
+
+test("evidence surfaces never use a decision colour", () => {
+  for (const selector of [
+    ".readiness",
+    ".pgcard__evidence",
+    ".pgcard__authz",
+    ".pgchosen__evidence",
+    ".pgcard__flag",
+  ]) {
+    const block = blocksFor(selector);
+    assert.ok(block.length > 0, `no rules found for ${selector}`);
+    for (const colour of ["--success", "--danger", "--warning", "#7CE8B0", "#FF9AA8", "#FFC96B"]) {
+      assert.ok(
+        !block.includes(colour),
+        `${selector} must not use ${colour}: evidence is not a decision`,
+      );
+    }
+  }
+});
+
+test("the decision panel is where the strong colours live", () => {
+  assert.match(CSS, /\.pgverdict\[data-decision="ALLOW"\][^{]*\{[^}]*var\(--success\)/);
+  assert.match(CSS, /\.pgverdict\[data-decision="BLOCK"\][^{]*\{[^}]*var\(--danger\)/);
+  assert.match(CSS, /\.pgverdict\[data-decision="REVIEW"\][^{]*\{[^}]*var\(--warning\)/);
+  // And it is the largest thing on the page once it exists.
+  assert.match(CSS, /\.pgverdict__word\s*\{[\s\S]*?clamp\(46px/);
+});
+
+test("nothing outside the decision and its own rail step paints full-strength green", () => {
+  const allowed = [
+    ".pgverdict",
+    '.rail__step[data-state="allow"]',
+    ".gapfig__row",
+    ".sysstate",
+    ".outcome--allow",
+    ".spine",
+    ".journey",
+    ".pipeline",
+    ".listing",
+    ".verdict",
+    ".status",
+    ".check",
+    ".tier",
+    ".claim",
+    ".exchange",
+    ".authority",
+    ".ledger",
+    ".figure",
+    ".measured",
+    ".attack",
+    ".onboard",
+    ".fact",
+    ".health",
+    ".knowledge",
+    ".conflict",
+    ".provenance",
+    ".resolve",
+    ".recovery",
+    ".transact",
+    ".readiness--listing",
+  ];
+  const playground = CSS.slice(CSS.indexOf("/* Playground"));
+  for (const match of playground.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    if (!/var\(--success\)|#7CE8B0/.test(match[2])) continue;
+    const selector = match[1].trim();
+    assert.ok(
+      allowed.some((prefix) => selector.includes(prefix)),
+      `unexpected full-strength green on ${selector}`,
+    );
+  }
 });

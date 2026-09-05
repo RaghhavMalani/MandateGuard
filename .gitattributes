@@ -12,6 +12,9 @@ data/models/*.json text eol=lf
 data/eval/*.json text eol=lf
 data/eval/semantic-v2/*.json text eol=lf
 data/eval/authorization-scale/*.json text eol=lf
+# Hashed byte-for-byte by the retrieval-v2 freeze check, so the checkout
+# must not depend on the platform's line endings.
+fixtures/playground/*.json text eol=lf
 artifacts/engineering/discovery/*.json text eol=lf
 requirements-train.txt text eol=lf
 scripts/freeze_semantic_v2.py text eol=lf

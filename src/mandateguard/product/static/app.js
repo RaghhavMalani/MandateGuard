@@ -188,7 +188,7 @@ export const EVALUATION_EVIDENCE = {
 
 /** Engineering quality only. Updated when the suites change; a test count is
     never presented as scale, model quality, or authorization evidence. */
-export const TEST_TOTALS = { python: 1322, ui: 156 };
+export const TEST_TOTALS = { python: 1322, ui: 188 };
 
 export class SubmissionLock {
   #locked = false;
@@ -2049,50 +2049,56 @@ function revealFigure(element) {
 /* whether a purchase is permitted.                                     */
 /* ------------------------------------------------------------------ */
 
-/** The stages the live rail walks through, in order. */
+/**
+ * The four steps of the product story, in the order a person asks them.
+ *
+ * The eight-stage engineering rail this replaced was a truthful account of the
+ * controller and an unreadable account of the purchase. These four are the only
+ * questions a first-time reader is actually holding: what did I ask, what was
+ * chosen, what did MandateGuard say, and what happened to the money.
+ */
 export const PLAYGROUND_RAIL = [
-  { id: "INTENT", label: "User intent" },
-  { id: "SEARCH", label: "Agent searching the sandbox" },
-  { id: "CANDIDATES", label: "Candidates" },
-  { id: "SELECT", label: "Product selected" },
-  { id: "EVIDENCE", label: "Trusted evidence" },
+  { id: "MANDATE", label: "User mandate" },
+  { id: "SELECTION", label: "Product selected" },
   { id: "MANDATEGUARD", label: "MandateGuard" },
-  { id: "DECISION", label: "Allow / Block / Review" },
-  { id: "PAYMENT", label: "Payment gate" },
+  { id: "EXECUTION", label: "Execution" },
 ];
 
 const RAIL_ORDER = PLAYGROUND_RAIL.map((item) => item.id);
 
 /**
- * Turn what has happened so far into one state per rail stage.
+ * Turn what has happened so far into one state per step.
  *
  * `decision` is read from the run, never inferred: a rail that guessed a
  * verdict from how far the run had got would show ALLOW while the controller
  * was still deciding.
  */
-export function railStates({ intent, candidates, selected, evidence, snapshot } = {}) {
+export function railStates({ intent, candidates, selected, snapshot } = {}) {
   const decision = snapshot?.result?.decision || null;
-  const running = snapshot && !terminalStates.has(snapshot.state);
+  const running = Boolean(snapshot) && !terminalStates.has(snapshot.state);
   const executionStatus = snapshot?.result?.execution?.status || null;
-  const done = (flag) => (flag ? "done" : "waiting");
   const states = {
-    INTENT: done(Boolean(intent)),
-    SEARCH: candidates ? "done" : intent ? "active" : "waiting",
-    CANDIDATES: done(Boolean(candidates && candidates.length)),
-    SELECT: done(Boolean(selected)),
-    EVIDENCE: done(Boolean(evidence && evidence.length)),
-    MANDATEGUARD: decision ? "done" : selected && running ? "active" : "waiting",
-    DECISION: decision ? String(decision).toLowerCase() : "waiting",
-    PAYMENT: "waiting",
+    MANDATE: intent ? "done" : "waiting",
+    SELECTION: selected
+      ? "done"
+      : candidates && candidates.length
+        ? "active"
+        : "waiting",
+    MANDATEGUARD: decision
+      ? String(decision).toLowerCase()
+      : selected && running
+        ? "active"
+        : "waiting",
+    EXECUTION: "waiting",
   };
   if (decision && decision !== "ALLOW") {
-    states.PAYMENT = "stopped";
+    states.EXECUTION = "stopped";
   } else if (executionStatus === "ORDER_CREATED") {
-    states.PAYMENT = "done";
+    states.EXECUTION = "done";
   } else if (executionStatus === "AUTHORIZED") {
-    states.PAYMENT = "active";
+    states.EXECUTION = "active";
   } else if (executionStatus) {
-    states.PAYMENT = "stopped";
+    states.EXECUTION = "stopped";
   }
   return states;
 }
@@ -2100,21 +2106,18 @@ export function railStates({ intent, candidates, selected, evidence, snapshot } 
 export function renderPlaygroundRail(context) {
   const states = railStates(context || {});
   const detail = {
-    SEARCH: context?.catalogSize
-      ? `${Number(context.catalogSize).toLocaleString("en-IN")} sandbox products`
-      : "",
-    CANDIDATES: context?.candidates ? `${context.candidates.length} found` : "",
-    SELECT: context?.selected ? context.selected.name : "",
-    EVIDENCE: context?.evidence ? `${context.evidence.length} trusted records` : "",
-    DECISION: context?.snapshot?.result?.decision || "",
-    PAYMENT: playgroundPaymentDetail(context?.snapshot),
+    MANDATE: context?.intent || "",
+    SELECTION: context?.selected?.name || (context?.candidates?.length
+      ? `${context.candidates.length} candidates found`
+      : ""),
+    MANDATEGUARD: context?.snapshot?.result?.decision || "",
+    EXECUTION: playgroundPaymentDetail(context?.snapshot),
   };
   const rows = PLAYGROUND_RAIL.map((stage, index) => {
     const state = states[stage.id] || "waiting";
     return `
       <li class="rail__step" data-state="${escapeHtml(state)}" data-stage="${escapeHtml(stage.id)}">
         <span class="rail__index">${index + 1}</span>
-        <span class="rail__line" aria-hidden="true"></span>
         <span class="rail__body">
           <span class="rail__label">${escapeHtml(stage.label)}</span>
           <span class="rail__detail">${escapeHtml(detail[stage.id] || "")}</span>
@@ -2138,9 +2141,16 @@ export function railProgress(context) {
   return Number((reached / RAIL_ORDER.length).toFixed(3));
 }
 
-/* ---------------- readiness ---------------- */
+/* ---------------- evidence status ----------------
+ *
+ * Evidence is not authorization. These rows say what a merchant has published
+ * about a listing and nothing about whether a purchase is permitted, so they
+ * are worded neutrally (AVAILABLE, MISSING, CONFLICT, CURRENT) and are drawn in
+ * the navy/cobalt family. Green, red and amber belong to one thing on this
+ * page, and it is the decision.
+ */
 
-const READINESS_ROWS = [
+const EVIDENCE_ROWS = [
   ["merchant_identity", "Merchant identity"],
   ["sku_evidence", "SKU evidence"],
   ["authoritative_price", "Authoritative price"],
@@ -2150,30 +2160,56 @@ const READINESS_ROWS = [
   ["evidence_version", "Evidence version"],
 ];
 
-const READINESS_WORD = {
-  DECLARED: "VERIFIED",
-  NOT_DECLARED: "NOT DECLARED",
-  CONFLICTED: "CONFLICTED",
+const EVIDENCE_WORD = {
+  DECLARED: "AVAILABLE",
+  NOT_DECLARED: "MISSING",
+  CONFLICTED: "CONFLICT",
   CURRENT: "CURRENT",
   UNKNOWN: "UNKNOWN",
 };
 
+const EVIDENCE_TONE = {
+  DECLARED: "present",
+  CURRENT: "present",
+  NOT_DECLARED: "missing",
+  UNKNOWN: "missing",
+  CONFLICTED: "conflict",
+};
+
+export function evidenceWord(raw) {
+  return EVIDENCE_WORD[String(raw)] || String(raw ?? "UNKNOWN");
+}
+
+/**
+ * Collapse the published-evidence matrix into one neutral word.
+ *
+ * AVAILABLE means every field this sandbox tracks has a current merchant
+ * record. It does not mean the purchase will be allowed, and the card says so
+ * on the line underneath.
+ */
+export function evidenceSummary(readiness) {
+  if (!readiness) return null;
+  const present = EVIDENCE_ROWS.filter(([key]) => readiness[key] !== undefined);
+  if (!present.length) return null;
+  const missing = present
+    .filter(([key]) => readiness[key] === "NOT_DECLARED" || readiness[key] === "UNKNOWN")
+    .map(([, label]) => label);
+  const conflicted = present.some(([key]) => readiness[key] === "CONFLICTED");
+  if (conflicted) return { state: "CONFLICT", missing };
+  if (missing.length) return { state: "INCOMPLETE", missing };
+  return { state: "AVAILABLE", missing: [] };
+}
+
 export function renderReadiness(readiness) {
   if (!readiness) return "";
-  const rows = READINESS_ROWS.filter(([key]) => readiness[key] !== undefined)
+  const rows = EVIDENCE_ROWS.filter(([key]) => readiness[key] !== undefined)
     .map(([key, label]) => {
       const raw = String(readiness[key]);
-      const word = READINESS_WORD[raw] || raw;
-      const tone =
-        raw === "DECLARED" || raw === "CURRENT"
-          ? "ok"
-          : raw === "CONFLICTED"
-            ? "conflict"
-            : "missing";
+      const tone = EVIDENCE_TONE[raw] || "missing";
       return `
         <li class="readiness__row" data-field="${escapeHtml(key)}" data-tone="${tone}">
           <span class="readiness__k">${escapeHtml(label)}</span>
-          <span class="readiness__v">${escapeHtml(word)}</span>
+          <span class="readiness__v">${escapeHtml(evidenceWord(raw))}</span>
         </li>`;
     })
     .join("");
@@ -2182,6 +2218,12 @@ export function renderReadiness(readiness) {
 
 /* ---------------- candidates ---------------- */
 
+/**
+ * Three lines about why a listing is on the page, and no more.
+ *
+ * Retrieval is advisory. Anything longer here competed for attention with the
+ * decision, which is the only thing on this page with authority.
+ */
 export function renderWhyFound(why, candidate = {}) {
   if (!why) return "";
   const priceMinor = Number(why.price_minor ?? candidate.price_minor);
@@ -2198,22 +2240,18 @@ export function renderWhyFound(why, candidate = {}) {
     : why.within_budget === false
       ? "above your limit"
       : "no limit stated yet";
+  const terms = why.matched_terms?.length
+    ? why.matched_terms.join(", ")
+    : "no direct term match";
   const rows = [
-    ["Category match", why.category_match || candidate.category || "related listing text"],
-    [
-      "Key terms",
-      why.matched_terms?.length
-        ? why.matched_terms.join(", ")
-        : "no direct term match",
-    ],
     ["Budget", budget],
-    ["Brand", why.brand_match || "not specified"],
+    ["Key terms", why.exact_phrase_match ? `${terms} · phrase “${why.exact_phrase_match}”` : terms],
+    ["Category match", why.category_match || candidate.category || "related listing text"],
   ];
-  if (why.exact_phrase_match) rows[1][1] += ` · phrase “${why.exact_phrase_match}”`;
   if (why.source) rows.push(["Source", "created by your simulated onboarding"]);
   return `
     <div class="pgcard__why">
-      <p class="pgcard__whyk">WHY THE AGENT FOUND IT</p>
+      <p class="pgcard__whyk">WHY FOUND</p>
       <dl class="pgcard__signals">
         ${rows
           .map(
@@ -2236,6 +2274,13 @@ export function renderPlaygroundCandidate(
   const onboarded = candidate.onboarded
     ? '<span class="pgcard__flag" data-tone="new">ONBOARDED IN THIS SESSION</span>'
     : "";
+  const summary = evidenceSummary(candidate.readiness);
+  const evidenceChip = summary
+    ? `<p class="pgcard__evidence" data-state="${escapeHtml(summary.state)}">
+         <span class="pgcard__evidencek">TRUSTED EVIDENCE</span>
+         <span class="pgcard__evidencev">${escapeHtml(summary.state)}</span>
+       </p>`
+    : "";
   return `
     <article class="pgcard" data-product="${escapeHtml(candidate.catalog_product_id)}"
              data-selected="${selected ? "true" : "false"}">
@@ -2250,36 +2295,52 @@ export function renderPlaygroundCandidate(
         ${recurring}${onboarded}
       </p>
       ${renderWhyFound(candidate.why_found, candidate)}
-      <div class="pgcard__readiness">
-        <p class="pgcard__readinessk">AGENT READINESS</p>
-        ${renderReadiness(candidate.readiness)}
+      <div class="pgcard__state">
+        ${evidenceChip}
+        <p class="pgcard__authz">
+          <span class="pgcard__authzk">AUTHORIZATION</span>
+          <span class="pgcard__authzv">NOT YET CHECKED</span>
+        </p>
       </div>
-      <details class="pgcard__detail">
-        <summary>Technical detail</summary>
-        <dl class="pgcard__dl">
-          <div><dt>Merchant ID</dt><dd>${escapeHtml(candidate.merchant_id)}</dd></div>
-          <div><dt>SKU</dt><dd>${escapeHtml(candidate.sku)}</dd></div>
-          <div><dt>Billing model</dt><dd>${escapeHtml(candidate.billing_model)}</dd></div>
-          <div><dt>Recurrence record</dt><dd>${escapeHtml(candidate.recurrence_declaration)}</dd></div>
-          <div><dt>Evidence version</dt><dd>${escapeHtml(candidate.evidence_version)}</dd></div>
-          <div><dt>Effective from</dt><dd>${escapeHtml(candidate.effective_from)}</dd></div>
-        </dl>
-      </details>
       <button type="button" class="pgcard__go" data-authorize="${escapeHtml(
         candidate.catalog_product_id,
       )}"${clarificationRequired ? " disabled" : ""}>${
-        clarificationRequired
-          ? "CLARIFY YOUR REQUIREMENT FIRST"
-          : "CHECK AUTHORIZATION"
+        clarificationRequired ? "CLARIFY YOUR REQUIREMENT FIRST" : "SELECT PRODUCT"
       }</button>
+      <details class="pgcard__detail">
+        <summary>Technical detail</summary>
+        <div class="pgcard__detailbody">
+          <dl class="pgcard__dl">
+            <div><dt>Merchant ID</dt><dd>${escapeHtml(candidate.merchant_id)}</dd></div>
+            <div><dt>SKU</dt><dd>${escapeHtml(candidate.sku)}</dd></div>
+            <div><dt>Billing model</dt><dd>${escapeHtml(candidate.billing_model)}</dd></div>
+            <div><dt>Recurrence record</dt><dd>${escapeHtml(candidate.recurrence_declaration)}</dd></div>
+            <div><dt>Evidence version</dt><dd>${escapeHtml(candidate.evidence_version)}</dd></div>
+            <div><dt>Effective from</dt><dd>${escapeHtml(candidate.effective_from)}</dd></div>
+          </dl>
+          <p class="pgcard__detailk">PUBLISHED MERCHANT EVIDENCE</p>
+          ${renderReadiness(candidate.readiness)}
+        </div>
+      </details>
     </article>`;
 }
 
-export function renderPlaygroundCandidates(payload, selectedId = null) {
+/**
+ * The candidate grid, optionally narrowed to the chosen listing.
+ *
+ * Once a product is selected the page has a different job, so the grid stops
+ * being the page: the chosen card stays, the rest go behind one button, and the
+ * authorization workspace below becomes the thing being read.
+ */
+export function renderPlaygroundCandidates(payload, selectedId = null, { collapsed = false } = {}) {
   const candidates = payload?.candidates || [];
   if (!candidates.length) return "";
   const clarificationRequired = Boolean(payload?.clarification_required);
-  return candidates
+  const showing =
+    collapsed && selectedId
+      ? candidates.filter((candidate) => candidate.catalog_product_id === selectedId)
+      : candidates;
+  const cards = showing
     .map((candidate) =>
       renderPlaygroundCandidate(candidate, {
         selected: candidate.catalog_product_id === selectedId,
@@ -2287,6 +2348,12 @@ export function renderPlaygroundCandidates(payload, selectedId = null) {
       }),
     )
     .join("");
+  if (collapsed && showing.length && showing.length < candidates.length) {
+    return `${cards}<button type="button" class="pgcard__showall" id="pg-show-all">SHOW ALL ${
+      candidates.length
+    } RESULTS</button>`;
+  }
+  return cards;
 }
 
 /**
@@ -2435,11 +2502,12 @@ export function renderSpendingLimitPrompt(payload, suggestedMinor) {
     </div>`;
 }
 
-/* ---------------- chosen product and its evidence ---------------- */
+/* ---------------- the authorization workspace ---------------- */
 
 export function renderChosenProduct(panel) {
   if (!panel?.product) return "";
   const product = panel.product;
+  const summary = evidenceSummary(panel.readiness);
   const evidence = (panel.trusted_evidence || [])
     .map(
       (entry) => `
@@ -2457,38 +2525,387 @@ export function renderChosenProduct(panel) {
     <div class="pgchosen">
       <div class="pgchosen__head">
         <div>
+          <p class="pgchosen__k">PRODUCT SELECTED</p>
           <h3 class="pgchosen__name">${escapeHtml(product.name)}</h3>
           <p class="pgchosen__meta">${escapeHtml(product.merchant)} · ${escapeHtml(
-            product.sku,
+            product.category || product.sku,
           )}</p>
         </div>
         <p class="pgchosen__price">${money(product.price_minor, product.currency)}</p>
       </div>
-      <div class="pgchosen__readiness">${renderReadiness(panel.readiness)}</div>
-      <div class="pgchosen__evidence">${evidence}</div>
-      <p class="pgchosen__notice">${escapeHtml(
-        panel.notice || "SIMULATED MERCHANT SANDBOX. No real money moves.",
-      )}</p>
+      ${
+        summary
+          ? `<p class="pgchosen__evidence" data-state="${escapeHtml(summary.state)}">
+               <span>TRUSTED EVIDENCE</span><strong>${escapeHtml(summary.state)}</strong>
+             </p>`
+          : ""
+      }
+      <details class="pgchosen__detail">
+        <summary>Merchant evidence the controller reads (${
+          (panel.trusted_evidence || []).length
+        })</summary>
+        <div class="pgchosen__readiness">${renderReadiness(panel.readiness)}</div>
+        <div class="pgchosen__evidencelist">${evidence}</div>
+        <p class="pgchosen__notice">${escapeHtml(
+          panel.notice || "SIMULATED MERCHANT SANDBOX. No real money moves.",
+        )}</p>
+      </details>
     </div>`;
 }
 
-/* ---------------- verdict ---------------- */
+/**
+ * What you allowed, beside what the agent proposed.
+ *
+ * Every cell is transcribed from the run: the left column from the reading of
+ * the instruction, the right column from the merchant's own record and the
+ * proposal the controller was given. Nothing here is scored, and nothing here
+ * concludes anything — the verdict is one section further down, and it is the
+ * controller's.
+ */
+export function renderMandateComparison(snapshot) {
+  const selection = snapshot?.playground_selection;
+  const buyer = snapshot?.result?.buyer;
+  const product = selection?.product;
+  if (!product && !buyer) return "";
+  const mandate = selection?.mandate || {};
+  const readiness = selection?.readiness || {};
+  const currency = product?.currency || buyer?.currency || "INR";
+  const quantity = Math.max(1, Number(mandate.quantity || buyer?.quantity || 1));
+  const priceMinor = buyer?.price_minor ?? product?.price_minor;
+  const ceiling =
+    mandate.max_total_minor === null || mandate.max_total_minor === undefined
+      ? null
+      : Number(mandate.max_total_minor);
+  const exclusions = (mandate.exclusions || []).join(", ");
+  const brands = (mandate.brand_hints || []).join(", ");
+  const none = "—";
+  const rows = [
+    [
+      "Product / category",
+      mandate.search_text || "any product",
+      product ? `${product.name} · ${product.category}` : buyer?.product || none,
+    ],
+    ["Maximum spend", ceiling === null ? "not stated" : money(ceiling, currency), none],
+    [
+      "Actual price",
+      none,
+      Number.isFinite(Number(priceMinor))
+        ? `${money(priceMinor, currency)}${quantity > 1 ? ` × ${quantity}` : ""}`
+        : none,
+    ],
+    [
+      "Billing requirement",
+      mandate.recurring_allowed === false
+        ? "One-time payment only"
+        : mandate.recurrence_stated
+          ? "Recurring billing allowed"
+          : "not stated",
+      product?.billing_model || none,
+    ],
+    [
+      "Billing evidence",
+      "Must be published by the merchant",
+      readiness.billing_model ? evidenceWord(readiness.billing_model) : "UNKNOWN",
+    ],
+    ["Brand restriction", brands || "none stated", product?.brand || none],
+    ["Merchant", "Any merchant with published evidence", product?.merchant || buyer?.merchant || none],
+    [
+      "Important exclusions",
+      exclusions || "none stated",
+      readiness.content_classification
+        ? `Content classification ${evidenceWord(readiness.content_classification)}`
+        : "UNKNOWN",
+    ],
+  ];
+  return `
+    <div class="pgcompare">
+      <div class="pgcompare__head">
+        <p class="pgcompare__k">&nbsp;</p>
+        <p class="pgcompare__k pgcompare__k--left">WHAT YOU ALLOWED</p>
+        <p class="pgcompare__k pgcompare__k--right">WHAT THE AGENT PROPOSED</p>
+      </div>
+      <dl class="pgcompare__rows">
+        ${rows
+          .map(
+            ([label, left, right]) => `
+              <div class="pgcompare__row">
+                <dt>${escapeHtml(label)}</dt>
+                <dd class="pgcompare__left">${escapeHtml(String(left))}</dd>
+                <dd class="pgcompare__right">${escapeHtml(String(right))}</dd>
+              </div>`,
+          )
+          .join("")}
+      </dl>
+    </div>`;
+}
+
+/* ---------------- the MandateGuard check list ----------------
+ *
+ * Seven named checks, each one a grouping label over the controller's own
+ * constraint families. The grouping is presentation: a group is PASS only when
+ * every family the run recorded for it passed, FAIL the moment one failed, and
+ * UNKNOWN whenever a family could not be evaluated or a semantic constraint
+ * abstained. No status is computed from anything but the run's recorded rows,
+ * and every row that fed a group is readable under "Constraint families".
+ */
+
+export const CHECK_GROUPS = [
+  { id: "budget", label: "Budget", tierA: ["A1", "A7"], tierB: ["B1", "B2", "B6", "B7"] },
+  { id: "product", label: "Product identity", tierA: ["A6"], tierB: ["B3", "B5"] },
+  { id: "merchant", label: "Merchant identity", tierA: ["A3"], tierB: ["B9"] },
+  { id: "sku", label: "SKU evidence", tierA: ["A2"], tierB: ["B10"] },
+  { id: "billing", label: "Billing terms", tierA: ["A8"], tierB: ["B4", "B8"] },
+  { id: "exclusions", label: "Exclusions", semantic: true },
+  { id: "consent", label: "Consent", tierA: ["A4", "A5"] },
+];
+
+const DETERMINISTIC_STATUS = {
+  PASS: "PASS",
+  FAIL: "FAIL",
+  NOT_EVALUABLE: "UNKNOWN",
+};
+
+const SEMANTIC_STATUS = {
+  PASS: "PASS",
+  VIOLATION: "FAIL",
+  ABSTAIN: "UNKNOWN",
+};
+
+/** Roll a group's contributing rows up into one word, worst case first. */
+export function checkGroupStatus(group, { tierA = [], tierB = [], semantic = [] } = {}) {
+  const statuses = [];
+  for (const row of tierA) {
+    if (group.tierA?.includes(row.family)) statuses.push(DETERMINISTIC_STATUS[row.status] || "UNKNOWN");
+  }
+  for (const row of tierB) {
+    if (group.tierB?.includes(row.family)) statuses.push(DETERMINISTIC_STATUS[row.status] || "UNKNOWN");
+  }
+  if (group.semantic) {
+    if (!semantic.length) return "NONE STATED";
+    for (const row of semantic) statuses.push(SEMANTIC_STATUS[row.status] || "UNKNOWN");
+  }
+  if (!statuses.length) return "UNKNOWN";
+  if (statuses.includes("FAIL")) return "FAIL";
+  if (statuses.includes("UNKNOWN")) return "UNKNOWN";
+  return "PASS";
+}
+
+/**
+ * The seven checks, before and after the controller has run.
+ *
+ * Choosing a product is not asking for permission, so the workspace opens in a
+ * state that says so in as many words: every row reads NOT YET CHECKED and the
+ * only thing on offer is a button that asks. This is the whole point of the
+ * screen. Published evidence being complete is a fact about a merchant's
+ * paperwork; whether this purchase may happen is a question nobody has put to
+ * MandateGuard yet.
+ */
+export function renderMandateGuardChecks(snapshot) {
+  const selection = snapshot?.playground_selection;
+  const authorization = snapshot?.result?.authorization;
+  if (!authorization && !selection) return "";
+  const checked = Boolean(authorization);
+  const deterministic = authorization?.deterministic || {};
+  const tierA = deterministic.tier_a || [];
+  const tierB = deterministic.tier_b || [];
+  const semantic = authorization?.semantic?.checks || [];
+  const rows = CHECK_GROUPS.map((group) => {
+    const status = checked
+      ? checkGroupStatus(group, { tierA, tierB, semantic })
+      : "NOT YET CHECKED";
+    return `
+      <li class="pgchecks__row" data-check="${escapeHtml(group.id)}" data-status="${escapeHtml(status)}">
+        <span class="pgchecks__label">${escapeHtml(group.label)}</span>
+        <span class="pgchecks__status">${escapeHtml(status)}</span>
+      </li>`;
+  }).join("");
+  if (!checked) {
+    const productId = selection?.product?.catalog_product_id || "";
+    return `
+      <div class="pgchecks" data-checked="false">
+        <p class="pgchecks__k">AUTHORIZATION</p>
+        <p class="pgchecks__pending">NOT YET CHECKED</p>
+        <ul class="pgchecks__list">${rows}</ul>
+        <div class="pgchecks__ask">
+          <button type="button" class="pgchecks__run" data-check-authorization="${escapeHtml(
+            productId,
+          )}">CHECK AUTHORIZATION</button>
+          <button type="button" class="pgchecks__back" id="pg-change-product">CHANGE PRODUCT</button>
+        </div>
+      </div>`;
+  }
+  const familyRow = (row) => `
+    <div class="pgchecks__family" data-status="${escapeHtml(String(row.status))}">
+      <code>${escapeHtml(String(row.family ?? row.constraint_id ?? ""))}</code>
+      <span>${escapeHtml(String(row.label ?? row.constraint ?? ""))}</span>
+      <em>${escapeHtml(String(row.status ?? ""))}</em>
+    </div>`;
+  return `
+    <div class="pgchecks" data-checked="true">
+      <p class="pgchecks__k">WHAT MANDATEGUARD COULD CHECK</p>
+      <ul class="pgchecks__list">${rows}</ul>
+      <details class="pgchecks__detail">
+        <summary>Constraint families (Tier A, Tier B, semantic)</summary>
+        <div class="pgchecks__families">
+          ${tierA.map(familyRow).join("")}
+          ${tierB.map(familyRow).join("")}
+          ${semantic.map(familyRow).join("")}
+        </div>
+      </details>
+    </div>`;
+}
+
+/* ---------------- the decision ---------------- */
+
+/**
+ * Fallback decision copy.
+ *
+ * The server sends the headline for a run it narrated. A follow-up action -
+ * an execution attempt, a mutation - answers with the run and no narration, so
+ * these strings stand in. They are the same three sentences the server uses.
+ */
+const DECISION_COPY = {
+  ALLOW: "This purchase matches your mandate. Payment execution may proceed.",
+  BLOCK: "MandateGuard stopped this before payment.",
+  REVIEW: "MandateGuard refused to guess.",
+};
+
+/** The families that decide whether a total was within the stated ceiling. */
+const CEILING_FAMILIES = new Set(["A7", "B6", "B7"]);
+
+/**
+ * The one to three reasons that actually determined the outcome.
+ *
+ * For a refusal that is the recorded failing constraint and its recorded
+ * reason; for an ALLOW it is the first lines the run gave. Nothing is
+ * paraphrased and nothing is added.
+ */
+export function determiningReasons(explanation) {
+  const why = explanation?.why || [];
+  const labels = explanation?.failed_constraint_labels || [];
+  if (!labels.length) return why.slice(0, 4);
+  const matched = why.filter(
+    (line) =>
+      labels.some((label) => label && line.includes(label)) ||
+      line.startsWith("ABSTAIN:") ||
+      line.startsWith("VIOLATION:"),
+  );
+  return (matched.length ? matched : labels).slice(0, 3);
+}
+
+/**
+ * The evidence a REVIEW is waiting on, named from the run's own records.
+ *
+ * The merchant fields the sandbox tracks come first, because "billing model"
+ * is a thing a merchant can go and publish. When every field is present and the
+ * verifier still abstained, the constraint it abstained on is the answer
+ * instead, so the panel is never empty and never repeats the reason shown
+ * beneath it.
+ */
+export function missingEvidence(snapshot) {
+  const summary = evidenceSummary(snapshot?.playground_selection?.readiness);
+  const fromEvidence = (summary ? summary.missing : []).filter(Boolean);
+  if (fromEvidence.length) return fromEvidence.slice(0, 6);
+  return (snapshot?.result?.authorization?.semantic?.checks || [])
+    .filter((row) => row?.status === "ABSTAIN")
+    .map((row) => String(row.constraint || row.constraint_id || ""))
+    .filter(Boolean)
+    .slice(0, 6);
+}
+
+function decisionLedger(label, value, tone) {
+  return `
+    <div class="pgverdict__cell" data-tone="${escapeHtml(tone || "neutral")}">
+      <p class="pgverdict__cellk">${escapeHtml(label)}</p>
+      <p class="pgverdict__cellv">${escapeHtml(value)}</p>
+    </div>`;
+}
 
 export function renderPlaygroundVerdict(snapshot) {
   const result = snapshot?.result;
   if (!result) return "";
   const decision = String(result.decision || "");
   const explanation = snapshot.explanation || {};
+  const headline = explanation.headline || DECISION_COPY[decision] || result.decision_reason || "";
+  const execution = result.execution || {};
+  const providerCalls = explanation.provider_calls ?? execution.razorpay_calls ?? 0;
+  const externalCalls = explanation.external_network_calls ?? execution.external_network_calls ?? 0;
+  const mandate = snapshot.playground_selection?.mandate || {};
+  const buyer = result.buyer || {};
+  const currency = buyer.currency || "INR";
+  const failedLabels = explanation.failed_constraint_labels || [];
+  const failedFamilies = explanation.failed_constraints || [];
+  const reasons = determiningReasons(explanation);
+
+  let figure = "";
+  if (decision === "BLOCK") {
+    const ceilingFailure = failedFamilies.some((family) => CEILING_FAMILIES.has(String(family)));
+    const ceiling = mandate.max_total_minor;
+    if (ceilingFailure && ceiling !== null && ceiling !== undefined) {
+      figure = `
+        <div class="pgverdict__ledger">
+          ${decisionLedger("YOUR LIMIT", money(ceiling, currency), "neutral")}
+          ${decisionLedger("PROPOSED PRICE", money(buyer.price_minor, currency), "against")}
+        </div>`;
+    }
+  } else if (decision === "REVIEW") {
+    const missing = missingEvidence(snapshot);
+    figure = `
+      <p class="pgverdict__need">MandateGuard needs more trusted evidence.</p>
+      ${
+        missing.length
+          ? `<p class="pgverdict__k">MISSING</p>
+             <ul class="pgverdict__missing">${missing
+               .map((item) => `<li>${escapeHtml(item)}</li>`)
+               .join("")}</ul>`
+          : ""
+      }`;
+  }
+
+  const capability =
+    decision === "ALLOW" && ["AUTHORIZED", "ORDER_CREATED"].includes(execution.status)
+      ? `<p class="pgverdict__capability">CAPABILITY ISSUED</p>
+         <button type="button" class="pgverdict__continue" id="pg-continue">CONTINUE TO EXECUTION</button>`
+      : "";
+
+  const failed =
+    decision !== "ALLOW" && failedLabels.length
+      ? `<p class="pgverdict__k">${decision === "REVIEW" ? "UNRESOLVED" : "FAILED"}</p>
+         <ul class="pgverdict__failed">${failedLabels
+           .map(
+             (label, index) =>
+               `<li>${escapeHtml(label)}<code>${escapeHtml(
+                 String(failedFamilies[index] || ""),
+               )}</code></li>`,
+           )
+           .join("")}</ul>`
+      : "";
+
   return `
     <div class="pgverdict" data-decision="${escapeHtml(decision)}">
-      <p class="pgverdict__k">MANDATEGUARD</p>
+      <p class="pgverdict__k">FINAL DECISION</p>
       <p class="pgverdict__word">${escapeHtml(decision)}</p>
-      <p class="pgverdict__headline">${escapeHtml(
-        explanation.headline || result.decision_reason || "",
-      )}</p>
+      <p class="pgverdict__headline">${escapeHtml(headline)}</p>
+      ${figure}
+      ${failed}
+      ${
+        reasons.length
+          ? `<p class="pgverdict__k">${decision === "ALLOW" ? "WHY" : "WHAT DECIDED IT"}</p>
+             <ul class="pgverdict__reasons">${reasons
+               .map((line) => `<li>${escapeHtml(line)}</li>`)
+               .join("")}</ul>`
+          : ""
+      }
+      ${capability}
+      <p class="pgverdict__counts">
+        ${decision === "ALLOW" ? "" : "<span>Payment not reached.</span>"}
+        <span>Provider calls: ${escapeHtml(String(providerCalls))}</span>
+        <span>External calls: ${escapeHtml(String(externalCalls))}</span>
+      </p>
     </div>`;
 }
 
+/** The complete recorded reason set, kept out of the way of the decision. */
 export function renderPlaygroundWhy(snapshot) {
   const explanation = snapshot?.explanation;
   if (!explanation) return "";
@@ -2503,39 +2920,53 @@ export function renderPlaygroundWhy(snapshot) {
     )
     .join("");
   return `
-    <div class="pgwhy">
-      <p class="pgwhy__k">WHY</p>
-      <ul class="pgwhy__list">${why}</ul>
-      ${
-        failed
-          ? `<p class="pgwhy__k">FAILED CONSTRAINT</p><ul class="pgwhy__failed">${failed}</ul>`
-          : ""
-      }
-      <dl class="pgwhy__counts">
-        <div><dt>PROVIDER CALLS</dt><dd>${escapeHtml(String(explanation.provider_calls ?? 0))}</dd></div>
-        <div><dt>EXTERNAL CALLS</dt><dd>${escapeHtml(
-          String(explanation.external_network_calls ?? 0),
-        )}</dd></div>
-        <div><dt>DECIDED BY</dt><dd>${escapeHtml(explanation.controller || "")}</dd></div>
-      </dl>
-    </div>`;
+    <details class="pgwhy">
+      <summary>Full reason record</summary>
+      <div class="pgwhy__body">
+        <p class="pgwhy__k">EVERY RECORDED REASON</p>
+        <ul class="pgwhy__list">${why}</ul>
+        ${
+          failed
+            ? `<p class="pgwhy__k">FAILED CONSTRAINT</p><ul class="pgwhy__failed">${failed}</ul>`
+            : ""
+        }
+        <dl class="pgwhy__counts">
+          <div><dt>PROVIDER CALLS</dt><dd>${escapeHtml(String(explanation.provider_calls ?? 0))}</dd></div>
+          <div><dt>EXTERNAL CALLS</dt><dd>${escapeHtml(
+            String(explanation.external_network_calls ?? 0),
+          )}</dd></div>
+          <div><dt>DECIDED BY</dt><dd>${escapeHtml(explanation.controller || "")}</dd></div>
+        </dl>
+      </div>
+    </details>`;
 }
 
-function renderExecutionChecks(checks) {
+/* ---------------- the execution lab ---------------- */
+
+/**
+ * The gate conditions, in the order the gate applies them.
+ *
+ * `merchant_bound` lives on the capability rather than the check set, so the
+ * merchant row appears only when a capability was recorded for this attempt.
+ */
+function renderExecutionChecks(checks, capability) {
   if (!checks) return "";
   const rows = [
-    ["SIGNED?", checks.signed],
-    ["EXPIRED?", checks.expired],
-    ["MANDATE ACTIVE?", checks.mandate_active],
-    ["TRANSACTION MATCHES?", checks.transaction_matches],
-    ["PROVIDER REACHED?", checks.provider_reached],
+    ["SIGNATURE VALID", checks.signed, true],
+    ["EXPIRED", checks.expired, false],
+    ["CONSENT ACTIVE", checks.mandate_active, true],
+    ["TRANSACTION MATCH", checks.transaction_matches, true],
   ];
+  if (capability && capability.merchant_bound !== undefined) {
+    rows.push(["MERCHANT MATCH", capability.merchant_bound, true]);
+  }
+  rows.push(["PROVIDER REACHED", checks.provider_reached, true]);
   return `<dl class="pggate__checks">${rows
     .map(
-      ([label, value]) =>
-        `<div data-check="${value ? "yes" : "no"}"><dt>${escapeHtml(label)}</dt><dd>${
-          label === "PROVIDER REACHED?" && !value ? "NO" : value ? "YES" : "NO"
-        }</dd></div>`,
+      ([label, value, goodWhenTrue]) =>
+        `<div data-check="${(goodWhenTrue ? Boolean(value) : !value) ? "yes" : "no"}"><dt>${escapeHtml(
+          label,
+        )}</dt><dd>${value ? "YES" : "NO"}</dd></div>`,
     )
     .join("")}</dl>`;
 }
@@ -2560,13 +2991,16 @@ export function renderExecutionLab(snapshot) {
         <div class="pggate__arrow" aria-hidden="true">→</div>
         <div><span>ATTEMPTED ${label}</span><strong>${escapeHtml(format(lab.attempted[field]))}</strong></div>
       </div>
+      ${renderExecutionChecks(lab.checks, execution.capability)}
       <dl class="pggate__verdict">
         <div><dt>SIGNED CAPABILITY</dt><dd>${lab.checks?.signed ? "VALID SIGNATURE" : "INVALID"}</dd></div>
         <div><dt>EXECUTION</dt><dd>REJECTED</dd></div>
         <div><dt>REASON</dt><dd>${escapeHtml(lab.reason || execution.reason || "")}</dd></div>
+        <div><dt>EXTERNAL CALLS</dt><dd>${escapeHtml(
+          String(lab.external_additional_calls ?? execution.external_network_calls ?? 0),
+        )}</dd></div>
         <div><dt>PROVIDER CALLS</dt><dd>${escapeHtml(String(lab.provider_additional_calls ?? 0))}</dd></div>
       </dl>
-      ${renderExecutionChecks(lab.checks)}
     </section>`;
 }
 
@@ -2605,13 +3039,29 @@ export function renderPlaygroundExecution(snapshot) {
   const order = execution.order || null;
   const buyer = snapshot?.result?.buyer || {};
   const rejected = execution.status === "REJECTED_BEFORE_NETWORK";
+  const authorized = ["AUTHORIZED", "ORDER_CREATED", "REJECTED_BEFORE_NETWORK"].includes(
+    execution.status,
+  );
+  const authorizedRows = [
+    ["MERCHANT", buyer.merchant || ""],
+    ["SKU", buyer.sku || ""],
+    ["PRICE", money(buyer.price_minor, buyer.currency)],
+    [
+      "CAPABILITY",
+      created ? "issued, consumed" : execution.capability ? "issued, signed + unexpired" : "not issued",
+    ],
+    ["CONSENT", execution.consent?.status || ""],
+  ]
+    .filter(([, value]) => value !== "" && value !== null && value !== undefined)
+    .map(
+      ([key, value]) =>
+        `<div><dt>${escapeHtml(key)}</dt><dd>${escapeHtml(String(value))}</dd></div>`,
+    )
+    .join("");
   const rows = [
     ["STATUS", humanize(execution.status)],
     ["ORDER", order?.order_id || (created ? "" : "not created")],
     ["AMOUNT", money(order?.amount ?? buyer.price_minor, order?.currency || buyer.currency)],
-    ["MERCHANT", buyer.merchant || ""],
-    ["SKU", buyer.sku || ""],
-    ["CAPABILITY", created ? "consumed" : execution.consent?.status ? "signed + unexpired" : "not issued"],
     // Consent is checked when the capability is spent, not only when it was
     // issued, so the state at spend time is the interesting one to show.
     ["CONSENT AT SPEND TIME", execution.consent?.status || ""],
@@ -2626,6 +3076,14 @@ export function renderPlaygroundExecution(snapshot) {
     )
     .join("");
   return `
+    ${
+      authorized && authorizedRows
+        ? `<div class="pgauth">
+             <p class="pgauth__k">AUTHORIZED TRANSACTION</p>
+             <dl class="pgauth__rows">${authorizedRows}</dl>
+           </div>`
+        : ""
+    }
     <div class="pgexec" data-created="${created ? "true" : "false"}">
       <p class="pgexec__k">${created ? "SIMULATED OFFLINE ORDER" : rejected ? "REJECTED BEFORE NETWORK" : "PAYMENT NOT REACHED"}</p>
       <dl class="pgexec__rows">${rows}</dl>
@@ -2636,7 +3094,7 @@ export function renderPlaygroundExecution(snapshot) {
     </div>
     ${renderRecurringProof(snapshot)}
     ${renderExecutionLab(snapshot)}
-    ${rejected && !execution.lab ? `<section class="pggate pggate--compact"><p class="pggate__eyebrow">EXECUTION GATE CHECKS</p>${renderExecutionChecks(execution.security_checks)}</section>` : ""}`;
+    ${rejected && !execution.lab ? `<section class="pggate pggate--compact"><p class="pggate__eyebrow">EXECUTION GATE CHECKS</p>${renderExecutionChecks(execution.security_checks, execution.capability)}</section>` : ""}`;
 }
 
 export function renderPlaygroundFollowUps(snapshot) {
@@ -2647,12 +3105,12 @@ export function renderPlaygroundFollowUps(snapshot) {
   if (execution.status === "AUTHORIZED") {
     const featured = snapshot.scenario_follow_up;
     buttons.push(
-      '<button type="button" class="pgfollow__btn" id="pg-execute">EXECUTE ONCE</button>',
+      '<button type="button" class="pgfollow__btn pgfollow__btn--go" id="pg-execute">EXECUTE</button>',
+      `<button type="button" class="pgfollow__btn${featured === "MUTATE_PRICE" ? " pgfollow__btn--featured" : ""}" id="pg-mutate-price">MUTATE PRICE</button>`,
+      `<button type="button" class="pgfollow__btn${featured === "MUTATE_SKU" ? " pgfollow__btn--featured" : ""}" id="pg-mutate-sku">SWAP SKU</button>`,
+      `<button type="button" class="pgfollow__btn${featured === "MUTATE_MERCHANT" ? " pgfollow__btn--featured" : ""}" id="pg-mutate-merchant">CHANGE MERCHANT</button>`,
       '<button type="button" class="pgfollow__btn" disabled title="Execute once before replaying">REPLAY CAPABILITY</button>',
       '<button type="button" class="pgfollow__btn" id="pg-revoke">REVOKE CONSENT</button>',
-      `<button type="button" class="pgfollow__btn${featured === "MUTATE_PRICE" ? " pgfollow__btn--featured" : ""}" id="pg-mutate-price">MUTATE PRICE TO ₹7,999</button>`,
-      `<button type="button" class="pgfollow__btn${featured === "MUTATE_SKU" ? " pgfollow__btn--featured" : ""}" id="pg-mutate-sku">SWAP SKU BEFORE EXECUTION</button>`,
-      `<button type="button" class="pgfollow__btn${featured === "MUTATE_MERCHANT" ? " pgfollow__btn--featured" : ""}" id="pg-mutate-merchant">CHANGE MERCHANT</button>`,
     );
   }
   if (execution.status === "ORDER_CREATED" && !execution.replay) {
@@ -2676,7 +3134,7 @@ export function renderPlaygroundFollowUps(snapshot) {
     ? `<div class="pgfollow__replay"><p class="pgfollow__note" data-replay="${escapeHtml(execution.replay.status)}">${escapeHtml(
         `Second presentation of the same capability: ${execution.replay.status} (${execution.replay.reason}), ` +
           `${execution.replay.razorpay_additional_calls} additional provider calls.`,
-      )}</p>${renderExecutionChecks(execution.replay.checks)}</div>`
+      )}</p>${renderExecutionChecks(execution.replay.checks, execution.capability)}</div>`
     : "";
   if (!buttons.length && !note && !replay) return "";
   return `<div class="pgfollow">${buttons.join("")}${note}${replay}</div>`;
@@ -2723,6 +3181,35 @@ export function renderTryThese(examples) {
 }
 
 /**
+ * Quantise a proportion onto the fixed ladder of bar widths the stylesheet
+ * defines.
+ *
+ * The page is served under `style-src 'self'`, so a computed width cannot ride
+ * in on a `style` attribute: the browser refuses it and reports a Content
+ * Security Policy violation on every load. The widths therefore live in the
+ * stylesheet as twenty-one `[data-bar]` rules, and the only thing that crosses
+ * the boundary is which of them applies.
+ */
+/**
+ * Snap a 0-1 progress value onto the five states the stylesheet knows about.
+ *
+ * Same reason as `barBucket`: under `style-src 'self'` a progress fill cannot
+ * be written as a style attribute, so progress crosses into the DOM as one of a
+ * finite set of values and the stylesheet owns the geometry.
+ */
+export function progressBucket(fraction) {
+  const value = Number(fraction);
+  const clamped = Number.isFinite(value) ? Math.min(Math.max(value, 0), 1) : 0;
+  return String(Math.round(clamped * 4) * 25);
+}
+
+export function barBucket(value, scale) {
+  const ratio = Number(value || 0) / Math.max(Number(scale) || 1, 1);
+  const percent = Math.round(Math.min(Math.max(ratio, 0), 1) * 100);
+  return String(Math.max(5, Math.round(percent / 5) * 5));
+}
+
+/**
  * Searchable, agent-ready, authorized now.
  *
  * Three populations that must never be added together. The bar widths are
@@ -2733,21 +3220,20 @@ export function renderGapFigure({ marketplace, sandbox, authorizedNote } = {}) {
   const listings = Number(marketplace || 0);
   const products = Number(sandbox || 0);
   const scale = Math.max(listings, products, 1);
-  const bar = (value) => Math.max(4, Math.round((Number(value || 0) / scale) * 100));
   return `
     <ol class="gapfig">
       <li class="gapfig__row" data-tier="searchable">
         <p class="gapfig__k">SEARCHABLE</p>
         <p class="gapfig__v">${listings.toLocaleString("en-IN")}</p>
         <p class="gapfig__what">historical marketplace listings</p>
-        <span class="gapfig__bar" style="--gap-width:${bar(listings)}%"></span>
+        <span class="gapfig__bar" data-bar="${escapeHtml(barBucket(listings, scale))}"></span>
       </li>
       <li class="gapfig__gap"><span>trust gap — no published merchant evidence</span></li>
       <li class="gapfig__row" data-tier="ready">
         <p class="gapfig__k">AGENT-READY</p>
         <p class="gapfig__v">${products.toLocaleString("en-IN")}</p>
         <p class="gapfig__what">synthetic products with merchant-published evidence</p>
-        <span class="gapfig__bar" style="--gap-width:${bar(products)}%"></span>
+        <span class="gapfig__bar" data-bar="${escapeHtml(barBucket(products, scale))}"></span>
       </li>
       <li class="gapfig__gap"><span>your mandate, right now</span></li>
       <li class="gapfig__row" data-tier="authorized">
@@ -2756,7 +3242,7 @@ export function renderGapFigure({ marketplace, sandbox, authorizedNote } = {}) {
         <p class="gapfig__what">${escapeHtml(
           authorizedNote || "only the products that pass the check you just ran",
         )}</p>
-        <span class="gapfig__bar" style="--gap-width:6%"></span>
+        <span class="gapfig__bar" data-bar="5"></span>
       </li>
     </ol>`;
 }
@@ -3019,9 +3505,12 @@ function init() {
     noMatch: $("#pg-nomatch"),
     chosenRegion: $("#pg-chosen-region"),
     chosen: $("#pg-chosen-panel"),
+    compare: $("#pg-compare"),
+    checks: $("#pg-checks"),
     outcomeRegion: $("#pg-outcome-region"),
     verdict: $("#pg-verdict"),
     why: $("#pg-why"),
+    executionRegion: $("#pg-execution-region"),
     execution: $("#pg-execution"),
     followUps: $("#pg-followups"),
     scenarioGrid: $("#pg-scenario-grid"),
@@ -3049,6 +3538,9 @@ function init() {
     runId: null,
     limitMinor: null,
     deferExecution: false,
+    // Once a product is chosen the grid stops being the page. The other
+    // candidates are one button away, never gone.
+    collapseResults: false,
   };
   const pgSearchLock = new SubmissionLock();
   const pgAuthorizeLock = new SubmissionLock();
@@ -3123,7 +3615,9 @@ function init() {
     elements.journey.innerHTML = renderJourney(stages);
     const decision = snapshot?.result?.decision || latestSelection?.status || "waiting";
     elements.journey.dataset.decision = String(decision).toLowerCase().replaceAll(" ", "-");
-    elements.journey.style.setProperty("--journey-fill", String(journeyProgress(stages)));
+    // A finite bucket, not a computed length. `style-src 'self'` forbids the
+    // style attribute, and CSS reads this attribute instead.
+    elements.journey.dataset.progress = progressBucket(journeyProgress(stages));
     [...elements.journey.querySelectorAll(".journey__step")].forEach((step, index) => {
       if (step.dataset.state === "waiting") return;
       motion(step, [{ transform: "translateY(5px)" }, { transform: "translateY(0)" }], {
@@ -3355,17 +3849,14 @@ function init() {
       snapshot: pgState.snapshot,
       catalogSize: playgroundConfig?.catalog?.products,
     });
-    pg.rail.style.setProperty(
-      "--rail-fill",
-      String(
-        railProgress({
-          intent: pgState.intent,
-          candidates: pgState.search?.candidates,
-          selected: pgState.selected,
-          evidence: pgState.evidence,
-          snapshot: pgState.snapshot,
-        }),
-      ),
+    pg.rail.dataset.progress = progressBucket(
+      railProgress({
+        intent: pgState.intent,
+        candidates: pgState.search?.candidates,
+        selected: pgState.selected,
+        evidence: pgState.evidence,
+        snapshot: pgState.snapshot,
+      }),
     );
     [...pg.rail.querySelectorAll(".rail__step")].forEach((step, index) => {
       if (step.dataset.state === "waiting") return;
@@ -3393,10 +3884,10 @@ function init() {
     pg.limit.hidden = !pg.limit.innerHTML.trim();
     pg.clarify.innerHTML = renderClarificationRequired(payload);
     pg.clarify.hidden = !pg.clarify.innerHTML.trim();
-    pg.candidates.innerHTML = renderPlaygroundCandidates(
-      payload,
-      pgState.selected?.catalog_product_id || null,
-    );
+    const selectedId = pgState.selected?.catalog_product_id || null;
+    const collapsed = Boolean(pgState.collapseResults && selectedId);
+    pg.candidates.innerHTML = renderPlaygroundCandidates(payload, selectedId, { collapsed });
+    pg.candidates.dataset.collapsed = collapsed ? "true" : "false";
     pg.noMatch.innerHTML = renderNoMatch(payload);
     pg.noMatch.hidden = !pg.noMatch.innerHTML.trim();
     pg.resultsMeta.textContent = payload
@@ -3407,12 +3898,15 @@ function init() {
         } considered`
       : "";
     pg.candidates.querySelectorAll("[data-authorize]").forEach((button) => {
-      button.addEventListener("click", () =>
-        pgAuthorize(button.dataset.authorize, {
-          deferExecution: pgState.deferExecution,
-        }),
-      );
+      button.addEventListener("click", () => pgSelect(button.dataset.authorize));
     });
+    const showAll = pg.candidates.querySelector("#pg-show-all");
+    if (showAll) {
+      showAll.addEventListener("click", () => {
+        pgState.collapseResults = false;
+        paintCandidates();
+      });
+    }
     [...pg.candidates.querySelectorAll(".pgcard")].forEach((card, index) =>
       motion(card, [{ opacity: "0", transform: "translateY(10px)" }, { opacity: "1", transform: "translateY(0)" }], {
         duration: 260,
@@ -3437,8 +3931,10 @@ function init() {
     pgState.snapshot = null;
     pgState.runId = null;
     pgState.limitMinor = null;
+    pgState.collapseResults = false;
     pg.chosenRegion.hidden = true;
     pg.outcomeRegion.hidden = true;
+    pg.executionRegion.hidden = true;
     pg.search.disabled = true;
     pg.search.textContent = "SEARCHING";
     paintRail();
@@ -3455,7 +3951,32 @@ function init() {
     }
   };
 
-  const pgRenderRun = (snapshot) => {
+  /**
+   * Carry the run's narration across a follow-up action.
+   *
+   * `/execute`, `/mutate`, `/revoke` and `/replay` answer with the run itself
+   * and no narration or selection panel, because they change execution and not
+   * the decision. Re-rendering from that answer alone would blank the workspace
+   * the reader is looking at. So the earlier narration is carried forward, and
+   * only while the newer answer still reports the same decision: the moment a
+   * response disagrees with what was narrated, the narration is dropped rather
+   * than shown beside a verdict it does not describe.
+   */
+  const pgCarryNarration = (snapshot) => {
+    const previous = pgState.snapshot;
+    if (!previous || previous.run_id !== snapshot.run_id) return snapshot;
+    if (previous.result?.decision !== snapshot.result?.decision) return snapshot;
+    const merged = { ...snapshot };
+    if (!merged.explanation && previous.explanation) merged.explanation = previous.explanation;
+    if (!merged.playground_selection && previous.playground_selection) {
+      merged.playground_selection = previous.playground_selection;
+    }
+    if (!merged.scenario_id && previous.scenario_id) merged.scenario_id = previous.scenario_id;
+    return merged;
+  };
+
+  const pgRenderRun = (incoming) => {
+    const snapshot = pgCarryNarration(incoming);
     pgState.snapshot = snapshot;
     pgState.runId = snapshot.run_id;
     if (snapshot.playground_selection?.product) {
@@ -3464,6 +3985,8 @@ function init() {
       pg.chosenRegion.hidden = false;
       pg.chosen.innerHTML = renderChosenProduct(snapshot.playground_selection);
     }
+    pg.compare.innerHTML = renderMandateComparison(snapshot);
+    pg.checks.innerHTML = renderMandateGuardChecks(snapshot);
     pg.outcomeRegion.hidden = false;
     pg.outcomeRegion.dataset.decision = snapshot.result?.decision || "";
     if (snapshot.state === "ERROR") {
@@ -3472,6 +3995,7 @@ function init() {
       pg.why.innerHTML = "";
       pg.execution.innerHTML = "";
       pg.followUps.innerHTML = "";
+      pg.executionRegion.hidden = true;
       paintRail();
       return;
     }
@@ -3479,6 +4003,7 @@ function init() {
     pg.why.innerHTML = renderPlaygroundWhy(snapshot);
     pg.execution.innerHTML = renderPlaygroundExecution(snapshot);
     pg.followUps.innerHTML = renderPlaygroundFollowUps(snapshot);
+    pg.executionRegion.hidden = !pg.execution.innerHTML.trim();
     paintRail();
     motion(
       pg.verdict.querySelector(".pgverdict__word"),
@@ -3504,6 +4029,12 @@ function init() {
       }),
     );
     bindPg("#pg-recover", () => pgRunAction("recover", "#pg-recover", "ACQUIRING EVIDENCE"));
+    bindPg("#pg-continue", () =>
+      pg.executionRegion.scrollIntoView({
+        behavior: prefersReducedMotion() ? "auto" : "smooth",
+        block: "start",
+      }),
+    );
   };
 
   const pgPoll = async (initial) => {
@@ -3517,7 +4048,37 @@ function init() {
     return snapshot;
   };
 
-  async function pgAuthorize(catalogProductId, { deferExecution = false } = {}) {
+  /** Bind the two controls the pre-authorization workspace offers. */
+  const bindWorkspace = () => {
+    const ask = pg.checks.querySelector("[data-check-authorization]");
+    if (ask) {
+      ask.addEventListener("click", () =>
+        pgAuthorize(ask.dataset.checkAuthorization, {
+          deferExecution: pgState.deferExecution,
+        }),
+      );
+    }
+    const back = pg.checks.querySelector("#pg-change-product");
+    if (back) {
+      back.addEventListener("click", () => {
+        pgState.collapseResults = false;
+        paintCandidates();
+        pg.resultsRegion.scrollIntoView({
+          behavior: prefersReducedMotion() ? "auto" : "smooth",
+          block: "start",
+        });
+      });
+    }
+  };
+
+  /**
+   * Step 3: open the workspace on a chosen listing.
+   *
+   * The server re-reads the product from its own catalogue and hands back what
+   * the merchant published. Nothing is authorized here, and the panel says so:
+   * asking is the next, separate, deliberate click.
+   */
+  async function pgSelect(catalogProductId) {
     if (!pgAuthorizeLock.acquire()) return;
     pgError("");
     const limit = declaredLimitMinor();
@@ -3535,12 +4096,43 @@ function init() {
       });
       pgState.selected = preview.product;
       pgState.evidence = preview.trusted_evidence;
+      pgState.snapshot = null;
+      pgState.runId = null;
+      // The grid has done its job. Narrow it to the chosen listing so the
+      // authorization workspace below is what the reader is looking at.
+      pgState.collapseResults = true;
+      paintCandidates();
+      const pending = { playground_selection: preview };
       pg.chosenRegion.hidden = false;
       pg.chosen.innerHTML = renderChosenProduct(preview);
-      pg.candidates.querySelectorAll(".pgcard").forEach((card) => {
-        card.dataset.selected = card.dataset.product === catalogProductId ? "true" : "false";
+      pg.compare.innerHTML = renderMandateComparison(pending);
+      pg.checks.innerHTML = renderMandateGuardChecks(pending);
+      bindWorkspace();
+      pg.outcomeRegion.hidden = true;
+      pg.executionRegion.hidden = true;
+      pg.chosenRegion.scrollIntoView({
+        behavior: prefersReducedMotion() ? "auto" : "smooth",
+        block: "start",
       });
       paintRail();
+    } catch (error) {
+      pgError(error.message);
+    } finally {
+      pgAuthorizeLock.release();
+    }
+  }
+
+  /** Step 4: put the chosen purchase to the controller. */
+  async function pgAuthorize(catalogProductId, { deferExecution = false } = {}) {
+    if (!pgAuthorizeLock.acquire()) return;
+    pgError("");
+    const limit = pgState.limitMinor ?? declaredLimitMinor();
+    const ask = pg.checks.querySelector("[data-check-authorization]");
+    if (ask) {
+      ask.disabled = true;
+      ask.textContent = "CHECKING";
+    }
+    try {
       const snapshot = await pgFetch("/api/playground/authorize", {
         intent: pgState.intent,
         catalog_product_id: catalogProductId,
@@ -3555,10 +4147,14 @@ function init() {
       await pgPoll(snapshot);
       pg.outcomeRegion.scrollIntoView({
         behavior: prefersReducedMotion() ? "auto" : "smooth",
-        block: "start",
+        block: "center",
       });
     } catch (error) {
       pgError(error.message);
+      if (ask) {
+        ask.disabled = false;
+        ask.textContent = "CHECK AUTHORIZATION";
+      }
     } finally {
       pgAuthorizeLock.release();
     }
@@ -3599,6 +4195,9 @@ function init() {
     pgError("");
     pg.chosenRegion.hidden = true;
     pg.outcomeRegion.hidden = true;
+    pg.executionRegion.hidden = true;
+    pgState.snapshot = null;
+    pgState.collapseResults = false;
     try {
       const snapshot = await pgFetch("/api/playground/scenario", {
         scenario_id: scenarioId,

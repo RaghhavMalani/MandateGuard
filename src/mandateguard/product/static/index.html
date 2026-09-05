@@ -24,65 +24,72 @@
 
         <nav class="mainnav" aria-label="Primary">
           <div class="mainnav__list" role="tablist" aria-label="Commerce lab views">
-            <button
-              class="navtab"
-              id="tab-playground"
-              role="tab"
-              type="button"
-              aria-selected="true"
-              aria-controls="view-playground"
-              data-view="playground"
-            >PLAYGROUND</button>
-            <button
-              class="navtab"
-              id="tab-observe"
-              role="tab"
-              type="button"
-              aria-selected="false"
-              tabindex="-1"
-              aria-controls="view-observe"
-              data-view="observe"
-            >MARKETPLACE</button>
-            <button
-              class="navtab"
-              id="tab-attack"
-              role="tab"
-              type="button"
-              aria-selected="false"
-              tabindex="-1"
-              aria-controls="view-attack"
-              data-view="attack"
-            >ATTACK LAB</button>
-            <button
-              class="navtab"
-              id="tab-scale"
-              role="tab"
-              type="button"
-              aria-selected="false"
-              tabindex="-1"
-              aria-controls="view-scale"
-              data-view="scale"
-            >SCALE LAB</button>
-            <button
-              class="navtab"
-              id="tab-evidence"
-              role="tab"
-              type="button"
-              aria-selected="false"
-              tabindex="-1"
-              aria-controls="view-evidence"
-              data-view="evidence"
-            >EVIDENCE</button>
-            <button
-              class="navtab"
-              id="tab-evaluation"
-              role="tab"
-              type="button"
-              aria-selected="false"
-              tabindex="-1"
-              aria-controls="view-evaluation"
-              data-view="evaluation"
-            >EVALUATION</button>
+            <div class="mainnav__group" role="presentation">
+              <button
+                class="navtab"
+                id="tab-playground"
+                role="tab"
+                type="button"
+                aria-selected="true"
+                aria-controls="view-playground"
+                data-view="playground"
+              >PLAYGROUND</button>
+              <button
+                class="navtab"
+                id="tab-observe"
+                role="tab"
+                type="button"
+                aria-selected="false"
+                tabindex="-1"
+                aria-controls="view-observe"
+                data-view="observe"
+              >MARKETPLACE</button>
+              <button
+                class="navtab"
+                id="tab-attack"
+                role="tab"
+                type="button"
+                aria-selected="false"
+                tabindex="-1"
+                aria-controls="view-attack"
+                data-view="attack"
+              >ATTACK LAB</button>
+              <button
+                class="navtab"
+                id="tab-scale"
+                role="tab"
+                type="button"
+                aria-selected="false"
+                tabindex="-1"
+                aria-controls="view-scale"
+                data-view="scale"
+              >SCALE</button>
+            </div>
+            <!-- Research surfaces. Kept reachable, kept out of the product path:
+                 a first-time reader should meet the product before the method. -->
+            <div class="mainnav__group mainnav__group--secondary" role="presentation">
+              <span class="mainnav__rule" aria-hidden="true"></span>
+              <button
+                class="navtab navtab--secondary"
+                id="tab-evidence"
+                role="tab"
+                type="button"
+                aria-selected="false"
+                tabindex="-1"
+                aria-controls="view-evidence"
+                data-view="evidence"
+              >EVIDENCE</button>
+              <button
+                class="navtab navtab--secondary"
+                id="tab-evaluation"
+                role="tab"
+                type="button"
+                aria-selected="false"
+                tabindex="-1"
+                aria-controls="view-evaluation"
+                data-view="evaluation"
+              >EVALUATION</button>
+            </div>
           </div>
         </nav>
 
@@ -101,22 +108,46 @@
       <!-- ============================ PLAYGROUND ============================ -->
       <section id="view-playground" class="view" role="tabpanel" aria-labelledby="tab-playground" tabindex="-1">
 
-        <!-- What a first-time reader needs before any technical detail: an AI
-             agent can choose a product, choosing is not permission to spend,
-             and this page is simulated so anything can safely be tried. -->
-        <section class="pg-open" aria-labelledby="pg-open-title">
-          <p class="pg-open__eyebrow">THE PLAYGROUND</p>
-          <h1 class="pg-open__title" id="pg-open-title">
-            An AI agent can choose what to buy.<br />
-            <em>Choosing is not permission to spend.</em>
+        <!-- ------------------------------------------------------------------
+             First viewport. One claim, one sentence of substance, the authority
+             rail, and the three words this product can answer. Everything
+             measurable, technical or adversarial waits until the reader has
+             asked their own question.
+             ------------------------------------------------------------------ -->
+        <section class="pg-hero" aria-labelledby="pg-hero-title">
+          <h1 class="pg-hero__title" id="pg-hero-title">
+            AI can choose what to buy.<br />
+            <em>It shouldn&rsquo;t decide what it&rsquo;s allowed to pay for.</em>
           </h1>
-          <ol class="pg-primer" aria-label="What MandateGuard does">
-            <li><span class="pg-primer__k">CHECKS</span> your constraints, the merchant&rsquo;s published evidence, and your consent right now</li>
-            <li><span class="pg-primer__k pg-primer__k--allow">ALLOW</span> execution may proceed</li>
-            <li><span class="pg-primer__k pg-primer__k--block">BLOCK</span> the request breaks your mandate</li>
-            <li><span class="pg-primer__k pg-primer__k--review">REVIEW</span> the evidence is missing or contradicts itself</li>
-            <li><span class="pg-primer__k">ML</span> helps find and understand products &mdash; it never authorizes payment</li>
+          <p class="pg-hero__sub">
+            MandateGuard verifies user constraints, trusted merchant evidence, and current
+            consent before payment execution.
+          </p>
+
+          <ol class="pg-flow" aria-label="Where MandateGuard sits">
+            <li class="pg-flow__step">
+              <p class="pg-flow__who">AI BUYER</p>
+              <p class="pg-flow__does">chooses</p>
+            </li>
+            <li class="pg-flow__arrow" aria-hidden="true"></li>
+            <li class="pg-flow__step pg-flow__step--guard">
+              <p class="pg-flow__who">MANDATEGUARD</p>
+              <p class="pg-flow__does">verifies</p>
+            </li>
+            <li class="pg-flow__arrow" aria-hidden="true"></li>
+            <li class="pg-flow__step">
+              <p class="pg-flow__who">PAYMENT</p>
+              <p class="pg-flow__does">executes</p>
+            </li>
           </ol>
+
+          <dl class="pg-legend" aria-label="What MandateGuard can answer">
+            <div><dt data-decision="ALLOW">ALLOW</dt><dd>matches mandate</dd></div>
+            <div><dt data-decision="BLOCK">BLOCK</dt><dd>violates mandate</dd></div>
+            <div><dt data-decision="REVIEW">REVIEW</dt><dd>insufficient trusted evidence</dd></div>
+          </dl>
+
+          <a class="pg-hero__cta" href="#pg-console">TRY IT YOURSELF</a>
         </section>
 
         <!-- Sandbox declaration. Stated before the input, not after it. -->
@@ -130,35 +161,28 @@
             MandateGuard requires. <strong>Nothing here represents a live marketplace or real
             money.</strong>
           </p>
-          <p class="pg-sandbox__meta" id="pg-catalog-meta"></p>
-          <dl class="pg-worldkey" aria-label="Playground and Marketplace distinction">
-            <div>
-              <dt>PLAYGROUND</dt>
-              <dd>Simulated merchants with versioned published evidence. No real money moves.</dd>
-            </div>
-            <div>
-              <dt>MARKETPLACE</dt>
-              <dd>Historical discovery listings. Searchable does not mean agent-ready.</dd>
-            </div>
-          </dl>
+          <details class="pg-sandbox__more">
+            <summary>What is in this world</summary>
+            <p class="pg-sandbox__meta" id="pg-catalog-meta"></p>
+            <dl class="pg-worldkey" aria-label="Playground and Marketplace distinction">
+              <div>
+                <dt>PLAYGROUND</dt>
+                <dd>Simulated merchants with versioned published evidence. No real money moves.</dd>
+              </div>
+              <div>
+                <dt>MARKETPLACE</dt>
+                <dd>Historical discovery listings. Searchable does not mean agent-ready.</dd>
+              </div>
+            </dl>
+          </details>
         </section>
 
-        <section class="pg-strip" aria-labelledby="pg-strip-title">
-          <div class="pg-strip__head">
-            <p class="pg-strip__eyebrow">90-SECOND JUDGE PATH</p>
-            <h2 class="pg-strip__title" id="pg-strip-title">Try MandateGuard</h2>
-            <p class="pg-strip__note">Every button runs the real controller or execution gate.</p>
-          </div>
-          <div class="pg-strip__actions" id="pg-judge-strip"></div>
-        </section>
-
-        <!-- The instruction. Free text is the primary input; everything else -->
-        <!-- on this screen is a shortcut into the same field.                -->
-        <section class="pg-console" aria-labelledby="pg-console-title">
-          <h2 class="section-head__title" id="pg-console-title">
+        <!-- ---------------- STEP 1: what did the user ask? ---------------- -->
+        <section class="pg-console" id="pg-console" aria-labelledby="pg-console-title">
+          <p class="pg-step">STEP 1 &mdash; WHAT DID YOU ASK THE AI TO BUY?</p>
+          <h2 class="pg-console__title" id="pg-console-title">
             Type anything you would ask an AI shopping agent
           </h2>
-          <div class="pg-tryrow" id="pg-try-row" aria-label="Example instructions"></div>
           <div class="pg-field">
             <label class="pg-field__label" for="pg-intent">YOUR BUYING INSTRUCTION</label>
             <textarea
@@ -178,18 +202,29 @@
             </p>
           </div>
           <p class="formerror" id="pg-error" role="alert" hidden></p>
+
+          <div class="pg-shortcuts">
+            <p class="pg-shortcuts__k" id="pg-try-label">Or start from an example</p>
+            <div class="pg-tryrow" id="pg-try-row" aria-labelledby="pg-try-label"></div>
+          </div>
+          <div class="pg-shortcuts">
+            <p class="pg-shortcuts__k" id="pg-strip-label">Or run a prepared journey &mdash; every one runs the real controller</p>
+            <div class="pg-strip__actions" id="pg-judge-strip" aria-labelledby="pg-strip-label"></div>
+          </div>
         </section>
 
-        <!-- The live rail. One row per stage, filled as the run progresses. -->
+        <!-- The four-step progression. One row per stage of the story, filled
+             as the run gets there and never ahead of it. -->
         <section class="pg-rail-region" aria-labelledby="pg-rail-title" id="pg-rail-region" hidden>
-          <h2 class="visually-hidden" id="pg-rail-title">Run progress</h2>
+          <h2 class="visually-hidden" id="pg-rail-title">Where this run has got to</h2>
           <div class="pg-rail" id="pg-rail" aria-live="polite"></div>
         </section>
 
-        <!-- Candidates. -->
+        <!-- ---------------- STEP 2: what did the AI find? ---------------- -->
         <section class="pg-results" aria-labelledby="pg-results-title" id="pg-results-region" hidden>
           <div class="section-head">
-            <h2 class="section-head__title" id="pg-results-title">What the agent found</h2>
+            <p class="pg-step">STEP 2 &mdash; WHAT THE AI FOUND</p>
+            <h2 class="section-head__title" id="pg-results-title">Choose a product</h2>
             <p class="section-head__meta" id="pg-results-meta"></p>
           </div>
           <div id="pg-mandate-panel" class="pg-mandate"></div>
@@ -199,34 +234,46 @@
           <div id="pg-nomatch" class="pg-nomatch" hidden></div>
         </section>
 
-        <!-- The chosen product and its trusted evidence, before the verdict. -->
+        <!-- ---------------- STEP 3: the authorization workspace ----------------
+             What you allowed, beside what the agent proposed, beside what
+             MandateGuard could check. No verdict lives in this section.
+             ------------------------------------------------------------------ -->
         <section class="pg-chosen" aria-labelledby="pg-chosen-title" id="pg-chosen-region" hidden>
           <div class="section-head">
-            <h2 class="section-head__title" id="pg-chosen-title">Trusted merchant evidence</h2>
-            <p class="section-head__meta">What the controller is about to read</p>
+            <p class="pg-step">STEP 3 &mdash; MANDATEGUARD</p>
+            <h2 class="section-head__title" id="pg-chosen-title">Your mandate against this proposal</h2>
           </div>
           <div id="pg-chosen-panel"></div>
+          <div id="pg-compare" class="pg-compare"></div>
+          <div id="pg-checks" class="pg-checks"></div>
         </section>
 
-        <!-- Verdict, reasons, execution. -->
+        <!-- ---------------- STEP 4: the decision ---------------- -->
         <section class="pg-outcome" aria-labelledby="pg-outcome-title" id="pg-outcome-region" hidden>
-          <h2 class="visually-hidden" id="pg-outcome-title">Authorization outcome</h2>
+          <h2 class="visually-hidden" id="pg-outcome-title">Authorization decision</h2>
           <div id="pg-verdict" class="pg-verdict"></div>
           <div id="pg-why" class="pg-why"></div>
+        </section>
+
+        <!-- ---------------- STEP 5: execution ---------------- -->
+        <section class="pg-executionlab" aria-labelledby="pg-execution-title" id="pg-execution-region" hidden>
+          <div class="section-head">
+            <p class="pg-step">STEP 5 &mdash; EXECUTION</p>
+            <h2 class="section-head__title" id="pg-execution-title">What happens to execution now</h2>
+          </div>
           <div id="pg-execution" class="pg-execution"></div>
           <div id="pg-followups" class="pg-followups"></div>
         </section>
 
-        <!-- One-click scenarios. Secondary to the free-text field above. -->
+        <!-- Secondary surfaces. Below the product path, never inside it. -->
         <section class="pg-scenarios" aria-labelledby="pg-scenarios-title">
           <div class="section-head">
-            <h2 class="section-head__title" id="pg-scenarios-title">Or run a prepared journey</h2>
+            <h2 class="section-head__title" id="pg-scenarios-title">Every prepared journey</h2>
             <p class="section-head__meta">Same search, same controller, same execution gate</p>
           </div>
           <div id="pg-scenario-grid" class="pg-scenario-grid"></div>
         </section>
 
-        <!-- Searchable vs buyable. The core product story, as a figure. -->
         <section class="pg-gap" aria-labelledby="pg-gap-title">
           <div class="section-head">
             <h2 class="section-head__title" id="pg-gap-title">Searchable is not buyable</h2>

@@ -163,10 +163,13 @@ test("the opening does not lead with tier terminology", () => {
 });
 
 test("free text is the primary input and examples are secondary", () => {
-  const label = html.indexOf("What should the agent buy?");
-  const examples = html.indexOf("Or start from an example");
+  // Scoped to the Marketplace panel: the Playground has its own console with
+  // its own copy, and an unscoped indexOf would find that one instead.
+  const view = html.slice(html.indexOf('id="view-observe"'), html.indexOf('id="view-attack"'));
+  const label = view.indexOf("What should the agent buy?");
+  const examples = view.indexOf("Or start from an example");
   assert.ok(label > 0 && examples > label, "examples must follow the free-text field");
-  assert.match(html, /placeholder="Buy wireless headphones below Rs 4,000/);
+  assert.match(view, /placeholder="Buy wireless headphones below Rs 4,000/);
 });
 
 /* ------------------------------------------------------------------ */

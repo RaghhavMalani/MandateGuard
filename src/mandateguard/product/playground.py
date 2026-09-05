@@ -662,7 +662,7 @@ class PlaygroundSurface:
 # ---------------------------------------------------------------------------
 
 _HEADLINES = {
-    "ALLOW": "Your mandate permits this purchase.",
+    "ALLOW": "This purchase matches your mandate. Payment execution may proceed.",
     "BLOCK": "MandateGuard stopped this before payment.",
     "REVIEW": "MandateGuard refused to guess.",
 }

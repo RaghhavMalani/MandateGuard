@@ -239,7 +239,9 @@ def test_allow_comes_from_the_real_controller(
     assert len(result["authorization"]["deterministic"]["tier_b"]) >= 10
     assert result["evidence"]["trusted_evidence_count"] >= 1
     assert result["execution"]["external_network_calls"] == 0
-    assert snapshot["explanation"]["headline"] == "Your mandate permits this purchase."
+    assert snapshot["explanation"]["headline"] == (
+        "This purchase matches your mandate. Payment execution may proceed."
+    )
 
 
 def test_choosing_an_over_budget_listing_blocks_before_payment(
