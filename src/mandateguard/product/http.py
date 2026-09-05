@@ -165,6 +165,13 @@ class CommerceLabHTTPServer(ThreadingHTTPServer):
 
 class CommerceLabHandler(BaseHTTPRequestHandler):
     server: CommerceLabHTTPServer
+    server_version = "MandateGuard"
+    sys_version = ""
+
+    def version_string(self) -> str:
+        """Identify the product without disclosing the stdlib/Python versions."""
+
+        return self.server_version
 
     def log_message(self, format: str, *args: object) -> None:
         # Suppress the default access line; it echoes the raw request target.

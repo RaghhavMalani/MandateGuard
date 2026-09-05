@@ -66,6 +66,19 @@ EFFECTIVE_FROM = "2026-09-01T00:00:00Z"
 #: Evidence version stamped on generated records.
 EVIDENCE_VERSION = "v1"
 
+#: The category identifiers this frozen taxonomy owns.
+#:
+#: A2 compares the product family a mandate authorizes against the family
+#: recorded in the committed server-side catalogue. That comparison only means
+#: anything for a category this taxonomy defines. A listing filed outside it -
+#: a simulated merchant onboarded from a crawled marketplace row, whose only
+#: category words are the ones that marketplace happened to print - has no
+#: server-owned family. Saying so is what makes A2 report the identity as
+#: unavailable instead of inventing one out of the seller's own prose.
+TAXONOMY_CATEGORY_IDS: frozenset[str] = frozenset(
+    category.category_id for category in CATEGORIES
+)
+
 #: Family weights out of 1000, applied per listing. Categories that cannot
 #: plausibly carry a family redistribute its weight to ``COMPLETE``, so the
 #: realised mix differs slightly per category and is reported, never assumed.
@@ -163,6 +176,14 @@ class SandboxProduct:
             recurring=self.recurring,
             tags=self.keywords,
             evidence_ids=self.evidence_ids,
+            # Server-owned families only. See TAXONOMY_CATEGORY_IDS: an
+            # onboarded listing's category came off a crawled page, so it is
+            # reported absent rather than as a family nothing vouched for.
+            product_family=(
+                self.category_id
+                if self.category_id in TAXONOMY_CATEGORY_IDS
+                else None
+            ),
         )
 
     def public_mapping(self) -> dict[str, Any]:

@@ -66,6 +66,9 @@ class HardConstraints:
     recurring_allowed: bool
     merchant_allowlist: tuple[str, ...] | None = None
     sku_allowlist: tuple[str, ...] | None = None
+    product_family_allowlist: tuple[str, ...] | None = field(
+        default=None, metadata={"canonical_omit_none": True}
+    )
 
     def __post_init__(self) -> None:
         _require_nonnegative_int(self.max_total_minor, "max_total_minor")
@@ -74,6 +77,9 @@ class HardConstraints:
             raise ValueError("recurring_allowed must be a boolean")
         self._validate_allowlist(self.merchant_allowlist, "merchant_allowlist")
         self._validate_allowlist(self.sku_allowlist, "sku_allowlist")
+        self._validate_allowlist(
+            self.product_family_allowlist, "product_family_allowlist"
+        )
 
     @staticmethod
     def _validate_allowlist(values: tuple[str, ...] | None, name: str) -> None:

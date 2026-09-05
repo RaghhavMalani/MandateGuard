@@ -23,6 +23,10 @@ import pytest
 from mandateguard.product.scale_evidence import (
     ANOMALY_REPORT,
     ARTIFACT_DIR,
+    AUTHORIZATION_SCALE_ARTIFACT_DIR,
+    AUTHORIZATION_SCALE_FREEZE,
+    AUTHORIZATION_SCALE_FREEZE_DIR,
+    AUTHORIZATION_SCALE_REPORT,
     RETRIEVAL_REPORT,
     SCALE_REPORT,
     TRAINING_REPORT,
@@ -42,6 +46,14 @@ REQUIRED_IN_IMAGE = (
     f"{ARTIFACT_DIR.as_posix()}/{RETRIEVAL_REPORT}",
     f"{ARTIFACT_DIR.as_posix()}/{ANOMALY_REPORT}",
     f"data/models/{TRAINING_REPORT}",
+    (
+        f"{AUTHORIZATION_SCALE_ARTIFACT_DIR.as_posix()}/"
+        f"{AUTHORIZATION_SCALE_REPORT}"
+    ),
+    (
+        f"{AUTHORIZATION_SCALE_FREEZE_DIR.as_posix()}/"
+        f"{AUTHORIZATION_SCALE_FREEZE}"
+    ),
     "data/processed/discovery_catalog.jsonl.gz",
     "data/processed/discovery_catalog.manifest.json",
     "data/models/lexical_index.mgdx",
@@ -243,6 +255,17 @@ def test_the_container_equivalent_runtime_loads_system_scale(container_root: Pat
     assert scale["request_p95_ms"] is not None
     assert scale["retrieval_p99_ms"] is not None
     assert scale["request_p99_ms"] is not None
+    assert scale["authorization_scale"] == {
+        "available": True,
+        "cases": 25_000,
+        "target_invariant_agreement": 25_000,
+        "scope": (
+            "Synthetic authorization-scale cases; one process, one machine, "
+            "sequential, no concurrency, and no network."
+        ),
+        "source": "artifacts/engineering/authorization-scale/benchmark.json",
+        "freeze_source": "data/eval/authorization-scale/WORLD_FREEZE.json",
+    }
 
 
 def test_the_container_equivalent_runtime_loads_model_quality(

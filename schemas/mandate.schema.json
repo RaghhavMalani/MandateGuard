@@ -48,7 +48,8 @@
                 "max_quantity": {"type": "integer", "minimum": 1, "description": "Maximum aggregate execution quantity enforced by B7."},
                 "recurring_allowed": {"type": "boolean", "description": "Mandate recurrence permission enforced by B8 against self-report and A8 against catalog recurrence where available."},
                 "merchant_allowlist": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 128}},
-                "sku_allowlist": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 128}}
+                "sku_allowlist": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 128}},
+                "product_family_allowlist": {"type": "array", "maxItems": 16, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 128}, "description": "Deterministically interpreted product families authorized by the mandate; compared only with server-owned catalog family data."}
               }
             },
             "semantic": {

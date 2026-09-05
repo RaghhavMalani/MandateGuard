@@ -237,7 +237,7 @@ TIMELINE_STEPS: tuple[tuple[str, str], ...] = (
 
 _TIER_A_LABELS = {
     "A1": "Authoritative price",
-    "A2": "SKU ownership",
+    "A2": "SKU ownership and product family",
     "A3": "Merchant binding",
     "A4": "Single-use mandate nonce",
     "A5": "Mandate expiry",
@@ -884,7 +884,7 @@ class CommerceLabService:
     def __exit__(self, *_args: object) -> None:
         self.close()
 
-    def live_configuration(self) -> dict[str, Any]:
+    def live_configuration(self, *, public: bool = False) -> dict[str, Any]:
         required = (
             "OPENAI_API_KEY",
             "MANDATEGUARD_SEMANTIC_MODEL",
@@ -903,11 +903,24 @@ class CommerceLabService:
         if importlib.util.find_spec("openai") is None:
             problems.append("OpenAI Python package is not installed")
         available = not missing and not problems
-        return {
+        configuration = {
             "available": available,
             "missing_configuration": missing,
             "problems": problems,
             "execution_environment": "RAZORPAY_TEST_MODE",
+        }
+        if not public:
+            return configuration
+        return {
+            **configuration,
+            "missing_configuration": (
+                ["SERVER_CONFIGURATION"] if missing else []
+            ),
+            "problems": (
+                ["Live Test Mode server configuration is invalid"]
+                if problems
+                else []
+            ),
         }
 
     def public_config(self) -> dict[str, Any]:
@@ -926,7 +939,7 @@ class CommerceLabService:
                 },
                 "live": {
                     "label": "LIVE TEST MODE",
-                    **self.live_configuration(),
+                    **self.live_configuration(public=True),
                 },
             },
             "presets": [dict(item) for item in PRODUCT_PRESETS],

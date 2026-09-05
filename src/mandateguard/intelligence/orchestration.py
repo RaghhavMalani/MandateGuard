@@ -271,6 +271,9 @@ def build_mandate_from_intent(
                     recurring_allowed=interpreted.recurring_allowed,
                     merchant_allowlist=interpreted.merchant_allowlist,
                     sku_allowlist=interpreted.sku_allowlist,
+                    product_family_allowlist=(
+                        interpreted.product_family_allowlist
+                    ),
                 ),
                 semantic=_semantic_constraints(interpreted),
             ),

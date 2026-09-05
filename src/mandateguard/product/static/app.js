@@ -208,6 +208,20 @@ export class SubmissionLock {
   }
 }
 
+/** A monotonic token that lets only the newest async interaction paint state. */
+export class LatestInteraction {
+  #generation = 0;
+
+  begin() {
+    this.#generation += 1;
+    return this.#generation;
+  }
+
+  isCurrent(generation) {
+    return generation === this.#generation;
+  }
+}
+
 export function escapeHtml(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -1796,9 +1810,6 @@ export function renderSystemScale(scale) {
     <p class="measured__caveat">${escapeHtml(scale.caveat || "")}</p>
     <dl class="measured__source">
       <div><dt>Source</dt><dd><code>${escapeHtml(scale.source)}</code></dd></div>
-      <div><dt>Measured on</dt><dd><code>${escapeHtml(
-        scale.environment?.platform || "n/a",
-      )}</code></dd></div>
     </dl>`;
 }
 
@@ -2579,10 +2590,30 @@ export function renderMandateComparison(snapshot) {
   const exclusions = (mandate.exclusions || []).join(", ");
   const brands = (mandate.brand_hints || []).join(", ");
   const none = "—";
+  // The left column is headed WHAT YOU ALLOWED, so it may only carry things
+  // the mandate actually asserts. The raw search text is not one of them: it
+  // steers retrieval and constrains nothing, and printing it here would read
+  // as an allowance the mandate never made.
+  const family = mandate.product_family;
+  const allowedFamily = !family
+    ? "No product family stated"
+    : family.available_in_sandbox === false
+      ? `${family.label} — no such family in this sandbox`
+      : family.label;
+  // Whether the merchant's billing model has to be resolved at all depends on
+  // what the buyer asked for. With no recurrence restriction stated there is
+  // nothing an unpublished billing model can contradict, and the run can still
+  // reach ALLOW; with "no subscriptions" stated, an unpublished billing model
+  // is exactly what sends it to REVIEW.
+  const billingEvidenceNeed = !mandate.recurrence_stated
+    ? "Not required: no billing restriction stated"
+    : mandate.recurring_allowed
+      ? "Not required: a renewing charge is acceptable"
+      : "Required: a one-time-only mandate needs a published billing model";
   const rows = [
     [
       "Product / category",
-      mandate.search_text || "any product",
+      allowedFamily,
       product ? `${product.name} · ${product.category}` : buyer?.product || none,
     ],
     ["Maximum spend", ceiling === null ? "not stated" : money(ceiling, currency), none],
@@ -2595,16 +2626,16 @@ export function renderMandateComparison(snapshot) {
     ],
     [
       "Billing requirement",
-      mandate.recurring_allowed === false
-        ? "One-time payment only"
-        : mandate.recurrence_stated
+      !mandate.recurrence_stated
+        ? "No restriction stated"
+        : mandate.recurring_allowed
           ? "Recurring billing allowed"
-          : "not stated",
+          : "One-time only",
       product?.billing_model || none,
     ],
     [
       "Billing evidence",
-      "Must be published by the merchant",
+      billingEvidenceNeed,
       readiness.billing_model ? evidenceWord(readiness.billing_model) : "UNKNOWN",
     ],
     ["Brand restriction", brands || "none stated", product?.brand || none],
@@ -2651,9 +2682,9 @@ export function renderMandateComparison(snapshot) {
 
 export const CHECK_GROUPS = [
   { id: "budget", label: "Budget", tierA: ["A1", "A7"], tierB: ["B1", "B2", "B6", "B7"] },
-  { id: "product", label: "Product identity", tierA: ["A6"], tierB: ["B3", "B5"] },
+  { id: "product", label: "Product identity", tierA: ["A2", "A6"], tierB: ["B3", "B5"] },
   { id: "merchant", label: "Merchant identity", tierA: ["A3"], tierB: ["B9"] },
-  { id: "sku", label: "SKU evidence", tierA: ["A2"], tierB: ["B10"] },
+  { id: "sku", label: "SKU evidence", tierA: [], tierB: ["B10"] },
   { id: "billing", label: "Billing terms", tierA: ["A8"], tierB: ["B4", "B8"] },
   { id: "exclusions", label: "Exclusions", semantic: true },
   { id: "consent", label: "Consent", tierA: ["A4", "A5"] },
@@ -3248,6 +3279,12 @@ export function renderGapFigure({ marketplace, sandbox, authorizedNote } = {}) {
 }
 
 export function renderScaleWorlds(config, playground) {
+  const authorizationScale = config?.system_scale?.authorization_scale;
+  const measuredAuthorizationCases = Number(authorizationScale?.cases);
+  const authorizationAvailable =
+    authorizationScale?.available === true &&
+    Number.isFinite(measuredAuthorizationCases) &&
+    measuredAuthorizationCases > 0;
   const rows = [
     [
       "DISCOVERY REALITY",
@@ -3260,10 +3297,13 @@ export function renderScaleWorlds(config, playground) {
       "synthetic products with versioned merchant evidence",
     ],
     [
-      "AUTHORIZATION SCALE",
-      Number(config?.system_scale?.authorization_scale?.cases || 0).toLocaleString("en-IN") ||
-        "see benchmark",
-      "synthetic authorization benchmark cases",
+      "SYNTHETIC AUTHORIZATION-SCALE CASES",
+      authorizationAvailable
+        ? measuredAuthorizationCases.toLocaleString("en-IN")
+        : "UNAVAILABLE",
+      authorizationAvailable
+        ? authorizationScale.scope
+        : authorizationScale?.reason || "frozen benchmark artifact unavailable",
     ],
     ["MODEL QUALITY", "retrieval + classifier", "advisory metrics, never authorization"],
   ];
@@ -3546,6 +3586,14 @@ function init() {
   const pgAuthorizeLock = new SubmissionLock();
   const pgActionLock = new SubmissionLock();
   const onboardLock = new SubmissionLock();
+  const pgScenarioGeneration = new LatestInteraction();
+  let pgScenarioAbortController = null;
+
+  const cancelScenarioInteraction = () => {
+    pgScenarioGeneration.begin();
+    pgScenarioAbortController?.abort();
+    pgScenarioAbortController = null;
+  };
 
   /* ---------------- counters ---------------- */
   const figureObserver =
@@ -3811,13 +3859,14 @@ function init() {
     }
   };
 
-  const pgFetch = async (url, body) => {
+  const pgFetch = async (url, body, { signal } = {}) => {
     const headers = { "Content-Type": "application/json" };
     if (pgState.sessionId) headers["X-MandateGuard-Session"] = pgState.sessionId;
     const response = await fetch(url, {
       method: "POST",
       headers,
       body: JSON.stringify(body ?? {}),
+      signal,
     });
     const payload = await response.json();
     if (!response.ok) throw new Error(payload?.error?.message || "The request failed safely.");
@@ -3825,10 +3874,10 @@ function init() {
     return payload;
   };
 
-  const pgGet = async (url) => {
+  const pgGet = async (url, { signal } = {}) => {
     const headers = {};
     if (pgState.sessionId) headers["X-MandateGuard-Session"] = pgState.sessionId;
-    const response = await fetch(url, { headers });
+    const response = await fetch(url, { headers, signal });
     const payload = await response.json();
     if (!response.ok) throw new Error(payload?.error?.message || "The request failed safely.");
     return payload;
@@ -3917,6 +3966,7 @@ function init() {
 
   const pgSearch = async (rawIntent) => {
     if (!pgSearchLock.acquire()) return;
+    cancelScenarioInteraction();
     const intent = (rawIntent ?? pg.intent.value).trim();
     pgError("");
     if (!intent) {
@@ -4037,12 +4087,20 @@ function init() {
     );
   };
 
-  const pgPoll = async (initial) => {
+  const pgPoll = async (
+    initial,
+    { isActive = () => true, signal } = {},
+  ) => {
     let snapshot = initial;
+    if (!isActive()) return snapshot;
     pgRenderRun(snapshot);
     while (!terminalStates.has(snapshot.state)) {
       await new Promise((resolve) => setTimeout(resolve, 180));
-      snapshot = await pgGet(`/api/runs/${encodeURIComponent(snapshot.run_id)}`);
+      if (!isActive()) return snapshot;
+      snapshot = await pgGet(`/api/runs/${encodeURIComponent(snapshot.run_id)}`, {
+        signal,
+      });
+      if (!isActive()) return snapshot;
       pgRenderRun(snapshot);
     }
     return snapshot;
@@ -4080,6 +4138,11 @@ function init() {
    */
   async function pgSelect(catalogProductId) {
     if (!pgAuthorizeLock.acquire()) return;
+    // Choosing a listing by hand is a newer interaction than any guided
+    // scenario still in flight, and paints the same regions. Retire the
+    // scenario first, or its late response repaints the workspace over this
+    // one and the reader is shown two different runs at once.
+    cancelScenarioInteraction();
     pgError("");
     const limit = declaredLimitMinor();
     if (pgState.search?.spending_limit_required && !limit) {
@@ -4125,6 +4188,7 @@ function init() {
   /** Step 4: put the chosen purchase to the controller. */
   async function pgAuthorize(catalogProductId, { deferExecution = false } = {}) {
     if (!pgAuthorizeLock.acquire()) return;
+    cancelScenarioInteraction();
     pgError("");
     const limit = pgState.limitMinor ?? declaredLimitMinor();
     const ask = pg.checks.querySelector("[data-check-authorization]");
@@ -4191,18 +4255,34 @@ function init() {
   }
 
   const pgRunScenario = async (scenarioId) => {
-    if (!pgAuthorizeLock.acquire()) return;
+    const generation = pgScenarioGeneration.begin();
+    pgScenarioAbortController?.abort();
+    const abortController = new AbortController();
+    pgScenarioAbortController = abortController;
+    const isActive = () => pgScenarioGeneration.isCurrent(generation);
+    const configuredScenario = (playgroundConfig?.scenarios || []).find(
+      (scenario) => scenario.scenario_id === scenarioId,
+    );
     pgError("");
+    if (configuredScenario?.intent) {
+      pgState.intent = configuredScenario.intent;
+      pg.intent.value = configuredScenario.intent;
+    }
     pg.chosenRegion.hidden = true;
     pg.outcomeRegion.hidden = true;
     pg.executionRegion.hidden = true;
     pgState.snapshot = null;
     pgState.collapseResults = false;
     try {
-      const snapshot = await pgFetch("/api/playground/scenario", {
-        scenario_id: scenarioId,
-        request_id: createRequestId(),
-      });
+      const snapshot = await pgFetch(
+        "/api/playground/scenario",
+        {
+          scenario_id: scenarioId,
+          request_id: createRequestId(),
+        },
+        { signal: abortController.signal },
+      );
+      if (!isActive()) return;
       pgState.intent = snapshot.result?.buyer?.mandate || pgState.intent;
       pg.intent.value = pgState.intent;
       pgState.search = null;
@@ -4210,15 +4290,16 @@ function init() {
         ? { name: snapshot.result.buyer.product, catalog_product_id: null }
         : null;
       pg.resultsRegion.hidden = true;
-      await pgPoll(snapshot);
+      await pgPoll(snapshot, { isActive, signal: abortController.signal });
+      if (!isActive()) return;
       pg.outcomeRegion.scrollIntoView({
         behavior: prefersReducedMotion() ? "auto" : "smooth",
         block: "start",
       });
     } catch (error) {
-      pgError(error.message);
+      if (error?.name !== "AbortError" && isActive()) pgError(error.message);
     } finally {
-      pgAuthorizeLock.release();
+      if (isActive()) pgScenarioAbortController = null;
     }
   };
 
@@ -4234,6 +4315,7 @@ function init() {
       button.addEventListener("click", () => {
         // Inserted, not submitted. The field stays editable so a reviewer can
         // change one word and see what that does.
+        cancelScenarioInteraction();
         pg.intent.value = button.dataset.intent;
         pgState.deferExecution = button.dataset.deferExecution === "true";
         pg.intent.focus();
@@ -4251,6 +4333,7 @@ function init() {
   };
 
   pg.search.addEventListener("click", () => pgSearch());
+  pg.intent.addEventListener("input", cancelScenarioInteraction);
   pg.intent.addEventListener("keydown", (event) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();

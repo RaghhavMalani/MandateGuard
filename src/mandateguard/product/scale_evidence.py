@@ -31,6 +31,12 @@ RETRIEVAL_REPORT = "retrieval_evaluation.json"
 ANOMALY_REPORT = "anomaly_evaluation.json"
 SCALE_REPORT = "scale_benchmark.json"
 TRAINING_REPORT = "training_report.json"
+AUTHORIZATION_SCALE_ARTIFACT_DIR = (
+    Path("artifacts") / "engineering" / "authorization-scale"
+)
+AUTHORIZATION_SCALE_REPORT = "benchmark.json"
+AUTHORIZATION_SCALE_FREEZE_DIR = Path("data") / "eval" / "authorization-scale"
+AUTHORIZATION_SCALE_FREEZE = "WORLD_FREEZE.json"
 
 #: The four kinds of evidence this product has, kept apart on purpose. Merging
 #: them is how "709 tests" ends up being presented as scale.
@@ -73,6 +79,98 @@ def _best_retrieval_configuration(report: Mapping[str, Any]) -> dict[str, Any] |
     return None
 
 
+def _authorization_scale(repository_root: Path) -> dict[str, Any]:
+    """Load the measured primary rung and prove that it matches its freeze.
+
+    The report also contains a larger exploratory rung.  It is deliberately not
+    substituted for the preregistered primary count: the public claim is the
+    measured rung that the frozen world names as primary.
+    """
+
+    report = _read(
+        repository_root
+        / AUTHORIZATION_SCALE_ARTIFACT_DIR
+        / AUTHORIZATION_SCALE_REPORT
+    )
+    freeze = _read(
+        repository_root
+        / AUTHORIZATION_SCALE_FREEZE_DIR
+        / AUTHORIZATION_SCALE_FREEZE
+    )
+    unavailable = {
+        "available": False,
+        "reason": "The frozen authorization-scale benchmark is unavailable.",
+    }
+    if report is None or freeze is None:
+        return unavailable
+    if (
+        report.get("freeze_payload_sha256") != freeze.get("freeze_payload_sha256")
+        or report.get("taxonomy_sha256") != freeze.get("taxonomy_sha256")
+    ):
+        return {
+            "available": False,
+            "reason": "The authorization-scale report does not match its frozen world.",
+        }
+    primary_count = freeze.get("primary_case_count")
+    if isinstance(primary_count, bool) or not isinstance(primary_count, int):
+        return unavailable
+    frozen_rungs = freeze.get("scale_ladder")
+    measured_rungs = report.get("ladder")
+    if not isinstance(frozen_rungs, list) or not isinstance(measured_rungs, list):
+        return unavailable
+    frozen = next(
+        (
+            item
+            for item in frozen_rungs
+            if isinstance(item, Mapping) and item.get("case_count") == primary_count
+        ),
+        None,
+    )
+    measured = next(
+        (
+            item
+            for item in measured_rungs
+            if isinstance(item, Mapping) and item.get("case_count") == primary_count
+        ),
+        None,
+    )
+    if frozen is None or measured is None:
+        return unavailable
+    counters = measured.get("counters")
+    if not isinstance(counters, Mapping):
+        return unavailable
+    if (
+        measured.get("freeze_status") != "MATCHES_FREEZE"
+        or measured.get("case_descriptor_stream_sha256")
+        != frozen.get("case_descriptor_stream_sha256")
+        or counters.get("total_cases") != primary_count
+        or counters.get("target_invariant_agreement") != primary_count
+    ):
+        return {
+            "available": False,
+            "reason": "The frozen authorization-scale measurement failed validation.",
+        }
+    return {
+        "available": True,
+        "cases": primary_count,
+        "target_invariant_agreement": counters.get(
+            "target_invariant_agreement"
+        ),
+        "scope": (
+            "Synthetic authorization-scale cases; one process, one machine, "
+            "sequential, no concurrency, and no network."
+        ),
+        "source": (
+            f"{AUTHORIZATION_SCALE_ARTIFACT_DIR.as_posix()}/"
+            f"{AUTHORIZATION_SCALE_REPORT}"
+        ),
+        "freeze_source": (
+            f"{AUTHORIZATION_SCALE_FREEZE_DIR.as_posix()}/"
+            f"{AUTHORIZATION_SCALE_FREEZE}"
+        ),
+    }
+
+
 def system_scale(
     *, repository_root: Path, models_dir: Path
 ) -> dict[str, Any]:
@@ -113,7 +211,7 @@ def system_scale(
         "request_p95_ms": request_latency.get("p95"),
         "request_p99_ms": request_latency.get("p99"),
         "evaluated_queries": (retrieval or {}).get("queries"),
-        "environment": (scale or {}).get("environment"),
+        "authorization_scale": _authorization_scale(repository_root),
         "source": f"{ARTIFACT_DIR.as_posix()}/{SCALE_REPORT}",
         "caveat": MEASUREMENT_SCOPE,
         "latency_note": (

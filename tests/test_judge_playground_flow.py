@@ -352,8 +352,21 @@ def test_simulated_onboarding_creates_new_evidence_and_leaves_source_untrusted(
     assert run.completion.wait(30)
     snapshot = service.playground_run_snapshot(run)
     assert snapshot["world"] == "SANDBOX_ONBOARDED"
-    assert snapshot["result"]["decision"] == "ALLOW"
+    # Everything the simulated merchant published clears. The one thing it
+    # cannot publish is a server-owned product family - its category words came
+    # off the crawled page - so A2 reports that identity as unavailable and the
+    # run reaches REVIEW instead of assuming the families agree.
+    assert snapshot["result"]["decision"] == "REVIEW"
     assert snapshot["result"]["execution"]["external_network_calls"] == 0
+    unresolved = [
+        row
+        for row in snapshot["result"]["authorization"]["deterministic"]["tier_a"]
+        if row["status"] != "PASS"
+    ]
+    assert [row["family"] for row in unresolved] == ["A2"]
+    assert unresolved[0]["reason"] == (
+        "server-owned product-family identity unavailable for selected SKU"
+    )
 
     after_selection = service.discovery_select(
         intent=intent, catalog_product_id=source_id

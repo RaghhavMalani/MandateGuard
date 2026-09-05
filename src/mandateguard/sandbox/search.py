@@ -77,7 +77,25 @@ _ABSENT_FAMILY_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
 
 @dataclass(frozen=True, slots=True)
 class ProductFamilyIntent:
-    """A high-confidence discovery family, with authorization authority NONE."""
+    """The product family a request names, read from the frozen synonym table.
+
+    This is the one value on the discovery side that does reach authorization.
+    It is bound into the mandate as product_family_allowlist and compared by
+    A2 against the family recorded in the committed server-side catalogue, so
+    valid evidence for an unrelated kind of product cannot make that
+    substitution authorized.
+
+    What makes that safe is *how* it is derived. The reading below is a
+    deterministic lookup in the same frozen category vocabulary the sandbox is
+    generated from: a table, a regex, and a longest-match rule. No model scores
+    it, no merchant prose contributes to it, and nothing about the selected
+    product is consulted while it is read. A ranker may still propose whatever
+    it likes; it simply cannot widen what the mandate authorizes.
+
+    Being wrong here fails closed in both directions. Reading a family the user
+    did not mean narrows the mandate and costs a purchase; reading none at all
+    asserts no family constraint, and every other constraint still applies.
+    """
 
     label: str
     category_ids: tuple[str, ...]
@@ -91,7 +109,8 @@ class ProductFamilyIntent:
             "matched_phrase": self.matched_phrase,
             "confidence": "HIGH",
             "available_in_sandbox": self.available,
-            "authority": "RETRIEVAL_ONLY_NONE_FOR_AUTHORIZATION",
+            "authority": "DETERMINISTIC_VOCABULARY_BOUND_INTO_MANDATE",
+            "enforced_by": "A2",
         }
 
 
@@ -129,13 +148,18 @@ def _category_scores(query: str) -> dict[str, float]:
 def infer_product_family(
     query: str, category_scores: dict[str, float] | None = None
 ) -> ProductFamilyIntent | None:
-    """Infer a deterministic shelf only where the words make it unambiguous.
+    """Read the requested shelf, or return None where the words do not name one.
 
     A named absent family wins before catalogue synonyms are considered. This
     prevents a secondary attribute such as "camera" in a smartphone request
-    from becoming the requested product. Present families come from the same
-    frozen synonym vocabulary used by ranking, so the guard and ranker cannot
-    drift into competing taxonomies.
+    from becoming the requested product; the empty category_ids it returns
+    is a real constraint, not a missing one, and authorizes nothing.
+
+    Present families come from the same frozen synonym vocabulary used by
+    ranking, so the guard and the ranker cannot drift into competing
+    taxonomies. Where a word leans on several shelves at once - "shoes",
+    "audio" - every shelf it names is returned. Widening to the set the word
+    honestly covers is safe; narrowing to a guessed one is not.
     """
 
     for pattern, label in _ABSENT_FAMILY_PATTERNS:

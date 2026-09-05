@@ -572,6 +572,11 @@ class PlaygroundSurface:
                 if product.evidence_family.value != scenario.selection_argument:
                     continue
                 if (
+                    intent.product_family_allowlist is not None
+                    and product.category_id not in intent.product_family_allowlist
+                ):
+                    continue
+                if (
                     intent.max_total_minor is not None
                     and product.price_minor > intent.max_total_minor
                 ):

@@ -44,6 +44,12 @@ COPY data/provenance/ /app/data/provenance/
 # files out of artifacts/, plus data/models/training_report.json above.
 COPY artifacts/engineering/discovery/ /app/artifacts/engineering/discovery/
 
+# The authorization-scale claim is loaded from the measured primary rung and
+# cross-checked against the world frozen before execution. Both inputs must be
+# present or the interface says UNAVAILABLE.
+COPY artifacts/engineering/authorization-scale/benchmark.json /app/artifacts/engineering/authorization-scale/benchmark.json
+COPY data/eval/authorization-scale/WORLD_FREEZE.json /app/data/eval/authorization-scale/WORLD_FREEZE.json
+
 # The measured Playground outcome mix. The sandbox catalogue itself is generated
 # deterministically in-process on first use, so no catalogue artifact is copied
 # and none needs to be: only this report, which SCALE LAB renders.

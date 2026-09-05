@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   CHECK_GROUPS,
+  LatestInteraction,
   PLAYGROUND_RAIL,
   barBucket,
   checkGroupStatus,
@@ -38,6 +39,7 @@ import {
   renderReadiness,
   renderScaleWorlds,
   renderScenarioGrid,
+  renderSystemScale,
   renderSpendingLimitPrompt,
   renderTryThese,
   renderWhyFound,
@@ -577,7 +579,7 @@ test("the workspace puts what you allowed beside what the agent proposed", () =>
   }
   assert.match(html, /₹5,000/);
   assert.match(html, /₹899/);
-  assert.match(html, /One-time payment only/);
+  assert.match(html, /One-time only/);
   assert.match(html, /ONE_TIME/);
   assert.match(html, /subscriptions/);
 });
@@ -1156,7 +1158,7 @@ test("the scale lab refuses to combine populations into one number", () => {
   );
   assert.match(html, /DISCOVERY REALITY/);
   assert.match(html, /JUDGE SANDBOX/);
-  assert.match(html, /AUTHORIZATION SCALE/);
+  assert.match(html, /SYNTHETIC AUTHORIZATION-SCALE CASES/);
   assert.match(html, /MODEL QUALITY/);
   assert.match(html, /never combined into a single/);
 });
@@ -1582,6 +1584,387 @@ test("nothing outside the decision and its own rail step paints full-strength gr
     assert.ok(
       allowed.some((prefix) => selector.includes(prefix)),
       `unexpected full-strength green on ${selector}`,
+    );
+  }
+});
+
+/* ------------------------------------------------------------------ */
+/* The mandate table must say what the controller was actually given.  */
+/*                                                                     */
+/* Public black-box testing found the table printing "One-time payment */
+/* only" for "Buy wireless headphones under 5000", an instruction that */
+/* states no recurrence constraint at all. The controller had parsed   */
+/* none. The row was inventing an allowance and describing it to the   */
+/* reader as theirs.                                                   */
+/*                                                                     */
+/* The payloads below are not written here. They are produced by the   */
+/* real sandbox intent reader and committed by                         */
+/* tests/test_judge_playground_mandate_render.py, which fails if the   */
+/* reader stops producing them. So these assertions are made against   */
+/* backend truth rather than against an object free to drift from it.  */
+/* ------------------------------------------------------------------ */
+
+const MANDATE_RENDER_CASES = JSON.parse(
+  readFileSync(
+    fileURLToPath(
+      new URL("../../fixtures/playground/mandate_render_cases.json", import.meta.url),
+    ),
+    "utf8",
+  ),
+);
+
+const renderedRows = (html) => {
+  const rows = new Map();
+  for (const match of html.matchAll(
+    /<dt>([^<]*)<\/dt>\s*<dd class="pgcompare__left">([\s\S]*?)<\/dd>\s*<dd class="pgcompare__right">([\s\S]*?)<\/dd>/g,
+  )) {
+    rows.set(match[1].trim(), { left: match[2].trim(), right: match[3].trim() });
+  }
+  return rows;
+};
+
+const selectionFor = (mandate) => ({
+  product: CANDIDATE,
+  readiness: CANDIDATE.readiness,
+  mandate,
+});
+
+const BARE_MANDATE = {
+  max_total_minor: 500000,
+  currency: "INR",
+  quantity: 1,
+  exclusions: [],
+  brand_hints: [],
+};
+
+test("the fixture the mandate table is checked against carries every recurrence stance", () => {
+  const ids = MANDATE_RENDER_CASES.cases.map((entry) => entry.case_id);
+  assert.ok(ids.length >= 5, "the render fixture lost cases");
+  assert.equal(new Set(ids).size, ids.length, "duplicate case ids in the render fixture");
+  const stances = MANDATE_RENDER_CASES.cases.map(
+    (entry) => `${entry.mandate.recurrence_stated}/${entry.mandate.recurring_allowed}`,
+  );
+  for (const stance of ["false/false", "true/false", "true/true"]) {
+    assert.ok(stances.includes(stance), `no fixture case states ${stance}`);
+  }
+});
+
+test("every billing-requirement cell is the one the parsed mandate earns", () => {
+  for (const entry of MANDATE_RENDER_CASES.cases) {
+    const rows = renderedRows(
+      renderMandateComparison({ playground_selection: selectionFor(entry.mandate) }),
+    );
+    assert.equal(
+      rows.get("Billing requirement").left,
+      entry.expected_billing_requirement_cell,
+      `${entry.case_id}: wrong billing requirement for ${JSON.stringify(entry.instruction)}`,
+    );
+  }
+});
+
+test("a bare instruction is never described as a one-time-only mandate", () => {
+  const bare = MANDATE_RENDER_CASES.cases.find(
+    (entry) => entry.case_id === "bare_query_states_no_billing_restriction",
+  );
+  assert.equal(bare.mandate.recurrence_stated, false);
+  const html = renderMandateComparison({ playground_selection: selectionFor(bare.mandate) });
+  assert.match(html, /No restriction stated/);
+  assert.doesNotMatch(html, /One-time only/);
+  assert.doesNotMatch(html, /Recurring billing allowed/);
+});
+
+test("an explicit refusal of subscriptions is described as one-time only", () => {
+  const explicit = MANDATE_RENDER_CASES.cases.find(
+    (entry) => entry.case_id === "explicit_no_subscriptions_is_one_time_only",
+  );
+  assert.equal(explicit.mandate.recurrence_stated, true);
+  assert.equal(explicit.mandate.recurring_allowed, false);
+  const rows = renderedRows(
+    renderMandateComparison({ playground_selection: selectionFor(explicit.mandate) }),
+  );
+  assert.equal(rows.get("Billing requirement").left, "One-time only");
+});
+
+test("the billing-requirement cell is a total function of the two parsed flags", () => {
+  // Whatever the reader can produce, the row must state a stance the payload
+  // supports - and may claim a restriction only where one was actually stated.
+  for (const recurrence_stated of [true, false]) {
+    for (const recurring_allowed of [true, false]) {
+      const rows = renderedRows(
+        renderMandateComparison({
+          playground_selection: selectionFor({
+            ...BARE_MANDATE,
+            recurrence_stated,
+            recurring_allowed,
+          }),
+        }),
+      );
+      const cell = rows.get("Billing requirement").left;
+      if (!recurrence_stated) {
+        assert.equal(cell, "No restriction stated");
+      } else {
+        assert.equal(cell, recurring_allowed ? "Recurring billing allowed" : "One-time only");
+      }
+    }
+  }
+});
+
+test("the need for billing evidence follows the mandate, not a fixed sentence", () => {
+  // Incomplete billing evidence plus no recurrence constraint can still reach
+  // ALLOW; incomplete billing evidence plus "no subscriptions" reaches REVIEW.
+  // The row has to make that difference readable before the verdict arrives.
+  const cell = (mandate) =>
+    renderedRows(
+      renderMandateComparison({ playground_selection: selectionFor(mandate) }),
+    ).get("Billing evidence").left;
+  assert.match(
+    cell({ ...BARE_MANDATE, recurrence_stated: false, recurring_allowed: false }),
+    /^Not required/,
+  );
+  assert.match(
+    cell({ ...BARE_MANDATE, recurrence_stated: true, recurring_allowed: true }),
+    /^Not required/,
+  );
+  assert.match(
+    cell({ ...BARE_MANDATE, recurrence_stated: true, recurring_allowed: false }),
+    /^Required/,
+  );
+});
+
+test("what you allowed never shows raw search text as a product constraint", () => {
+  // search_text steers retrieval and constrains nothing. Printing it under
+  // WHAT YOU ALLOWED would read as an allowance the mandate never made.
+  const rows = renderedRows(
+    renderMandateComparison({
+      playground_selection: selectionFor({
+        ...BARE_MANDATE,
+        search_text: "something nice",
+        product_family: null,
+        recurrence_stated: false,
+        recurring_allowed: false,
+      }),
+    }),
+  );
+  assert.equal(rows.get("Product / category").left, "No product family stated");
+});
+
+test("a product family the sandbox does not carry says so where it is claimed", () => {
+  const absent = MANDATE_RENDER_CASES.cases.find(
+    (entry) => entry.case_id === "family_absent_from_sandbox",
+  );
+  assert.equal(absent.mandate.product_family.available_in_sandbox, false);
+  const rows = renderedRows(
+    renderMandateComparison({ playground_selection: selectionFor(absent.mandate) }),
+  );
+  assert.match(rows.get("Product / category").left, /no such family in this sandbox/);
+});
+
+test("the enforced product family is the cell the mandate table prints", () => {
+  const named = MANDATE_RENDER_CASES.cases.find(
+    (entry) => entry.case_id === "explicit_no_subscriptions_is_one_time_only",
+  );
+  const rows = renderedRows(
+    renderMandateComparison({ playground_selection: selectionFor(named.mandate) }),
+  );
+  assert.equal(rows.get("Product / category").left, named.mandate.product_family.label);
+});
+
+test("A2 is grouped under product identity now that it carries the family check", () => {
+  const product = CHECK_GROUPS.find((group) => group.id === "product");
+  assert.ok(product.tierA.includes("A2"), "A2 must roll up into Product identity");
+  assert.equal(
+    checkGroupStatus(product, {
+      tierA: [
+        { family: "A2", status: "FAIL" },
+        { family: "A6", status: "PASS" },
+      ],
+    }),
+    "FAIL",
+  );
+  assert.equal(
+    checkGroupStatus(product, {
+      tierA: [
+        { family: "A2", status: "NOT_EVALUABLE" },
+        { family: "A6", status: "PASS" },
+      ],
+    }),
+    "UNKNOWN",
+  );
+});
+
+/* ------------------------------------------------------------------ */
+/* The authorization-scale figure                                      */
+/*                                                                     */
+/* The deployed page reported AUTHORIZATION SCALE 0. Nothing measured  */
+/* zero: system_scale carried no authorization_scale key at all, and   */
+/* Number(undefined || 0) rendered a confident, false number. A        */
+/* measurement that is missing has to read as missing.                 */
+/* ------------------------------------------------------------------ */
+
+test("a missing authorization-scale artifact reads UNAVAILABLE, never 0", () => {
+  for (const system_scale of [
+    {},
+    { authorization_scale: null },
+    { authorization_scale: { available: false, reason: "artifact absent" } },
+    { authorization_scale: { available: true, cases: 0 } },
+    { authorization_scale: { available: true, cases: null } },
+    { authorization_scale: { available: false, cases: 25000 } },
+  ]) {
+    const html = renderScaleWorlds(
+      { discovery: { catalog: { listings: 17702 } }, system_scale },
+      { catalog: { products: 3960 } },
+    );
+    assert.match(html, /UNAVAILABLE/);
+    assert.doesNotMatch(
+      html,
+      /<p class="scaleworlds__v">0<\/p>/,
+      "an unavailable measurement must never render as 0",
+    );
+  }
+});
+
+test("a measured authorization-scale figure is rendered with its qualification", () => {
+  const html = renderScaleWorlds(
+    {
+      discovery: { catalog: { listings: 17702 } },
+      system_scale: {
+        authorization_scale: {
+          available: true,
+          cases: 25000,
+          target_invariant_agreement: 25000,
+          scope:
+            "Synthetic authorization-scale cases; one process, one machine, " +
+            "sequential, no concurrency, and no network.",
+        },
+      },
+    },
+    { catalog: { products: 3960 } },
+  );
+  assert.match(html, /SYNTHETIC AUTHORIZATION-SCALE CASES/);
+  assert.match(html, /25,000/);
+  assert.match(html, /one process, one machine/);
+  assert.doesNotMatch(html, /UNAVAILABLE/);
+});
+
+test("the measured-on environment is not published beside the scale figures", () => {
+  const html = renderSystemScale({
+    available: true,
+    catalog_listings: 17702,
+    categories: 40,
+    source: "artifacts/engineering/discovery/scale_benchmark.json",
+    caveat: "measured once",
+    environment: { platform: "Windows-11-10.0.26200-SP0", processor: "Intel64 Family 6" },
+  });
+  assert.doesNotMatch(html, /Measured on/);
+  assert.doesNotMatch(html, /Windows-11/);
+  assert.doesNotMatch(html, /Intel64/);
+});
+
+/* ------------------------------------------------------------------ */
+/* Only the newest guided interaction may paint                        */
+/*                                                                     */
+/* Clicking through guided scenarios quickly could leave the textarea  */
+/* showing one scenario and the result showing another: each run wrote */
+/* the instruction only after its own request came back, so a slow     */
+/* first response landed on top of a fast second one.                  */
+/* ------------------------------------------------------------------ */
+
+test("a newer interaction retires every older generation", () => {
+  const latest = new LatestInteraction();
+  const first = latest.begin();
+  assert.equal(latest.isCurrent(first), true);
+  const second = latest.begin();
+  assert.equal(latest.isCurrent(first), false);
+  assert.equal(latest.isCurrent(second), true);
+  latest.begin();
+  assert.equal(latest.isCurrent(second), false);
+});
+
+test("an out-of-order scenario response cannot paint over a newer one", async () => {
+  // The exact interleaving the report describes: scenario A is clicked,
+  // scenario B is clicked before A answers, and A answers last.
+  const painted = { textarea: null, result: null };
+  const latest = new LatestInteraction();
+
+  const run = async (name, responseDelayMs) => {
+    const generation = latest.begin();
+    const isActive = () => latest.isCurrent(generation);
+    // Painted synchronously, at click time, from the scenario the browser
+    // already holds. Nothing is awaited before this line.
+    painted.textarea = name;
+    await new Promise((resolve) => setTimeout(resolve, responseDelayMs));
+    if (!isActive()) return;
+    painted.textarea = name;
+    await new Promise((resolve) => setTimeout(resolve, 1));
+    if (!isActive()) return;
+    painted.result = name;
+  };
+
+  await Promise.all([run("scenario-a", 40), run("scenario-b", 1)]);
+
+  assert.equal(painted.result, "scenario-b");
+  assert.equal(painted.textarea, "scenario-b");
+  assert.equal(
+    painted.textarea,
+    painted.result,
+    "the instruction and the verdict must come from the same scenario",
+  );
+});
+
+const SCENARIO_RUNNER = APP_JS.slice(
+  APP_JS.indexOf("const pgRunScenario = async"),
+  APP_JS.indexOf("const pgRunScenario = async") + 2600,
+);
+
+test("the scenario runner paints its instruction before it awaits anything", () => {
+  assert.ok(SCENARIO_RUNNER.length > 0, "pgRunScenario was renamed; update this regression");
+  const firstAwait = SCENARIO_RUNNER.indexOf("await ");
+  const synchronousPaint = SCENARIO_RUNNER.indexOf("pg.intent.value = configuredScenario.intent");
+  assert.ok(synchronousPaint >= 0, "the scenario instruction is no longer painted at click time");
+  assert.ok(firstAwait >= 0, "the scenario runner no longer awaits; update this regression");
+  assert.ok(
+    synchronousPaint < firstAwait,
+    "the scenario instruction must be painted before the first await",
+  );
+});
+
+test("every paint after an await in the scenario runner is generation-guarded", () => {
+  assert.match(SCENARIO_RUNNER, /const generation = pgScenarioGeneration\.begin\(\)/);
+  assert.match(
+    SCENARIO_RUNNER,
+    /const isActive = \(\) => pgScenarioGeneration\.isCurrent\(generation\)/,
+  );
+  assert.match(SCENARIO_RUNNER, /abortController\.signal/);
+  // Both post-await paints, and the poll that repaints on every tick.
+  assert.match(SCENARIO_RUNNER, /if \(!isActive\(\)\) return;\s*pgState\.intent = snapshot/);
+  assert.match(SCENARIO_RUNNER, /pgPoll\(snapshot, \{ isActive/);
+});
+
+test("typing or searching retires a guided scenario in flight", () => {
+  assert.match(APP_JS, /pg\.intent\.addEventListener\("input", cancelScenarioInteraction\)/);
+  assert.match(
+    APP_JS,
+    /const cancelScenarioInteraction = \(\) => \{\s*pgScenarioGeneration\.begin\(\)/,
+  );
+  const search = APP_JS.slice(APP_JS.indexOf("const pgSearch = async"));
+  assert.ok(
+    search.indexOf("cancelScenarioInteraction()") < search.indexOf("await "),
+    "a new search must retire an in-flight scenario before it awaits",
+  );
+});
+
+test("choosing or checking a listing by hand retires a guided scenario too", () => {
+  // pgSelect and pgAuthorize paint the same workspace regions the scenario
+  // runner does. A scenario that answers late must not repaint over them.
+  for (const name of ["async function pgSelect", "async function pgAuthorize"]) {
+    const body = APP_JS.slice(APP_JS.indexOf(name), APP_JS.indexOf(name) + 1200);
+    assert.ok(body.length > 0, `${name} was renamed; update this regression`);
+    const retire = body.indexOf("cancelScenarioInteraction()");
+    const firstAwait = body.indexOf("await ");
+    assert.ok(retire >= 0, `${name} does not retire an in-flight scenario`);
+    assert.ok(
+      retire < firstAwait,
+      `${name} must retire an in-flight scenario before it awaits`,
     );
   }
 });

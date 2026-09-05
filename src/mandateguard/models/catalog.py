@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import re
 
 
@@ -20,6 +20,9 @@ class CatalogItem:
     merchant_id: str
     effective_unit_price_minor: int
     recurring: bool
+    product_family: str | None = field(
+        default=None, metadata={"canonical_omit_none": True}
+    )
 
     def __post_init__(self) -> None:
         _nonempty(self.sku, "sku", 128)
@@ -34,6 +37,8 @@ class CatalogItem:
             )
         if not isinstance(self.recurring, bool):
             raise ValueError("recurring must be a boolean")
+        if self.product_family is not None:
+            _nonempty(self.product_family, "product_family", 128)
 
 
 @dataclass(frozen=True, slots=True)

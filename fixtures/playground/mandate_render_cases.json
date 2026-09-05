@@ -1,0 +1,197 @@
+{
+  "fixture_version": "playground-mandate-render-v1",
+  "purpose": "Mandate payloads produced by the real sandbox intent reader, so the browser's mandate table can be asserted against backend truth instead of against a hand-written object that is free to drift from it.",
+  "produced_by": "tests/test_judge_playground_mandate_render.py",
+  "cases": [
+    {
+      "case_id": "bare_query_states_no_billing_restriction",
+      "instruction": "Buy wireless headphones under 5000",
+      "mandate": {
+        "interpreter_version": "sandbox-intent-reader-v1",
+        "raw_text": "Buy wireless headphones under 5000",
+        "search_text": "wireless headphones",
+        "max_total_minor": 500000,
+        "ceiling_source": "STATED_IN_INSTRUCTION",
+        "currency": "INR",
+        "quantity": 1,
+        "recurring_allowed": false,
+        "recurrence_stated": false,
+        "purpose": null,
+        "exclusions": [],
+        "brand_hints": [],
+        "product_family": {
+          "label": "Headphones",
+          "allowed_category_ids": [
+            "audio-headphones"
+          ],
+          "matched_phrase": "wireless headphones",
+          "available_in_sandbox": true,
+          "enforcement": "HARD_DETERMINISTIC"
+        },
+        "coverage": {
+          "coverage_version": "sandbox-constraint-coverage-v1",
+          "coverage_status": "COMPLETE",
+          "recognized_constraints": [
+            "MAX_TOTAL: INR 5,000.00"
+          ],
+          "unresolved_constraint_spans": [],
+          "blocks_authorization": false,
+          "authority": "NONE_DETECTION_ONLY_NEVER_INTERPRETATION"
+        },
+        "authority": "NONE"
+      },
+      "expected_billing_requirement_cell": "No restriction stated"
+    },
+    {
+      "case_id": "explicit_no_subscriptions_is_one_time_only",
+      "instruction": "Buy wireless headphones under 5000. No subscriptions.",
+      "mandate": {
+        "interpreter_version": "sandbox-intent-reader-v1",
+        "raw_text": "Buy wireless headphones under 5000. No subscriptions.",
+        "search_text": "wireless headphones",
+        "max_total_minor": 500000,
+        "ceiling_source": "STATED_IN_INSTRUCTION",
+        "currency": "INR",
+        "quantity": 1,
+        "recurring_allowed": false,
+        "recurrence_stated": true,
+        "purpose": null,
+        "exclusions": [
+          "subscriptions"
+        ],
+        "brand_hints": [],
+        "product_family": {
+          "label": "Headphones",
+          "allowed_category_ids": [
+            "audio-headphones"
+          ],
+          "matched_phrase": "wireless headphones",
+          "available_in_sandbox": true,
+          "enforcement": "HARD_DETERMINISTIC"
+        },
+        "coverage": {
+          "coverage_version": "sandbox-constraint-coverage-v1",
+          "coverage_status": "COMPLETE",
+          "recognized_constraints": [
+            "MAX_TOTAL: INR 5,000.00",
+            "RECURRENCE: one-time payment only",
+            "EXCLUSION: subscriptions"
+          ],
+          "unresolved_constraint_spans": [],
+          "blocks_authorization": false,
+          "authority": "NONE_DETECTION_ONLY_NEVER_INTERPRETATION"
+        },
+        "authority": "NONE"
+      },
+      "expected_billing_requirement_cell": "One-time only"
+    },
+    {
+      "case_id": "explicit_subscription_is_allowed_recurring",
+      "instruction": "Buy a streaming subscription under 500. A monthly subscription is fine.",
+      "mandate": {
+        "interpreter_version": "sandbox-intent-reader-v1",
+        "raw_text": "Buy a streaming subscription under 500. A monthly subscription is fine.",
+        "search_text": "a streaming subscription   a monthly subscription is fine",
+        "max_total_minor": 50000,
+        "ceiling_source": "STATED_IN_INSTRUCTION",
+        "currency": "INR",
+        "quantity": 1,
+        "recurring_allowed": true,
+        "recurrence_stated": true,
+        "purpose": null,
+        "exclusions": [],
+        "brand_hints": [],
+        "product_family": {
+          "label": "Subscriptions",
+          "allowed_category_ids": [
+            "subscriptions-media"
+          ],
+          "matched_phrase": "subscription",
+          "available_in_sandbox": true,
+          "enforcement": "HARD_DETERMINISTIC"
+        },
+        "coverage": {
+          "coverage_version": "sandbox-constraint-coverage-v1",
+          "coverage_status": "COMPLETE",
+          "recognized_constraints": [
+            "MAX_TOTAL: INR 500.00",
+            "RECURRENCE: recurring charge permitted"
+          ],
+          "unresolved_constraint_spans": [],
+          "blocks_authorization": false,
+          "authority": "NONE_DETECTION_ONLY_NEVER_INTERPRETATION"
+        },
+        "authority": "NONE"
+      },
+      "expected_billing_requirement_cell": "Recurring billing allowed"
+    },
+    {
+      "case_id": "family_absent_from_sandbox",
+      "instruction": "Buy a smartphone under 50000",
+      "mandate": {
+        "interpreter_version": "sandbox-intent-reader-v1",
+        "raw_text": "Buy a smartphone under 50000",
+        "search_text": "a smartphone",
+        "max_total_minor": 5000000,
+        "ceiling_source": "STATED_IN_INSTRUCTION",
+        "currency": "INR",
+        "quantity": 1,
+        "recurring_allowed": false,
+        "recurrence_stated": false,
+        "purpose": null,
+        "exclusions": [],
+        "brand_hints": [],
+        "product_family": {
+          "label": "smartphones",
+          "allowed_category_ids": [],
+          "matched_phrase": "smartphone",
+          "available_in_sandbox": false,
+          "enforcement": "HARD_DETERMINISTIC"
+        },
+        "coverage": {
+          "coverage_version": "sandbox-constraint-coverage-v1",
+          "coverage_status": "COMPLETE",
+          "recognized_constraints": [
+            "MAX_TOTAL: INR 50,000.00"
+          ],
+          "unresolved_constraint_spans": [],
+          "blocks_authorization": false,
+          "authority": "NONE_DETECTION_ONLY_NEVER_INTERPRETATION"
+        },
+        "authority": "NONE"
+      },
+      "expected_billing_requirement_cell": "No restriction stated"
+    },
+    {
+      "case_id": "no_product_family_stated",
+      "instruction": "Buy something nice under 2000",
+      "mandate": {
+        "interpreter_version": "sandbox-intent-reader-v1",
+        "raw_text": "Buy something nice under 2000",
+        "search_text": "something nice",
+        "max_total_minor": 200000,
+        "ceiling_source": "STATED_IN_INSTRUCTION",
+        "currency": "INR",
+        "quantity": 1,
+        "recurring_allowed": false,
+        "recurrence_stated": false,
+        "purpose": null,
+        "exclusions": [],
+        "brand_hints": [],
+        "product_family": null,
+        "coverage": {
+          "coverage_version": "sandbox-constraint-coverage-v1",
+          "coverage_status": "COMPLETE",
+          "recognized_constraints": [
+            "MAX_TOTAL: INR 2,000.00"
+          ],
+          "unresolved_constraint_spans": [],
+          "blocks_authorization": false,
+          "authority": "NONE_DETECTION_ONLY_NEVER_INTERPRETATION"
+        },
+        "authority": "NONE"
+      },
+      "expected_billing_requirement_cell": "No restriction stated"
+    }
+  ]
+}

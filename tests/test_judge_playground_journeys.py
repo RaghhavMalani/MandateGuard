@@ -630,6 +630,16 @@ def test_onboarding_leaves_the_marketplace_row_untrusted(
 def test_a_freshly_onboarded_listing_gets_a_fresh_authorization(
     service: CommerceLabService, marketplace_listing: dict[str, Any], no_network: None
 ) -> None:
+    """A fresh run, and an honest one: the family nobody vouched for.
+
+    Onboarding publishes a price, a billing model, a content classification and
+    an intended-use list, and every one of those clears. What it cannot publish
+    is a *server-owned product family*: the listing's only category words came
+    off a crawled marketplace page, and this instruction does name a product
+    family. So A2 reports the identity as unavailable and the run reaches
+    REVIEW rather than guessing that the two agree.
+    """
+
     session = session_id(service)
     intent = marketplace_listing["intent"]
     payload = service.playground_onboard(
@@ -651,8 +661,16 @@ def test_a_freshly_onboarded_listing_gets_a_fresh_authorization(
         session=session,
     )
     assert snapshot["world"] == "SANDBOX_ONBOARDED"
-    assert snapshot["result"]["decision"] == "ALLOW"
+    assert snapshot["result"]["decision"] == "REVIEW"
     assert snapshot["result"]["buyer"]["merchant"].startswith("sandbox-onboarded-")
+    assert snapshot["result"]["execution"]["razorpay_calls"] == 0
+    tier_a = snapshot["result"]["authorization"]["deterministic"]["tier_a"]
+    unresolved = [row for row in tier_a if row["status"] != "PASS"]
+    assert [row["family"] for row in unresolved] == ["A2"]
+    assert unresolved[0]["status"] == "NOT_EVALUABLE"
+    assert unresolved[0]["reason"] == (
+        "server-owned product-family identity unavailable for selected SKU"
+    )
 
 
 def test_an_onboarded_merchant_that_declares_nothing_reaches_review(

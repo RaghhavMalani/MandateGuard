@@ -156,6 +156,7 @@ class InterpretedPurchaseIntent:
     exclusions: tuple[str, ...]
     merchant_allowlist: tuple[str, ...] | None = None
     sku_allowlist: tuple[str, ...] | None = None
+    product_family_allowlist: tuple[str, ...] | None = None
 
     def __post_init__(self) -> None:
         _nonnegative_int(self.max_total_minor, "max_total_minor")
@@ -184,28 +185,44 @@ class InterpretedPurchaseIntent:
             identifiers=True,
             nullable=True,
         )
+        product_family_allowlist = _string_tuple(
+            self.product_family_allowlist,
+            "product_family_allowlist",
+            maximum_items=16,
+            identifiers=True,
+            nullable=True,
+        )
         object.__setattr__(self, "exclusions", exclusions)
         object.__setattr__(self, "merchant_allowlist", merchant_allowlist)
         object.__setattr__(self, "sku_allowlist", sku_allowlist)
+        object.__setattr__(
+            self, "product_family_allowlist", product_family_allowlist
+        )
 
     @classmethod
     def from_mapping(cls, value: object) -> InterpretedPurchaseIntent:
-        data = _exact_mapping(
-            value,
-            frozenset(
-                {
-                    "max_total_minor",
-                    "quantity",
-                    "currency",
-                    "purpose",
-                    "recurring_allowed",
-                    "exclusions",
-                    "merchant_allowlist",
-                    "sku_allowlist",
-                }
-            ),
-            "interpreted_intent",
+        required = frozenset(
+            {
+                "max_total_minor",
+                "quantity",
+                "currency",
+                "purpose",
+                "recurring_allowed",
+                "exclusions",
+                "merchant_allowlist",
+                "sku_allowlist",
+            }
         )
+        allowed = required | {"product_family_allowlist"}
+        if (
+            not isinstance(value, Mapping)
+            or not required.issubset(value)
+            or not frozenset(value).issubset(allowed)
+        ):
+            raise ValueError(
+                "interpreted_intent must contain exactly the declared fields"
+            )
+        data = value
         return cls(
             max_total_minor=data["max_total_minor"],
             quantity=data["quantity"],
@@ -215,10 +232,11 @@ class InterpretedPurchaseIntent:
             exclusions=data["exclusions"],
             merchant_allowlist=data["merchant_allowlist"],
             sku_allowlist=data["sku_allowlist"],
+            product_family_allowlist=data.get("product_family_allowlist"),
         )
 
     def to_mapping(self) -> dict[str, Any]:
-        return {
+        result = {
             "max_total_minor": self.max_total_minor,
             "quantity": self.quantity,
             "currency": self.currency,
@@ -234,6 +252,11 @@ class InterpretedPurchaseIntent:
                 list(self.sku_allowlist) if self.sku_allowlist is not None else None
             ),
         }
+        if self.product_family_allowlist is not None:
+            result["product_family_allowlist"] = list(
+                self.product_family_allowlist
+            )
+        return result
 
 
 @dataclass(frozen=True, slots=True)
@@ -348,6 +371,7 @@ class CommerceProduct:
     recurring: bool
     tags: tuple[str, ...]
     evidence_ids: tuple[str, ...]
+    product_family: str | None = None
 
     def __post_init__(self) -> None:
         _identifier(self.merchant_id, "merchant_id")
@@ -372,9 +396,11 @@ class CommerceProduct:
         )
         object.__setattr__(self, "tags", tags)
         object.__setattr__(self, "evidence_ids", evidence_ids)
+        if self.product_family is not None:
+            _identifier(self.product_family, "product_family")
 
     def discovery_mapping(self) -> dict[str, Any]:
-        return {
+        result = {
             "merchant_id": self.merchant_id,
             "sku": self.sku,
             "name": self.name,
@@ -385,6 +411,9 @@ class CommerceProduct:
             "tags": list(self.tags),
             "evidence_ids": list(self.evidence_ids),
         }
+        if self.product_family is not None:
+            result["product_family"] = self.product_family
+        return result
 
 
 class RetrievalSource(str, Enum):

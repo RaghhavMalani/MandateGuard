@@ -98,10 +98,25 @@ class SandboxIntent:
     purpose: str | None
     exclusions: tuple[str, ...]
     brand_hints: tuple[str, ...]
+    product_family_label: str | None
+    product_family_allowlist: tuple[str, ...] | None
+    product_family_match: str | None
+    product_family_available: bool | None
     parsed: ParsedIntent
     coverage: ConstraintCoverage
 
     def to_mapping(self) -> dict[str, Any]:
+        product_family = (
+            {
+                "label": self.product_family_label,
+                "allowed_category_ids": list(self.product_family_allowlist or ()),
+                "matched_phrase": self.product_family_match,
+                "available_in_sandbox": self.product_family_available,
+                "enforcement": "HARD_DETERMINISTIC",
+            }
+            if self.product_family_label is not None
+            else None
+        )
         return {
             "interpreter_version": INTERPRETER_VERSION,
             "raw_text": self.raw_text,
@@ -115,6 +130,7 @@ class SandboxIntent:
             "purpose": self.purpose,
             "exclusions": list(self.exclusions),
             "brand_hints": list(self.brand_hints),
+            "product_family": product_family,
             "coverage": self.coverage.to_mapping(),
             "authority": "NONE",
         }
@@ -154,6 +170,11 @@ class SandboxIntent:
             lines.append(f"Nothing involving {item}.")
         for item in self.brand_hints:
             lines.append(f"Prefer the brand {item}.")
+        if self.product_family_label is not None:
+            lines.append(
+                f"Product family: {self.product_family_label} "
+                "(deterministically enforced)."
+            )
         # Say what was *not* understood in the same list as what was. A
         # requirement the mandate does not carry is the one a person most needs
         # to see, so it is never relegated to a separate panel.
@@ -195,6 +216,7 @@ class SandboxIntent:
             exclusions=self.exclusions,
             merchant_allowlist=merchant_allowlist,
             sku_allowlist=sku_allowlist,
+            product_family_allowlist=self.product_family_allowlist,
         )
 
 
@@ -261,9 +283,18 @@ def read_intent(
             ceiling_source = "SET_FOR_THIS_CHECK"
 
     purpose, purpose_span = _purpose_in(parsed.raw_text)
+    search_text = parsed.search_text or parsed.raw_text.strip().lower()
+    # Read here, not at the surface. The product family is the one reading on
+    # this side that becomes a *hard* mandate constraint, so it has to travel
+    # with every SandboxIntent rather than being attached by whichever caller
+    # remembered to. Imported inside the function because the search module
+    # reads SandboxIntent from here; at call time both modules exist.
+    from mandateguard.sandbox.search import infer_product_family
+
+    family = infer_product_family(search_text)
     return SandboxIntent(
         raw_text=parsed.raw_text,
-        search_text=parsed.search_text or parsed.raw_text.strip().lower(),
+        search_text=search_text,
         max_total_minor=ceiling,
         ceiling_source=ceiling_source,
         currency=parsed.currency,
@@ -275,6 +306,12 @@ def read_intent(
         purpose=purpose,
         exclusions=parsed.exclusions,
         brand_hints=parsed.brand_hints,
+        product_family_label=family.label if family is not None else None,
+        product_family_allowlist=(
+            family.category_ids if family is not None else None
+        ),
+        product_family_match=family.matched_phrase if family is not None else None,
+        product_family_available=family.available if family is not None else None,
         parsed=parsed,
         coverage=assess_coverage(
             parsed.raw_text,

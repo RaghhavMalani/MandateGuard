@@ -166,11 +166,20 @@ SCENARIOS: tuple[Scenario, ...] = (
         world=SANDBOX_WORLD,
         selection="EVIDENCE_FAMILY",
         selection_argument="AUTHORITY_CONFLICT",
-        expectation="REVIEW, zero payment-provider calls",
+        expectation=(
+            "REVIEW because two current billing records contradict each other, "
+            "zero payment-provider calls"
+        ),
         story=(
-            "Two current merchant records disagree about whether this listing "
-            "renews. MandateGuard will not pick the convenient one, so the "
-            "journey stops at REVIEW with no payment attempted."
+            "A desk lamp, inside the budget, from the merchant that owns the "
+            "SKU: product family, price and identity all check out. What does "
+            "not is the paperwork. Two of this merchant's own current billing "
+            "records contradict each other - one says the charge renews, the "
+            "other says it settles once - so there is no resolved billing model "
+            "for the buyer's 'no subscriptions' to be checked against. "
+            "MandateGuard will not pick the convenient record, so the journey "
+            "stops at REVIEW with no payment attempted. Read the two statements "
+            "in the trusted evidence beside the decision."
         ),
     ),
     Scenario(
@@ -180,7 +189,10 @@ SCENARIOS: tuple[Scenario, ...] = (
         world=SANDBOX_WORLD,
         selection="EVIDENCE_FAMILY",
         selection_argument="BILLING_UNDECLARED",
-        expectation="REVIEW, zero payment-provider calls",
+        expectation=(
+            "REVIEW because no billing record exists at all, "
+            "zero payment-provider calls"
+        ),
         story=(
             "The buyer said no subscriptions. This merchant never recorded a "
             "billing model at all, so there is nothing authoritative to check "

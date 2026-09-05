@@ -186,25 +186,51 @@ def evaluate_tier_a(
         else:
             results.append(_pass(TaxonomyFamily.A1))
 
-    # A2: SKU existence and ownership.
+    # A2: SKU existence, ownership, and server-owned product-family identity.
+    #
+    # A product-family constraint is interpreted before the mandate is built.
+    # It is never inferred from merchant prose or a learned model. The
+    # comparison below uses the category recorded in the committed server-side
+    # catalog snapshot, so valid evidence for a different kind of product
+    # cannot make that substitution authorized.
     if catalog_commitment_state is not CommitmentState.MATCH:
         results.append(_catalog_not_evaluable(TaxonomyFamily.A2, catalog_commitment_state))
     else:
         missing_skus: list[str] = []
         ownership_mismatches: list[str] = []
+        family_mismatches: list[str] = []
+        family_unavailable_skus: list[str] = []
         for line in payload.lines:
             item = catalog_snapshot.item_by_sku(line.sku)
             if item is None:
                 missing_skus.append(line.sku)
             elif item.merchant_id != payload.merchant_id:
                 ownership_mismatches.append(line.sku)
-        if missing_skus or ownership_mismatches:
+            elif hard.product_family_allowlist is not None:
+                if item.product_family is None:
+                    family_unavailable_skus.append(line.sku)
+                elif item.product_family not in hard.product_family_allowlist:
+                    family_mismatches.append(line.sku)
+        if missing_skus or ownership_mismatches or family_mismatches:
             results.append(
                 _fail(
                     TaxonomyFamily.A2,
-                    "SKU is absent from the catalog or not owned by the declared merchant",
+                    "SKU is absent, not owned by the declared merchant, or outside the mandate's product family",
+                    allowed_product_families=(
+                        ",".join(hard.product_family_allowlist)
+                        if hard.product_family_allowlist is not None
+                        else None
+                    ),
+                    family_mismatches=",".join(sorted(family_mismatches)),
                     missing_skus=",".join(sorted(missing_skus)),
                     ownership_mismatches=",".join(sorted(ownership_mismatches)),
+                )
+            )
+        elif family_unavailable_skus:
+            results.append(
+                _not_evaluable(
+                    TaxonomyFamily.A2,
+                    "server-owned product-family identity unavailable for selected SKU",
                 )
             )
         else:

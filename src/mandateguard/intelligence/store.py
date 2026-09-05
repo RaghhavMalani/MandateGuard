@@ -360,6 +360,7 @@ class TrustedCommerceStore:
                     merchant_id=product.merchant_id,
                     effective_unit_price_minor=product.effective_unit_price_minor,
                     recurring=product.recurring,
+                    product_family=product.product_family,
                 )
                 for product in merchant_products
             ),

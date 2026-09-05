@@ -43,6 +43,9 @@ artifacts/engineering/discovery/*
 !artifacts/engineering/discovery/scale_benchmark.json
 !artifacts/engineering/discovery/retrieval_evaluation.json
 !artifacts/engineering/discovery/anomaly_evaluation.json
+!artifacts/engineering/authorization-scale/
+artifacts/engineering/authorization-scale/*
+!artifacts/engineering/authorization-scale/benchmark.json
 
 # The discovery catalog, its frozen indexes, and the training report that the
 # MODEL QUALITY surface reads. The raw dataset archive and the evaluation query
@@ -69,6 +72,9 @@ data/eval/*
 !data/eval/judge-playground/
 data/eval/judge-playground/*
 !data/eval/judge-playground/JUDGE_QUERY_REPORT.json
+!data/eval/authorization-scale/
+data/eval/authorization-scale/*
+!data/eval/authorization-scale/WORLD_FREEZE.json
 
 Dockerfile
 .dockerignore
