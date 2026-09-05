@@ -12,6 +12,7 @@ import {
   renderClarificationRequired,
   renderGapFigure,
   renderJudgeHealth,
+  renderJudgeTestStrip,
   renderNoMatch,
   renderOnboardedResult,
   renderOnboardingForm,
@@ -23,6 +24,8 @@ import {
   renderPlaygroundRail,
   renderPlaygroundVerdict,
   renderPlaygroundWhy,
+  renderExecutionLab,
+  renderRecurringProof,
   renderReadiness,
   renderScaleWorlds,
   renderScenarioGrid,
@@ -42,8 +45,8 @@ const CSS = readFileSync(
 
 const CANDIDATE = {
   catalog_product_id: "sandbox.0123456789abcdef01234567",
-  merchant_id: "sandbox-acme-audio",
-  merchant: "Acme Audio (Synthetic)",
+  merchant_id: "sandbox-relay-audio",
+  merchant: "Relay Audio (Synthetic)",
   sku: "audio-headphones-026",
   name: "Kestrel Wireless Headphones M60",
   brand: "Kestrel",
@@ -66,8 +69,10 @@ const CANDIDATE = {
     within_budget: true,
     lexical_score: 18.4,
     category_score: 9,
-    semantic_similarity: 0.82,
-    semantic_method: "DETERMINISTIC_CATEGORY_SYNONYM",
+    price_minor: 89900,
+    max_total_minor: 500000,
+    quantity: 1,
+    currency: "INR",
     exact_phrase_match: "wireless headphones",
     total_score: 41.2,
   },
@@ -254,7 +259,7 @@ test("a candidate shows product, price, merchant, category and why it was found"
   const html = renderPlaygroundCandidate(CANDIDATE);
   assert.match(html, /Kestrel Wireless Headphones M60/);
   assert.match(html, /899/);
-  assert.match(html, /Acme Audio \(Synthetic\)/);
+  assert.match(html, /Relay Audio \(Synthetic\)/);
   assert.match(html, /Headphones/);
   assert.match(html, /WHY THE AGENT FOUND IT/);
   assert.match(html, /AGENT READINESS/);
@@ -266,7 +271,7 @@ test("hashes and identifiers stay behind a disclosure rather than on the card", 
   const summaryIndex = html.indexOf("Technical detail");
   assert.ok(summaryIndex > 0);
   assert.ok(html.indexOf("audio-headphones-026") > summaryIndex);
-  assert.ok(html.indexOf("sandbox-acme-audio") > summaryIndex);
+  assert.ok(html.indexOf("sandbox-relay-audio") > summaryIndex);
 });
 
 test("a renewing listing is flagged on the card before it is chosen", () => {
@@ -288,17 +293,18 @@ test("candidate rendering escapes anything a merchant record could contain", () 
 test("why-found names each of the signals that put a listing on the page", () => {
   const html = renderWhyFound(CANDIDATE.why_found);
   for (const label of [
-    "Semantic similarity",
-    "Lexical signal",
+    "Key terms",
     "Budget",
-    "Brand preference",
+    "Brand",
     "Category match",
   ]) {
     assert.ok(html.includes(label), `missing signal: ${label}`);
   }
   assert.match(html, /wireless, headphones/);
-  assert.match(html, /within your limit/);
+  assert.match(html, /₹899/);
+  assert.match(html, /₹5,000/);
   assert.match(html, /Headphones/);
+  assert.doesNotMatch(html, /semantic|similarity|score/i);
 });
 
 
@@ -310,9 +316,9 @@ test("why-found reports an over-budget candidate honestly", () => {
 
 test("why-found admits when a signal is absent rather than inventing one", () => {
   const html = renderWhyFound({ within_budget: true, matched_terms: [] });
-  assert.match(html, /no category-synonym signal/);
+  assert.match(html, /related listing text/);
   assert.match(html, /no direct term match/);
-  assert.match(html, /none stated/);
+  assert.match(html, /not specified/);
 });
 
 test("candidate list marks the chosen one", () => {
@@ -375,6 +381,36 @@ test("an empty result names the constraint that excluded each near miss", () => 
 
 test("a result with candidates renders no empty-state panel", () => {
   assert.equal(renderNoMatch({ candidates: [CANDIDATE] }), "");
+});
+
+test("why-found budget explanation accounts for quantity", () => {
+  const html = renderWhyFound({
+    within_budget: true,
+    matched_terms: ["bottle"],
+    price_minor: 75000,
+    max_total_minor: 200000,
+    quantity: 2,
+    currency: "INR",
+  });
+  assert.match(html, /2 × ₹750 = ₹1,500 ≤ ₹2,000/);
+});
+
+test("an absent category gets an honest no-direct-match with labelled alternatives", () => {
+  const html = renderNoMatch({
+    candidates: [],
+    constraints_applied: ["No renewing subscription"],
+    no_match: {
+      headline: "NO DIRECT SANDBOX MATCH",
+      message: "MandateGuard's sandbox does not currently contain this product category.",
+      what_was_understood: "smartphones",
+      closest_available_categories: [{ category_id: "cameras", label: "Cameras" }],
+    },
+    near_misses: [],
+  });
+  assert.match(html, /NO DIRECT SANDBOX MATCH/);
+  assert.match(html, /smartphones/);
+  assert.match(html, /CLOSEST AVAILABLE CATEGORIES/);
+  assert.match(html, /alternatives, not direct matches/i);
 });
 
 /* ------------------------------------------------------------------ */
@@ -488,12 +524,65 @@ test("a revoked execution shows the consent state at spend time", () => {
   assert.match(html, /MANDATE_REVOKED/);
 });
 
+test("a price mutation shows both transactions and all execution-gate checks", () => {
+  const snapshot = {
+    result: {
+      buyer: { currency: "INR" },
+      execution: {
+        reason: "TRANSACTION_HASH_MISMATCH",
+        lab: {
+          mutation: "PRICE",
+          authorized: { price_minor: 349900, sku: "headphones-042", merchant_id: "merchant-a" },
+          attempted: { price_minor: 799900, sku: "headphones-042", merchant_id: "merchant-a" },
+          reason: "TRANSACTION_HASH_MISMATCH",
+          provider_additional_calls: 0,
+          checks: {
+            signed: true,
+            expired: false,
+            mandate_active: true,
+            transaction_matches: false,
+            provider_reached: false,
+          },
+        },
+      },
+    },
+  };
+  const html = renderExecutionLab(snapshot);
+  assert.match(html, /AUTHORIZED PRICE/);
+  assert.match(html, /₹3,499/);
+  assert.match(html, /ATTEMPTED PRICE/);
+  assert.match(html, /₹7,999/);
+  assert.match(html, /VALID SIGNATURE/);
+  assert.match(html, /TRANSACTION_HASH_MISMATCH/);
+  for (const label of ["SIGNED?", "EXPIRED?", "MANDATE ACTIVE?", "TRANSACTION MATCHES?", "PROVIDER REACHED?"]) {
+    assert.ok(html.includes(label));
+  }
+});
+
+test("the recurring scenario compares the mandate to trusted merchant billing evidence", () => {
+  const html = renderRecurringProof({
+    scenario_id: "recurring-billing",
+    playground_selection: { product: { billing_model: "RECURRING" } },
+    explanation: { failed_constraint_labels: ["Catalog recurrence", "Recurrence permission"] },
+    result: { execution: { razorpay_calls: 0 } },
+  });
+  assert.match(html, /USER REQUIRED/);
+  assert.match(html, /ONE_TIME/);
+  assert.match(html, /TRUSTED MERCHANT EVIDENCE/);
+  assert.match(html, /RECURRING/);
+  assert.match(html, /PROVIDER CALLS/);
+  assert.match(html, />0</);
+});
+
 test("follow-ups are offered only when the run supports them", () => {
   const authorized = renderPlaygroundFollowUps({
     result: { decision: "ALLOW", execution: { status: "AUTHORIZED" } },
   });
   assert.match(authorized, /id="pg-revoke"/);
   assert.match(authorized, /id="pg-execute"/);
+  assert.match(authorized, /id="pg-mutate-price"/);
+  assert.match(authorized, /id="pg-mutate-sku"/);
+  assert.match(authorized, /id="pg-mutate-merchant"/);
 
   const executed = renderPlaygroundFollowUps({
     result: { decision: "ALLOW", execution: { status: "ORDER_CREATED" } },
@@ -552,6 +641,17 @@ test("scenario cards say which world they run in", () => {
   assert.match(html, /REGISTERED MERCHANT FIXTURES/);
 });
 
+test("the top judge strip exposes seven human-labelled real scenarios", () => {
+  const html = renderJudgeTestStrip([
+    { scenario_id: "safe-purchase", label: "SAFE PURCHASE", expectation: "ALLOW" },
+    { scenario_id: "price-mutation", label: "PRICE MUTATION", expectation: "REJECT" },
+  ]);
+  assert.match(html, /data-scenario="safe-purchase"/);
+  assert.match(html, /data-scenario="price-mutation"/);
+  assert.match(HTML, /id="pg-judge-strip"/);
+  assert.match(HTML, /Try MandateGuard/i);
+});
+
 test("try-these prompts are human sentences, not test-case names", () => {
   const html = renderTryThese([
     { label: "Buy headphones under ₹5,000", intent: "Buy wireless headphones under INR 5,000." },
@@ -562,12 +662,12 @@ test("try-these prompts are human sentences, not test-case names", () => {
 });
 
 test("the gap figure keeps the three populations apart", () => {
-  const html = renderGapFigure({ marketplace: 17702, sandbox: 3060 });
+  const html = renderGapFigure({ marketplace: 17702, sandbox: 3960 });
   assert.match(html, /SEARCHABLE/);
   assert.match(html, /17,702/);
   assert.match(html, /trust gap/);
   assert.match(html, /AGENT-READY/);
-  assert.match(html, /3,060/);
+  assert.match(html, /3,960/);
   assert.match(html, /AUTHORIZED NOW/);
   // No total anywhere: adding these numbers would be the one wrong move.
   assert.doesNotMatch(html, /20,762/);
@@ -576,7 +676,7 @@ test("the gap figure keeps the three populations apart", () => {
 test("the scale lab refuses to combine populations into one number", () => {
   const html = renderScaleWorlds(
     { discovery: { catalog: { listings: 17702 } }, system_scale: {} },
-    { catalog: { products: 3060 } },
+    { catalog: { products: 3960 } },
   );
   assert.match(html, /DISCOVERY REALITY/);
   assert.match(html, /JUDGE SANDBOX/);

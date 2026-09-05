@@ -38,7 +38,7 @@ from mandateguard.sandbox.templates import EvidenceFamily
 
 @pytest.fixture(scope="module")
 def service() -> Iterator[CommerceLabService]:
-    # A module-scoped service so the 3,060-product world is generated once for
+    # A module-scoped service so the 3,960-product world is generated once for
     # the whole file rather than once per test. Its own directory, so nothing
     # here shares a ledger or a consent registry with another test module.
     state_dir = Path(tempfile.mkdtemp(prefix="mandateguard-playground-tests-"))

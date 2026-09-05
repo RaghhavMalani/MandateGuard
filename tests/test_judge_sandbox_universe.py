@@ -45,7 +45,7 @@ from mandateguard.sandbox.universe import (
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
-FREEZE_PATH = REPOSITORY_ROOT / "data" / "eval" / "judge-playground" / "SANDBOX_FREEZE.json"
+FREEZE_PATH = REPOSITORY_ROOT / "data" / "eval" / "judge-playground-v3" / "SANDBOX_FREEZE.json"
 
 
 @pytest.fixture(scope="module")

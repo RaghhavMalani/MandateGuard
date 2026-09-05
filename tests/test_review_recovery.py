@@ -159,6 +159,13 @@ def test_recovered_allow_capability_replay_is_rejected_before_network(
         "reason": "NONCE_ALREADY_USED",
         "razorpay_additional_calls": 0,
         "external_additional_calls": 0,
+        "checks": {
+            "signed": True,
+            "expired": False,
+            "mandate_active": True,
+            "transaction_matches": True,
+            "provider_reached": False,
+        },
     }
 
 

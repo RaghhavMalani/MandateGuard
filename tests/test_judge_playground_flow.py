@@ -29,7 +29,7 @@ HEALTH_REPORT = (
     REPOSITORY_ROOT
     / "data"
     / "eval"
-    / "judge-playground"
+    / "judge-playground-v3"
     / "JUDGE_QUERY_REPORT.json"
 )
 
@@ -131,8 +131,9 @@ def test_unknown_product_request_returns_explained_near_misses_not_an_error(
     )
     assert result["candidates"] == []
     assert result["no_match_message"] == (
-        "No suitable sandbox product matched all of your constraints."
+        "MandateGuard's sandbox does not currently contain this product category."
     )
+    assert result["no_match"]["headline"] == "NO DIRECT SANDBOX MATCH"
     assert len(result["near_misses"]) == 4
     assert all(item["excluded_by"] for item in result["near_misses"])
     assert any(

@@ -38,6 +38,7 @@ from mandateguard.sandbox.templates import (
     CURRENCY,
     Category,
     EvidenceFamily,
+    FEATURED_PRODUCTS,
     IDENTITY_TEMPLATE,
     MERCHANT_TERMS_TEMPLATE,
     MERCHANTS,
@@ -361,12 +362,13 @@ def _generate_category(category: Category) -> Iterator[SandboxProduct]:
     for index in range(PRODUCTS_PER_CATEGORY):
         merchant = merchants[_draw("merchant", category.category_id, index, len(merchants))]
         brand = BRANDS[_draw("brand", category.category_id, index, len(BRANDS))]
-        family = _family_for(category, index)
-        price = _price_for(category, index)
+        featured = FEATURED_PRODUCTS.get((category.category_id, index))
+        family = featured[2] if featured is not None else _family_for(category, index)
+        price = featured[1] if featured is not None else _price_for(category, index)
         purposes = _purposes_for(category, index)
         subject = _subject_for(category, index)
         name = _name_for(category, index, brand, subject)
-        sku = f"{category.category_id}-{index:03d}"
+        sku = featured[0] if featured is not None else f"{category.category_id}-{index:03d}"
         billing_text, content_text, purpose_text = _evidence_texts(
             product_name=name,
             category=category,

@@ -57,6 +57,43 @@ _WEIGHT_EXACT_PHRASE = 18.0
 MAX_RESULTS = 10
 MIN_RESULTS = 5
 
+#: Explicitly absent product families that are easy for a shared word to
+#: misroute (for example, a smartphone request containing "camera"). These
+#: rules are retrieval-only. They do not create mandate constraints and never
+#: reach authorization.
+_ABSENT_FAMILY_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
+    (re.compile(r"\b(?:smartphone|android phone|mobile phone|iphone)\b", re.I), "smartphones"),
+    (re.compile(r"\b(?:microwave|microwave oven)\b", re.I), "microwave ovens"),
+    (re.compile(r"\b(?:gaming console|game console|playstation|xbox)\b", re.I), "gaming consoles"),
+    (re.compile(r"\b(?:baby stroller|stroller|pram)\b", re.I), "baby strollers"),
+    (re.compile(r"\b(?:dog food|cat food|pet food)\b", re.I), "pet food"),
+    (re.compile(r"\b(?:camping tent|two person tent|tent)\b", re.I), "camping tents"),
+    (re.compile(r"\b(?:bicycle|commuter bike|road bike)\b", re.I), "bicycles"),
+    (re.compile(r"\b(?:refrigerator|fridge)\b", re.I), "refrigerators"),
+    (re.compile(r"\b(?:washing machine|washer)\b", re.I), "washing machines"),
+    (re.compile(r"\b(?:garden hose|watering hose)\b", re.I), "garden hoses"),
+)
+
+
+@dataclass(frozen=True, slots=True)
+class ProductFamilyIntent:
+    """A high-confidence discovery family, with authorization authority NONE."""
+
+    label: str
+    category_ids: tuple[str, ...]
+    matched_phrase: str
+    available: bool
+
+    def to_mapping(self) -> dict[str, Any]:
+        return {
+            "label": self.label,
+            "category_ids": list(self.category_ids),
+            "matched_phrase": self.matched_phrase,
+            "confidence": "HIGH",
+            "available_in_sandbox": self.available,
+            "authority": "RETRIEVAL_ONLY_NONE_FOR_AUTHORIZATION",
+        }
+
 
 def tokens(text: str) -> list[str]:
     return [item for item in _TOKEN_RE.findall(text.lower()) if item not in _STOPWORDS]
@@ -89,6 +126,84 @@ def _category_scores(query: str) -> dict[str, float]:
     return scores
 
 
+def infer_product_family(
+    query: str, category_scores: dict[str, float] | None = None
+) -> ProductFamilyIntent | None:
+    """Infer a deterministic shelf only where the words make it unambiguous.
+
+    A named absent family wins before catalogue synonyms are considered. This
+    prevents a secondary attribute such as "camera" in a smartphone request
+    from becoming the requested product. Present families come from the same
+    frozen synonym vocabulary used by ranking, so the guard and ranker cannot
+    drift into competing taxonomies.
+    """
+
+    for pattern, label in _ABSENT_FAMILY_PATTERNS:
+        match = pattern.search(query)
+        if match is not None:
+            return ProductFamilyIntent(
+                label=label,
+                category_ids=(),
+                matched_phrase=match.group(0).lower(),
+                available=False,
+            )
+
+    words = set(tokens(query))
+    normalized_query = " ".join(_TOKEN_RE.findall(query.lower()))
+    if "for my desk" in normalized_query:
+        return ProductFamilyIntent(
+            label="Office accessories",
+            category_ids=("office-accessories",),
+            matched_phrase="for my desk",
+            available=True,
+        )
+    if "light" in words and words.intersection({"reading", "study", "night"}):
+        return ProductFamilyIntent(
+            label="Desk lamps",
+            category_ids=("lighting-desk-lamps",),
+            matched_phrase="light + reading/study",
+            available=True,
+        )
+    if words.intersection({"clean", "cleaning", "cleaner", "mop"}) and words.intersection(
+        {"floor", "room", "surface", "bathroom", "tiles"}
+    ):
+        return ProductFamilyIntent(
+            label="Cleaning and home care",
+            category_ids=("cleaning-products",),
+            matched_phrase="cleaning + home surface",
+            available=True,
+        )
+
+    scores = category_scores if category_scores is not None else _category_scores(query)
+    if not scores:
+        return None
+    strongest = max(scores.values())
+    category_ids = tuple(sorted(key for key, score in scores.items() if score == strongest))
+    labels = {
+        category.category_id: category.label
+        for category in CATEGORIES
+        if category.category_id in category_ids
+    }
+    label = " / ".join(labels[item] for item in category_ids)
+    matched = []
+    present = _phrases(query)
+    for category in CATEGORIES:
+        if category.category_id not in category_ids:
+            continue
+        matched.extend(
+            synonym
+            for synonym in (category.label.lower(), *category.synonyms)
+            if synonym in present
+        )
+    matched_phrase = sorted(set(matched), key=lambda item: (-len(item), item))[0]
+    return ProductFamilyIntent(
+        label=label,
+        category_ids=category_ids,
+        matched_phrase=matched_phrase,
+        available=True,
+    )
+
+
 @dataclass(frozen=True, slots=True)
 class SearchSignal:
     """Why one listing came back, in terms a person can check."""
@@ -99,8 +214,6 @@ class SearchSignal:
     within_budget: bool
     lexical_score: float
     category_score: float
-    semantic_similarity: float
-    semantic_method: str
     exact_phrase_match: str | None
     total_score: float
 
@@ -112,8 +225,7 @@ class SearchSignal:
             "within_budget": self.within_budget,
             "lexical_score": round(self.lexical_score, 4),
             "category_score": round(self.category_score, 4),
-            "semantic_similarity": round(self.semantic_similarity, 4),
-            "semantic_method": self.semantic_method,
+            "ranking_method": "LEXICAL_FIELD_WEIGHTED_PLUS_CATEGORY_INTENT_GUARD",
             "exact_phrase_match": self.exact_phrase_match,
             "total_score": round(self.total_score, 4),
         }
@@ -147,6 +259,7 @@ class SearchResult:
     near_misses: tuple[NearMiss, ...]
     considered: int
     matched_categories: tuple[str, ...]
+    product_family: ProductFamilyIntent | None
 
 
 class SandboxSearch:
@@ -213,6 +326,7 @@ class SandboxSearch:
             phrase for phrase in _phrases(query) if " " in phrase
         }
         category_scores = _category_scores(query)
+        product_family = infer_product_family(query, category_scores)
         brand_hints = {item.lower() for item in intent.brand_hints}
 
         # Only listings that share at least one query token can score above
@@ -221,6 +335,16 @@ class SandboxSearch:
         reachable: set[str] = set()
         for token in set(query_tokens):
             reachable |= self._postings.get(token, set())
+        if product_family is not None:
+            if not product_family.available:
+                reachable.clear()
+            else:
+                allowed_categories = set(product_family.category_ids)
+                reachable = {
+                    catalog_id
+                    for catalog_id in reachable
+                    if self._by_id[catalog_id].category_id in allowed_categories
+                }
 
         scored: list[tuple[float, SandboxProduct, SearchSignal]] = []
         for catalog_id in reachable:
@@ -246,11 +370,6 @@ class SandboxSearch:
                 None,
             )
             phrase_score = _WEIGHT_EXACT_PHRASE if exact_phrase else 0.0
-            # This is a deterministic category-synonym similarity signal, not
-            # an embedding or an authorization input. It is exposed so the UI
-            # can name the semantic signal honestly instead of implying that a
-            # model ran in the dependency-free offline sandbox.
-            semantic_similarity = category_scores.get(product.category_id, 0.0)
             total = (
                 lexical
                 + category_score
@@ -278,8 +397,6 @@ class SandboxSearch:
                         within_budget=within_budget,
                         lexical_score=lexical,
                         category_score=category_score,
-                        semantic_similarity=semantic_similarity,
-                        semantic_method="DETERMINISTIC_CATEGORY_SYNONYM_V1",
                         exact_phrase_match=exact_phrase,
                         total_score=total,
                     ),
@@ -312,6 +429,7 @@ class SandboxSearch:
             near_misses=tuple(misses[:4]),
             considered=considered,
             matched_categories=tuple(sorted(category_scores)),
+            product_family=product_family,
         )
 
     def _closest_available(

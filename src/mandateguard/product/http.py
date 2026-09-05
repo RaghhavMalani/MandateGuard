@@ -32,6 +32,7 @@ _REPLAY_PATH_RE = re.compile(r"^/api/runs/(run_[0-9a-f]{32})/replay$")
 _RECOVER_PATH_RE = re.compile(r"^/api/runs/(run_[0-9a-f]{32})/recover$")
 _REVOKE_PATH_RE = re.compile(r"^/api/runs/(run_[0-9a-f]{32})/revoke$")
 _EXECUTE_PATH_RE = re.compile(r"^/api/runs/(run_[0-9a-f]{32})/execute$")
+_MUTATE_PATH_RE = re.compile(r"^/api/runs/(run_[0-9a-f]{32})/mutate$")
 _MAX_REQUEST_BYTES = 16_384
 _DISCOVERY_SEARCH_PATH = "/api/discovery/search"
 _DISCOVERY_SELECT_PATH = "/api/discovery/select"
@@ -49,6 +50,7 @@ _SESSION_HEADER = "X-MandateGuard-Session"
 _DEFAULT_PRODUCT_HOST = "0.0.0.0"
 _DEFAULT_PRODUCT_PORT = 8080
 _ROUTE_TEMPLATES = (
+    (_MUTATE_PATH_RE, "/api/runs/{run_id}/mutate"),
     (_EXECUTE_PATH_RE, "/api/runs/{run_id}/execute"),
     (_REVOKE_PATH_RE, "/api/runs/{run_id}/revoke"),
     (_RECOVER_PATH_RE, "/api/runs/{run_id}/recover"),
@@ -457,6 +459,47 @@ class CommerceLabHandler(BaseHTTPRequestHandler):
                         raise ValueError("execution request body must be empty")
                 response = self.server.service.attempt_execution(
                     execute_match.group(1)
+                )
+            except KeyError:
+                self._send_error(HTTPStatus.NOT_FOUND, "RUN_NOT_FOUND", "Run not found.")
+                return
+            except MandateStateBusyError:
+                self._send_error(
+                    HTTPStatus.CONFLICT,
+                    "MANDATE_STATE_BUSY",
+                    "Consent state is guarded by another in-flight operation; "
+                    "no provider call was made.",
+                )
+                return
+            except MandateStateCorruptionError:
+                self._send_error(
+                    HTTPStatus.CONFLICT,
+                    "MANDATE_STATE_CORRUPT",
+                    "Trusted mandate state is inconsistent; refusing to act on it.",
+                )
+                return
+            except (TypeError, ValueError) as error:
+                self._send_error(HTTPStatus.BAD_REQUEST, "INVALID_REQUEST", str(error))
+                return
+            except RuntimeError as error:
+                self._send_error(
+                    HTTPStatus.CONFLICT,
+                    "EXECUTION_UNAVAILABLE",
+                    str(error),
+                )
+                return
+            self._send_json(HTTPStatus.OK, response)
+            return
+        mutate_match = _MUTATE_PATH_RE.fullmatch(path)
+        if mutate_match:
+            if not self._guard_run(mutate_match.group(1)):
+                return
+            try:
+                payload = self._read_json()
+                if set(payload) != {"mutation"}:
+                    raise ValueError("mutation request must contain only mutation")
+                response = self.server.service.attempt_mutated_execution(
+                    mutate_match.group(1), payload["mutation"]
                 )
             except KeyError:
                 self._send_error(HTTPStatus.NOT_FOUND, "RUN_NOT_FOUND", "Run not found.")

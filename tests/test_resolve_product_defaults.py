@@ -167,6 +167,13 @@ def test_recoverable_review_recovers_to_allow_at_product_defaults(
         "reason": "NONCE_ALREADY_USED",
         "razorpay_additional_calls": 0,
         "external_additional_calls": 0,
+        "checks": {
+            "signed": True,
+            "expired": False,
+            "mandate_active": True,
+            "transaction_matches": True,
+            "provider_reached": False,
+        },
     }
     assert (
         replayed["result"]["observed_counters"]["offline_adapter_calls"] == 1

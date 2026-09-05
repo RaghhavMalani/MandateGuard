@@ -1,6 +1,6 @@
 """Run the frozen judge query set through the Playground and record the mix.
 
-    python scripts/evaluate_judge_playground.py [--out data/eval/judge-playground]
+    python scripts/evaluate_judge_playground.py [--out data/eval/judge-playground-v3]
 
 Every outcome comes from the real controller over the real sandbox catalogue.
 The script measures; it does not assert. Read the report, and if ordinary
@@ -28,7 +28,7 @@ def main() -> int:
     parser.add_argument(
         "--out",
         type=Path,
-        default=REPOSITORY_ROOT / "data" / "eval" / "judge-playground",
+        default=REPOSITORY_ROOT / "data" / "eval" / "judge-playground-v3",
         help="directory the report is written to",
     )
     arguments = parser.parse_args()

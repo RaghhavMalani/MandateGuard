@@ -1,0 +1,220 @@
+{
+  "scope": "FIXED_HOSTILE_RETRIEVAL_SMOKE_TEST_AUTHORITY_NONE",
+  "world_version": "mandateguard-sandbox-commerce-v3",
+  "prompt_count": 16,
+  "correct_direct_match_count": 16,
+  "no_match_count": 0,
+  "wrong_match_count": 0,
+  "wrong_match_rate": 0.0,
+  "external_network_calls": 0,
+  "outcomes": [
+    {
+      "prompt": "water bottle under 1000",
+      "expected_category": "drinkware-water-bottles",
+      "classification": "CORRECT DIRECT MATCH",
+      "returned_category_at_1": "drinkware-water-bottles",
+      "returned_categories_at_5": [
+        "drinkware-water-bottles",
+        "drinkware-water-bottles",
+        "drinkware-water-bottles",
+        "drinkware-water-bottles",
+        "drinkware-water-bottles"
+      ]
+    },
+    {
+      "prompt": "winter jacket below 5000",
+      "expected_category": "apparel-jackets",
+      "classification": "CORRECT DIRECT MATCH",
+      "returned_category_at_1": "apparel-jackets",
+      "returned_categories_at_5": [
+        "apparel-jackets",
+        "apparel-jackets",
+        "apparel-jackets",
+        "apparel-jackets",
+        "apparel-jackets"
+      ]
+    },
+    {
+      "prompt": "coffee maker under 4000",
+      "expected_category": "coffee-makers",
+      "classification": "CORRECT DIRECT MATCH",
+      "returned_category_at_1": "coffee-makers",
+      "returned_categories_at_5": [
+        "coffee-makers",
+        "coffee-makers",
+        "coffee-makers",
+        "coffee-makers",
+        "coffee-makers"
+      ]
+    },
+    {
+      "prompt": "printer below 12000",
+      "expected_category": "printers",
+      "classification": "CORRECT DIRECT MATCH",
+      "returned_category_at_1": "printers",
+      "returned_categories_at_5": [
+        "printers",
+        "printers",
+        "printers",
+        "printers",
+        "printers"
+      ]
+    },
+    {
+      "prompt": "hard disk under 6000",
+      "expected_category": "computer-storage",
+      "classification": "CORRECT DIRECT MATCH",
+      "returned_category_at_1": "computer-storage",
+      "returned_categories_at_5": [
+        "computer-storage",
+        "computer-storage",
+        "computer-storage",
+        "computer-storage",
+        "computer-storage"
+      ]
+    },
+    {
+      "prompt": "board game below 2000",
+      "expected_category": "toys-board-games",
+      "classification": "CORRECT DIRECT MATCH",
+      "returned_category_at_1": "toys-board-games",
+      "returned_categories_at_5": [
+        "toys-board-games",
+        "toys-board-games",
+        "toys-board-games",
+        "toys-board-games",
+        "toys-board-games"
+      ]
+    },
+    {
+      "prompt": "floor cleaner under 800",
+      "expected_category": "cleaning-products",
+      "classification": "CORRECT DIRECT MATCH",
+      "returned_category_at_1": "cleaning-products",
+      "returned_categories_at_5": [
+        "cleaning-products",
+        "cleaning-products",
+        "cleaning-products",
+        "cleaning-products",
+        "cleaning-products"
+      ]
+    },
+    {
+      "prompt": "power bank under 2000",
+      "expected_category": "mobile-power",
+      "classification": "CORRECT DIRECT MATCH",
+      "returned_category_at_1": "mobile-power",
+      "returned_categories_at_5": [
+        "mobile-power",
+        "mobile-power",
+        "mobile-power",
+        "mobile-power",
+        "mobile-power"
+      ]
+    },
+    {
+      "prompt": "wireless headphones under 5000",
+      "expected_category": "audio-headphones",
+      "classification": "CORRECT DIRECT MATCH",
+      "returned_category_at_1": "audio-headphones",
+      "returned_categories_at_5": [
+        "audio-headphones",
+        "audio-headphones",
+        "audio-headphones",
+        "audio-headphones",
+        "audio-headphones"
+      ]
+    },
+    {
+      "prompt": "desk lamp below 2000",
+      "expected_category": "lighting-desk-lamps",
+      "classification": "CORRECT DIRECT MATCH",
+      "returned_category_at_1": "lighting-desk-lamps",
+      "returned_categories_at_5": [
+        "lighting-desk-lamps",
+        "lighting-desk-lamps",
+        "lighting-desk-lamps",
+        "lighting-desk-lamps",
+        "lighting-desk-lamps"
+      ]
+    },
+    {
+      "prompt": "college backpack under 3000",
+      "expected_category": "bags-backpacks",
+      "classification": "CORRECT DIRECT MATCH",
+      "returned_category_at_1": "bags-backpacks",
+      "returned_categories_at_5": [
+        "bags-backpacks",
+        "bags-backpacks",
+        "bags-backpacks",
+        "bags-backpacks",
+        "bags-backpacks"
+      ]
+    },
+    {
+      "prompt": "running shoes below 6000",
+      "expected_category": "footwear-running",
+      "classification": "CORRECT DIRECT MATCH",
+      "returned_category_at_1": "footwear-running",
+      "returned_categories_at_5": [
+        "footwear-running",
+        "footwear-running",
+        "footwear-running",
+        "footwear-running",
+        "footwear-running"
+      ]
+    },
+    {
+      "prompt": "camera under 30000",
+      "expected_category": "cameras",
+      "classification": "CORRECT DIRECT MATCH",
+      "returned_category_at_1": "cameras",
+      "returned_categories_at_5": [
+        "cameras",
+        "cameras",
+        "cameras",
+        "cameras",
+        "cameras"
+      ]
+    },
+    {
+      "prompt": "smartwatch below 10000",
+      "expected_category": "wearables-smartwatches",
+      "classification": "CORRECT DIRECT MATCH",
+      "returned_category_at_1": "wearables-smartwatches",
+      "returned_categories_at_5": [
+        "wearables-smartwatches",
+        "wearables-smartwatches",
+        "wearables-smartwatches",
+        "wearables-smartwatches",
+        "wearables-smartwatches"
+      ]
+    },
+    {
+      "prompt": "keyboard under 7000",
+      "expected_category": "computing-keyboards",
+      "classification": "CORRECT DIRECT MATCH",
+      "returned_category_at_1": "computing-keyboards",
+      "returned_categories_at_5": [
+        "computing-keyboards",
+        "computing-keyboards",
+        "computing-keyboards",
+        "computing-keyboards",
+        "computing-keyboards"
+      ]
+    },
+    {
+      "prompt": "office chair below 15000",
+      "expected_category": "furniture-office-chairs",
+      "classification": "CORRECT DIRECT MATCH",
+      "returned_category_at_1": "furniture-office-chairs",
+      "returned_categories_at_5": [
+        "furniture-office-chairs",
+        "furniture-office-chairs",
+        "furniture-office-chairs",
+        "furniture-office-chairs",
+        "furniture-office-chairs"
+      ]
+    }
+  ]
+}

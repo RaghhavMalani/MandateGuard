@@ -19,10 +19,11 @@ made at all. A `REVIEW` can enter a bounded, user-triggered trusted-evidence rec
 loop; the full controller must then produce a fresh `ALLOW` before execution is possible.
 
 The default **Playground** lets a judge type any purchase instruction and search a
-deterministic universe of **3,060 explicitly synthetic products** from 50 simulated
+deterministic universe of **3,960 explicitly synthetic products** from 60 simulated
 merchants. Those merchants publish versioned evidence, so ordinary safe requests can reach
 the real `ALLOW` path without weakening the controller. Prepared journeys also exercise
-`BLOCK`, `REVIEW`, revocation and replay, entirely offline.
+`BLOCK`, `REVIEW`, recurring-billing refusal, post-authorization price/SKU/merchant
+mutation, revocation and replay, entirely offline.
 
 The separate **Marketplace** mode still searches the **17,702-listing historical corpus**.
 Those crawled rows remain discovery-only and untrusted. A simulation can create a new
@@ -56,13 +57,13 @@ payment provider was never contacted:
 
 | World | Scale | Authority |
 | --- | ---: | --- |
-| Judge Sandbox | 3,060 synthetic products, 50 simulated merchants, 34 categories | Server-generated, schema-valid, versioned evidence bound to exact merchant/SKU identities |
+| Judge Sandbox | 3,960 synthetic products, 60 simulated merchants, 44 categories | Server-generated, schema-valid, versioned evidence bound to exact merchant/SKU identities |
 | Historical Marketplace | 17,702 historical listings | Discovery only; crawled prices and text are never merchant evidence |
 
-Sandbox world `mandateguard-sandbox-commerce-v2` is generated from a fixed seed and frozen
-construction vocabulary. Product digest: `0323d4f6a052d31807667f7e0f350b3b574ccbce839033097912b8e01eff7f5e`.
+Sandbox world `mandateguard-sandbox-commerce-v3` is generated from a fixed seed and frozen
+construction vocabulary. Product digest: `523ff6aa4ccead30fd99a9cc1481286c05a7e2460b13d9a13ebbd1d3b4a72741`.
 The 120-query judge evaluation found candidates for 100% of prompts; top choices produced
-108 `ALLOW`, 2 `BLOCK`, and 10 `REVIEW` decisions. Ordinary prompts reached `ALLOW` 98.7%
+100 `ALLOW`, 2 `BLOCK`, and 18 `REVIEW` decisions. Ordinary prompts reached `ALLOW` 97.3%
 of the time. These are experience measurements on synthetic data, not a safety contract.
 
 ---
@@ -211,13 +212,13 @@ claims.
 ### Judge Playground — interactive authorization
 
 The sandbox is generated, not stored as thousands of hand-written fixtures. Its catalogue,
-trusted evidence store and search index build in 223 ms in one measured local process and
-allocate approximately 27.8 MB of Python memory. The generated catalogue text represents
-4,735,383 bytes; no materialized product catalogue is committed. The frozen query run
-measured full service search at 1.945 ms p50 / 3.418 ms p95 and authorization at 11.186 ms
-p50 / 16.126 ms p95 on the same machine. Method and machine details are frozen in
-[`data/eval/judge-playground/RUNTIME_REPORT.json`](data/eval/judge-playground/RUNTIME_REPORT.json)
-and [`data/eval/judge-playground/JUDGE_QUERY_REPORT.json`](data/eval/judge-playground/JUDGE_QUERY_REPORT.json).
+trusted evidence store and search index build in 379 ms in one measured local process and
+allocate approximately 35.7 MB of Python memory. The generated catalogue text represents
+6,140,416 bytes; no materialized product catalogue is committed. The frozen query run
+measured indexed search at 0.613 ms p50 / 1.105 ms p95 and authorization at 11.096 ms
+p50 / 17.564 ms p95 on the same machine. Method and machine details are frozen in
+[`data/eval/judge-playground-v3/RUNTIME_REPORT.json`](data/eval/judge-playground-v3/RUNTIME_REPORT.json)
+and [`data/eval/judge-playground-v3/JUDGE_QUERY_REPORT.json`](data/eval/judge-playground-v3/JUDGE_QUERY_REPORT.json).
 
 ### INT-1 — end to end
 
@@ -565,8 +566,8 @@ than failing in some less obvious way.
 
 | Gate | Result |
 | --- | --- |
-| Python suite | 1,214 passed |
-| UI suite | 94 passed |
+| Python suite | 1,322 passed |
+| UI suite | 156 passed |
 | JavaScript syntax | passed |
 
 Test counts are **engineering quality**, reported on their own. They are not a scale
@@ -623,7 +624,7 @@ Stated plainly, because the evidence is only worth what its scope allows.
 - The anomaly evaluation injects its own defects. A detector that finds them is **not**
   thereby shown to find fraud in production traffic.
 - Only **8 of 17,702 historical listings** carry separately registered merchant evidence.
-  The judge-facing transactable path is demonstrated in a separate 3,060-product synthetic
+  The judge-facing transactable path is demonstrated in a separate 3,960-product synthetic
   sandbox; that does not make any additional marketplace row transactable.
 
 ---

@@ -41,10 +41,12 @@ from mandateguard.sandbox.scenarios import (
     SCENARIOS_BY_ID,
     Scenario,
     TRY_THESE,
+    judge_test_strip,
     public_scenarios,
 )
 from mandateguard.sandbox.search import (
     Candidate,
+    ProductFamilyIntent,
     SandboxSearch,
     SearchResult,
     category_directory,
@@ -70,7 +72,7 @@ MAX_TOP_K = 10
 MIN_TOP_K = 1
 
 #: Where `scripts/evaluate_judge_playground.py` writes its measured outcome mix.
-HEALTH_REPORT_PATH = Path("data") / "eval" / "judge-playground" / "JUDGE_QUERY_REPORT.json"
+HEALTH_REPORT_PATH = Path("data") / "eval" / "judge-playground-v3" / "JUDGE_QUERY_REPORT.json"
 
 
 def _load_health_report(repository_root: Path | None) -> dict[str, Any] | None:
@@ -182,6 +184,7 @@ class PlaygroundSurface:
             },
             "categories": category_directory(),
             "scenarios": public_scenarios(),
+            "judge_test_strip": judge_test_strip(),
             "try_these": [dict(item) for item in TRY_THESE],
             "max_top_k": MAX_TOP_K,
             "max_declared_ceiling_minor": MAX_DECLARED_CEILING_MINOR,
@@ -241,14 +244,14 @@ class PlaygroundSurface:
             )
         intent = self.read(intent_text, declared_ceiling_minor=declared_ceiling_minor)
         result = self._search.search(intent, limit=top_k)
-        onboarded = self._matching_onboarded(session, intent)
+        onboarded = self._matching_onboarded(session, intent, result.product_family)
         # A person's newly onboarded record belongs at the front of their own
         # results, but the response remains within the same public 1-10 bound.
         # Without this cap, eight session records plus eight generated results
         # could turn the promised candidate set into a 16-item wall.
         candidates = (
             onboarded
-            + [self._candidate_mapping(item) for item in result.candidates]
+            + [self._candidate_mapping(item, intent) for item in result.candidates]
         )[:top_k]
         return {
             "world": WORLD_SANDBOX,
@@ -256,11 +259,16 @@ class PlaygroundSurface:
             "mandate_plain_english": intent.plain_english(),
             "spending_limit_required": intent.max_total_minor is None,
             "retrieval": {
-                "method": "LEXICAL_FIELD_WEIGHTED_PLUS_CATEGORY_SYNONYM",
+                "method": "LEXICAL_FIELD_WEIGHTED_PLUS_CATEGORY_INTENT_GUARD",
                 "catalog_products": self._manifest["product_count"],
                 "considered": result.considered,
                 "matched_categories": list(result.matched_categories),
                 "returned": len(candidates),
+                "product_family": (
+                    result.product_family.to_mapping()
+                    if result.product_family is not None
+                    else None
+                ),
             },
             "candidates": candidates,
             "near_misses": [item.to_mapping() for item in result.near_misses],
@@ -276,24 +284,75 @@ class PlaygroundSurface:
                 if intent.coverage.blocks_authorization
                 else None
             ),
-            "no_match_message": (
-                None
-                if candidates
-                else "No suitable sandbox product matched all of your constraints."
-            ),
+            "no_match": self._no_match_mapping(result, candidates),
+            "no_match_message": self._no_match_message(result, candidates),
             "authority": "RETRIEVAL_IS_ADVISORY_AND_DECIDES_NOTHING",
         }
 
+    @staticmethod
+    def _no_match_message(
+        result: SearchResult, candidates: list[dict[str, Any]]
+    ) -> str | None:
+        if candidates:
+            return None
+        if result.product_family is None or not result.product_family.available:
+            return "MandateGuard's sandbox does not currently contain this product category."
+        return "No suitable sandbox product matched all of your constraints."
+
+    @staticmethod
+    def _no_match_mapping(
+        result: SearchResult, candidates: list[dict[str, Any]]
+    ) -> dict[str, Any] | None:
+        if candidates:
+            return None
+        family = result.product_family
+        absent = family is None or not family.available
+        closest: list[dict[str, str]] = []
+        seen: set[str] = set()
+        for miss in result.near_misses:
+            if miss.product.category_id in seen:
+                continue
+            seen.add(miss.product.category_id)
+            closest.append(
+                {
+                    "category_id": miss.product.category_id,
+                    "label": miss.product.category_label,
+                }
+            )
+        return {
+            "headline": (
+                "NO DIRECT SANDBOX MATCH"
+                if absent
+                else "NO PRODUCT MEETS EVERY CONSTRAINT"
+            ),
+            "message": (
+                "MandateGuard's sandbox does not currently contain this product category."
+                if absent
+                else "The sandbox found the product family, but no listing met every stated constraint."
+            ),
+            "what_was_understood": family.label if family is not None else None,
+            "closest_available_categories": closest,
+            "alternatives_are_not_direct_matches": True,
+        }
+
     def _matching_onboarded(
-        self, session: JudgeSession | None, intent: SandboxIntent
+        self,
+        session: JudgeSession | None,
+        intent: SandboxIntent,
+        family: ProductFamilyIntent | None,
     ) -> list[dict[str, Any]]:
         """Surface this visitor's own onboarded listings alongside the catalogue."""
 
         if session is None:
             return []
         results: list[dict[str, Any]] = []
+        if family is not None and not family.available:
+            return results
+        allowed_categories = set(family.category_ids) if family is not None else None
         query_terms = {word for word in intent.search_text.split() if len(word) > 2}
         for merchant in self.sessions.onboarded(session):
+            if allowed_categories is not None and merchant.product.category_id not in allowed_categories:
+                continue
             haystack = f"{merchant.product.name} {merchant.product.category_label}".lower()
             if query_terms and not any(term in haystack for term in query_terms):
                 continue
@@ -311,15 +370,29 @@ class PlaygroundSurface:
                     or merchant.product.price_minor * intent.quantity
                     <= intent.max_total_minor
                 ),
+                "price_minor": merchant.product.price_minor,
+                "max_total_minor": intent.max_total_minor,
+                "quantity": intent.quantity,
+                "currency": merchant.product.currency,
                 "source": "SIMULATED_MERCHANT_ONBOARDING_IN_THIS_SESSION",
             }
             results.append(mapping)
         return results
 
-    def _candidate_mapping(self, candidate: Candidate) -> dict[str, Any]:
+    def _candidate_mapping(
+        self, candidate: Candidate, intent: SandboxIntent
+    ) -> dict[str, Any]:
         product = candidate.product
         mapping = product.public_mapping()
         mapping["why_found"] = candidate.signal.to_mapping()
+        mapping["why_found"].update(
+            {
+                "price_minor": product.price_minor,
+                "max_total_minor": intent.max_total_minor,
+                "quantity": intent.quantity,
+                "currency": product.currency,
+            }
+        )
         mapping["readiness"] = readiness_for(self._store, product)
         return mapping
 
@@ -468,6 +541,27 @@ class PlaygroundSurface:
                 "SCENARIO_UNAVAILABLE",
                 "No sandbox listing in that category is above this budget.",
             )
+        if scenario.selection == "SKU":
+            for product in self._universe.products:
+                if product.sku == scenario.selection_argument:
+                    return intent, product
+            raise PlaygroundError(
+                "SCENARIO_UNAVAILABLE", "The featured sandbox listing is unavailable."
+            )
+        if scenario.selection == "EVIDENCE_FAMILY_VIOLATION":
+            for product in self._universe.products:
+                if product.evidence_family.value != scenario.selection_argument:
+                    continue
+                if (
+                    intent.max_total_minor is not None
+                    and product.price_minor > intent.max_total_minor
+                ):
+                    continue
+                return intent, product
+            raise PlaygroundError(
+                "SCENARIO_UNAVAILABLE",
+                "No sandbox listing with that trusted evidence is in budget.",
+            )
         if scenario.selection == "EVIDENCE_FAMILY":
             for candidate in result.candidates:
                 if candidate.product.evidence_family.value == scenario.selection_argument:
@@ -591,6 +685,7 @@ def explain_decision(result: Mapping[str, Any], intent: SandboxIntent) -> dict[s
 
     reasons: list[str] = []
     failed_constraints: list[str] = []
+    failed_constraint_labels: list[str] = []
     price_minor = buyer.get("price_minor")
     currency = buyer.get("currency", "INR")
 
@@ -603,10 +698,12 @@ def explain_decision(result: Mapping[str, Any], intent: SandboxIntent) -> dict[s
     for row in deterministic.get("tier_a", []) or []:
         if isinstance(row, Mapping) and row.get("status") not in {"PASS", None}:
             failed_constraints.append(str(row.get("family", "")))
+            failed_constraint_labels.append(str(row.get("label", row.get("family", ""))))
             reasons.append(f"{row.get('label')}: {row.get('reason')}")
     for row in deterministic.get("tier_b", []) or []:
         if isinstance(row, Mapping) and row.get("status") == "FAIL":
             failed_constraints.append(str(row.get("family", "")))
+            failed_constraint_labels.append(str(row.get("label", row.get("family", ""))))
             reasons.append(f"{row.get('label')}: {row.get('reason')}")
     for row in semantic.get("checks", []) or []:
         if not isinstance(row, Mapping):
@@ -616,6 +713,7 @@ def explain_decision(result: Mapping[str, Any], intent: SandboxIntent) -> dict[s
             reasons.append(f"{row.get('constraint')} — {row.get('reason')}")
         elif status in {"VIOLATION", "ABSTAIN"}:
             failed_constraints.append(str(row.get("constraint_id", "")))
+            failed_constraint_labels.append(str(row.get("constraint", row.get("constraint_id", ""))))
             reasons.append(f"{status}: {row.get('constraint')} — {row.get('reason')}")
 
     if decision == "ALLOW":
@@ -627,6 +725,7 @@ def explain_decision(result: Mapping[str, Any], intent: SandboxIntent) -> dict[s
         "decision": decision,
         "why": reasons[:10],
         "failed_constraints": [item for item in failed_constraints if item][:6],
+        "failed_constraint_labels": [item for item in failed_constraint_labels if item][:6],
         "provider_calls": execution.get("razorpay_calls", 0),
         "external_network_calls": execution.get("external_network_calls", 0),
         # An ALLOW reaches the execution gate, but a deferred or revoked run

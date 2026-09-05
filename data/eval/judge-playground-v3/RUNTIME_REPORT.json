@@ -1,0 +1,38 @@
+{
+  "scope": "ONE_LOCAL_PROCESS_DESCRIPTIVE_NOT_A_PRODUCTION_SLO",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.12.0",
+  "world_version": "mandateguard-sandbox-commerce-v3",
+  "products_sha256": "523ff6aa4ccead30fd99a9cc1481286c05a7e2460b13d9a13ebbd1d3b4a72741",
+  "product_count": 3960,
+  "merchant_count": 60,
+  "category_count": 44,
+  "evidence_count": 7980,
+  "cold_playground_build_ms": 378.534,
+  "python_allocations_after_build_bytes": 35661715,
+  "python_peak_allocations_during_build_bytes": 35664050,
+  "search": {
+    "queries": 120,
+    "candidate_found_rate": 1.0,
+    "latency_ms": {
+      "p50": 0.613,
+      "p95": 1.105,
+      "max": 2.133,
+      "median": 0.61
+    }
+  },
+  "authorization": {
+    "source": "JUDGE_QUERY_REPORT_REAL_CONTROLLER_RUNS",
+    "latency_ms": {
+      "p50": 11.096,
+      "p95": 17.564
+    }
+  },
+  "artifact_bytes": {
+    "materialized_catalog_on_disk": 0,
+    "generated_catalog_text": 6140416,
+    "sandbox_python_source": 229461,
+    "frozen_query_and_reports": 382806,
+    "full_static_ui": 313341
+  }
+}

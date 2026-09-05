@@ -31,7 +31,7 @@ OUTPUT_PATH = (
     REPOSITORY_ROOT
     / "data"
     / "eval"
-    / "judge-playground"
+    / "judge-playground-v3"
     / "RUNTIME_REPORT.json"
 )
 
@@ -86,22 +86,41 @@ def main() -> int:
     product_source = [REPOSITORY_ROOT / "src" / "mandateguard" / "product" / "playground.py"]
     frozen_artifacts = [
         QUERY_PATH,
+        REPOSITORY_ROOT / "fixtures" / "playground" / "retrieval_v2_queries.json",
         REPOSITORY_ROOT
         / "data"
         / "eval"
-        / "judge-playground"
+        / "judge-playground-v3"
         / "SANDBOX_FREEZE.json",
         REPOSITORY_ROOT
         / "data"
         / "eval"
-        / "judge-playground"
+        / "judge-playground-v3"
         / "JUDGE_QUERY_REPORT.json",
+        REPOSITORY_ROOT
+        / "data"
+        / "eval"
+        / "judge-playground-v3"
+        / "RETRIEVAL_V2_REPORT.json",
+        REPOSITORY_ROOT
+        / "data"
+        / "eval"
+        / "judge-playground-v3"
+        / "HOSTILE_SMOKE_REPORT.json",
     ]
     static_assets = [
         REPOSITORY_ROOT / "src" / "mandateguard" / "product" / "static" / name
         for name in ("index.html", "app.css", "app.js")
     ]
     manifest = universe_manifest(universe)
+    health_path = (
+        REPOSITORY_ROOT
+        / "data"
+        / "eval"
+        / "judge-playground-v3"
+        / "JUDGE_QUERY_REPORT.json"
+    )
+    health = json.loads(health_path.read_text(encoding="utf-8")) if health_path.is_file() else {}
     report = {
         "scope": "ONE_LOCAL_PROCESS_DESCRIPTIVE_NOT_A_PRODUCTION_SLO",
         "platform": platform.platform(),
@@ -109,6 +128,9 @@ def main() -> int:
         "world_version": manifest["world_version"],
         "products_sha256": manifest["products_sha256"],
         "product_count": manifest["product_count"],
+        "merchant_count": manifest["merchant_count"],
+        "category_count": manifest["category_count"],
+        "evidence_count": manifest["evidence_count"],
         "cold_playground_build_ms": round(cold_load_ms, 3),
         "python_allocations_after_build_bytes": current_bytes,
         "python_peak_allocations_during_build_bytes": peak_bytes,
@@ -124,9 +146,16 @@ def main() -> int:
                 "median": round(median(search_times), 3),
             },
         },
+        "authorization": {
+            "source": "JUDGE_QUERY_REPORT_REAL_CONTROLLER_RUNS",
+            "latency_ms": {
+                "p50": health.get("latency_ms", {}).get("authorization_p50"),
+                "p95": health.get("latency_ms", {}).get("authorization_p95"),
+            },
+        },
         "artifact_bytes": {
             # The catalogue itself is generated in memory and is not committed
-            # as a 3,060-row JSON fixture.
+            # as a 3,960-row JSON fixture.
             "materialized_catalog_on_disk": 0,
             "generated_catalog_text": manifest["text_bytes"],
             "sandbox_python_source": _bytes(sandbox_source + product_source),

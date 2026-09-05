@@ -138,6 +138,13 @@ def test_capability_replay_is_rejected_before_an_additional_provider_call(
         "reason": "NONCE_ALREADY_USED",
         "razorpay_additional_calls": 0,
         "external_additional_calls": 0,
+        "checks": {
+            "signed": True,
+            "expired": False,
+            "mandate_active": True,
+            "transaction_matches": True,
+            "provider_reached": False,
+        },
     }
     assert replayed["result"]["execution"]["razorpay_calls"] == 1
 
@@ -370,6 +377,9 @@ def test_access_log_is_bounded_and_free_of_intent_and_identifiers(
     )
     assert route_template("/api/runs/run_" + "a" * 32 + "/recover") == (
         "/api/runs/{run_id}/recover"
+    )
+    assert route_template("/api/runs/run_" + "a" * 32 + "/mutate") == (
+        "/api/runs/{run_id}/mutate"
     )
     assert route_template("/../../etc/passwd") == "/unmatched"
 

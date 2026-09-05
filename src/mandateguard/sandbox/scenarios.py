@@ -82,6 +82,67 @@ SCENARIOS: tuple[Scenario, ...] = (
         ),
     ),
     Scenario(
+        scenario_id="recurring-billing",
+        label="RECURRING BILLING",
+        intent="Buy this as a one-time purchase. No subscriptions.",
+        world=SANDBOX_WORLD,
+        selection="EVIDENCE_FAMILY_VIOLATION",
+        selection_argument="RECURRING_DECLARED",
+        declared_ceiling_minor=500_000,
+        expectation="BLOCK on recurrence / billing model, zero provider calls",
+        story=(
+            "The buyer requires a one-time purchase. The selected synthetic "
+            "merchant record explicitly declares recurring billing, so the existing "
+            "controller blocks it and issues no capability."
+        ),
+    ),
+    Scenario(
+        scenario_id="price-mutation",
+        label="PRICE MUTATION",
+        intent="Buy wireless headphones under INR 5,000. No subscriptions.",
+        world=SANDBOX_WORLD,
+        selection="SKU",
+        selection_argument="headphones-042",
+        expectation="ALLOW at INR 3,499, then transaction hash mismatch at INR 7,999",
+        story=(
+            "MandateGuard signs an exact INR 3,499 transaction. The execution lab "
+            "changes the amount to INR 7,999 after authorization and presents the "
+            "original capability to the ordinary execution gate."
+        ),
+        defer_execution=True,
+        follow_up="MUTATE_PRICE",
+    ),
+    Scenario(
+        scenario_id="sku-mutation",
+        label="SKU SWAP",
+        intent="Buy wireless headphones under INR 5,000. No subscriptions.",
+        world=SANDBOX_WORLD,
+        selection="SKU",
+        selection_argument="headphones-042",
+        expectation="ALLOW for headphones-042, then transaction hash mismatch for headphones-091",
+        story=(
+            "The merchant stays fixed while the SKU changes after authorization. "
+            "The signed capability remains valid but cannot authorize a different item."
+        ),
+        defer_execution=True,
+        follow_up="MUTATE_SKU",
+    ),
+    Scenario(
+        scenario_id="merchant-mutation",
+        label="MERCHANT CHANGE",
+        intent="Buy wireless headphones under INR 5,000. No subscriptions.",
+        world=SANDBOX_WORLD,
+        selection="SKU",
+        selection_argument="headphones-042",
+        expectation="ALLOW for merchant A, then MERCHANT_MISMATCH for merchant B",
+        story=(
+            "The transaction is redirected to another synthetic merchant after "
+            "authorization. The execution gate rejects the changed seller before I/O."
+        ),
+        defer_execution=True,
+        follow_up="MUTATE_MERCHANT",
+    ),
+    Scenario(
         scenario_id="prohibited-content",
         label="PROHIBITED CONTENT",
         intent=(
@@ -182,6 +243,16 @@ SCENARIOS: tuple[Scenario, ...] = (
 
 SCENARIOS_BY_ID = {item.scenario_id: item for item in SCENARIOS}
 
+JUDGE_TEST_STRIP_IDS: tuple[str, ...] = (
+    "safe-purchase",
+    "budget-violation",
+    "recurring-billing",
+    "price-mutation",
+    "sku-mutation",
+    "revoked-after-allow",
+    "replay",
+)
+
 
 def public_scenarios() -> list[dict[str, Any]]:
     return [
@@ -196,6 +267,19 @@ def public_scenarios() -> list[dict[str, Any]]:
             "expectation_is_documentation": True,
         }
         for item in SCENARIOS
+    ]
+
+
+def judge_test_strip() -> list[dict[str, Any]]:
+    """The compact 90-second path, backed by the ordinary scenario registry."""
+
+    return [
+        {
+            "scenario_id": scenario_id,
+            "label": SCENARIOS_BY_ID[scenario_id].label,
+            "expectation": SCENARIOS_BY_ID[scenario_id].expectation,
+        }
+        for scenario_id in JUDGE_TEST_STRIP_IDS
     ]
 
 

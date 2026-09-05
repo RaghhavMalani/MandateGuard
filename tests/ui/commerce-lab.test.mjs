@@ -1041,23 +1041,23 @@ test("Playground rail has the complete authorization journey and never infers a 
 });
 
 
-test("each sandbox result names all five retrieval signals and readiness fields", () => {
+test("each sandbox result names only the actual retrieval signals and readiness fields", () => {
   const html = renderPlaygroundCandidate(sandboxCandidate);
   assert.match(html, /Dimmable study lamp/);
   assert.match(html, /₹1,599/);
   assert.match(html, /Brightleaf Lighting \(Synthetic\)/);
   assert.match(html, /Desk lamps/);
   for (const label of [
-    "Semantic similarity",
-    "Lexical signal",
+    "Key terms",
     "Budget",
-    "Brand preference",
+    "Brand",
     "Category match",
   ]) {
     assert.match(html, new RegExp(label));
   }
-  assert.match(html, /deterministic category synonym/);
-  assert.match(html, /exact phrase “study lamp”/);
+  assert.doesNotMatch(html, /Semantic similarity/);
+  assert.match(html, /<dt>Category match<\/dt><dd>Desk lamps<\/dd>/);
+  assert.match(html, /phrase “study lamp”/);
   assert.match(html, /Merchant identity/);
   assert.match(html, /SKU evidence/);
   assert.match(html, /Billing model/);

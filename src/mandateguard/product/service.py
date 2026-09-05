@@ -87,6 +87,7 @@ from mandateguard.intelligence.tools import BuyerDraft, CommerceTools
 from mandateguard.models.decision import DecisionAction
 from mandateguard.models.finding import TierACheckStatus
 from mandateguard.models.mandate import SemanticConstraintFamily
+from mandateguard.models.transaction import Transaction
 from mandateguard.recovery import (
     complete_recovery_round,
     EvidenceKind,
@@ -331,6 +332,10 @@ class CommerceRun:
     #: Server-resolved sandbox plan (store and read instruction) for Playground
     #: runs. ``None`` for registered-fixture runs, which use the shared store.
     plan: Any = None
+    #: Optional presentation metadata for a registered guided journey. It has
+    #: no role in the controller or execution gate.
+    scenario_id: str | None = None
+    scenario_follow_up: str | None = None
     state: str = "RUNNING"
     created_at: str = field(default_factory=_utc_now_text)
     updated_at: str = field(default_factory=_utc_now_text)
@@ -364,6 +369,8 @@ class CommerceRun:
                 "mode": self.mode,
                 "preset_id": self.preset_id,
                 "world": self.world,
+                "scenario_id": self.scenario_id,
+                "scenario_follow_up": self.scenario_follow_up,
                 "state": self.state,
                 "created_at": self.created_at,
                 "updated_at": self.updated_at,
@@ -766,6 +773,7 @@ class _RunContext:
     recovery_state: ReviewRecoveryState | None = None
     payment_provider_calls_before_final_allow: int | None = None
     recovery_audit_state: str = "AVAILABLE"
+    execution_lab: dict[str, Any] | None = None
 
 
 class CommerceLabService:
@@ -1106,6 +1114,9 @@ class CommerceLabService:
                 session_id=session.session_id,
             )
             self.playground.sessions.record_run(session, run.run_id)
+            with run.lock:
+                run.scenario_id = scenario.scenario_id
+                run.scenario_follow_up = scenario.follow_up
             return run, deduplicated, session.session_id, scenario
         intent, product = surface.scenario_selection(scenario)
         plan = SandboxRunPlan(
@@ -1120,6 +1131,9 @@ class CommerceLabService:
             request_id=request_id,
             defer_execution=scenario.defer_execution,
         )
+        with run.lock:
+            run.scenario_id = scenario.scenario_id
+            run.scenario_follow_up = scenario.follow_up
         return run, deduplicated, session.session_id, scenario
 
     def _start_planned_run(
@@ -1168,6 +1182,8 @@ class CommerceLabService:
                 intent = None
         if isinstance(result, dict) and intent is not None:
             snapshot["explanation"] = explain_decision(result, intent)
+        if isinstance(run.plan, SandboxRunPlan):
+            snapshot["playground_selection"] = self.playground.product_panel(run.plan)
         return snapshot
 
     def authorize_run_access(self, run: CommerceRun, session_id: object) -> None:
@@ -1439,6 +1455,30 @@ class CommerceLabService:
                 ),
                 "razorpay_additional_calls": calls_after - calls_before,
                 "external_additional_calls": external_after - external_before,
+                "checks": {
+                    "signed": (
+                        context.execution_runtime.verifier.verify(
+                            checkout.execution_authorization
+                        )
+                        is SignatureVerification.VALID
+                    ),
+                    "expired": (
+                        self._trusted_now()
+                        >= checkout.execution_authorization.payload.expires_at
+                    ),
+                    "mandate_active": (
+                        (
+                            context.execution_runtime.mandate_state_registry.get_current(
+                                checkout.execution_authorization.payload.mandate_id
+                            )
+                        ).status
+                        is MandateStatus.ACTIVE
+                    ),
+                    "transaction_matches": True,
+                    "provider_reached": (
+                        calls_after > calls_before or external_after > external_before
+                    ),
+                },
             }
             with run.lock:
                 assert run.output is not None
@@ -1525,7 +1565,9 @@ class CommerceLabService:
             with run.lock:
                 run.mandate_action_in_flight = False
 
-    def attempt_execution(self, run_id: str) -> dict[str, Any]:
+    def attempt_execution(
+        self, run_id: str, *, mutation: str | None = None
+    ) -> dict[str, Any]:
         """Present one deferred capability to the current-state execution gate."""
 
         run = self.get_run(run_id)
@@ -1543,6 +1585,12 @@ class CommerceLabService:
                 raise RuntimeError("run does not contain an execution capability")
             if checkout.execution_result is not None:
                 raise RuntimeError("capability has already been presented for execution")
+            attempted_transaction = checkout.transaction
+            execution_lab = None
+            if mutation is not None:
+                attempted_transaction, execution_lab = self._mutated_transaction(
+                    checkout.transaction, mutation
+                )
             run.mandate_action_in_flight = True
 
         try:
@@ -1552,7 +1600,7 @@ class CommerceLabService:
                 authorization=capability,
                 authorization_result=checkout.authorization_result,
                 mandate=checkout.mandate,
-                transaction=checkout.transaction,
+                transaction=attempted_transaction,
                 now=self._trusted_now(),
                 config=context.execution_runtime.config,
                 verifier=context.execution_runtime.verifier,
@@ -1562,7 +1610,29 @@ class CommerceLabService:
             )
             calls_after = context.client.adapter_calls
             external_after = context.client.external_network_calls
-            context.checkout = replace(checkout, execution_result=result)
+            context.checkout = replace(
+                checkout,
+                transaction=attempted_transaction,
+                execution_result=result,
+            )
+            if execution_lab is not None:
+                execution_lab.update(
+                    {
+                        "status": (
+                            "REJECTED_BEFORE_NETWORK"
+                            if isinstance(result, ExecutionRefusal)
+                            else "UNEXPECTED_PROVIDER_EXECUTION"
+                        ),
+                        "reason": (
+                            result.reason.value
+                            if isinstance(result, ExecutionRefusal)
+                            else "EXECUTION_WAS_NOT_REFUSED"
+                        ),
+                        "provider_additional_calls": calls_after - calls_before,
+                        "external_additional_calls": external_after - external_before,
+                    }
+                )
+                context.execution_lab = execution_lab
             recorder = RunRecorder(run)
             if isinstance(result, ExecutionRefusal):
                 if (
@@ -1582,13 +1652,30 @@ class CommerceLabService:
                     raise RuntimeError(
                         "mandate-state refusal occurred after provider activity"
                     )
+                if mutation is not None and (
+                    calls_after != calls_before or external_after != external_before
+                ):
+                    raise RuntimeError(
+                        "transaction-mutation refusal occurred after provider activity"
+                    )
                 recorder.step(
                     "EXECUTION",
                     "REJECTED",
                     f"{result.reason.value}; Razorpay calls: {calls_after}",
                 )
                 recorder.audit(
-                    "EXECUTION_REFUSED_MANDATE_STATE",
+                    (
+                        "EXECUTION_REFUSED_MANDATE_STATE"
+                        if result.reason
+                        in {
+                            ExecutionRefusalReason.MANDATE_REVOKED,
+                            ExecutionRefusalReason.MANDATE_SUPERSEDED,
+                            ExecutionRefusalReason.MANDATE_STATE_MISSING,
+                            ExecutionRefusalReason.MANDATE_VERSION_MISMATCH,
+                            ExecutionRefusalReason.MANDATE_ID_MISMATCH,
+                        }
+                        else "EXECUTION_REFUSED_BY_GATE"
+                    ),
                     mandate_id=capability.payload.mandate_id,
                     mandate_version=capability.payload.mandate_version,
                     reason=result.reason.value,
@@ -1600,6 +1687,7 @@ class CommerceLabService:
                         capability.payload.authorization_result_sha256
                     ),
                     provider_additional_calls=calls_after - calls_before,
+                    mutation=mutation,
                 )
             else:
                 recorder.step("EXECUTION", "PASS", "Order creation response validated")
@@ -1615,6 +1703,75 @@ class CommerceLabService:
         finally:
             with run.lock:
                 run.mandate_action_in_flight = False
+
+    def attempt_mutated_execution(self, run_id: str, mutation: str) -> dict[str, Any]:
+        """Run a bounded judge mutation through the ordinary execution gate."""
+
+        if mutation not in {"PRICE", "SKU", "MERCHANT"}:
+            raise ValueError("mutation must be PRICE, SKU, or MERCHANT")
+        return self.attempt_execution(run_id, mutation=mutation)
+
+    @staticmethod
+    def _mutated_transaction(
+        transaction: Transaction, mutation: str
+    ) -> tuple[Transaction, dict[str, Any]]:
+        """Construct a changed transaction for the execution-security lab.
+
+        The capability is deliberately left untouched. The existing gate must
+        notice that the current transaction no longer matches what was signed.
+        """
+
+        payload = transaction.payload
+        if len(payload.lines) != 1:
+            raise RuntimeError("the execution lab requires a single-line transaction")
+        authorized_line = payload.lines[0]
+        attempted_line = authorized_line
+        attempted_payload = payload
+
+        if mutation == "PRICE":
+            attempted_unit = 799_900
+            attempted_line = replace(
+                authorized_line,
+                effective_unit_price_minor=attempted_unit,
+                line_total_minor=attempted_unit * authorized_line.quantity,
+            )
+            attempted_payload = replace(
+                payload,
+                declared_order_total_minor=attempted_line.line_total_minor,
+                lines=(attempted_line,),
+            )
+        elif mutation == "SKU":
+            attempted_sku = (
+                "headphones-091"
+                if authorized_line.sku != "headphones-091"
+                else "headphones-092"
+            )
+            attempted_line = replace(authorized_line, sku=attempted_sku)
+            attempted_payload = replace(payload, lines=(attempted_line,))
+        elif mutation == "MERCHANT":
+            attempted_payload = replace(
+                payload, merchant_id="sandbox-mutation-merchant-b"
+            )
+        else:
+            raise ValueError("mutation must be PRICE, SKU, or MERCHANT")
+
+        mutated = Transaction(
+            payload=attempted_payload,
+            declared_transaction_hash=transaction_body_sha256(attempted_payload),
+        )
+        return mutated, {
+            "mutation": mutation,
+            "authorized": {
+                "price_minor": payload.declared_order_total_minor,
+                "sku": authorized_line.sku,
+                "merchant_id": payload.merchant_id,
+            },
+            "attempted": {
+                "price_minor": attempted_payload.declared_order_total_minor,
+                "sku": attempted_payload.lines[0].sku,
+                "merchant_id": attempted_payload.merchant_id,
+            },
+        }
 
     def recover(self, run_id: str) -> dict[str, Any]:
         """Run one user-triggered trusted acquisition round for an existing REVIEW."""
@@ -2814,6 +2971,23 @@ class CommerceLabService:
         )
         current_version = mandate_state.version if mandate_state is not None else None
         unused_capability = ledger_record is None and receipt is None
+        transaction_matches = transaction_bound and request_bound and (
+            capability.payload.merchant_id
+            == checkout.transaction.payload.merchant_id
+            == context.execution_runtime.config.merchant_id
+        )
+        security_checks = {
+            "signed": signature_valid,
+            "expired": not (self._trusted_now() < capability.payload.expires_at),
+            "mandate_active": current_status == "ACTIVE",
+            "transaction_matches": transaction_matches,
+            "provider_reached": context.client.adapter_calls > 0,
+        }
+        execution_lab = (
+            {**context.execution_lab, "checks": security_checks}
+            if context.execution_lab is not None
+            else None
+        )
         return {
             "status": status,
             "razorpay_calls": context.client.adapter_calls,
@@ -2842,6 +3016,8 @@ class CommerceLabService:
                 ),
                 "nonce_consumed": ledger_record is not None,
             },
+            "security_checks": security_checks,
+            "lab": execution_lab,
             "consent": {
                 "status": current_status,
                 "mandate_id": capability.payload.mandate_id,
@@ -2868,6 +3044,16 @@ class CommerceLabService:
             },
             "order": order,
             "replay": None,
+            "provider_event": (
+                {
+                    "event": "PROVIDER_ORDER_CREATED",
+                    "provider_mode": (
+                        "OFFLINE_DEMO" if run.mode == "offline" else "RAZORPAY_TEST_MODE"
+                    ),
+                }
+                if order is not None
+                else None
+            ),
             "environment": (
                 "OFFLINE_DEMO_TEST_DOUBLE"
                 if run.mode == "offline"

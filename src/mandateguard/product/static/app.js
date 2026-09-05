@@ -188,7 +188,7 @@ export const EVALUATION_EVIDENCE = {
 
 /** Engineering quality only. Updated when the suites change; a test count is
     never presented as scale, model quality, or authorization evidence. */
-export const TEST_TOTALS = { python: 1214, ui: 94 };
+export const TEST_TOTALS = { python: 1322, ui: 156 };
 
 export class SubmissionLock {
   #locked = false;
@@ -2182,27 +2182,34 @@ export function renderReadiness(readiness) {
 
 /* ---------------- candidates ---------------- */
 
-export function renderWhyFound(why) {
+export function renderWhyFound(why, candidate = {}) {
   if (!why) return "";
-  const semantic = Number(why.semantic_similarity || 0);
+  const priceMinor = Number(why.price_minor ?? candidate.price_minor);
+  const hasCeiling = why.max_total_minor !== null && why.max_total_minor !== undefined;
+  const ceilingMinor = hasCeiling ? Number(why.max_total_minor) : NaN;
+  const quantity = Math.max(1, Number(why.quantity || 1));
+  const totalMinor = priceMinor * quantity;
+  const currency = why.currency || candidate.currency || "INR";
+  const budget = Number.isFinite(totalMinor) && Number.isFinite(ceilingMinor)
+    ? `${quantity > 1 ? `${quantity} × ${money(priceMinor, currency)} = ` : ""}${money(
+        totalMinor,
+        currency,
+      )} ${why.within_budget === false ? ">" : "≤"} ${money(ceilingMinor, currency)}`
+    : why.within_budget === false
+      ? "above your limit"
+      : "no limit stated yet";
   const rows = [
+    ["Category match", why.category_match || candidate.category || "related listing text"],
     [
-      "Semantic similarity",
-      semantic > 0
-        ? `${semantic.toFixed(2)} · deterministic category synonym`
-        : "no category-synonym signal",
-    ],
-    [
-      "Lexical signal",
+      "Key terms",
       why.matched_terms?.length
-        ? `${why.matched_terms.join(", ")} · score ${Number(why.lexical_score || 0).toFixed(2)}`
+        ? why.matched_terms.join(", ")
         : "no direct term match",
     ],
-    ["Budget", why.within_budget === false ? "above your limit" : "within your limit"],
-    ["Brand preference", why.brand_match || "none stated"],
-    ["Category match", why.category_match || "related listing text"],
+    ["Budget", budget],
+    ["Brand", why.brand_match || "not specified"],
   ];
-  if (why.exact_phrase_match) rows[1][1] += ` · exact phrase “${why.exact_phrase_match}”`;
+  if (why.exact_phrase_match) rows[1][1] += ` · phrase “${why.exact_phrase_match}”`;
   if (why.source) rows.push(["Source", "created by your simulated onboarding"]);
   return `
     <div class="pgcard__why">
@@ -2242,7 +2249,7 @@ export function renderPlaygroundCandidate(
         <span>${escapeHtml(candidate.category)}</span>
         ${recurring}${onboarded}
       </p>
-      ${renderWhyFound(candidate.why_found)}
+      ${renderWhyFound(candidate.why_found, candidate)}
       <div class="pgcard__readiness">
         <p class="pgcard__readinessk">AGENT READINESS</p>
         ${renderReadiness(candidate.readiness)}
@@ -2341,6 +2348,8 @@ export function renderClarificationRequired(payload) {
  */
 export function renderNoMatch(payload) {
   if (!payload || (payload.candidates || []).length) return "";
+  const noMatch = payload.no_match || {};
+  const absentFamily = noMatch.headline === "NO DIRECT SANDBOX MATCH";
   const applied = (payload.constraints_applied || [])
     .map((line) => `<li>${escapeHtml(line)}</li>`)
     .join("");
@@ -2356,14 +2365,23 @@ export function renderNoMatch(payload) {
         </li>`,
     )
     .join("");
+  const categories = (noMatch.closest_available_categories || [])
+    .map((item) => `<li>${escapeHtml(item.label)}</li>`)
+    .join("");
   return `
     <div class="nomatch">
-      <p class="nomatch__head">${escapeHtml(
-        payload.no_match_message || "No suitable sandbox product matched all of your constraints.",
+      <p class="nomatch__head">${escapeHtml(noMatch.headline || "NO DIRECT SANDBOX MATCH")}</p>
+      <p class="nomatch__body">${escapeHtml(
+        noMatch.message || payload.no_match_message || "No suitable sandbox product matched all of your constraints.",
       )}</p>
+      ${noMatch.what_was_understood ? `<p class="nomatch__k">WHAT WAS UNDERSTOOD</p><p class="nomatch__understood">${escapeHtml(noMatch.what_was_understood)}</p>` : ""}
       ${applied ? `<p class="nomatch__k">CONSTRAINTS APPLIED</p><ul class="nomatch__list">${applied}</ul>` : ""}
       ${
-        misses
+        absentFamily && categories
+          ? `<p class="nomatch__k">CLOSEST AVAILABLE CATEGORIES</p>
+             <ul class="nomatch__list nomatch__alternatives">${categories}</ul>
+             <p class="nomatch__alternative-note">These are alternatives, not direct matches.</p>`
+          : misses
           ? `<p class="nomatch__k">CLOSEST CANDIDATES, AND WHAT EXCLUDED THEM</p>
              <ul class="nomatch__misses">${misses}</ul>`
           : ""
@@ -2477,8 +2495,12 @@ export function renderPlaygroundWhy(snapshot) {
   const why = (explanation.why || [])
     .map((line) => `<li>${escapeHtml(line)}</li>`)
     .join("");
+  const labels = explanation.failed_constraint_labels || [];
   const failed = (explanation.failed_constraints || [])
-    .map((item) => `<li><code>${escapeHtml(item)}</code></li>`)
+    .map(
+      (item, index) =>
+        `<li><code>${escapeHtml(item)}</code><span>${escapeHtml(labels[index] || humanize(item))}</span></li>`,
+    )
     .join("");
   return `
     <div class="pgwhy">
@@ -2499,6 +2521,75 @@ export function renderPlaygroundWhy(snapshot) {
     </div>`;
 }
 
+function renderExecutionChecks(checks) {
+  if (!checks) return "";
+  const rows = [
+    ["SIGNED?", checks.signed],
+    ["EXPIRED?", checks.expired],
+    ["MANDATE ACTIVE?", checks.mandate_active],
+    ["TRANSACTION MATCHES?", checks.transaction_matches],
+    ["PROVIDER REACHED?", checks.provider_reached],
+  ];
+  return `<dl class="pggate__checks">${rows
+    .map(
+      ([label, value]) =>
+        `<div data-check="${value ? "yes" : "no"}"><dt>${escapeHtml(label)}</dt><dd>${
+          label === "PROVIDER REACHED?" && !value ? "NO" : value ? "YES" : "NO"
+        }</dd></div>`,
+    )
+    .join("")}</dl>`;
+}
+
+export function renderExecutionLab(snapshot) {
+  const execution = snapshot?.result?.execution || {};
+  const lab = execution.lab;
+  if (!lab) return "";
+  const field =
+    lab.mutation === "PRICE" ? "price_minor" : lab.mutation === "SKU" ? "sku" : "merchant_id";
+  const label = lab.mutation === "PRICE" ? "PRICE" : lab.mutation === "SKU" ? "SKU" : "MERCHANT";
+  const format = (value) =>
+    field === "price_minor" ? money(value, snapshot?.result?.buyer?.currency || "INR") : value;
+  return `
+    <section class="pggate" data-mutation="${escapeHtml(lab.mutation)}" aria-label="Execution gate result">
+      <div class="pggate__head">
+        <p class="pggate__eyebrow">EXECUTION SECURITY LAB</p>
+        <p class="pggate__status">REJECTED BEFORE NETWORK</p>
+      </div>
+      <div class="pggate__binding">
+        <div><span>AUTHORIZED ${label}</span><strong>${escapeHtml(format(lab.authorized[field]))}</strong></div>
+        <div class="pggate__arrow" aria-hidden="true">→</div>
+        <div><span>ATTEMPTED ${label}</span><strong>${escapeHtml(format(lab.attempted[field]))}</strong></div>
+      </div>
+      <dl class="pggate__verdict">
+        <div><dt>SIGNED CAPABILITY</dt><dd>${lab.checks?.signed ? "VALID SIGNATURE" : "INVALID"}</dd></div>
+        <div><dt>EXECUTION</dt><dd>REJECTED</dd></div>
+        <div><dt>REASON</dt><dd>${escapeHtml(lab.reason || execution.reason || "")}</dd></div>
+        <div><dt>PROVIDER CALLS</dt><dd>${escapeHtml(String(lab.provider_additional_calls ?? 0))}</dd></div>
+      </dl>
+      ${renderExecutionChecks(lab.checks)}
+    </section>`;
+}
+
+export function renderRecurringProof(snapshot) {
+  if (snapshot?.scenario_id !== "recurring-billing") return "";
+  const product = snapshot?.playground_selection?.product || {};
+  const explanation = snapshot?.explanation || {};
+  return `
+    <section class="pgproof" aria-label="Recurring billing controller proof">
+      <p class="pgproof__eyebrow">CONTROLLER PROOF</p>
+      <dl class="pgproof__grid">
+        <div><dt>USER REQUIRED</dt><dd>ONE_TIME</dd></div>
+        <div><dt>TRUSTED MERCHANT EVIDENCE</dt><dd>${escapeHtml(product.billing_model || "")}</dd></div>
+        <div><dt>FAILED CONSTRAINT</dt><dd>${escapeHtml(
+          (explanation.failed_constraint_labels || []).join(" / ") || "RECURRENCE / BILLING MODEL",
+        )}</dd></div>
+        <div><dt>PROVIDER CALLS</dt><dd>${escapeHtml(
+          String(snapshot?.result?.execution?.razorpay_calls ?? 0),
+        )}</dd></div>
+      </dl>
+    </section>`;
+}
+
 /**
  * The execution panel.
  *
@@ -2513,13 +2604,14 @@ export function renderPlaygroundExecution(snapshot) {
   const created = execution.status === "ORDER_CREATED";
   const order = execution.order || null;
   const buyer = snapshot?.result?.buyer || {};
+  const rejected = execution.status === "REJECTED_BEFORE_NETWORK";
   const rows = [
     ["STATUS", humanize(execution.status)],
     ["ORDER", order?.order_id || (created ? "" : "not created")],
     ["AMOUNT", money(order?.amount ?? buyer.price_minor, order?.currency || buyer.currency)],
     ["MERCHANT", buyer.merchant || ""],
     ["SKU", buyer.sku || ""],
-    ["CAPABILITY", created ? "consumed" : execution.consent?.status ? "issued" : ""],
+    ["CAPABILITY", created ? "consumed" : execution.consent?.status ? "signed + unexpired" : "not issued"],
     // Consent is checked when the capability is spent, not only when it was
     // issued, so the state at spend time is the interesting one to show.
     ["CONSENT AT SPEND TIME", execution.consent?.status || ""],
@@ -2535,13 +2627,16 @@ export function renderPlaygroundExecution(snapshot) {
     .join("");
   return `
     <div class="pgexec" data-created="${created ? "true" : "false"}">
-      <p class="pgexec__k">${created ? "SIMULATED OFFLINE ORDER" : "PAYMENT NOT REACHED"}</p>
+      <p class="pgexec__k">${created ? "SIMULATED OFFLINE ORDER" : rejected ? "REJECTED BEFORE NETWORK" : "PAYMENT NOT REACHED"}</p>
       <dl class="pgexec__rows">${rows}</dl>
       <p class="pgexec__note">
         Offline Razorpay-style test adapter. No external network call was made, no money moved,
         and nothing was captured or settled at a payment provider.
       </p>
-    </div>`;
+    </div>
+    ${renderRecurringProof(snapshot)}
+    ${renderExecutionLab(snapshot)}
+    ${rejected && !execution.lab ? `<section class="pggate pggate--compact"><p class="pggate__eyebrow">EXECUTION GATE CHECKS</p>${renderExecutionChecks(execution.security_checks)}</section>` : ""}`;
 }
 
 export function renderPlaygroundFollowUps(snapshot) {
@@ -2550,14 +2645,19 @@ export function renderPlaygroundFollowUps(snapshot) {
   const execution = result.execution || {};
   const buttons = [];
   if (execution.status === "AUTHORIZED") {
+    const featured = snapshot.scenario_follow_up;
     buttons.push(
-      '<button type="button" class="pgfollow__btn" id="pg-revoke">REVOKE MY PERMISSION</button>',
-      '<button type="button" class="pgfollow__btn" id="pg-execute">ATTEMPT EXECUTION</button>',
+      '<button type="button" class="pgfollow__btn" id="pg-execute">EXECUTE ONCE</button>',
+      '<button type="button" class="pgfollow__btn" disabled title="Execute once before replaying">REPLAY CAPABILITY</button>',
+      '<button type="button" class="pgfollow__btn" id="pg-revoke">REVOKE CONSENT</button>',
+      `<button type="button" class="pgfollow__btn${featured === "MUTATE_PRICE" ? " pgfollow__btn--featured" : ""}" id="pg-mutate-price">MUTATE PRICE TO ₹7,999</button>`,
+      `<button type="button" class="pgfollow__btn${featured === "MUTATE_SKU" ? " pgfollow__btn--featured" : ""}" id="pg-mutate-sku">SWAP SKU BEFORE EXECUTION</button>`,
+      `<button type="button" class="pgfollow__btn${featured === "MUTATE_MERCHANT" ? " pgfollow__btn--featured" : ""}" id="pg-mutate-merchant">CHANGE MERCHANT</button>`,
     );
   }
   if (execution.status === "ORDER_CREATED" && !execution.replay) {
     buttons.push(
-      '<button type="button" class="pgfollow__btn" id="pg-replay">REPLAY THE SAME CAPABILITY</button>',
+      '<button type="button" class="pgfollow__btn pgfollow__btn--featured" id="pg-replay">REPLAY CAPABILITY</button>',
     );
   }
   if (result.decision === "REVIEW" && result.recovery?.action?.enabled) {
@@ -2573,10 +2673,10 @@ export function renderPlaygroundFollowUps(snapshot) {
         )}</p>`
       : "";
   const replay = execution.replay
-    ? `<p class="pgfollow__note" data-replay="${escapeHtml(execution.replay.status)}">${escapeHtml(
+    ? `<div class="pgfollow__replay"><p class="pgfollow__note" data-replay="${escapeHtml(execution.replay.status)}">${escapeHtml(
         `Second presentation of the same capability: ${execution.replay.status} (${execution.replay.reason}), ` +
           `${execution.replay.razorpay_additional_calls} additional provider calls.`,
-      )}</p>`
+      )}</p>${renderExecutionChecks(execution.replay.checks)}</div>`
     : "";
   if (!buttons.length && !note && !replay) return "";
   return `<div class="pgfollow">${buttons.join("")}${note}${replay}</div>`;
@@ -2595,6 +2695,16 @@ export function renderScenarioGrid(scenarios) {
             item.world === "REGISTERED" ? "REGISTERED MERCHANT FIXTURES" : "SANDBOX",
           )}</span>
         </button>`,
+    )
+    .join("");
+}
+
+export function renderJudgeTestStrip(items) {
+  return (items || [])
+    .map(
+      (item) => `<button type="button" class="pgstrip__btn" data-scenario="${escapeHtml(
+        item.scenario_id,
+      )}" title="${escapeHtml(item.expectation)}">${escapeHtml(item.label)}</button>`,
     )
     .join("");
 }
@@ -2636,7 +2746,7 @@ export function renderGapFigure({ marketplace, sandbox, authorizedNote } = {}) {
       <li class="gapfig__row" data-tier="ready">
         <p class="gapfig__k">AGENT-READY</p>
         <p class="gapfig__v">${products.toLocaleString("en-IN")}</p>
-        <p class="gapfig__what">synthetic sandbox products with complete evidence</p>
+        <p class="gapfig__what">synthetic products with merchant-published evidence</p>
         <span class="gapfig__bar" style="--gap-width:${bar(products)}%"></span>
       </li>
       <li class="gapfig__gap"><span>your mandate, right now</span></li>
@@ -2661,7 +2771,7 @@ export function renderScaleWorlds(config, playground) {
     [
       "JUDGE SANDBOX",
       Number(playground?.catalog?.products || 0).toLocaleString("en-IN"),
-      "synthetic evidence-complete products",
+      "synthetic products with versioned merchant evidence",
     ],
     [
       "AUTHORIZATION SCALE",
@@ -2893,6 +3003,7 @@ function init() {
   };
   const pg = {
     catalogMeta: $("#pg-catalog-meta"),
+    judgeStrip: $("#pg-judge-strip"),
     tryRow: $("#pg-try-row"),
     intent: $("#pg-intent"),
     search: $("#pg-search-button"),
@@ -3347,6 +3458,12 @@ function init() {
   const pgRenderRun = (snapshot) => {
     pgState.snapshot = snapshot;
     pgState.runId = snapshot.run_id;
+    if (snapshot.playground_selection?.product) {
+      pgState.selected = snapshot.playground_selection.product;
+      pgState.evidence = snapshot.playground_selection.trusted_evidence || [];
+      pg.chosenRegion.hidden = false;
+      pg.chosen.innerHTML = renderChosenProduct(snapshot.playground_selection);
+    }
     pg.outcomeRegion.hidden = false;
     pg.outcomeRegion.dataset.decision = snapshot.result?.decision || "";
     if (snapshot.state === "ERROR") {
@@ -3375,6 +3492,17 @@ function init() {
     bindPg("#pg-revoke", () => pgRunAction("revoke", "#pg-revoke", "REVOKING"));
     bindPg("#pg-execute", () => pgRunAction("execute", "#pg-execute", "CHECKING CONSENT"));
     bindPg("#pg-replay", () => pgRunAction("replay", "#pg-replay", "REPLAYING"));
+    bindPg("#pg-mutate-price", () =>
+      pgRunAction("mutate", "#pg-mutate-price", "CHECKING ₹7,999", { mutation: "PRICE" }),
+    );
+    bindPg("#pg-mutate-sku", () =>
+      pgRunAction("mutate", "#pg-mutate-sku", "CHECKING NEW SKU", { mutation: "SKU" }),
+    );
+    bindPg("#pg-mutate-merchant", () =>
+      pgRunAction("mutate", "#pg-mutate-merchant", "CHECKING MERCHANT", {
+        mutation: "MERCHANT",
+      }),
+    );
     bindPg("#pg-recover", () => pgRunAction("recover", "#pg-recover", "ACQUIRING EVIDENCE"));
   };
 
@@ -3436,7 +3564,7 @@ function init() {
     }
   }
 
-  async function pgRunAction(action, selector, busyLabel) {
+  async function pgRunAction(action, selector, busyLabel, body = {}) {
     if (!pgState.runId || !pgActionLock.acquire()) return;
     const button = document.querySelector(selector);
     const original = button?.textContent;
@@ -3450,7 +3578,7 @@ function init() {
       if (pgState.sessionId) headers["X-MandateGuard-Session"] = pgState.sessionId;
       const response = await fetch(
         `/api/runs/${encodeURIComponent(pgState.runId)}/${action}`,
-        { method: "POST", headers, body: "{}" },
+        { method: "POST", headers, body: JSON.stringify(body) },
       );
       const payload = await response.json();
       if (!response.ok) throw new Error(payload?.error?.message || "The request failed safely.");
@@ -3514,6 +3642,10 @@ function init() {
     });
     pg.scenarioGrid.innerHTML = renderScenarioGrid(payload.scenarios);
     pg.scenarioGrid.querySelectorAll("[data-scenario]").forEach((button) => {
+      button.addEventListener("click", () => pgRunScenario(button.dataset.scenario));
+    });
+    pg.judgeStrip.innerHTML = renderJudgeTestStrip(payload.judge_test_strip);
+    pg.judgeStrip.querySelectorAll("[data-scenario]").forEach((button) => {
       button.addEventListener("click", () => pgRunScenario(button.dataset.scenario));
     });
     elements.judgeHealth.innerHTML = renderJudgeHealth(payload.outcome_health);

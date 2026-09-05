@@ -26,7 +26,7 @@ from mandateguard.sandbox.universe import (  # noqa: E402
 
 
 FREEZE_PATH = (
-    REPOSITORY_ROOT / "data" / "eval" / "judge-playground" / "SANDBOX_FREEZE.json"
+    REPOSITORY_ROOT / "data" / "eval" / "judge-playground-v3" / "SANDBOX_FREEZE.json"
 )
 
 

@@ -26,7 +26,7 @@ from enum import Enum
 
 
 #: Bump on any change to the vocabulary below. The frozen manifest pins it.
-WORLD_VERSION = "mandateguard-sandbox-commerce-v2"
+WORLD_VERSION = "mandateguard-sandbox-commerce-v3"
 
 #: Domain-separated generator seed. Fixed; never read from the environment.
 WORLD_SEED = 20260904
@@ -36,7 +36,7 @@ WORLD_SEED = 20260904
 #: (``merchant-*``) or a crawled marketplace listing.
 SANDBOX_MERCHANT_PREFIX = "sandbox-"
 
-#: Products generated per category. 34 categories -> 3,060 products.
+#: Products generated per category. 44 categories -> 3,960 products.
 PRODUCTS_PER_CATEGORY = 90
 
 #: Distinct price points spread across each category's band.
@@ -605,6 +605,167 @@ CATEGORIES: tuple[Category, ...] = (
         detail="A concealed heating element, a cool-touch body and a two-year warranty.",
     ),
     Category(
+        category_id="drinkware-water-bottles",
+        label="Water bottles and drinkware",
+        group="Home",
+        price_low_minor=29_900,
+        price_high_minor=249_900,
+        synonyms=(
+            "water bottle", "water bottles", "bottle", "drinkware", "flask",
+            "insulated flask", "tumbler", "sports bottle",
+        ),
+        nouns=("Water Bottle", "Insulated Flask", "Travel Tumbler", "Sports Bottle"),
+        adjectives=("Leakproof", "Insulated", "Stainless-Steel", "Lightweight", "Wide-Mouth"),
+        purposes=(
+            PURPOSE_PERSONAL_USE, PURPOSE_OFFICE_WORK, PURPOSE_INDIVIDUAL_STUDY,
+            PURPOSE_FITNESS_TRAINING, PURPOSE_TRAVEL_USE, PURPOSE_GENERAL_USE,
+        ),
+        detail="A leak-resistant lid, a carry loop and a food-safe inner surface.",
+    ),
+    Category(
+        category_id="apparel-basics",
+        label="Apparel basics",
+        group="Apparel",
+        price_low_minor=39_900,
+        price_high_minor=299_900,
+        synonyms=(
+            "apparel", "clothing", "t shirt", "t shirts", "tee", "shirt",
+            "hoodie", "joggers", "everyday wear",
+        ),
+        nouns=("T-Shirt", "Everyday Shirt", "Pullover Hoodie", "Joggers"),
+        adjectives=("Cotton", "Relaxed-Fit", "Everyday", "Lightweight", "Soft-Knit"),
+        purposes=(PURPOSE_PERSONAL_USE, PURPOSE_HOME_USE, PURPOSE_TRAVEL_USE, PURPOSE_GENERAL_USE),
+        detail="A machine-washable fabric, reinforced seams and a printed care label.",
+    ),
+    Category(
+        category_id="apparel-jackets",
+        label="Jackets and outerwear",
+        group="Apparel",
+        price_low_minor=99_900,
+        price_high_minor=799_900,
+        synonyms=(
+            "jacket", "jackets", "winter jacket", "rain jacket", "raincoat",
+            "coat", "outerwear", "windcheater",
+        ),
+        nouns=("Winter Jacket", "Rain Jacket", "Everyday Coat", "Windcheater"),
+        adjectives=("Warm-Lined", "Water-Resistant", "Packable", "Lightweight", "Insulated"),
+        purposes=(PURPOSE_PERSONAL_USE, PURPOSE_TRAVEL_USE, PURPOSE_GENERAL_USE),
+        detail="A full-length zip, two secured pockets and a clearly labelled shell fabric.",
+    ),
+    Category(
+        category_id="home-textiles",
+        label="Home textiles and bedsheets",
+        group="Home",
+        price_low_minor=49_900,
+        price_high_minor=599_900,
+        synonyms=(
+            "bedsheet", "bedsheets", "bed sheet", "bed linen", "duvet cover",
+            "blanket", "pillowcase", "home textiles", "bedding",
+        ),
+        nouns=("Bedsheet Set", "Duvet Cover", "Bed Blanket", "Pillowcase Set"),
+        adjectives=("Cotton", "Queen-Size", "Double-Bed", "Soft-Woven", "Easy-Care"),
+        purposes=(PURPOSE_HOME_USE, PURPOSE_PERSONAL_USE, PURPOSE_GENERAL_USE),
+        detail="A labelled fibre composition, colourfast finish and machine-washable care instructions.",
+    ),
+    Category(
+        category_id="printers",
+        label="Printers",
+        group="Electronics",
+        price_low_minor=399_900,
+        price_high_minor=2_999_900,
+        synonyms=(
+            "printer", "printers", "inkjet printer", "laser printer", "photo printer",
+            "multifunction printer", "print documents", "printing",
+        ),
+        nouns=("Inkjet Printer", "Laser Printer", "Multifunction Printer", "Photo Printer"),
+        adjectives=("Wireless", "Compact", "Duplex", "Colour", "Home-Office"),
+        purposes=(
+            PURPOSE_HOME_USE, PURPOSE_OFFICE_WORK, PURPOSE_INDIVIDUAL_STUDY,
+            PURPOSE_GENERAL_USE,
+        ),
+        detail="Wi-Fi printing, a documented cartridge family and a one-year service warranty.",
+    ),
+    Category(
+        category_id="computer-storage",
+        label="Computer storage",
+        group="Electronics",
+        price_low_minor=149_900,
+        price_high_minor=1_999_900,
+        synonyms=(
+            "hard disk", "hard drive", "external drive", "external hard drive",
+            "portable ssd", "ssd", "usb drive", "flash drive", "computer storage",
+            "storage drive", "backup photos",
+        ),
+        nouns=("External Hard Drive", "Portable SSD", "USB Flash Drive", "Storage Drive"),
+        adjectives=("Portable", "Rugged", "High-Speed", "Compact", "Encrypted"),
+        purposes=(
+            PURPOSE_PERSONAL_USE, PURPOSE_OFFICE_WORK, PURPOSE_PHOTOGRAPHY_WORK,
+            PURPOSE_TRAVEL_USE, PURPOSE_GENERAL_USE,
+        ),
+        detail="A stated capacity, bundled cable and documented filesystem compatibility.",
+    ),
+    Category(
+        category_id="coffee-makers",
+        label="Coffee makers",
+        group="Home",
+        price_low_minor=129_900,
+        price_high_minor=1_499_900,
+        synonyms=(
+            "coffee maker", "coffee makers", "coffee machine", "drip coffee",
+            "espresso maker", "coffee brewer", "filter coffee machine",
+        ),
+        nouns=("Coffee Maker", "Drip Coffee Machine", "Espresso Maker", "Coffee Brewer"),
+        adjectives=("Compact", "Two-Cup", "Programmable", "Auto-Shutoff", "Glass-Carafe"),
+        purposes=(PURPOSE_KITCHEN_USE, PURPOSE_HOME_USE, PURPOSE_OFFICE_WORK, PURPOSE_GENERAL_USE),
+        detail="A removable filter basket, measured water tank and automatic shutoff.",
+    ),
+    Category(
+        category_id="cleaning-products",
+        label="Cleaning and home care",
+        group="Home",
+        price_low_minor=9_900,
+        price_high_minor=249_900,
+        synonyms=(
+            "floor cleaner", "floor cleaning", "clean floor", "cleaning product",
+            "cleaning products", "surface cleaner", "bathroom cleaner", "home care",
+            "mop", "clean my room",
+        ),
+        nouns=("Floor Cleaner", "Surface Cleaner", "Bathroom Cleaner", "Microfibre Mop Set"),
+        adjectives=("Tile-Safe", "Low-Foam", "Concentrated", "Everyday", "Citrus"),
+        purposes=(PURPOSE_HOME_USE, PURPOSE_PERSONAL_USE, PURPOSE_GENERAL_USE),
+        detail="A sealed container, measured-use directions and a clearly printed ingredient label.",
+    ),
+    Category(
+        category_id="toys-board-games",
+        label="Toys and board games",
+        group="Leisure",
+        price_low_minor=39_900,
+        price_high_minor=499_900,
+        synonyms=(
+            "board game", "board games", "tabletop game", "strategy game",
+            "family game", "card game", "toys", "game night",
+        ),
+        nouns=("Family Board Game", "Strategy Board Game", "Tabletop Game", "Card Game Set"),
+        adjectives=("Four-Player", "Cooperative", "Quick-Play", "Classic", "Travel-Size"),
+        purposes=(PURPOSE_HOME_USE, PURPOSE_PERSONAL_USE, PURPOSE_TRAVEL_USE, PURPOSE_GENERAL_USE),
+        detail="A printed rulebook, counted playing pieces and a stated player-age range.",
+    ),
+    Category(
+        category_id="travel-accessories",
+        label="Travel accessories",
+        group="Lifestyle",
+        price_low_minor=29_900,
+        price_high_minor=399_900,
+        synonyms=(
+            "travel accessories", "packing cubes", "packing cube", "neck pillow",
+            "travel pillow", "luggage organiser", "luggage organizer", "passport holder",
+        ),
+        nouns=("Packing Cube Set", "Travel Neck Pillow", "Luggage Organiser", "Passport Holder"),
+        adjectives=("Packable", "Washable", "Compression", "Memory-Foam", "Lightweight"),
+        purposes=(PURPOSE_TRAVEL_USE, PURPOSE_PERSONAL_USE, PURPOSE_GENERAL_USE),
+        detail="A washable cover, labelled dimensions and a compact storage pouch.",
+    ),
+    Category(
         category_id="personal-care",
         label="Personal care",
         group="Personal",
@@ -727,7 +888,7 @@ def _m(slug: str, name: str, *categories: str) -> Merchant:
 #: Every merchant is fictional. The names below are constructed for the sandbox
 #: and are not intended to refer to any real seller, brand, or company.
 MERCHANTS: tuple[Merchant, ...] = (
-    _m("acme-audio", "Acme Audio (Synthetic)", "audio-headphones", "audio-earbuds"),
+    _m("relay-audio", "Relay Audio (Synthetic)", "audio-headphones", "audio-earbuds"),
     _m("northwind-sound", "Northwind Sound (Synthetic)", "audio-headphones", "audio-speakers"),
     _m("clearnote-audio", "Clearnote Audio (Synthetic)", "audio-earbuds", "audio-speakers"),
     _m("pinewood-compute", "Pinewood Compute (Synthetic)", "computing-laptops", "computing-monitors"),
@@ -777,6 +938,16 @@ MERCHANTS: tuple[Merchant, ...] = (
     _m("beacon-workspace", "Beacon Workspace (Synthetic)", "furniture-office-chairs", "office-accessories"),
     _m("tidepool-bags", "Tidepool Bags (Synthetic)", "bags-backpacks", "camera-accessories"),
     _m("greenmill-kitchen", "Greenmill Kitchen (Synthetic)", "kitchen-tools", "personal-care"),
+    _m("riverglass-ware", "Riverglass Ware (Synthetic)", "drinkware-water-bottles", "travel-accessories"),
+    _m("cottonwood-cloth", "Cottonwood Cloth (Synthetic)", "apparel-basics", "apparel-jackets"),
+    _m("stormline-apparel", "Stormline Apparel (Synthetic)", "apparel-jackets", "apparel-basics"),
+    _m("loomhouse-home", "Loomhouse Home (Synthetic)", "home-textiles", "cleaning-products"),
+    _m("printfield-systems", "Printfield Systems (Synthetic)", "printers", "computer-storage"),
+    _m("archive-compute", "Archive Compute (Synthetic)", "computer-storage", "printers"),
+    _m("morning-kitchen", "Morning Kitchen (Synthetic)", "coffee-makers", "kitchen-tools"),
+    _m("tableturn-games", "Tableturn Games (Synthetic)", "toys-board-games", "books"),
+    _m("clearhome-supply", "Clearhome Supply (Synthetic)", "cleaning-products", "home-textiles"),
+    _m("waypoint-travel", "Waypoint Travel (Synthetic)", "travel-accessories", "bags-luggage"),
 )
 
 
@@ -794,6 +965,14 @@ SERIES: tuple[str, ...] = (
     "S1", "S2", "S3", "M40", "M60", "M80", "Pro", "Lite", "Core", "Studio",
     "Classic", "Edge", "One", "Duo", "Plus", "Air",
 )
+
+#: Stable judge-facing listings whose exact transaction identity is useful to
+#: demonstrate post-authorization binding. They are ordinary members of the
+#: generated world with ordinary merchant evidence; this data influences no
+#: authorization outcome. Tuple value: ``(sku, price_minor, evidence_family)``.
+FEATURED_PRODUCTS: dict[tuple[str, int], tuple[str, int, EvidenceFamily]] = {
+    ("audio-headphones", 42): ("headphones-042", 349_900, EvidenceFamily.COMPLETE),
+}
 
 
 # ---------------------------------------------------------------------------

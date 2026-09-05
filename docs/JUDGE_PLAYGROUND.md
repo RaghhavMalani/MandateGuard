@@ -51,15 +51,15 @@ asserts that no verdict literal appears on the path that starts one.
 
 | Module | What it owns |
 |---|---|
-| `templates.py` | The frozen construction vocabulary: 34 categories, 50 merchants, brands, price bands, purposes, and the evidence sentence templates. Versioned by `WORLD_VERSION`. |
+| `templates.py` | The frozen construction vocabulary: 44 categories, 60 merchants, brands, price bands, purposes, and the evidence sentence templates. Versioned by `WORLD_VERSION`. |
 | `universe.py` | Deterministic generation. Every field is a pure function of `(WORLD_VERSION, WORLD_SEED, category_id, index)`. |
 | `store.py` | Projection into `TrustedCommerceStore`, plus the declaration scan that produces the readiness signals. |
 | `intent.py` | Reading an arbitrary buying instruction into a bounded mandate. |
-| `search.py` | Field-weighted lexical retrieval plus category-synonym matching, and the near-miss explanation. |
+| `search.py` | Field-weighted lexical retrieval plus a deterministic category-intent guard and the near-miss explanation. It has no authorization authority. |
 | `buyer.py` | The commerce agent, through the same four-function tool boundary. |
 | `session.py` | Ephemeral per-visitor scoping. |
 | `onboarding.py` | Simulated merchant onboarding. |
-| `scenarios.py` | The eight one-click journeys. |
+| `scenarios.py` | Twelve one-click journeys, including recurring refusal, three post-authorization mutations, revocation, and replay. |
 | `health.py` | The measured outcome mix. |
 
 ### Determinism
@@ -68,7 +68,7 @@ asserts that no verdict literal appears on the path that starts one.
 python scripts/freeze_judge_sandbox.py
 ```
 
-writes `data/eval/judge-playground/SANDBOX_FREEZE.json`, which records counts
+writes `data/eval/judge-playground-v3/SANDBOX_FREEZE.json`, which records counts
 and digests and **no outcomes**. `tests/test_judge_sandbox_universe.py` fails if
 the generator drifts from it. Regenerating the freeze is something that
 accompanies a `WORLD_VERSION` change, not a way to silence that test.
@@ -171,21 +171,26 @@ and are capped at 512 live, 8 onboarded merchants each, 64 runs each.
 python scripts/evaluate_judge_playground.py
 ```
 
-runs a fixed set of 120 realistic buying instructions
+runs the original fixed set of 120 realistic buying instructions
 (`fixtures/playground/judge_queries.json`) through search, selection and the
 real controller, and writes
-`data/eval/judge-playground/JUDGE_QUERY_REPORT.json`.
+`data/eval/judge-playground-v3/JUDGE_QUERY_REPORT.json`.
 
 The query set records the *kind* of question each entry asks and never an
 expected verdict, so there is nothing to tune the world towards.
 
-This is a **fixed engineering UX evaluation, not a preregistered one.** The
-questions and the first measured report landed in the same commit, so nothing
-in the repository proves the questions were written before the outcomes were
-seen, and this document does not claim otherwise. What the version and digest
-fields do establish is that a later change to the questions is visible: the set
-is versioned (`query_set_version`) and the report records the world digest it
-was measured against.
+The v3 retrieval evaluation adds 50 fixed out-of-distribution prompts to those
+120. Its complete 170-prompt expectations were frozen in commit `62e200b`
+before the v3 search implementation was executed. The old 120-query artifact
+history remains under `data/eval/judge-playground/`; v3 artifacts are written to
+`data/eval/judge-playground-v3/`. This is a fixed engineering UX evaluation, not
+a claim of general product-search quality.
+
+The executed retrieval report records 94.12% direct-match coverage, 99.38%
+correct category at 1 and at 5 among present-category matches, 100% no-result
+correctness, and 0.59% wrong matches. The method is lexical field weighting plus
+the category-intent guard; no embedding model or semantic similarity score is
+used. Retrieval expectations have authority `NONE` over authorization.
 
 Two passes are measured, because they answer different questions:
 
@@ -207,7 +212,7 @@ be true of all of them:
 | Population | Count | What it is |
 |---|---|---|
 | Discovery reality | 17,702 | Historical marketplace listings. Searchable only. |
-| Judge sandbox | 3,060 | Synthetic evidence-complete products. |
+| Judge sandbox | 3,960 | Synthetic products with versioned trusted evidence, including complete, conflicting, missing, recurring, and prohibited evidence families. |
 | Authorization scale | see `docs/AUTHORIZATION_SCALE_PROTOCOL.md` | Synthetic benchmark cases. |
 | Model quality | retrieval + classifier metrics | Advisory. Never authorization. |
 
